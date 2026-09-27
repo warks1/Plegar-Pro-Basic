@@ -1,14 +1,14 @@
-PLEGAR PRO — SIMULADOR GEOMÉTRICO BETA 5
+PLEGAR PRO — SIMULADOR 3D BETA 10
 
-Beta experimental centrada en perfiles paramétricos de punzones/matrices y secuencias multi-plegado.
+Mejoras principales:
+- Visor 3D local sin dependencias externas.
+- Órbita, desplazamiento, zoom por rueda y controles +/−.
+- Vistas isométrica, frontal, lateral y superior.
+- Visualización de mesa, matriz, punzón y chapa.
+- Animación y control por fotograma.
+- Secuencia L → U → Z y adición de plegados.
+- Indicador de colisión durante el recorrido.
+- Selector de familias MECOS y AMADA.
+- Diseño responsive para PC/tablet/móvil.
 
-Incluye:
-- perfiles 2D paramétricos de punzones y matrices con nariz/hombros/garganta/radio;
-- deformación secuencial de la chapa en L/U/Z/caja;
-- comprobación de interferencia herramienta-chapa y ala-ala;
-- catálogo separado AMADA/MECOS;
-- familias AMADA tomadas del catálogo AFH 2024 y estado de verificación por registro;
-- matrices de 30 grados y familias especiales;
-- visualización industrial renovada.
-
-IMPORTANTE: una geometría exacta de fabricante requiere cotejo referencia por referencia de cada cota del plano técnico. Los registros no confirmados están marcados como pendientes.
+Abrir index.html con Chrome, Edge, Safari o Firefox.

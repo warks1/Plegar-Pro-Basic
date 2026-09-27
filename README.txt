@@ -1,14 +1,14 @@
-PLEGAR PRO — SIMULADOR BETA
+PLEGAR PRO — SIMULADOR GEOMÉTRICO BETA 5
 
-Abrir index.html en un navegador moderno.
+Beta experimental centrada en perfiles paramétricos de punzones/matrices y secuencias multi-plegado.
 
 Incluye:
-- Selección de fabricante Mecos / Amada.
-- Biblioteca inicial editable de matrices V6, V12, V16, V24, V32, V40 y V50.
-- Punzones de demostración.
-- Espesor y ángulo objetivo.
-- Simulación 2D animada de punzón, matriz y chapa.
-- Resultado aproximado SIN COLISIÓN / COLISIÓN.
+- perfiles 2D paramétricos de punzones y matrices con nariz/hombros/garganta/radio;
+- deformación secuencial de la chapa en L/U/Z/caja;
+- comprobación de interferencia herramienta-chapa y ala-ala;
+- catálogo separado AMADA/MECOS;
+- familias AMADA tomadas del catálogo AFH 2024 y estado de verificación por registro;
+- matrices de 30 grados y familias especiales;
+- visualización industrial renovada.
 
-IMPORTANTE:
-Las referencias incluidas son datos base de demostración y NO deben interpretarse como catálogo oficial o geometría exacta de Mecos/Amada. Para una versión de producción hay que cargar las fichas oficiales y geometrías reales de cada fabricante/modelo.
+IMPORTANTE: una geometría exacta de fabricante requiere cotejo referencia por referencia de cada cota del plano técnico. Los registros no confirmados están marcados como pendientes.

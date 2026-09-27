@@ -1,14 +1,14 @@
-PLEGAR PRO — SIMULADOR 3D BETA 10
+PLEGAR PRO — BETA 11
 
-Mejoras principales:
-- Visor 3D local sin dependencias externas.
-- Órbita, desplazamiento, zoom por rueda y controles +/−.
-- Vistas isométrica, frontal, lateral y superior.
-- Visualización de mesa, matriz, punzón y chapa.
-- Animación y control por fotograma.
-- Secuencia L → U → Z y adición de plegados.
-- Indicador de colisión durante el recorrido.
-- Selector de familias MECOS y AMADA.
-- Diseño responsive para PC/tablet/móvil.
+Revisión centrada en el simulador:
+- Vista 3D industrial rediseñada.
+- Punzón y matriz visibles como geometría 3D separada.
+- Punzón trabaja desde arriba y la chapa se deforma hacia la matriz.
+- Cámara orbital, pan y zoom.
+- Vistas isométrica/frontal/lateral/superior.
+- Secuencia L/U/Z/Caja.
+- Diagnóstico dinámico de contacto durante la animación.
+- Catálogo estructurado por familias.
+- Datos verificados separados de referencias y entradas pendientes para evitar inventar geometrías de fabricante.
 
-Abrir index.html con Chrome, Edge, Safari o Firefox.
+Fuentes de catálogo consultadas para la estructura: MECOS y AMADA oficiales.

@@ -110,6 +110,15 @@ body{background:radial-gradient(circle at 80% 0%,color-mix(in srgb,var(--accent)
 
 .industrialMark{width:min(260px,72vw);margin:0 auto 2px;filter:drop-shadow(0 0 16px rgba(30,231,245,.18))}.industrialMark svg{display:block;width:100%;height:auto}.industrialMark path:nth-of-type(2){animation:ppPunch 1.2s ease-in-out infinite alternate}.industrialMark path:nth-of-type(3){stroke-dasharray:18 10;animation:ppSheet 1.7s linear infinite}.ultimateTag{font-size:12px;letter-spacing:6px;color:#c8d7dc;margin:0 0 8px 6px}@keyframes ppPunch{to{transform:translateY(8px)}}@keyframes ppSheet{to{stroke-dashoffset:-56px}}
 </style>
+
+<style id="final-layout-fix">
+.toolbar,.actions{display:flex!important;flex-wrap:wrap!important;align-items:center!important;gap:8px!important}
+.toolbar>.btn,.actions>.btn{position:relative!important;flex:1 1 145px!important;min-width:110px!important;max-width:100%!important;white-space:normal!important;line-height:1.2!important}
+.listItem{min-width:0!important}
+.listItem>span{min-width:0!important;overflow:hidden}
+.listItem>button{flex:0 0 auto!important;min-width:90px!important}
+@media(max-width:760px){.toolbar>.btn,.actions>.btn{flex:1 1 100%!important}.listItem{flex-direction:column!important;align-items:stretch!important}.listItem>button{width:100%!important}}
+</style>
 </head>
 <body>
 <div id="loader" aria-label="Cargando Plegar Pro">
@@ -616,7 +625,7 @@ const tools=[
 ];
 function renderTools(){
  let maker=$('toolMaker').value,q=$('toolSearch').value.toLowerCase();
- $('toolList').innerHTML=tools.filter(t=>(maker==='Todos'||t.maker===maker)&&t.name.toLowerCase().includes(q)).map(t=>`<div class="listItem"><span><b>${t.name}</b><small class="muted">${t.maker} · ${t.type}</small></span><button class="btn secondary chooseTool" data-name="${t.name}">Seleccionar</button></div>`).join('');
+ $('toolList').innerHTML=tools.filter(t=>(maker==='Todos'||t.maker===maker||((t.maker==='MECOS / Bystronic'||t.maker==='Trumpf')&&(maker==='MECOS'||maker==='TRUMPF')))&&t.name.toLowerCase().includes(q)).map(t=>`<div class="listItem"><span><b>${t.name}</b><small class="muted">${t.maker} · ${t.type}</small></span><button class="btn secondary chooseTool" data-name="${t.name}">Seleccionar</button></div>`).join('');
  document.querySelectorAll('.chooseTool').forEach(x=>x.addEventListener('click',()=>{let b=state.bends[sim.p3Active||0];if(!b)return;if(x.dataset.name.toLowerCase().includes('punz'))commit('Seleccionado utillaje',()=>b.punch=x.dataset.name);else{let m=x.dataset.name.match(/V(\d+)/);if(m)commit('Seleccionada matriz',()=>b.v=+m[1])}}));
 }
 function parseTechnical(text){
@@ -783,7 +792,7 @@ function bind(){
  $('p3Apply').onclick=()=>{let i=sim.p3Active;commit('Editado pliegue desde Programación 3D',()=>Object.assign(state.bends[i],{leg:+$('p3Leg').value,angle:+$('p3Angle').value,radius:+$('p3Radius').value,v:+$('p3V').value,gauge:+$('p3Gauge').value}))};
  $('p3Prev').onclick=()=>{$('p3Active').value=Math.max(0,--sim.p3Active);loadP3Fields();drawAll()};$('p3Next').onclick=()=>{$('p3Active').value=Math.min(state.bends.length-1,++sim.p3Active);loadP3Fields();drawAll()};
  $('freeAnalyze').onclick=()=>{let p=parseTechnical($('freeInput').value);commit('Entrada libre interpretada',()=>{state.project=p.project;state.bends=p.bends});$('freeResult').innerHTML=`Interpretado: ${p.bends.length} pliegues. Enviado a Programar, 2D y 3D.`;go('program')};
- $('freeToAI').onclick=()=>{$('aiInput').value=$('freeInput').value;go('ai')};$('loadExample').onclick=()=>commit('Cargado ejemplo Omega',()=>{state.project.ref='OMEGA-DEMO';state.bends=[{leg:50,angle:90,radius:2,v:16,punch:'Recto 88°',gauge:50,direction:1},{leg:50,angle:90,radius:2,v:16,punch:'Pata de cabra 90°',gauge:50,direction:-1},{leg:50,angle:90,radius:2,v:16,punch:'Pata de cabra 90°',gauge:50,direction:-1},{leg:50,angle:90,radius:2,v:16,punch:'Recto 88°',gauge:50,direction:1}]});
+ $('freeToAI').onclick=()=>{$('aiInput').value=$('freeInput').value;go('ai')};$('loadExample').onclick=()=>commit('Cargado ejemplo Omega',()=>{state.project.ref='OMEGA-DEMO';state.bends=[{leg:50,angle:90,radius:2,v:16,punch:'Recto 88°',gauge:50,direction:1,foldAngle:90},{leg:50,angle:90,radius:2,v:16,punch:'Pata de cabra 90°',gauge:50,direction:-1,foldAngle:-90},{leg:50,angle:90,radius:2,v:16,punch:'Pata de cabra 90°',gauge:50,direction:-1,foldAngle:-90},{leg:50,angle:90,radius:2,v:16,punch:'Recto 88°',gauge:50,direction:1,foldAngle:90}]});
  $('analyzeFile').onclick=()=>{let f=$('fileInput').files[0];$('fileResult').innerHTML=f?`Archivo registrado: <b>${f.name}</b><br>Se ha preparado el proyecto para completar geometría y datos.`:'Selecciona primero un archivo.'};
  ['curveRadius','curveAngle','curveLength','curveHits','curveSpring','curveV','curveThickness','curveStrategy','curveMode'].forEach(id=>$(id).addEventListener('input',()=>{readCurveInputs();renderCurve()}));
  $('curveCalculate').onclick=()=>commit('Recalculada Curva Perfecta',()=>readCurveInputs());
@@ -964,7 +973,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
   function currentBend(){return state.bends[sim.p3Active||0]||state.bends[0];}
   window.renderTools=function(){
     const maker=$('toolMaker')?.value||'Todos', q=($('toolSearch')?.value||'').toLowerCase();
-    const filtered=tools.filter(t=>(maker==='Todos'||t.maker===maker)&&(`${t.name} ${t.maker} ${t.type} ${t.v||''} ${t.angle||''} ${t.r||''}`).toLowerCase().includes(q));
+    const filtered=tools.filter(t=>(maker==='Todos'||t.maker===maker||((t.maker==='MECOS / Bystronic'||t.maker==='Trumpf')&&(maker==='MECOS'||maker==='TRUMPF')))&&(`${t.name} ${t.maker} ${t.type} ${t.v||''} ${t.angle||''} ${t.r||''}`).toLowerCase().includes(q));
     const dies=filtered.filter(t=>t.type==='Matriz'), punches=filtered.filter(t=>t.type==='Punzón');
     const mk=(t,kind)=>`<div class="listItem"><span><b>${esc(t.name)}</b><small class="muted">${esc(t.maker)} · ${t.angle?esc(t.angle)+'° · ':''}${t.v?'V'+esc(t.v)+' · ':''}${t.r?esc(t.r):''}</small></span><button class="btn secondary chooseTool2" data-kind="${kind}" data-name="${esc(t.name)}" data-v="${esc(t.v||'')}" data-angle="${esc(t.angle||'')}">Elegir</button></div>`;
     if($('dieList'))$('dieList').innerHTML=dies.map(t=>mk(t,'die')).join('')||'<div class="note">No hay matrices para este filtro.</div>';
@@ -984,4 +993,5 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
   window.setTimeout(()=>{try{renderTools()}catch(e){console.warn(e)}},1000);
 })();
 </script>
+
 </body></html>

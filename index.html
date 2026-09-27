@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Plegar Pro v49.5 · Menú móvil compatible</title>
+<title>Plegar Pro — Beta Final CAD</title>
 <style>
 :root{
   --bg:#06111b;--panel:#0d2131;--panel2:#112a3d;--line:#31536c;
@@ -109,15 +109,8 @@ body{background:radial-gradient(circle at 80% 0%,color-mix(in srgb,var(--accent)
 }
 
 .industrialMark{width:min(260px,72vw);margin:0 auto 2px;filter:drop-shadow(0 0 16px rgba(30,231,245,.18))}.industrialMark svg{display:block;width:100%;height:auto}.industrialMark path:nth-of-type(2){animation:ppPunch 1.2s ease-in-out infinite alternate}.industrialMark path:nth-of-type(3){stroke-dasharray:18 10;animation:ppSheet 1.7s linear infinite}.ultimateTag{font-size:12px;letter-spacing:6px;color:#c8d7dc;margin:0 0 8px 6px}@keyframes ppPunch{to{transform:translateY(8px)}}@keyframes ppSheet{to{stroke-dashoffset:-56px}}
-</style>
 
-<style id="final-layout-fix">
-.toolbar,.actions{display:flex!important;flex-wrap:wrap!important;align-items:center!important;gap:8px!important}
-.toolbar>.btn,.actions>.btn{position:relative!important;flex:1 1 145px!important;min-width:110px!important;max-width:100%!important;white-space:normal!important;line-height:1.2!important}
-.listItem{min-width:0!important}
-.listItem>span{min-width:0!important;overflow:hidden}
-.listItem>button{flex:0 0 auto!important;min-width:90px!important}
-@media(max-width:760px){.toolbar>.btn,.actions>.btn{flex:1 1 100%!important}.listItem{flex-direction:column!important;align-items:stretch!important}.listItem>button{width:100%!important}}
+.toolSplit{display:grid;grid-template-columns:1fr 1fr;gap:12px}.toolPanel{border:1px solid var(--line);border-radius:12px;padding:12px;background:var(--panel2)}.toolPanel h3{margin-top:0}.toolSelect{min-width:0}.toolMeta{font-size:11px;color:var(--muted);margin-top:4px}.toolChoice{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.toolChoice select{flex:1 1 220px}.omegaRow{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.omegaCell{border:1px solid var(--line);border-radius:10px;padding:9px;background:var(--panel2);text-align:center}.omegaCell b{display:block;color:var(--accent);font-size:18px}.omegaCell small{color:var(--muted)}@media(max-width:700px){.toolSplit,.omegaRow{grid-template-columns:1fr}.toolChoice select{flex-basis:100%}}
 </style>
 </head>
 <body>
@@ -219,7 +212,7 @@ body{background:radial-gradient(circle at 80% 0%,color-mix(in srgb,var(--accent)
 <div class="stage" style="min-height:300px"><canvas id="visionCanvas" width="1000" height="650"></canvas></div>
 <div class="kpis"><div class="kpi"><span>Calidad foto</span><b id="visionQuality">—</b></div><div class="kpi"><span>Líneas</span><b id="visionLines">—</b></div><div class="kpi"><span>Ángulos</span><b id="visionAngles">—</b></div><div class="kpi"><span>Confianza</span><b id="visionConfidence">—</b></div></div>
 <div id="visionResult" class="note">La detección aparecerá aquí. Revisa siempre las medidas antes de fabricar.</div>
-<div class="actions"><button class="btn" id="analyzeFile">Analizar archivo</button><button class="btn secondary" id="loadExample">Cargar ejemplo Omega</button></div>
+<div class="actions"><button class="btn" id="analyzeFile">Analizar archivo</button><button class="btn secondary" id="loadExample">Cargar ejemplo Omega</button></div><div class="note"><b>Ejemplo Omega — geometría nominal</b><div class="omegaRow" style="margin-top:9px"><div class="omegaCell"><b>50 mm</b><small>Ala 1 · +90°</small></div><div class="omegaCell"><b>50 mm</b><small>Ala 2 · −90°</small></div><div class="omegaCell"><b>50 mm</b><small>Ala 3 · −90°</small></div><div class="omegaCell"><b>50 mm</b><small>Ala 4 · +90°</small></div></div></div>
 <div id="fileResult" class="note">El prototipo registra el archivo y prepara una geometría editable. La lectura CAD industrial completa requiere conversor especializado.</div>
 </div></div></section>
 
@@ -256,6 +249,8 @@ body{background:radial-gradient(circle at 80% 0%,color-mix(in srgb,var(--accent)
 <div><label>Ángulo</label><input id="p3Angle" type="number"></div>
 <div><label>Radio</label><input id="p3Radius" type="number" step=".1"></div>
 <div><label>V</label><input id="p3V" type="number"></div>
+<div><label>Matriz (independiente)</label><select id="p3Matrix"></select></div>
+<div><label>Punzón (independiente)</label><select id="p3Punch"></select></div>
 <div><label>Tope X</label><input id="p3Gauge" type="number"></div>
 </div><div class="actions"><button class="btn" id="p3Apply">Aplicar al pliegue</button><button class="btn secondary" id="p3Prev">Pliegue anterior</button><button class="btn secondary" id="p3Next">Siguiente</button><button class="btn secondary" id="p3Fit">Centrar</button><button class="btn secondary" data-go="sim3d">Simular 3D</button></div>
 <div class="note">Arrastra sobre la vista para rotar. La programación 3D edita; la simulación 3D reproduce.</div></div>
@@ -311,11 +306,11 @@ body{background:radial-gradient(circle at 80% 0%,color-mix(in srgb,var(--accent)
 </div></section>
 
 <section class="page" id="tooling"><div class="grid">
-<div class="card c12"><div class="toolHeader"><div><h2>Biblioteca de utillaje</h2><p class="muted">Matrices y punzones se eligen por separado. Después se combinan en cada operación.</p></div><div class="toolBadge">CAD · UTILLAJE</div></div>
-<div class="fields toolFilters"><div><label>Fabricante</label><select id="toolMaker"><option>Todos</option><option>Bystronic</option><option>MECOS</option><option>AMADA</option><option>TRUMPF</option><option>Corplec</option><option>Genérico</option></select></div><div><label>Buscar</label><input id="toolSearch" placeholder="V16, 88°, R1.5, gooseneck..."></div></div></div>
-<div class="card c6"><h2>① Matrices</h2><div id="dieList" class="list toolPane"></div></div>
-<div class="card c6"><h2>② Punzones</h2><div id="punchList" class="list toolPane"></div></div>
-<div class="card c12"><h2>Combinación seleccionada</h2><div class="toolSelected"><div><span>Matriz</span><b id="selectedDie">Sin seleccionar</b></div><div><span>Punzón</span><b id="selectedPunch">Sin seleccionar</b></div><div><span>Operación</span><b id="selectedToolBend">—</b></div></div></div>
+<div class="card c12"><h2>Utillaje CAD — selección independiente</h2><div class="toolSplit">
+<div class="toolPanel"><h3>🔻 Matrices</h3><div class="fields"><div><label>Fabricante</label><select id="dieMaker"><option>Todos</option><option>MECOS</option><option>AMADA</option><option>Bystronic</option><option>Trumpf</option><option>Corplec</option></select></div><div><label>Buscar matriz</label><input id="dieSearch"></div></div><div id="dieList" class="list"></div></div>
+<div class="toolPanel"><h3>🔺 Punzones</h3><div class="fields"><div><label>Fabricante</label><select id="punchMaker"><option>Todos</option><option>MECOS</option><option>AMADA</option><option>Bystronic</option><option>Trumpf</option><option>Corplec</option></select></div><div><label>Buscar punzón</label><input id="punchSearch"></div></div><div id="punchList" class="list"></div></div>
+</div><div id="toolSelected" class="note">Selecciona una matriz y un punzón por separado. Se aplicarán al pliegue activo.</div></div>
+<div class="card c12"><h2>Biblioteca completa</h2><div class="fields"><div><label>Fabricante</label><select id="toolMaker"><option>Todos</option><option>MECOS</option><option>AMADA</option><option>Bystronic</option><option>Trumpf</option><option>Corplec</option></select></div><div><label>Buscar</label><input id="toolSearch"></div></div><div id="toolList" class="list"></div></div>
 </div></section>
 
 <section class="page" id="ai"><div class="grid">
@@ -411,9 +406,9 @@ const STORAGE='plegarProV43';
 let state={
  project:{ref:'PP-001',client:'Cliente demo',qty:10,rev:'A',material:'S235',thickness:2,kfactor:.42,machine:'Bystronic Xpert 3100 × 100 T'},
  bends:[
-  {leg:120,angle:90,radius:2,v:16,punch:'Recto 88°',gauge:120,direction:1},
-  {leg:85,angle:90,radius:2,v:16,punch:'Pata de cabra 90°',gauge:85,direction:-1},
-  {leg:60,angle:45,radius:2,v:16,punch:'Recto 30°',gauge:60,direction:1}
+  {leg:120,angle:90,radius:2,v:16,punch:'Punzón recto 88°',matrix:'Matriz MECOS V16 88°',gauge:120,direction:1},
+  {leg:85,angle:90,radius:2,v:16,punch:'Pata de cabra 90°',matrix:'Matriz MECOS V16 90°',gauge:85,direction:-1},
+  {leg:60,angle:45,radius:2,v:16,punch:'Punzón recto 30°',matrix:'Matriz MECOS V16 30°',gauge:60,direction:1}
  ],
  curve:{radius:250,angle:90,length:393,hits:18,spring:2,v:16,thickness:2,strategy:'uniform',mode:'radius'},
  development:{material:'S235',thickness:2,kfactor:.42,referenceV:16,punchRadius:1,punchAngle:88,bendLength:1000,tolerance:.5,dimensionType:'exterior',selectedVs:[12,16,22,24,32],bends:[{leg:120,angle:90,radius:2},{leg:85,angle:90,radius:2},{leg:60,angle:45,radius:2}]},
@@ -504,7 +499,7 @@ function populateP3(){
  $('p3Active').innerHTML=state.bends.map((b,i)=>`<option value="${i}">${bendSummary(b,i)}</option>`).join('');
  sim.p3Active=Math.min(sim.p3Active,Math.max(0,state.bends.length-1));$('p3Active').value=sim.p3Active;loadP3Fields();
 }
-function loadP3Fields(){if($('overlayProgram'))$('overlayProgram').innerHTML=`VISTA EN TIEMPO REAL<br>${state.project.material} · ${(+state.project.thickness).toFixed(2)} mm<br>${state.bends.length} pliegues · Desarrollo ${calcDevelopment().flat.toFixed(2)} mm`;let b=state.bends[sim.p3Active];if(!b)return;$('p3Leg').value=b.leg;$('p3Angle').value=b.angle;$('p3Radius').value=b.radius;$('p3V').value=b.v;$('p3Gauge').value=b.gauge}
+function loadP3Fields(){if($('overlayProgram'))$('overlayProgram').innerHTML=`VISTA EN TIEMPO REAL<br>${state.project.material} · ${(+state.project.thickness).toFixed(2)} mm<br>${state.bends.length} pliegues · Desarrollo ${calcDevelopment().flat.toFixed(2)} mm`;let b=state.bends[sim.p3Active];if(!b)return;$('p3Leg').value=b.leg;$('p3Angle').value=b.angle;$('p3Radius').value=b.radius;$('p3V').value=b.v;$('p3Gauge').value=b.gauge;renderToolSelectors();if($('p3Matrix'))$('p3Matrix').value=b.matrix||'';if($('p3Punch'))$('p3Punch').value=b.punch||''}
 function renderQualityOptions(){$('qBend').innerHTML=state.bends.map((b,i)=>`<option value="${i}">${bendSummary(b,i)}</option>`).join('')}
 const STANDARD_VS=[6,10,12,16,22,24,32,35,36,40,50];
 function ensureDevelopment(){
@@ -594,11 +589,13 @@ function renderVCompare(){
 function drawVChart(rows){let c=$('vChart');if(!c)return;let x=c.getContext('2d'),w=c.width,h=c.height;x.clearRect(0,0,w,h);x.strokeStyle=getComputedStyle(document.body).getPropertyValue('--line');x.fillStyle=getComputedStyle(document.body).getPropertyValue('--muted');x.font='24px sans-serif';x.fillText('Variación de desarrollo respecto a la V de referencia',35,38);let max=Math.max(.1,...rows.map(r=>Math.abs(r.delta)));let left=70,right=w-35,top=70,bottom=h-50;x.beginPath();x.moveTo(left,(top+bottom)/2);x.lineTo(right,(top+bottom)/2);x.stroke();rows.forEach((r,i)=>{let px=left+(right-left)*(i/(Math.max(1,rows.length-1)));let py=(top+bottom)/2-r.delta/max*(bottom-top)*.42;x.beginPath();x.arc(px,py,8,0,Math.PI*2);x.fill();x.fillText('V'+r.v,px-16,bottom+32);x.fillText((r.delta>=0?'+':'')+r.delta.toFixed(2),px-26,py-15)});}
 
 const tools=[
- // Matrices recuperadas: V6–V50 y ángulos solicitados anteriormente.
- ...[6,10,12,16,22,24,32,35,36,40,50].flatMap(v=>[30,60,88,90].map(a=>({maker:'MECOS / Bystronic',name:`Matriz V${v} ${a}°`,type:'Matriz',v,angle:a,source:'Biblioteca Plegar Pro · dato de familia'}))),
- // Configuración específica que ya se había definido.
- {maker:'MECOS / Bystronic',name:'Matriz V10 30° H100',type:'Matriz',v:10,angle:30,h:100,source:'Configuración definida para Plegar Pro'},
- // Punzones MECOS documentados anteriormente.
+ ...[6,10,12,16,22,24,32,35,36,40,50].flatMap(v=>[30,60,88,90].map(a=>({maker:'MECOS',name:`Matriz MECOS V${v} ${a}°`,type:'Matriz',v,angle:a,source:'Familia de utillaje Plegar Pro'}))),
+ {maker:'MECOS',name:'Matriz V10 30° H100',type:'Matriz',v:10,angle:30,h:100,source:'Configuración definida para Plegar Pro'},
+ ...[30,45,60,88,90].flatMap(a=>({maker:'AMADA',name:`Matriz 1-V ${a}°`,type:'Matriz',angle:a,source:'Familia AMADA; verificar referencia exacta'})),
+ ...[30,60,88,90].flatMap(a=>({maker:'AMADA',name:`Matriz 2-V ${a}°`,type:'Matriz',angle:a,source:'Familia AMADA; verificar referencia exacta'})),
+ {maker:'Bystronic',name:'Matriz V50',type:'Matriz',v:50,angle:88,source:'Familia Bystronic'},
+ {maker:'Corplec',name:'Matriz V50',type:'Matriz',v:50,angle:88,source:'Familia Corplec'},
+ ...[30,45,60,88,90].flatMap(a=>({maker:'MECOS',name:`Punzón recto ${a}°`,type:'Punzón',angle:a,source:'Familia MECOS; verificar referencia exacta'})),
  {maker:'MECOS',name:'Punzón recto 30° H100',type:'Punzón',angle:30,h:100,source:'Biblioteca MECOS'},
  {maker:'MECOS',name:'Punzón recto 30° H120',type:'Punzón',angle:30,h:120,source:'Familia solicitada; altura a verificar con plano'},
  {maker:'MECOS',name:'Punzón recto 30° H150',type:'Punzón',angle:30,h:150,source:'Familia solicitada; altura a verificar con plano'},
@@ -606,27 +603,30 @@ const tools=[
  {maker:'MECOS',name:'Punzón 11.911',type:'Punzón',ref:'11.911',angle:30,r:'R15',h:87,source:'Catálogo MECOS 2022'},
  {maker:'MECOS',name:'Punzón 11.914',type:'Punzón',ref:'11.914',angle:30,r:'R17.5',h:89,source:'Catálogo MECOS 2022'},
  {maker:'MECOS',name:'Punzón 11.916',type:'Punzón',ref:'11.916',angle:30,r:'R20',h:91,source:'Catálogo MECOS 2022'},
- // AMADA AFH documentados.
- {maker:'AMADA',name:'AFH 804 Standard R0.6',type:'Punzón',ref:'AFH 804',angle:88,r:'R0.6',h:120,source:'Catálogo AMADA AFH'},
- {maker:'AMADA',name:'AFH 804 Standard R1.5',type:'Punzón',ref:'AFH 804',angle:88,r:'R1.5',h:120,source:'Catálogo AMADA AFH'},
- {maker:'AMADA',name:'AFH 847 Gooseneck R0.6',type:'Punzón',ref:'AFH 847',angle:88,r:'R0.6',h:120,source:'Catálogo AMADA AFH'},
- {maker:'AMADA',name:'AFH 847 Gooseneck R1.5',type:'Punzón',ref:'AFH 847',angle:88,r:'R1.5',h:120,source:'Catálogo AMADA AFH'},
- {maker:'AMADA',name:'Matriz 1-V 88°',type:'Matriz',angle:88,source:'Catálogo AMADA AFH'},
- {maker:'AMADA',name:'Matriz 1-V 90°',type:'Matriz',angle:90,source:'Catálogo AMADA AFH'},
- {maker:'AMADA',name:'Matriz 2-V 88°',type:'Matriz',angle:88,source:'Catálogo AMADA AFH'},
- {maker:'AMADA',name:'Matriz 2-V 90°',type:'Matriz',angle:90,source:'Catálogo AMADA AFH'},
- // Familias de máquina / fabricantes ya contempladas en el proyecto.
- {maker:'Bystronic',name:'Punzón recto 88°',type:'Punzón',angle:88},
- {maker:'MECOS',name:'Pata de cabra 90°',type:'Punzón',angle:90},
- {maker:'Trumpf',name:'Punzón recto 30°',type:'Punzón',angle:30},
- {maker:'Corplec',name:'Matriz V50',type:'Matriz',v:50},
- {maker:'Trumpf',name:'TrumaBend V85 · familia de utillaje',type:'Máquina / referencia'},
+ {maker:'MECOS',name:'Pata de cabra 90°',type:'Punzón',angle:90,source:'Familia MECOS'},
+ ...[26,30,60,86,88,90].flatMap(a=>[{maker:'AMADA',name:`AFH 804 Standard ${a}°`,type:'Punzón',ref:'AFH 804',angle:a,h:120,source:'Familia AMADA AFH; verificar referencia exacta'},{maker:'AMADA',name:`AFH 847 Gooseneck ${a}°`,type:'Punzón',ref:'AFH 847',angle:a,h:120,source:'Familia AMADA AFH; verificar referencia exacta'}]),
+ {maker:'AMADA',name:'AFH 804 Standard R0.6 88°',type:'Punzón',ref:'AFH 804',angle:88,r:'R0.6',h:120,source:'Catálogo AMADA AFH'},
+ {maker:'AMADA',name:'AFH 804 Standard R1.5 88°',type:'Punzón',ref:'AFH 804',angle:88,r:'R1.5',h:120,source:'Catálogo AMADA AFH'},
+ {maker:'AMADA',name:'AFH 847 Gooseneck R0.6 88°',type:'Punzón',ref:'AFH 847',angle:88,r:'R0.6',h:120,source:'Catálogo AMADA AFH'},
+ {maker:'AMADA',name:'AFH 847 Gooseneck R1.5 88°',type:'Punzón',ref:'AFH 847',angle:88,r:'R1.5',h:120,source:'Catálogo AMADA AFH'},
+ ...[30,60,88,90].flatMap(a=>[{maker:'Bystronic',name:`Punzón recto ${a}°`,type:'Punzón',angle:a,source:'Familia Bystronic; verificar referencia exacta'},{maker:'Bystronic',name:`Punzón cuello de cisne ${a}°`,type:'Punzón',angle:a,source:'Familia Bystronic; verificar referencia exacta'}]),
+ ...[30,60,88,90].flatMap(a=>[{maker:'Trumpf',name:`Punzón recto ${a}°`,type:'Punzón',angle:a,source:'Familia TRUMPF; verificar referencia exacta'},{maker:'Trumpf',name:`Punzón cuello de cisne ${a}°`,type:'Punzón',angle:a,source:'Familia TRUMPF; verificar referencia exacta'}]),
+ ...[30,60,88,90].map(a=>({maker:'Corplec',name:`Punzón recto ${a}°`,type:'Punzón',angle:a,source:'Familia Corplec; verificar referencia exacta'})),
+ {maker:'Trumpf',name:'TrumaBend V85 · familia de máquina',type:'Máquina / referencia'},
  {maker:'Bystronic',name:'100 T · 2006 · referencia de máquina',type:'Máquina / referencia'}
 ];
+function toolCard(t,kind){return `<div class="listItem"><span><b>${t.name}</b><small class="muted">${t.maker} · ${t.type}${t.v?` · V${t.v}`:''}${t.angle?` · ${t.angle}°`:''}${t.r?` · ${t.r}`:''}${t.h?` · H${t.h}`:''}</small><small class="toolMeta">${t.source||'Referencia de biblioteca'}</small></span><button class="btn secondary chooseTool" data-name="${t.name.replace(/"/g,'&quot;')}" data-kind="${kind}">Seleccionar</button></div>`}
+function applyTool(kind,name){let b=state.bends[sim.p3Active||0];if(!b)return;let t=tools.find(x=>x.name===name);if(!t)return;commit(kind==='punch'?'Seleccionado punzón':'Seleccionada matriz',()=>{if(kind==='punch')b.punch=t.name;else{b.matrix=t.name;if(t.v)b.v=+t.v}});loadP3Fields();drawAll();renderToolSelectors();}
+function renderToolSelectors(){let b=state.bends[sim.p3Active||0];if($('p3Matrix'))$('p3Matrix').innerHTML=tools.filter(t=>t.type==='Matriz').map(t=>`<option value="${t.name.replace(/"/g,'&quot;')}" ${b&&b.matrix===t.name?'selected':''}>${t.name}</option>`).join('');if($('p3Punch'))$('p3Punch').innerHTML=tools.filter(t=>t.type==='Punzón').map(t=>`<option value="${t.name.replace(/"/g,'&quot;')}" ${b&&b.punch===t.name?'selected':''}>${t.name}</option>`).join('')}
 function renderTools(){
  let maker=$('toolMaker').value,q=$('toolSearch').value.toLowerCase();
- $('toolList').innerHTML=tools.filter(t=>(maker==='Todos'||t.maker===maker||((t.maker==='MECOS / Bystronic'||t.maker==='Trumpf')&&(maker==='MECOS'||maker==='TRUMPF')))&&t.name.toLowerCase().includes(q)).map(t=>`<div class="listItem"><span><b>${t.name}</b><small class="muted">${t.maker} · ${t.type}</small></span><button class="btn secondary chooseTool" data-name="${t.name}">Seleccionar</button></div>`).join('');
- document.querySelectorAll('.chooseTool').forEach(x=>x.addEventListener('click',()=>{let b=state.bends[sim.p3Active||0];if(!b)return;if(x.dataset.name.toLowerCase().includes('punz'))commit('Seleccionado utillaje',()=>b.punch=x.dataset.name);else{let m=x.dataset.name.match(/V(\d+)/);if(m)commit('Seleccionada matriz',()=>b.v=+m[1])}}));
+ let filtered=tools.filter(t=>(maker==='Todos'||t.maker===maker)&&t.name.toLowerCase().includes(q));
+ $('toolList').innerHTML=filtered.map(t=>toolCard(t,t.type==='Punzón'?'punch':'matrix')).join('')||'<div class="note">No hay resultados.</div>';
+ let dm=$('dieMaker').value,dq=$('dieSearch').value.toLowerCase(),pm=$('punchMaker').value,pq=$('punchSearch').value.toLowerCase();
+ $('dieList').innerHTML=tools.filter(t=>t.type==='Matriz'&&(dm==='Todos'||t.maker===dm)&&t.name.toLowerCase().includes(dq)).map(t=>toolCard(t,'matrix')).join('')||'<div class="note">No hay matrices.</div>';
+ $('punchList').innerHTML=tools.filter(t=>t.type==='Punzón'&&(pm==='Todos'||t.maker===pm)&&t.name.toLowerCase().includes(pq)).map(t=>toolCard(t,'punch')).join('')||'<div class="note">No hay punzones.</div>';
+ document.querySelectorAll('.chooseTool').forEach(x=>x.addEventListener('click',()=>applyTool(x.dataset.kind,x.dataset.name)));
+ let b=state.bends[sim.p3Active||0];if($('toolSelected'))$('toolSelected').innerHTML=b?`Matriz activa: <b>${b.matrix||('V'+b.v)}</b><br>Punzón activo: <b>${b.punch||'—'}</b>`:'Sin pliegue activo.';
 }
 function parseTechnical(text){
  let lower=text.toLowerCase();
@@ -649,7 +649,7 @@ function parseTechnical(text){
  let angle=angleMatches.find(a=>a<=180)||90;
  let proposal={
   project:{...state.project,material:mat?(mat==='inoxidable'?'Inoxidable 304':mat.toUpperCase()):state.project.material,thickness:th?+th.replace(',','.'):state.project.thickness},
-  bends:Array.from({length:bendsN},(_,i)=>({leg:legs[i]||legs[legs.length-1]||100,angle:angleMatches[i]||angle,radius:radius?+radius.replace(',','.'):2,v:v?+v:16,punch:angle<=45?'Recto 30°':'Recto 88°',gauge:legs[i]||100,direction:i%2? -1:1})),
+  bends:Array.from({length:bendsN},(_,i)=>({leg:legs[i]||legs[legs.length-1]||100,angle:angleMatches[i]||angle,radius:radius?+radius.replace(',','.'):2,v:v?+v:16,punch:angle<=45?'Punzón recto 30°':'Punzón recto 88°',matrix:`Matriz MECOS V${v||16} ${angle<=45?30:88}°`,gauge:legs[i]||100,direction:i%2? -1:1})),
   curve:curve?{radius:curveR?+curveR.replace(',','.'):(radius?+radius:250),angle:angle||90,length:0,hits:+hits||18,spring:2,v:+v||16}:null
  };
  if(proposal.curve)proposal.curve.length=Math.PI*proposal.curve.radius*proposal.curve.angle/180;
@@ -754,7 +754,7 @@ function loadProject(){let s=localStorage.getItem(STORAGE)||localStorage.getItem
 function download(name,data,type='application/json'){let a=document.createElement('a');a.href=URL.createObjectURL(new Blob([data],{type}));a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),500)}
 function applySettings(){let light=state.settings.theme==='light'||(state.settings.theme==='system'&&matchMedia('(prefers-color-scheme: light)').matches);document.body.classList.toggle('light',light);drawAll()}
 function migrateState(raw){
- let base=deep(state),r=raw||{};base={...base,...r,project:{...base.project,...(r.project||{})},curve:{...base.curve,...(r.curve||{})},settings:{...base.settings,...(r.settings||{})}};base.settings.owner={...state.settings.owner,...((r.settings||{}).owner||{})};base.bends=(r.bends||base.bends).map(b=>({leg:100,angle:90,radius:2,v:16,punch:'Recto 88°',gauge:b.leg||100,direction:1,...b}));base.development={...base.development,...(r.development||{}),bends:deep(base.bends.map(b=>({leg:b.leg,angle:b.angle,radius:b.radius})))};return base;
+ let base=deep(state),r=raw||{};base={...base,...r,project:{...base.project,...(r.project||{})},curve:{...base.curve,...(r.curve||{})},settings:{...base.settings,...(r.settings||{})}};base.settings.owner={...state.settings.owner,...((r.settings||{}).owner||{})};base.bends=(r.bends||base.bends).map(b=>{let x={leg:100,angle:90,radius:2,v:16,punch:'Punzón recto 88°',matrix:`Matriz MECOS V${b.v||16} ${Math.abs(b.angle||90)}°`,gauge:b.leg||100,direction:1,...b};if(x.punch==='Recto 88°')x.punch='Punzón recto 88°';if(x.punch==='Recto 30°')x.punch='Punzón recto 30°';if(!x.matrix)x.matrix=`Matriz MECOS V${x.v||16} ${Math.abs(x.angle||90)}°`;return x;});base.development={...base.development,...(r.development||{}),bends:deep(base.bends.map(b=>({leg:b.leg,angle:b.angle,radius:b.radius})))};return base;
 }
 
 let crmSelected=-1;
@@ -785,14 +785,14 @@ function applyCameraPreset(v,target='S3'){let m={iso:[-.35,.5],front:[0,0],rear:
 
 function bind(){
  $('backBtn').onclick=back;$('undoBtn').onclick=undo;$('redoBtn').onclick=redo;bindProjectInputs();
- $('addBend').onclick=()=>commit('Añadido pliegue',()=>state.bends.push({leg:100,angle:90,radius:2,v:16,punch:'Recto 88°',gauge:100,direction:1}));
+ $('addBend').onclick=()=>commit('Añadido pliegue',()=>state.bends.push({leg:100,angle:90,radius:2,v:16,punch:'Punzón recto 88°',matrix:'Matriz MECOS V16 88°',gauge:100,direction:1}));
  $('p2Add').onclick=$('addBend').onclick;$('autoSequence').onclick=()=>commit('Secuencia ordenada automáticamente',()=>state.bends.sort((a,b)=>b.leg-a.leg));
  $('sendSim').onclick=()=>{sim.s3Step=0;go('sim3d')};$('saveProgramNotes').onclick=()=>commit('Guardadas notas del programa',()=>state.programNotes=$('programNotes').value);
- $('p2Fit').onclick=drawAll;$('p3Active').onchange=()=>{sim.p3Active=+$('p3Active').value;loadP3Fields();drawAll()};
- $('p3Apply').onclick=()=>{let i=sim.p3Active;commit('Editado pliegue desde Programación 3D',()=>Object.assign(state.bends[i],{leg:+$('p3Leg').value,angle:+$('p3Angle').value,radius:+$('p3Radius').value,v:+$('p3V').value,gauge:+$('p3Gauge').value}))};
+ $('p2Fit').onclick=drawAll;$('p3Active').onchange=()=>{sim.p3Active=+$('p3Active').value;loadP3Fields();drawAll()};$('p3Matrix').onchange=()=>{let b=state.bends[sim.p3Active];if(b){let t=tools.find(x=>x.name===$('p3Matrix').value);commit('Seleccionada matriz',()=>{b.matrix=t.name;if(t.v)b.v=+t.v});drawAll();renderTools()}};$('p3Punch').onchange=()=>{let b=state.bends[sim.p3Active];if(b)commit('Seleccionado punzón',()=>b.punch=$('p3Punch').value)};
+ $('p3Apply').onclick=()=>{let i=sim.p3Active;commit('Editado pliegue desde Programación 3D',()=>Object.assign(state.bends[i],{leg:+$('p3Leg').value,angle:Math.abs(+$('p3Angle').value),radius:+$('p3Radius').value,v:+$('p3V').value,matrix:$('p3Matrix').value,punch:$('p3Punch').value,gauge:+$('p3Gauge').value,direction:(+$('p3Angle').value<0?-1:1)}))};
  $('p3Prev').onclick=()=>{$('p3Active').value=Math.max(0,--sim.p3Active);loadP3Fields();drawAll()};$('p3Next').onclick=()=>{$('p3Active').value=Math.min(state.bends.length-1,++sim.p3Active);loadP3Fields();drawAll()};
  $('freeAnalyze').onclick=()=>{let p=parseTechnical($('freeInput').value);commit('Entrada libre interpretada',()=>{state.project=p.project;state.bends=p.bends});$('freeResult').innerHTML=`Interpretado: ${p.bends.length} pliegues. Enviado a Programar, 2D y 3D.`;go('program')};
- $('freeToAI').onclick=()=>{$('aiInput').value=$('freeInput').value;go('ai')};$('loadExample').onclick=()=>commit('Cargado ejemplo Omega',()=>{state.project.ref='OMEGA-DEMO';state.bends=[{leg:50,angle:90,radius:2,v:16,punch:'Recto 88°',gauge:50,direction:1,foldAngle:90},{leg:50,angle:90,radius:2,v:16,punch:'Pata de cabra 90°',gauge:50,direction:-1,foldAngle:-90},{leg:50,angle:90,radius:2,v:16,punch:'Pata de cabra 90°',gauge:50,direction:-1,foldAngle:-90},{leg:50,angle:90,radius:2,v:16,punch:'Recto 88°',gauge:50,direction:1,foldAngle:90}]});
+ $('freeToAI').onclick=()=>{$('aiInput').value=$('freeInput').value;go('ai')};$('loadExample').onclick=()=>commit('Cargado ejemplo Omega',()=>{state.project.ref='OMEGA-DEMO';state.bends=[{leg:50,angle:90,radius:2,v:16,punch:'Punzón recto 88°',matrix:'Matriz MECOS V16 88°',gauge:50,direction:1},{leg:50,angle:90,radius:2,v:16,punch:'Punzón recto 88°',matrix:'Matriz MECOS V16 88°',gauge:50,direction:-1},{leg:50,angle:90,radius:2,v:16,punch:'Punzón recto 88°',matrix:'Matriz MECOS V16 88°',gauge:50,direction:-1},{leg:50,angle:90,radius:2,v:16,punch:'Punzón recto 88°',matrix:'Matriz MECOS V16 88°',gauge:50,direction:1}]});
  $('analyzeFile').onclick=()=>{let f=$('fileInput').files[0];$('fileResult').innerHTML=f?`Archivo registrado: <b>${f.name}</b><br>Se ha preparado el proyecto para completar geometría y datos.`:'Selecciona primero un archivo.'};
  ['curveRadius','curveAngle','curveLength','curveHits','curveSpring','curveV','curveThickness','curveStrategy','curveMode'].forEach(id=>$(id).addEventListener('input',()=>{readCurveInputs();renderCurve()}));
  $('curveCalculate').onclick=()=>commit('Recalculada Curva Perfecta',()=>readCurveInputs());
@@ -804,7 +804,7 @@ function bind(){
  $('devReset').onclick=()=>commit('Restablecida calculadora de desarrollo',()=>state.development={material:'S235',thickness:2,kfactor:.42,referenceV:16,punchRadius:1,punchAngle:88,bendLength:1000,tolerance:.5,dimensionType:'exterior',selectedVs:[12,16,22,24,32],bends:[{leg:100,angle:90,radius:2},{leg:100,angle:90,radius:2}]});
  ['devMaterial','devThickness','devK','devReferenceV','devPunchRadius','devPunchAngle','devBendLength','devTolerance','devDimensionType'].forEach(id=>$(id).onchange=()=>commit('Actualizado dato de desarrollo',()=>readDevelopmentInputs()));
  $('vSelectRecommended').onclick=()=>commit('Seleccionadas matrices V recomendadas',()=>{let t=state.development.thickness||1;state.development.selectedVs=STANDARD_VS.filter(v=>v>=t*5&&v<=t*14)});
- $('toolMaker').onchange=renderTools;$('toolSearch').oninput=renderTools;
+ $('toolMaker').onchange=renderTools;$('toolSearch').oninput=renderTools;$('dieMaker').onchange=renderTools;$('dieSearch').oninput=renderTools;$('punchMaker').onchange=renderTools;$('punchSearch').oninput=renderTools;
  $('aiCalculate').onclick=calculateAI;$('aiToProgram').onclick=sendAIProgram;$('aiToCurve').onclick=sendAICurve;
  $('woCreate').onclick=()=>commit('Guardada orden de trabajo',()=>state.workOrder={number:$('woNumber').value,state:$('woState').value,date:new Date().toLocaleString('es-ES')});
  $('woStart').onclick=()=>commit('Orden iniciada',()=>{state.workOrder=state.workOrder||{number:$('woNumber').value};state.workOrder.state='Producción'});
@@ -900,7 +900,7 @@ function installEssentialFallbacks(){
  bindOnlyIfMissing('redoBtn','click',()=>typeof redo==='function'&&redo());
  bindOnlyIfMissing('saveProject','click',()=>typeof saveProject==='function'&&saveProject());
  bindOnlyIfMissing('loadProject','click',()=>typeof loadProject==='function'&&loadProject());
- bindOnlyIfMissing('addBend','click',()=>{if(typeof commit==='function')commit('Añadido pliegue',()=>state.bends.push({leg:100,angle:90,radius:2,v:16,punch:'Recto 88°',gauge:100,direction:1}))});
+ bindOnlyIfMissing('addBend','click',()=>{if(typeof commit==='function')commit('Añadido pliegue',()=>state.bends.push({leg:100,angle:90,radius:2,v:16,punch:'Punzón recto 88°',matrix:'Matriz MECOS V16 88°',gauge:100,direction:1}))});
  safeBind('analyzeFile','click',()=>{const input=safeElement('fileInput'),result=safeElement('fileResult'),f=input&&input.files&&input.files[0];if(result)result.innerHTML=f?`Archivo registrado: <b>${f.name}</b><br>Preparado para análisis.`:'Selecciona primero un archivo.'});
  safeBind('photoInput','change',e=>typeof photoSelected==='function'&&photoSelected(e));
  safeBind('analyzePhoto','click',()=>typeof analyzePhotoLocal==='function'&&analyzePhotoLocal());
@@ -915,7 +915,7 @@ function audit(){
 function loader(){
  ensureCRM();renderCRM();
  let steps=['Inicializando núcleo','Cargando proyecto','Preparando Programar','Preparando vistas 2D','Preparando vistas 3D','Cargando Curva Perfecta','Conectando IA técnica','Verificando botones','Sincronizando módulos','Programa listo'];
- let i=0,t=setInterval(()=>{$('loadState').textContent=steps[i]+'...';$('loadFill').style.width=((i+1)/steps.length*100)+'%';i++;if(i===steps.length){clearInterval(t)}},120);
+ let i=0,t=setInterval(()=>{$('loadState').textContent=steps[i]+'...';$('loadFill').style.width=((i+1)/steps.length*100)+'%';i++;if(i===steps.length){clearInterval(t);setTimeout(()=>{$('loader').classList.add('hidden');forceFinishBoot('Programa listo')},250)}},500);
 }
 function forceFinishBoot(message='Programa listo'){
  const ld=safeElement('loader'),st=safeElement('loadState'),fill=safeElement('loadFill');
@@ -928,7 +928,7 @@ function startApplication(){
  // Safari/iPhone: navegación mínima disponible incluso si falla un módulo secundario.
  safeRun('enlaces y controles',bind);
  safeRun('navegación de emergencia',installEssentialFallbacks);
- safeRun('ajustes',renderSettings);
+ safeRun('ajustes',renderSettings);safeRun('utillaje inicial',()=>{state.bends.forEach(b=>{if(!b.matrix)b.matrix=`Matriz MECOS V${b.v||16} ${Math.abs(b.angle||90)}°`});renderToolSelectors()});
  safeRun('sincronización inicial',syncAll);
  safeRun('proyecto guardado',()=>{let saved=null;try{saved=localStorage.getItem(STORAGE)}catch(e){console.warn('Almacenamiento no disponible',e)}if(saved){try{state=migrateState(JSON.parse(saved));renderSettings();syncAll()}catch(e){console.warn('Proyecto guardado incompatible; se abre un proyecto limpio',e)}}});
  safeRun('auditoría',()=>{let issues=audit();if(issues.length)console.warn('Auditoría:',issues);else console.info('Auditoría funcional correcta')});
@@ -936,62 +936,12 @@ function startApplication(){
  safeRun('pantalla de carga',loader);
  safeRun('segunda verificación de eventos',installEssentialFallbacks);
  // Salida de emergencia: aunque falle una función o Safari pause un temporizador, abre la aplicación.
- setTimeout(()=>forceFinishBoot('Programa listo'),5000);
+ setTimeout(()=>forceFinishBoot('Programa listo'),1800);
  // Fallback absoluto: la pantalla de carga jamás bloquea la aplicación.
- setTimeout(()=>forceFinishBoot('Programa iniciado'),5000);
+ setTimeout(()=>forceFinishBoot('Programa iniciado'),3200);
 }
 window.addEventListener('error',e=>{console.error('Error controlado de ejecución',e.error||e.message);setTimeout(()=>forceFinishBoot('Programa iniciado con recuperación automática'),5000)});
 window.addEventListener('unhandledrejection',e=>{console.error('Promesa rechazada',e.reason);setTimeout(()=>forceFinishBoot('Programa iniciado con recuperación automática'),5000)});
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',startApplication,{once:true});else startApplication();
 </script>
-
-<style>
-.actions{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
-.actions .btn{min-height:40px;white-space:normal;position:relative;z-index:1}
-.card{min-width:0;overflow:hidden}
-.toolHeader{display:flex;justify-content:space-between;gap:16px;align-items:flex-start}.toolBadge{padding:7px 10px;border:1px solid var(--line);border-radius:10px;color:var(--accent);font-size:12px;font-weight:800;white-space:nowrap}.toolFilters{margin-top:10px}.toolPane{max-height:560px;overflow:auto}.toolPane .listItem{gap:12px;align-items:center}.toolPane .listItem>span{min-width:0;overflow:hidden}.toolPane .listItem b{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.toolPane .listItem small{display:block;margin-top:3px}.toolSelected{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.toolSelected>div{border:1px solid var(--line);border-radius:12px;padding:12px;background:rgba(255,255,255,.025);min-width:0}.toolSelected span{display:block;color:var(--muted);font-size:12px}.toolSelected b{display:block;margin-top:5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}@media(max-width:760px){.toolHeader{flex-direction:column}.toolSelected{grid-template-columns:1fr}.toolPane{max-height:420px}.actions .btn{flex:1 1 150px}}
-</style>
-<script>
-(function(){
-  // Biblioteca ampliada: se conservan las referencias anteriores y se añaden familias de punzones de uso habitual.
-  const EXTRA_PUNCHES=[
-   ['Genérico','Recto 26°','Punzón',26,'R0.8'],['Genérico','Recto 30°','Punzón',30,'R1'],['Genérico','Recto 45°','Punzón',45,'R1'],['Genérico','Recto 60°','Punzón',60,'R1'],['Genérico','Recto 86°','Punzón',86,'R0.8'],['Genérico','Recto 88°','Punzón',88,'R0.8'],['Genérico','Recto 90°','Punzón',90,'R0.8'],
-   ['Genérico','Recto 88° R0.6','Punzón',88,'R0.6'],['Genérico','Recto 88° R1.0','Punzón',88,'R1.0'],['Genérico','Recto 88° R1.5','Punzón',88,'R1.5'],['Genérico','Recto 88° R2.0','Punzón',88,'R2.0'],['Genérico','Recto 88° R3.0','Punzón',88,'R3.0'],
-   ['Genérico','Pata de cabra 86°','Punzón',86,'R0.8'],['Genérico','Pata de cabra 88°','Punzón',88,'R0.8'],['Genérico','Pata de cabra 90°','Punzón',90,'R0.8'],
-   ['Genérico','Gooseneck 30°','Punzón',30,'R2'],['Genérico','Gooseneck 60°','Punzón',60,'R2'],['Genérico','Gooseneck 88°','Punzón',88,'R0.8'],['Genérico','Gooseneck 90°','Punzón',90,'R0.8'],
-   ['Genérico','Punzón cuello de cisne 88° R1.5','Punzón',88,'R1.5'],['Genérico','Punzón cuello de cisne 88° R3','Punzón',88,'R3'],
-   ['MECOS','Recto 30° H100','Punzón',30,'R1'],['MECOS','Recto 30° H120','Punzón',30,'R1'],['MECOS','Recto 30° H150','Punzón',30,'R1'],['MECOS','11.904 · 30° · R10 · H83','Punzón',30,'R10'],['MECOS','11.911 · 30° · R15 · H87','Punzón',30,'R15'],['MECOS','11.914 · 30° · R17.5 · H89','Punzón',30,'R17.5'],['MECOS','11.916 · 30° · R20 · H91','Punzón',30,'R20'],['MECOS','Pata de cabra 90°','Punzón',90,'R1'],
-   ['AMADA','AFH 804 Standard R0.6','Punzón',88,'R0.6'],['AMADA','AFH 804 Standard R1.5','Punzón',88,'R1.5'],['AMADA','AFH 804 Standard R3','Punzón',88,'R3'],['AMADA','AFH 847 Gooseneck R0.6','Punzón',88,'R0.6'],['AMADA','AFH 847 Gooseneck R1.5','Punzón',88,'R1.5'],['AMADA','AFH 847 Gooseneck R3','Punzón',88,'R3'],
-   ['Bystronic','Recto 88°','Punzón',88,'R0.8'],['TRUMPF','Recto 30°','Punzón',30,'R1'],['TRUMPF','Recto 88°','Punzón',88,'R0.8']
-  ];
-  const EXTRA_DIES=[];
-  [6,10,12,16,22,24,32,35,36,40,50].forEach(v=>[30,60,88,90].forEach(a=>EXTRA_DIES.push({maker:'MECOS',name:`Matriz V${v} ${a}°`,type:'Matriz',v,angle:a,source:'Familia de matrices incorporada'})));
-  [['AMADA','Matriz 1-V 88°',88],['AMADA','Matriz 1-V 90°',90],['AMADA','Matriz 2-V 88°',88],['AMADA','Matriz 2-V 90°',90],['Corplec','Matriz V50',90]].forEach(x=>EXTRA_DIES.push({maker:x[0],name:x[1],type:'Matriz',angle:x[2],v:x[1].match(/V(\d+)/)?.[1]||null,source:'Biblioteca incorporada'}));
-  EXTRA_PUNCHES.forEach(x=>tools.push({maker:x[0],name:x[1],type:x[2],angle:x[3],r:x[4],source:'Familia de utillaje; verificar plano del fabricante antes de producción'}));
-  EXTRA_DIES.forEach(x=>tools.push(x));
-  function esc(v){return String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));}
-  function currentBend(){return state.bends[sim.p3Active||0]||state.bends[0];}
-  window.renderTools=function(){
-    const maker=$('toolMaker')?.value||'Todos', q=($('toolSearch')?.value||'').toLowerCase();
-    const filtered=tools.filter(t=>(maker==='Todos'||t.maker===maker||((t.maker==='MECOS / Bystronic'||t.maker==='Trumpf')&&(maker==='MECOS'||maker==='TRUMPF')))&&(`${t.name} ${t.maker} ${t.type} ${t.v||''} ${t.angle||''} ${t.r||''}`).toLowerCase().includes(q));
-    const dies=filtered.filter(t=>t.type==='Matriz'), punches=filtered.filter(t=>t.type==='Punzón');
-    const mk=(t,kind)=>`<div class="listItem"><span><b>${esc(t.name)}</b><small class="muted">${esc(t.maker)} · ${t.angle?esc(t.angle)+'° · ':''}${t.v?'V'+esc(t.v)+' · ':''}${t.r?esc(t.r):''}</small></span><button class="btn secondary chooseTool2" data-kind="${kind}" data-name="${esc(t.name)}" data-v="${esc(t.v||'')}" data-angle="${esc(t.angle||'')}">Elegir</button></div>`;
-    if($('dieList'))$('dieList').innerHTML=dies.map(t=>mk(t,'die')).join('')||'<div class="note">No hay matrices para este filtro.</div>';
-    if($('punchList'))$('punchList').innerHTML=punches.map(t=>mk(t,'punch')).join('')||'<div class="note">No hay punzones para este filtro.</div>';
-    document.querySelectorAll('.chooseTool2').forEach(btn=>btn.onclick=()=>{
-      const b=currentBend(); if(!b)return;
-      if(btn.dataset.kind==='die') commit('Seleccionada matriz',()=>{b.v=+(btn.dataset.v||b.v||16);b.die=btn.dataset.name});
-      else commit('Seleccionado punzón',()=>{b.punch=btn.dataset.name;b.punchAngle=+(btn.dataset.angle||b.punchAngle||88)});
-      updateSelectedTool(); renderTools();
-    });
-    updateSelectedTool();
-  };
-  function updateSelectedTool(){const b=currentBend();if($('selectedDie'))$('selectedDie').textContent=b?.die||('V'+(b?.v||16));if($('selectedPunch'))$('selectedPunch').textContent=b?.punch||'Sin seleccionar';if($('selectedToolBend'))$('selectedToolBend').textContent=b?'P'+((sim.p3Active||0)+1)+' · '+b.leg+' mm · '+b.angle+'°':'—';}
-  window.addEventListener('load',()=>{setTimeout(()=>{try{renderTools()}catch(e){console.warn(e)}},50)});
-  ['toolMaker','toolSearch'].forEach(id=>document.addEventListener('input',e=>{if(e.target?.id===id)renderTools()}));
-  // Botones duplicados/superpuestos: los contenedores flexibles y el selector de utillaje usan una única acción.
-  window.setTimeout(()=>{try{renderTools()}catch(e){console.warn(e)}},1000);
-})();
-</script>
-
 </body></html>

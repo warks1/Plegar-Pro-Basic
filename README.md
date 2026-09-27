@@ -1,3 +1,5 @@
 # Plegar Pro — Beta Final CAD
 
-Beta corregida: biblioteca separada de matrices y punzones, Omega 50/+90, 50/-90, 50/-90, 50/+90, carga 5 s y layout responsive.
+Base: Plegar Pro Ultimate v6 / v49.5 acumulada.
+
+Incluye selección independiente de matrices y punzones, biblioteca ampliada de utillaje, Omega 50/+90, 50/-90, 50/-90, 50/+90 y carga de 5 segundos.

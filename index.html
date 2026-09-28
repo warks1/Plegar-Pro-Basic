@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Plegar Pro v49.5 · Menú móvil compatible</title>
+<title>Plegar Pro · Beta 20 Omega + Perfiles Reales · Base Integrada</title>
 <style>
 :root{
   --bg:#06111b;--panel:#0d2131;--panel2:#112a3d;--line:#31536c;
@@ -112,6 +112,7 @@ body{background:radial-gradient(circle at 80% 0%,color-mix(in srgb,var(--accent)
 </style>
 </head>
 <body>
+<script>(function(){window.__PP_BOOT_DEADLINE=Date.now()+5000;function ppBootGuard(){var l=document.getElementById('loader');document.body.classList.add('boot-complete');if(l){l.classList.add('hidden');l.setAttribute('aria-hidden','true');l.style.display='none';}}window.__ppBootGuard=ppBootGuard;setTimeout(ppBootGuard,5000);})();</script>
 <div id="loader" aria-label="Cargando Plegar Pro">
   <div class="loadBox">
     <div class="industrialMark" aria-hidden="true">
@@ -135,7 +136,7 @@ body{background:radial-gradient(circle at 80% 0%,color-mix(in srgb,var(--accent)
 <input type="checkbox" id="menuToggle" class="menuToggle" aria-hidden="true">
 <aside class="side" id="mainSidebar">
   <div class="brand">PLEGAR <span>PRO</span></div>
-  <div class="version">Beta 20 · Omega + Perfiles Reales · base acumulativa integrada</div>
+  <div class="version">Beta 20 · Omega + Perfiles Reales · base acumulativa integrada · CAD/CAM</div>
   <nav class="nav">
     <h4>PRINCIPAL</h4>
     <button class="active" data-page="dashboard">Panel de control</button>
@@ -309,6 +310,7 @@ body{background:radial-gradient(circle at 80% 0%,color-mix(in srgb,var(--accent)
 <div><label>Matriz</label><select id="ppDieSelect"></select></div>
 <div><label>Pliegue activo</label><select id="ppBendSelect"></select></div></div>
 <div id="ppToolInfo" class="note" style="margin-top:10px"></div>
+<div class="pp-cad-card"><div class="pp-cad-head"><b>VISUALIZACIÓN DE UTILLAJE · PERFIL CAD</b><span id="ppCadStatus">SIN COLISIÓN</span></div><div class="pp-cad-view" id="ppCadView"><svg id="ppCadSvg" viewBox="0 0 900 430" preserveAspectRatio="xMidYMid meet" aria-label="Punzón, chapa, matriz y tope"></svg></div><div class="pp-cad-legend"><span>🔷 Punzón</span><span>▰ Chapa</span><span>🔻 Matriz V</span><span>▌ Tope X</span></div></div>
 <div class="actions"><button class="btn" id="ppApplyTools">Aplicar al pliegue</button><button class="btn secondary" id="ppAddOmega">Cargar Ω 50/50/50/50</button></div>
 </div>
 <div class="card c8"><h2>Biblioteca completa · MECOS / AMADA + otros</h2><div id="toolList" class="list"></div><div class="note" style="margin-top:8px">Los datos marcados como documentados proceden de catálogos/fichas localizadas; las familias orientativas se mantienen identificadas como tales y no se presentan como cotas oficiales.</div></div>
@@ -941,7 +943,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 </script>
 
 <style>
-#tooling .fields{grid-template-columns:1fr 1fr}.pp-collision-ok{color:var(--ok,#65e6a6)}.pp-collision-bad{color:#ff6877;font-weight:800}.pp-tool-preview{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}.pp-tool-preview>div{border:1px solid var(--line);border-radius:10px;padding:8px;background:#071019}.toolListHeader{font-size:10px;color:var(--muted);margin-bottom:5px}
+.pp-cad-card{margin-top:12px;border:1px solid var(--line);border-radius:14px;background:linear-gradient(180deg,#071019,#0a141c);overflow:hidden}.pp-cad-head{display:flex;justify-content:space-between;gap:10px;padding:9px 11px;border-bottom:1px solid var(--line);font-size:11px}.pp-cad-head span{font-weight:900;color:var(--ok,#58efb1)}.pp-cad-head span.bad{color:#ff6472}.pp-cad-view{height:310px;background:linear-gradient(180deg,#0d2b3d,#061018);position:relative}.pp-cad-view svg{width:100%;height:100%;display:block}.pp-cad-legend{display:flex;flex-wrap:wrap;gap:10px;padding:8px 11px;color:var(--muted);font-size:10px}.pp-cad-legend span{white-space:nowrap}@media(max-width:850px){.pp-cad-view{height:250px}}#tooling .fields{grid-template-columns:1fr 1fr}.pp-collision-ok{color:var(--ok,#65e6a6)}.pp-collision-bad{color:#ff6877;font-weight:800}.pp-tool-preview{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}.pp-tool-preview>div{border:1px solid var(--line);border-radius:10px;padding:8px;background:#071019}.toolListHeader{font-size:10px;color:var(--muted);margin-bottom:5px}
 @media(max-width:850px){#tooling .fields{grid-template-columns:1fr}.tableWrap{overflow-x:auto}#programRows{min-width:980px}}
 </style>
 <script>
@@ -970,6 +972,21 @@ const PP_PUNCHES=[
  {maker:'AMADA',name:'AFH 846 · H120 · R0.6',ref:'846',angle:88,h:120,r:.6,profile:'gooseneck',source:'Catálogo AMADA AFH',documented:true},
  {maker:'AMADA',name:'AFH 841 · H120 · 60° · R0.6',ref:'841',angle:60,h:120,r:.6,profile:'gooseneck',source:'Catálogo AMADA AFH',documented:true},
  {maker:'AMADA',name:'AFH 831 · H120 · 30° · R0.6',ref:'831',angle:30,h:120,r:.6,profile:'hemming',source:'Catálogo AMADA AFH',documented:true},
+ {maker:'AMADA',name:'AFH 804 · H120 · 86° · R0.6',ref:'804',angle:86,h:120,r:.6,profile:'amada804',source:'Catálogo AMADA AFH',documented:true},
+ {maker:'AMADA',name:'AFH 804 · H120 · 90° · R0.6',ref:'804',angle:90,h:120,r:.6,profile:'amada804',source:'Catálogo AMADA AFH',documented:true},
+ {maker:'AMADA',name:'AFH 804 · H120 · 86° · R3',ref:'804',angle:86,h:120,r:3,profile:'amada804',source:'Catálogo AMADA AFH',documented:true},
+ {maker:'AMADA',name:'AFH 804 · H120 · 88° · R3',ref:'804',angle:88,h:120,r:3,profile:'amada804',source:'Catálogo AMADA AFH',documented:true},
+ {maker:'AMADA',name:'AFH 804 · H120 · 90° · R3',ref:'804',angle:90,h:120,r:3,profile:'amada804',source:'Catálogo AMADA AFH',documented:true},
+ {maker:'AMADA',name:'AFH 847 · H120 · 86° · R3',ref:'847',angle:86,h:120,r:3,profile:'gooseneck',source:'Catálogo AMADA AFH',documented:true},
+ {maker:'AMADA',name:'AFH 847 · H120 · 88° · R3',ref:'847',angle:88,h:120,r:3,profile:'gooseneck',source:'Catálogo AMADA AFH',documented:true},
+ {maker:'AMADA',name:'AFH 847 · H120 · 90° · R3',ref:'847',angle:90,h:120,r:3,profile:'gooseneck',source:'Catálogo AMADA AFH',documented:true},
+ {maker:'AMADA',name:'AFH 831 · H200 · 30° · R0.6',ref:'831',angle:30,h:200,r:.6,profile:'hemming',source:'Catálogo AMADA AFH',documented:true},
+ {maker:'AMADA',name:'AFH 841 · H200 W55 · 60° · R0.6',ref:'841',angle:60,h:200,r:.6,profile:'gooseneck',source:'Catálogo AMADA AFH',documented:true},
+ {maker:'AMADA',name:'AFH 841 · H200 W95 · 60° · R0.6',ref:'841',angle:60,h:200,r:.6,profile:'gooseneck',source:'Catálogo AMADA AFH',documented:true},
+ {maker:'AMADA',name:'AFH 846 · H200 W110 · 86° · R0.6',ref:'846',angle:86,h:200,r:.6,profile:'gooseneck',source:'Catálogo AMADA AFH',documented:true},
+ {maker:'AMADA',name:'AFH 804 · H220 · 86° · R0.6',ref:'804',angle:86,h:220,r:.6,profile:'amada804',source:'Catálogo AMADA AFH',documented:true},
+ {maker:'AMADA',name:'AFH 846 · H220 W55 · 86° · R0.6',ref:'846',angle:86,h:220,r:.6,profile:'gooseneck',source:'Catálogo AMADA AFH',documented:true},
+ {maker:'AMADA',name:'AFH 846 · H220 W95 · 86° · R0.6',ref:'846',angle:86,h:220,r:.6,profile:'gooseneck',source:'Catálogo AMADA AFH',documented:true},
  {maker:'AMADA',name:'AFH estándar H90',angle:88,h:90,r:.6,profile:'gooseneck',source:'Familia AFH',documented:true},
  {maker:'AMADA',name:'AFH estándar H160',angle:88,h:160,r:.6,profile:'gooseneck',source:'Familia AFH',documented:true},
  {maker:'Bystronic',name:'Recto 88°',angle:88,h:100,r:1,profile:'mecos30',source:'Biblioteca Plegar Pro',documented:false},
@@ -984,11 +1001,15 @@ for(const d of [
 for(const a of [88,90])for(const n of ['1-V','2-V'])PP_DIES.push({maker:'AMADA',name:`${n} · ${a}°`,angle:a,v:n==='1-V'?16:20,h:60,r:1.5,profile:'v',source:'Catálogo AMADA AFH',documented:true});
 PP_DIES.push({maker:'AMADA',name:'V50 · 90°',v:50,angle:90,h:60,r:6,profile:'v',source:'Ficha/catálogo AMADA',documented:false});
 PP_DIES.push({maker:'Bystronic',name:'V50 · 88°',v:50,angle:88,h:60,r:5,profile:'v',source:'Biblioteca Plegar Pro',documented:false},{maker:'TRUMPF',name:'V16 · 30°',v:16,angle:30,h:60,r:1.5,profile:'v',source:'Biblioteca Plegar Pro',documented:false},{maker:'Corplec',name:'V50',v:50,angle:88,h:60,r:5,profile:'v',source:'Biblioteca Plegar Pro',documented:false});
+const omegaPunchName='AFH 804 Standard R0.6 · H120';
+const omegaDieName='Matriz V16 · 88°';
+const omegaPunchId=Math.max(0,PP_PUNCHES.findIndex(x=>x.name===omegaPunchName));
+const omegaDieId=Math.max(0,PP_DIES.findIndex(x=>x.name===omegaDieName));
 const PP_OMEGA_BENDS=[
- {leg:50,angle:90,radius:2,v:16,punch:'AFH 804 Standard R0.6 · H120',punchId:14,die:'Matriz V16 · 88°',dieId:9,gauge:50,direction:1},
- {leg:50,angle:90,radius:2,v:16,punch:'AFH 804 Standard R0.6 · H120',punchId:14,die:'Matriz V16 · 88°',dieId:9,gauge:50,direction:-1},
- {leg:50,angle:90,radius:2,v:16,punch:'AFH 804 Standard R0.6 · H120',punchId:14,die:'Matriz V16 · 88°',dieId:9,gauge:50,direction:-1},
- {leg:50,angle:90,radius:2,v:16,punch:'AFH 804 Standard R0.6 · H120',punchId:14,die:'Matriz V16 · 88°',dieId:9,gauge:50,direction:1}
+ {leg:50,angle:90,radius:2,v:16,punch:omegaPunchName,punchId:omegaPunchId,die:omegaDieName,dieId:omegaDieId,gauge:50,direction:1},
+ {leg:50,angle:90,radius:2,v:16,punch:omegaPunchName,punchId:omegaPunchId,die:omegaDieName,dieId:omegaDieId,gauge:50,direction:-1},
+ {leg:50,angle:90,radius:2,v:16,punch:omegaPunchName,punchId:omegaPunchId,die:omegaDieName,dieId:omegaDieId,gauge:50,direction:-1},
+ {leg:50,angle:90,radius:2,v:16,punch:omegaPunchName,punchId:omegaPunchId,die:omegaDieName,dieId:omegaDieId,gauge:50,direction:1}
 ];
 window.PP_PUNCHES=PP_PUNCHES;window.PP_DIES=PP_DIES;window.PP_OMEGA_BENDS=PP_OMEGA_BENDS;
 function migratePP(){
@@ -1003,10 +1024,11 @@ function renderPPSelectors(){
  const p=PP_PUNCHES[+ps.value],d=PP_DIES[+ds.value];$('ppToolInfo').innerHTML=`<b>Punzón:</b> ${p?.name||'—'}<br>${p?.source||''}<br><b>Matriz:</b> ${d?.name||'—'}<br>${d?.source||''}<div class="pp-tool-preview"><div>PERFIL PUNZÓN<br><strong>${p?.angle||'—'}° · H${p?.h||'—'} · R${p?.r??'—'}</strong></div><div>PERFIL MATRIZ<br><strong>V${d?.v||'—'} · ${d?.angle||'—'}° · R${d?.r??'—'}</strong></div></div>`;
 }
 function renderPPList(){const el=$('toolList');if(!el)return;const pm=$('ppPunchMaker')?.value||'Todos',dm=$('ppDieMaker')?.value||'Todos';const rows=[...PP_PUNCHES.filter(x=>pm==='Todos'||x.maker===pm).map((x,i)=>({x,i,k:'Punzón'})),...PP_DIES.filter(x=>dm==='Todos'||x.maker===dm).map((x,i)=>({x,i,k:'Matriz'}))];el.innerHTML=rows.map(o=>`<div class="listItem"><span><b>${o.x.name}</b><small class="muted">${o.x.maker} · ${o.k} · ${o.x.documented?'DOCUMENTADO':'FAMILIA/ORIENTATIVO'}</small></span></div>`).join('');}
+function renderPPGeometry(){const svg=$('ppCadSvg'),status=$('ppCadStatus');if(!svg||!status)return;const p=PP_PUNCHES[+$('ppPunchSelect')?.value]||PP_PUNCHES[0],d=PP_DIES[+$('ppDieSelect')?.value]||PP_DIES[0],b=state.bends[Math.max(0,+$('ppBendSelect')?.value||0)]||state.bends[0]||{leg:50,angle:90,gauge:50};const bad=ppCollision().hit;status.textContent=bad?'⚠ COLISIÓN / INTERFERENCIA':'✓ SIN COLISIÓN';status.classList.toggle('bad',bad);const v=Math.max(6,d?.v||16),ang=(d?.angle||88)*Math.PI/180,half=95,depth=65;const tipY=185,topY=38,dieY=255;const dx=Math.tan(Math.min(Math.PI/2-.08,ang/2))*depth;const punchW=Math.max(46,Math.min(130,(p?.h||120)*.38));const tipX=450;const sheetY=196;const stopX=185;svg.innerHTML=`<defs><linearGradient id="metalP" x1="0" x2="0" y1="0" y2="1"><stop stop-color="#dce7ec"/><stop offset=".45" stop-color="#8799a3"/><stop offset="1" stop-color="#3b4b55"/></linearGradient><linearGradient id="metalD" x1="0" x2="0" y1="0" y2="1"><stop stop-color="#667983"/><stop offset="1" stop-color="#202c33"/></linearGradient></defs><rect x="0" y="0" width="900" height="430" fill="transparent"/><line x1="0" y1="sheetY" x2="900" y2="sheetY" stroke="#e9f3f7" stroke-width="8"/><line x1="stopX" y1="125" x2="stopX" y2="300" stroke="#7de7ff" stroke-width="10"/><line x1="stopX-18" y1="125" x2="stopX+18" y2="125" stroke="#7de7ff" stroke-width="5"/><text x="stopX-10" y="112" fill="#8eeaff" font-size="15" font-weight="800">TOPE X · ${Number(b.gauge||50).toFixed(1)} mm</text><path d="M${tipX-punchW/2} ${topY} L${tipX+punchW/2} ${topY} L${tipX+punchW*.38} ${tipY-28} L${tipX+10} ${tipY} Q${tipX} ${tipY+9} ${tipX-10} ${tipY} L${tipX-punchW*.38} ${tipY-28} Z" fill="url(#metalP)" stroke="#d8f7ff" stroke-width="2"/><path d="M${tipX-half} ${dieY} L${tipX-dx} ${dieY+depth} L${tipX+dx} ${dieY+depth} L${tipX+half} ${dieY} L${tipX+half} ${dieY+32} L${tipX-half} ${dieY+32} Z" fill="url(#metalD)" stroke="#a8c0cb" stroke-width="2"/><path d="M${tipX-dx} ${dieY} L${tipX} ${dieY+depth} L${tipX+dx} ${dieY}" fill="none" stroke="#22e0f5" stroke-width="4"/><text x="${tipX-65}" y="${dieY+55}" fill="#9bb1bd" font-size="15" font-weight="800">MATRIZ · V${v} · ${d?.angle||88}°</text><text x="${tipX-115}" y="${topY-12}" fill="#cfe8f0" font-size="15" font-weight="800">PUNZÓN · ${p?.name||'—'}</text><circle cx="${tipX}" cy="${sheetY}" r="6" fill="${bad?'#ff6472':'#58efb1'}"/><text x="25" y="405" fill="#91aab7" font-size="14">Ángulo: ${b.angle||90}° · R${b.radius||2} · Espesor: ${state.project?.thickness||2} mm · Dirección: ${(b.direction||1)>0?'+':'−'}90°</text>`;}
 window.renderTools=function(){migratePP();renderPPSelectors();renderPPList();};
 window.renderProgram=window.renderProgram;
-function applyTooling(){const b=state.bends[+$('ppBendSelect').value];if(!b)return;const p=PP_PUNCHES[+$('ppPunchSelect').value],d=PP_DIES[+$('ppDieSelect').value];commit('Utillaje separado aplicado',()=>{b.punchId=+$('ppPunchSelect').value;b.dieId=+$('ppDieSelect').value;b.punch=p.name;b.die=d.name;if(d.v)b.v=d.v;state.development.referenceV=d.v||b.v;});renderPPSelectors();drawAll();toast('Punzón y matriz aplicados por separado');}
-function bindPP(){migratePP();['ppPunchMaker','ppDieMaker','ppBendSelect'].forEach(id=>{const e=$(id);if(e&&!e.dataset.pp){e.dataset.pp='1';e.addEventListener('change',renderPPSelectors)}});const a=$('ppApplyTools');if(a&&!a.dataset.pp){a.dataset.pp='1';a.addEventListener('click',applyTooling)}const o=$('ppAddOmega');if(o&&!o.dataset.pp){o.dataset.pp='1';o.addEventListener('click',()=>commit('Cargada Omega exacta',()=>{state.bends=PP_OMEGA_BENDS.map(x=>({...x}));state.project.ref='OMEGA-50-50-50-50';renderPPSelectors();drawAll();go('program')}))}renderPPSelectors();renderPPList();}
+function applyTooling(){const b=state.bends[+$('ppBendSelect').value];if(!b)return;const p=PP_PUNCHES[+$('ppPunchSelect').value],d=PP_DIES[+$('ppDieSelect').value];commit('Utillaje separado aplicado',()=>{b.punchId=+$('ppPunchSelect').value;b.dieId=+$('ppDieSelect').value;b.punch=p.name;b.die=d.name;if(d.v)b.v=d.v;state.development.referenceV=d.v||b.v;});renderPPSelectors();renderPPGeometry();drawAll();toast('Punzón y matriz aplicados por separado');}
+function bindPP(){migratePP();['ppPunchMaker','ppDieMaker','ppBendSelect'].forEach(id=>{const e=$(id);if(e&&!e.dataset.pp){e.dataset.pp='1';e.addEventListener('change',renderPPSelectors)}});const a=$('ppApplyTools');if(a&&!a.dataset.pp){a.dataset.pp='1';a.addEventListener('click',applyTooling)}const o=$('ppAddOmega');if(o&&!o.dataset.pp){o.dataset.pp='1';o.addEventListener('click',()=>commit('Cargada Omega exacta',()=>{state.bends=PP_OMEGA_BENDS.map(x=>({...x}));state.project.ref='OMEGA-50-50-50-50';renderPPSelectors();renderPPGeometry();drawAll();go('program')}))}renderPPSelectors();renderPPList();renderPPGeometry();}
 function ppCollision(){const b=state.bends[Math.max(0,Math.min(state.bends.length-1,sim.s3Step||sim.s2Step||1)-1)];if(!b)return {hit:false,msg:'Sin operación activa'};const d=PP_DIES[b.dieId||0]||PP_DIES.find(x=>x.v===b.v)||PP_DIES[0],p=PP_PUNCHES[b.punchId||0]||PP_PUNCHES[0];const angle=Math.abs(+b.angle||0),tight=(d.angle&&angle>d.angle+2),deep=(b.leg<Math.max(8,d.v*.9)&&d.v>10);return {hit:tight||deep,msg:tight?'Interferencia: ángulo de matriz incompatible':deep?'Interferencia: ala insuficiente / retorno de herramienta':'SIN COLISIÓN · pieza libre de herramienta',p,d};}
 window.ppCollision=ppCollision;
 function patchOverlays(){const c=ppCollision();document.querySelectorAll('.overlay').forEach(e=>{if(!e)return;let old=e.innerHTML.replace(/<br>⚠.*$/,'');e.innerHTML=old+`<br><span class="${c.hit?'pp-collision-bad':'pp-collision-ok'}">${c.hit?'⚠ '+c.msg:'✓ '+c.msg}</span><br>TOPE X: ${state.bends[Math.max(0,(sim.s3Step||1)-1)]?.gauge??'—'} mm`;});}

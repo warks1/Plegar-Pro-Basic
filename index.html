@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Plenetal Pro Basic — Collision Beta</title>
+<style>
+:root{--bg:#0a0e13;--panel:#111820;--line:#26313d;--cyan:#22d3ee;--green:#38d996;--red:#ff4d5a;--text:#e8eef5;--muted:#91a0b1}
+*{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,Arial,sans-serif;overflow:hidden}
+.app{display:grid;grid-template-columns:300px 1fr;grid-template-rows:58px 1fr 34px;height:100vh}
+header{grid-column:1/3;border-bottom:1px solid var(--line);display:flex;align-items:center;padding:0 18px;background:#0d131a}
+.logo{font-weight:800;letter-spacing:.5px;font-size:18px}.logo span{color:var(--cyan)}
+.status{margin-left:auto;display:flex;gap:8px;align-items:center;font-size:12px;color:var(--muted)}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 10px var(--green)}
+aside{background:#0d131a;border-right:1px solid var(--line);padding:14px;overflow:auto}
+section{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px;margin-bottom:10px}
+h3{font-size:12px;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);margin:0 0 10px}
+label{display:block;font-size:11px;color:var(--muted);margin:8px 0 4px}
+select,input,button{width:100%;border:1px solid #334252;background:#0b1117;color:var(--text);border-radius:7px;padding:9px;font-size:13px}
+button{cursor:pointer;background:#14202a}button:hover{border-color:var(--cyan)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:7px}.actions{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.primary{background:#0d3440;border-color:#17677a}.danger{border-color:#71303a;background:#281318}
+main{position:relative;display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:10px;min-width:0}
+.view{position:relative;background:#0b1016;border:1px solid var(--line);border-radius:12px;overflow:hidden;min-width:0}
+.viewhead{position:absolute;z-index:5;top:10px;left:12px;font-size:12px;color:var(--muted);background:#0b1016cc;padding:5px 8px;border-radius:5px}
+canvas{width:100%;height:100%;display:block}.badge{position:absolute;right:12px;top:10px;z-index:5;padding:7px 11px;border-radius:7px;font-weight:800;font-size:12px}
+.safe{background:#0d3325;color:#54f2ae;border:1px solid #1e7653}.collision{background:#3a1117;color:#ff6672;border:1px solid #8b303b}
+.info{position:absolute;bottom:10px;left:10px;right:10px;display:flex;gap:8px;flex-wrap:wrap;z-index:4}
+.chip{font-size:11px;background:#101923dd;border:1px solid var(--line);padding:6px 8px;border-radius:6px;color:#b9c5d2}
+footer{grid-column:1/3;border-top:1px solid var(--line);font-size:10px;color:#687787;display:flex;align-items:center;padding:0 14px}
+.small{font-size:10px;color:#718090;line-height:1.35}.slider{padding:0}
+@media(max-width:900px){.app{grid-template-columns:230px 1fr}main{grid-template-columns:1fr}.view:nth-child(2){display:none}}
+</style>
+</head>
+<body>
+<div class="app">
+<header><div class="logo">PLENETAL <span>PRO BASIC</span> <small style="color:#647384">/ COLLISION BETA</small></div>
+<div class="status"><span class="dot"></span> Motor geométrico activo</div></header>
+<aside>
+<section><h3>Máquina</h3>
+<label>Modelo</label><select id="machine"><option>TRUMPF TruBend V85</option><option>Bystronic 100 t</option></select>
+<div class="small" id="machineInfo">Configuración de trabajo orientativa para la beta. Los datos oficiales se incorporarán al catálogo definitivo.</div>
+</section>
+<section><h3>Herramientas</h3>
+<label>Punzón</label><select id="punch"><option value="30|100|30|8">MECOS recto 30° / H100</option><option value="88|100|88|5">MECOS 88° / H100</option><option value="90|100|90|6">MECOS 90° / H100</option><option value="86|100|86|5">MECOS 86° / H100</option></select>
+<label>Matriz</label><select id="die"><option value="50|50|88">MECOS V50 / 88° / H50</option><option value="32|32|88">MECOS V32 / 88° / H50</option><option value="40|40|88">MECOS V40 / 88° / H50</option><option value="24|24|88">MECOS V24 / 88° / H50</option></select>
+</section>
+<section><h3>Chapa / plegado</h3>
+<div class="grid2"><div><label>Grosor (mm)</label><input id="thk" type="number" value="2" step=".1" min=".5"></div><div><label>Ángulo (°)</label><input id="angle" type="number" value="90" step=".1" min="10" max="170"></div></div>
+<label>Longitud de ala (mm)</label><input id="leg" type="number" value="80" step=".1" min="5">
+<label>Posición de carrera Y (mm)</label><input id="stroke" class="slider" type="range" value="50" min="0" max="100" step=".1">
+<div class="actions" style="margin-top:9px"><button id="minus">−</button><button id="plus">+</button></div>
+</section>
+<section><h3>Secuencia</h3>
+<label>Programa</label><select id="sequence"><option>Omega 50 / 80 / 120 / 80 / 50</option><option>L — 80 / 90°</option><option>U — 80 / 90° / 80</option><option>Z — 80 / 90° / 80</option></select>
+<div class="actions" style="margin-top:9px"><button id="prev">◀ Paso</button><button id="next">Paso ▶</button></div>
+</section>
+<section><h3>Simulación</h3>
+<div class="actions"><button class="primary" id="play">▶ Simular</button><button id="reset">↺ Reiniciar</button></div>
+</section>
+</aside>
+<main>
+<div class="view"><div class="viewhead">2D · SECCIÓN DE PLEGADO</div><div id="badge2" class="badge safe">SIN COLISIÓN</div><canvas id="c2"></canvas>
+<div class="info"><span class="chip" id="dim">Ángulo 90.0° · t 2.0 mm · V50</span><span class="chip" id="step">Paso 1 / 5</span><span class="chip" id="depth">Carrera 50.0 mm</span></div></div>
+<div class="view"><div class="viewhead">3D · VISTA CAD/CAM</div><div id="badge3" class="badge safe">SIN COLISIÓN</div><canvas id="c3"></canvas>
+<div class="info"><span class="chip">Arrastra para girar</span><span class="chip">Rueda / pellizco para zoom</span></div></div>
+</main>
+<footer>Plenetal Pro Basic · Beta de simulación geométrica · AMS — prototipo de trabajo · Los datos de herramientas se muestran como configuración beta y deben validarse contra planos oficiales antes de producción.</footer>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/three@0.164.1/build/three.min.js"></script>
+<script>
+const $=id=>document.getElementById(id);
+let step=1, playing=false, angle=90, stroke=50, rotX=.55,rotY=-.65,zoom=1;
+const c2=$('c2'),x2=c2.getContext('2d'); let dpr=devicePixelRatio||1;
+function resize(){[c2].forEach(c=>{c.width=c.clientWidth*dpr;c.height=c.clientHeight*dpr}); renderer.setSize($('c3').clientWidth,$('c3').clientHeight,false); camera.aspect=$('c3').clientWidth/$('c3').clientHeight;camera.updateProjectionMatrix();draw2D()}
+window.addEventListener('resize',resize);
+
+const renderer=new THREE.WebGLRenderer({canvas:$('c3'),antialias:true}); renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+const scene=new THREE.Scene();scene.background=new THREE.Color(0x0b1016);
+const camera=new THREE.PerspectiveCamera(42,1,.1,1000);camera.position.set(150,110,210);
+scene.add(new THREE.AmbientLight(0xffffff,.75));const dl=new THREE.DirectionalLight(0xffffff,1.2);dl.position.set(100,180,150);scene.add(dl);
+const grid=new THREE.GridHelper(300,30,0x26313d,0x18222c);grid.rotation.x=0;scene.add(grid);
+let group=new THREE.Group();scene.add(group);
+function mat(col,metal=0.2){return new THREE.MeshStandardMaterial({color:col,metalness:metal,roughness:.38})}
+function rebuild3D(collision=false){
+while(group.children.length)group.remove(group.children[0]);
+let V=parseFloat($('die').value.split('|')[0]), t=parseFloat($('thk').value);
+let die=new THREE.Mesh(new THREE.BoxGeometry(150,12,30),mat(0x475462,.7));die.position.set(0,0,0);group.add(die);
+let v1=new THREE.Mesh(new THREE.BoxGeometry(150,38,5),mat(0x596674,.7));v1.position.set(-V/2,20,0);v1.rotation.z=-.25;group.add(v1);
+let v2=v1.clone();v2.position.x=V/2;v2.rotation.z=.25;group.add(v2);
+let punch=new THREE.Mesh(new THREE.BoxGeometry(150,50,7),mat(collision?0xff3344:0x27c6e8,.65));punch.position.set(0,stroke*.35+45,0);punch.rotation.z=0;group.add(punch);
+let sheet=new THREE.Mesh(new THREE.BoxGeometry(120,t,65),mat(0xc7d0d9,.35));sheet.position.set(-35,13,0);sheet.rotation.z=-THREE.MathUtils.degToRad(angle-90);group.add(sheet);
+let sheet2=new THREE.Mesh(new THREE.BoxGeometry(65,t,65),mat(0xc7d0d9,.35));sheet2.position.set(25,28,0);sheet2.rotation.z=THREE.MathUtils.degToRad(90-angle);group.add(sheet2);
+group.rotation.x=rotX;group.rotation.y=rotY;group.scale.setScalar(zoom);
+}
+function draw2D(){
+let W=c2.clientWidth,H=c2.clientHeight;x2.setTransform(dpr,0,0,dpr,0,0);x2.clearRect(0,0,W,H);
+x2.strokeStyle='#18222c';x2.lineWidth=1;for(let i=0;i<W;i+=30){x2.beginPath();x2.moveTo(i,0);x2.lineTo(i,H);x2.stroke()}for(let i=0;i<H;i+=30){x2.beginPath();x2.moveTo(0,i);x2.lineTo(W,i);x2.stroke()}
+let V=parseFloat($('die').value.split('|')[0]), t=parseFloat($('thk').value), a=parseFloat($('angle').value);
+let cx=W*.52, base=H*.70, s=Math.min(W/230,H/180);
+x2.lineCap='round';x2.lineJoin='round';
+x2.fillStyle='#556270';x2.beginPath();x2.moveTo(cx-100*s,base);x2.lineTo(cx- V/2*s,base);x2.lineTo(cx,base+18*s);x2.lineTo(cx+V/2*s,base);x2.lineTo(cx+100*s,base);x2.lineTo(cx+100*s,base+12*s);x2.lineTo(cx-100*s,base+12*s);x2.fill();
+let strokePx=(100-stroke)*.65*s;let py=base-55*s-strokePx;
+x2.fillStyle='#20c8e8';x2.beginPath();x2.moveTo(cx-45*s,py-55*s);x2.lineTo(cx+45*s,py-55*s);x2.lineTo(cx+8*s,py);x2.lineTo(cx,py+8*s);x2.lineTo(cx-8*s,py);x2.closePath();x2.fill();
+let L=parseFloat($('leg').value)*s;let ar=(a*Math.PI/180);let xEnd=cx+Math.cos(Math.PI-ar)*L,yEnd=py+Math.sin(Math.PI-ar)*L;
+x2.strokeStyle='#d7e0e8';x2.lineWidth=Math.max(2,t*s);x2.beginPath();x2.moveTo(cx-L,py);x2.lineTo(cx,py);x2.lineTo(xEnd,yEnd);x2.stroke();
+x2.fillStyle='#91a0b1';x2.font='12px Arial';x2.fillText('V '+V+' mm',cx-V*s/2,base+30*s);x2.fillText('H punzón '+$('punch').value.split('|')[1]+' mm',cx-55*s,py-68*s);
+x2.strokeStyle='#22d3ee';x2.lineWidth=1;x2.beginPath();x2.arc(cx,py,30,0,ar);x2.stroke();x2.fillText(a.toFixed(1)+'°',cx+34,py-8);
+let coll = stroke<12 && (V < t*7 || a<45 || a>165); setBadge(coll); 
+$('dim').textContent=`Ángulo ${a.toFixed(1)}° · t ${t.toFixed(1)} mm · V${V}`;
+$('depth').textContent=`Carrera ${stroke.toFixed(1)} mm`;
+rebuild3D(coll);
+}
+function setBadge(c){for(const id of ['badge2','badge3']){$(id).className='badge '+(c?'collision':'safe');$(id).textContent=c?'⚠ COLISIÓN':'✓ SIN COLISIÓN'}}
+function tick(){if(playing){stroke-=1.4;if(stroke<=0){stroke=0;playing=false} $('stroke').value=stroke;draw2D();requestAnimationFrame(tick)}}
+$('stroke').oninput=e=>{stroke=+e.target.value;draw2D()};$('angle').oninput=e=>{angle=+e.target.value;draw2D()};
+$('thk').oninput=draw2D;$('leg').oninput=draw2D;$('die').onchange=draw2D;$('punch').onchange=draw2D;$('machine').onchange=draw2D;
+$('play').onclick=()=>{stroke=100;$('stroke').value=100;playing=true;tick()};$('reset').onclick=()=>{playing=false;stroke=50;$('stroke').value=50;draw2D()};
+$('minus').onclick=()=>{stroke=Math.max(0,stroke-5);$('stroke').value=stroke;draw2D()};$('plus').onclick=()=>{stroke=Math.min(100,stroke+5);$('stroke').value=stroke;draw2D()};
+$('next').onclick=()=>{step=Math.min(5,step+1);$('step').textContent=`Paso ${step} / 5`;draw2D()};$('prev').onclick=()=>{step=Math.max(1,step-1);$('step').textContent=`Paso ${step} / 5`;draw2D()};
+$('c3').addEventListener('pointerdown',e=>{let sx=e.clientX,sy=e.clientY;const move=q=>{rotY+=(q.clientX-sx)*.008;rotX+=(q.clientY-sy)*.008;sx=q.clientX;sy=q.clientY;rebuild3D(false)};const up=()=>{window.removeEventListener('pointermove',move);window.removeEventListener('pointerup',up)};window.addEventListener('pointermove',move);window.addEventListener('pointerup',up)});
+$('c3').addEventListener('wheel',e=>{e.preventDefault();zoom=Math.max(.5,Math.min(2,zoom*(e.deltaY>0?.92:1.08)));rebuild3D(false)},{passive:false});
+function animate(){requestAnimationFrame(animate);renderer.render(scene,camera)}animate();resize();draw2D();
+</script>
+</body></html>

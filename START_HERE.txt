@@ -4,3 +4,14 @@ Entrada: index.html
 
 Base del proyecto: Beta 20 Omega + Perfiles Reales.
 No sustituir por otra beta.
+
+
+REPARACIÓN ACTUAL:
+Beta 20 Omega + Perfiles Reales — motor de colisiones reforzado.
+Se mantiene todo lo existente y se añaden comprobaciones visuales para:
+- Punzón
+- Matriz
+- Envolvente de máquina
+- Topes
+
+La simulación 3D mantiene la máquina completa visible y resalta la zona de riesgo cuando se detecta una posible interferencia.

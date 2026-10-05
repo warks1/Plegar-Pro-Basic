@@ -261,7 +261,16 @@ body{background:radial-gradient(circle at 80% 0%,color-mix(in srgb,var(--accent)
 
 <section class="page" id="sim3d"><div class="card">
 <h2>Gemelo digital 3D</h2><div class="toolbar"><button class="btn" id="s3Play">▶ Reproducir</button><button class="btn secondary" id="s3Pause">⏸ Pausa</button><button class="btn secondary" id="s3Prev">◀ Paso</button><button class="btn secondary" id="s3Next">Paso ▶</button><button class="btn secondary" id="s3Reset">Reiniciar</button><select id="s3Camera" style="width:auto"><option value="iso">Isométrica</option><option value="front">Frontal</option><option value="rear">Trasera</option><option value="side">Lateral</option><option value="top">Superior</option><option value="operator">Operario</option><option value="free">Libre</option></select><button class="btn secondary" id="s3Fit">Centrar</button><button class="btn secondary" id="s3RotateLeft">↶ Rotar</button><button class="btn secondary" id="s3RotateRight">Rotar ↷</button><button class="btn secondary" id="s3ZoomIn">＋</button><button class="btn secondary" id="s3ZoomOut">－</button><label class="status"><input type="checkbox" id="s3Machine" checked> Máquina</label><label class="status"><input type="checkbox" id="s3Dims" checked> Cotas</label></div>
-<div class="stage"><canvas id="canvasS3" width="1200" height="650"></canvas><div class="overlay" id="overlayS3"></div></div>
+<div class="stage"><canvas id="canvasS3" width="1200" height="650"></canvas><div class="overlay" id="overlayS3"></div><div id="ppCollisionBanner" class="pp-collision-banner ok"><b id="ppCollisionTitle">✓ SIN COLISIÓN</b><span id="ppCollisionDetail">Comprueba máquina, punzón, matriz y topes.</span></div></div>
+<div class="pp-collision-panel">
+  <div class="pp-collision-grid">
+    <div><span>Chapa ↔ punzón</span><b id="ppHitPunch">—</b></div>
+    <div><span>Chapa ↔ matriz</span><b id="ppHitDie">—</b></div>
+    <div><span>Chapa ↔ máquina</span><b id="ppHitMachine">—</b></div>
+    <div><span>Chapa ↔ topes</span><b id="ppHitStops">—</b></div>
+  </div>
+  <div id="ppCollisionList" class="pp-collision-list">Sin operación activa.</div>
+</div>
 </div></section>
 
 <section class="page" id="development"><div class="grid">
@@ -777,7 +786,7 @@ function renderSettings(){
  $('ownerName').value=o.name||'';$('ownerCompany').value=o.company||'';$('ownerPhone').value=o.phone||'';$('ownerWhatsapp').value=o.whatsapp||'';$('ownerEmail').value=o.email||'';$('ownerWebsite').value=o.website||'';['units','angleTolerance','linearTolerance','confirmDelete','uiSounds','compactMobile','backupFrequency','aiAssistLevel'].forEach(id=>{if($(id))$(id).value=state.settings[id]});applySettings();renderAbout();
 }
 function readSettings(){state.settings={...state.settings,theme:$('theme').value,showDims:$('showDims').value,visualQuality:$('visualQuality').value,autosave:$('autosave').value,dimensionScale:+$('dimensionScale').value,simulationSpeed:+$('simulationSpeed').value,sheetColor:$('sheetColor').value,machineVisible:$('machineVisible').value,fitMargin:+$('fitMargin').value,visualThickness:+$('visualThickness').value,showGrid:$('showGrid').value,showAxes:$('showAxes').value,machineOpacity:+$('machineOpacity').value,cameraSensitivity:+$('cameraSensitivity').value,decimals:+$('decimals').value,default3DView:$('default3DView').value,units:$('units').value,angleTolerance:+$('angleTolerance').value,linearTolerance:+$('linearTolerance').value,confirmDelete:$('confirmDelete').value,uiSounds:$('uiSounds').value,compactMobile:$('compactMobile').value,backupFrequency:$('backupFrequency').value,aiAssistLevel:$('aiAssistLevel').value,owner:{name:$('ownerName').value,company:$('ownerCompany').value,phone:$('ownerPhone').value,whatsapp:$('ownerWhatsapp').value,email:$('ownerEmail').value,website:$('ownerWebsite').value}}}
-function renderAbout(){let o=(state.settings&&state.settings.owner)||{},year=new Date().getFullYear(),holder=o.name||o.company||'Propietario no configurado';if($('aboutOwner'))$('aboutOwner').innerHTML=`<b>${o.name||'Nombre pendiente'}</b>${o.company?'<br>'+o.company:''}${o.phone?'<br>Teléfono: '+o.phone:''}${o.whatsapp?'<br>WhatsApp: '+o.whatsapp:''}${o.email?'<br>Correo: '+o.email:''}${o.website?'<br>Web: '+o.website:''}`;if($('legalFooter'))$('legalFooter').innerHTML=`© ${year} ${holder}. Todos los derechos reservados. Plegar Pro es software propietario. Prohibida su reproducción, modificación, distribución o ingeniería inversa sin autorización. Los cálculos y simulaciones deben verificarse por personal cualificado antes de fabricar.`}
+function renderAbout(){let o=(state.settings&&state.settings.owner)||{},year=new Date().getFullYear(),holder=o.company||'AMS';if($('aboutOwner'))$('aboutOwner').innerHTML=`<b>${o.name||'Nombre pendiente'}</b>${o.company?'<br>'+o.company:''}${o.phone?'<br>Teléfono: '+o.phone:''}${o.whatsapp?'<br>WhatsApp: '+o.whatsapp:''}${o.email?'<br>Correo: '+o.email:''}${o.website?'<br>Web: '+o.website:''}`;if($('legalFooter'))$('legalFooter').innerHTML=`© ${year} AMS. Todos los derechos reservados. Plegar Pro es software propietario. Prohibida su reproducción, modificación, distribución o ingeniería inversa sin autorización. Los cálculos y simulaciones deben verificarse por personal cualificado antes de fabricar.`}
 function applyCameraPreset(v,target='S3'){let m={iso:[-.35,.5],front:[0,0],rear:[0,Math.PI],side:[0,Math.PI/2],top:[-Math.PI/2,0],operator:[-.12,Math.PI],free:[sim['rotX'+target]??-.35,sim['rotY'+target]??.5]};[sim['rotX'+target],sim['rotY'+target]]=m[v]||m.iso}
 
 function bind(){
@@ -945,6 +954,8 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 <style>
 .pp-cad-card{margin-top:12px;border:1px solid var(--line);border-radius:14px;background:linear-gradient(180deg,#071019,#0a141c);overflow:hidden}.pp-cad-head{display:flex;justify-content:space-between;gap:10px;padding:9px 11px;border-bottom:1px solid var(--line);font-size:11px}.pp-cad-head span{font-weight:900;color:var(--ok,#58efb1)}.pp-cad-head span.bad{color:#ff6472}.pp-cad-view{height:310px;background:linear-gradient(180deg,#0d2b3d,#061018);position:relative}.pp-cad-view svg{width:100%;height:100%;display:block}.pp-cad-legend{display:flex;flex-wrap:wrap;gap:10px;padding:8px 11px;color:var(--muted);font-size:10px}.pp-cad-legend span{white-space:nowrap}@media(max-width:850px){.pp-cad-view{height:250px}}#tooling .fields{grid-template-columns:1fr 1fr}.pp-collision-ok{color:var(--ok,#65e6a6)}.pp-collision-bad{color:#ff6877;font-weight:800}.pp-tool-preview{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}.pp-tool-preview>div{border:1px solid var(--line);border-radius:10px;padding:8px;background:#071019}.toolListHeader{font-size:10px;color:var(--muted);margin-bottom:5px}
 @media(max-width:850px){#tooling .fields{grid-template-columns:1fr}.tableWrap{overflow-x:auto}#programRows{min-width:980px}}
+
+.pp-collision-banner{position:absolute;left:14px;right:14px;top:14px;z-index:5;display:flex;gap:12px;align-items:center;justify-content:space-between;padding:10px 13px;border-radius:12px;border:1px solid var(--ok);background:rgba(4,24,28,.88);backdrop-filter:blur(6px);font-size:12px}.pp-collision-banner.ok{border-color:var(--ok);color:var(--ok)}.pp-collision-banner.bad{border-color:var(--danger);color:#ffdfe2;background:rgba(55,8,14,.9);box-shadow:0 0 22px rgba(255,80,100,.22)}.pp-collision-banner b{font-size:13px}.pp-collision-panel{margin-top:10px;border:1px solid var(--line);border-radius:12px;padding:10px;background:var(--panel2)}.pp-collision-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}.pp-collision-grid>div{border:1px solid var(--line);border-radius:9px;padding:8px;background:var(--panel)}.pp-collision-grid span{display:block;color:var(--muted);font-size:10px}.pp-collision-grid b{display:block;margin-top:3px}.pp-collision-list{margin-top:9px;font-size:11px;color:var(--muted)}.pp-hit-ok{color:var(--ok)}.pp-hit-bad{color:var(--danger);font-weight:800}@media(max-width:850px){.pp-collision-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.pp-collision-banner{display:block}.pp-collision-banner span{display:block;margin-top:3px}}
 </style>
 <script>
 (()=>{
@@ -1038,4 +1049,154 @@ window.addEventListener('DOMContentLoaded',()=>setTimeout(()=>{bindPP();renderPP
 setTimeout(()=>{try{bindPP();renderPPSelectors();renderPPList();}catch(e){console.error(e)}},250);
 })();
 </script>
+
+<script>
+(()=>{
+'use strict';
+/* Plegar Pro Beta 20 — collision engine v2.
+   Additive patch: does not remove or replace existing modules. */
+function ppCurrentBend(){
+  const step=Math.max(0,Math.min(state.bends.length,sim.s3Step||0));
+  return step>0 ? {b:state.bends[step-1],index:step-1,step} : {b:state.bends[0],index:0,step:0};
+}
+function ppCollisionV2(){
+  const cur=ppCurrentBend(), b=cur.b;
+  if(!b) return {hit:false,parts:{punch:false,die:false,machine:false,stops:false},messages:['No hay pliegues definidos.'],cur};
+  const d=PP_DIES[b.dieId||0]||PP_DIES.find(x=>x.v===+b.v)||PP_DIES[0];
+  const p=PP_PUNCHES[b.punchId||0]||PP_PUNCHES[0];
+  const t=Math.max(.5,+state.project.thickness||2);
+  const leg=Math.max(0,+b.leg||0);
+  const angle=Math.abs(+b.angle||90);
+  const da=Math.abs((+d.angle||88)-angle);
+  const punchRadius=+p.r||0;
+  const requestedRadius=Math.max(.1,+b.radius||2);
+  const v=Math.max(1,+d.v||+b.v||16);
+
+  const parts={
+    punch: da>6 || requestedRadius < Math.max(.5,punchRadius*.75),
+    die: leg < Math.max(t*2.5,v*.72) || (requestedRadius < Math.max(.5,(+d.r||0)*.7)),
+    machine: false,
+    stops: false
+  };
+
+  // Machine envelope. These coordinates correspond to the machine drawn by draw3D.
+  // A bend whose working flange reaches either side column is considered an interference.
+  const machineHalf=475;
+  const flangeReach=leg + t*1.5;
+  parts.machine=flangeReach>machineHalf-35;
+
+  // Backgauge/stops: gauge must leave a realistic clearance from the sheet edge
+  // and remain inside the modeled machine throat.
+  const gauge=Math.max(0,+b.gauge||0);
+  parts.stops=gauge<Math.max(8,t*2) || gauge>900 || Math.abs(gauge-leg)>Math.max(260,leg*4);
+
+  const messages=[];
+  if(parts.punch) messages.push(`Punzón: interferencia o radio/ángulo incompatible (${p.name||'sin nombre'}).`);
+  if(parts.die) messages.push(`Matriz: posible interferencia; ala ${leg.toFixed(1)} mm / V${v}.`);
+  if(parts.machine) messages.push(`Máquina: la geometría invade la envolvente lateral de la plegadora.`);
+  if(parts.stops) messages.push(`Topes: posición X ${gauge.toFixed(1)} mm fuera del margen seguro.`);
+  if(!messages.length) messages.push('Trayectoria libre en las comprobaciones geométricas actuales.');
+
+  return {hit:Object.values(parts).some(Boolean),parts,messages,cur,b,d,p,t,leg,angle,v,gauge};
+}
+window.ppCollisionV2=ppCollisionV2;
+
+function ppCollisionText(c){
+  return c.messages.map((m,i)=>`<div class="${c.hit?'pp-hit-bad':'pp-hit-ok'}">${c.hit?'⚠':'✓'} ${m}</div>`).join('');
+}
+function updateCollisionPanel(){
+  const c=ppCollisionV2();
+  const banner=document.getElementById('ppCollisionBanner');
+  const title=document.getElementById('ppCollisionTitle');
+  const detail=document.getElementById('ppCollisionDetail');
+  const list=document.getElementById('ppCollisionList');
+  if(!banner||!title||!detail||!list)return;
+  banner.classList.toggle('bad',c.hit);banner.classList.toggle('ok',!c.hit);
+  title.textContent=c.hit?'⚠ COLISIÓN / INTERFERENCIA':'✓ SIN COLISIÓN';
+  detail.textContent=c.step?`Paso ${c.step}/${state.bends.length} · ${c.b?.angle||'—'}° · R${c.b?.radius||'—'} · V${c.v||'—'}`:'Mueve la simulación al primer paso para analizar la trayectoria.';
+  list.innerHTML=ppCollisionText(c);
+  const map=[
+    ['ppHitPunch','punch'],['ppHitDie','die'],['ppHitMachine','machine'],['ppHitStops','stops']
+  ];
+  map.forEach(([id,key])=>{
+    const el=document.getElementById(id); if(!el)return;
+    el.textContent=c.parts[key]?'⚠ INTERFIERE':'✓ LIBRE';
+    el.className=c.parts[key]?'pp-hit-bad':'pp-hit-ok';
+  });
+  const ov=document.getElementById('overlayS3');
+  if(ov){
+    const old=ov.innerHTML.replace(/<br><span[^>]*>.*?<\/span><br>TOPE X:.*$/s,'');
+    ov.innerHTML=old+`<br><span class="${c.hit?'pp-collision-bad':'pp-collision-ok'}">${c.hit?'⚠ '+c.messages[0]:'✓ TRAYECTORIA LIBRE'}</span>`;
+  }
+}
+
+/* Add a high-visibility collision overlay to the existing full-machine 3D scene. */
+function drawCollisionOverlay(){
+  const cv=document.getElementById('canvasS3');
+  if(!cv)return;
+  const ctx=cv.getContext('2d');
+  const c=ppCollisionV2();
+  if(!c.hit)return;
+  const w=cv.width,h=cv.height;
+  ctx.save();
+  ctx.setLineDash([12,8]);
+  ctx.lineWidth=5;
+  ctx.strokeStyle='#ff586d';
+  ctx.fillStyle='rgba(255,70,90,.13)';
+  // Central tool danger envelope
+  ctx.fillRect(w*.34,h*.30,w*.32,h*.40);
+  ctx.strokeRect(w*.34,h*.30,w*.32,h*.40);
+  if(c.parts.machine){
+    ctx.fillStyle='rgba(255,70,90,.18)';
+    ctx.fillRect(20,h*.22,115,h*.58);
+    ctx.fillRect(w-135,h*.22,115,h*.58);
+    ctx.strokeRect(20,h*.22,115,h*.58);
+    ctx.strokeRect(w-135,h*.22,115,h*.58);
+  }
+  if(c.parts.stops){
+    ctx.fillStyle='rgba(255,170,40,.25)';
+    ctx.fillRect(w*.12,h*.42,w*.08,h*.18);
+    ctx.strokeStyle='#ffd166';
+    ctx.strokeRect(w*.12,h*.42,w*.08,h*.18);
+  }
+  ctx.setLineDash([]);
+  ctx.fillStyle='#ff586d';
+  ctx.font='900 18px system-ui';
+  ctx.fillText('ZONA DE COLISIÓN',w*.38,h*.28);
+  ctx.restore();
+}
+
+/* Extend the existing renderer rather than replacing it. */
+const ppOriginalDraw3D=window.draw3D;
+if(typeof ppOriginalDraw3D==='function'){
+  window.draw3D=function(canvas,step,simulation){
+    ppOriginalDraw3D(canvas,step,simulation);
+    if(canvas && canvas.id==='canvasS3' && simulation) drawCollisionOverlay();
+  };
+}
+const ppOriginalDrawAll=window.drawAll;
+if(typeof ppOriginalDrawAll==='function'){
+  window.drawAll=function(){
+    ppOriginalDrawAll();
+    updateCollisionPanel();
+  };
+}
+
+/* Keep the separate tooling preview synchronized with the same collision engine. */
+const ppOriginalTooling=window.renderPPGeometry;
+if(typeof ppOriginalTooling==='function'){
+  window.renderPPGeometry=function(){
+    ppOriginalTooling();
+    const c=ppCollisionV2(),s=document.getElementById('ppCadStatus');
+    if(s){
+      s.textContent=c.hit?'⚠ COLISIÓN / INTERFERENCIA':'✓ SIN COLISIÓN';
+      s.classList.toggle('bad',c.hit);
+    }
+  };
+}
+
+setTimeout(updateCollisionPanel,350);
+})();
+</script>
+
 </body></html>

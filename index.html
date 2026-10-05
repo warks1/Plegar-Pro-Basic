@@ -1,125 +1,133 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Plenetal Pro Basic — Collision Beta</title>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Plenetal Pro Basic</title>
 <style>
-:root{--bg:#0a0e13;--panel:#111820;--line:#26313d;--cyan:#22d3ee;--green:#38d996;--red:#ff4d5a;--text:#e8eef5;--muted:#91a0b1}
-*{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,Arial,sans-serif;overflow:hidden}
-.app{display:grid;grid-template-columns:300px 1fr;grid-template-rows:58px 1fr 34px;height:100vh}
-header{grid-column:1/3;border-bottom:1px solid var(--line);display:flex;align-items:center;padding:0 18px;background:#0d131a}
-.logo{font-weight:800;letter-spacing:.5px;font-size:18px}.logo span{color:var(--cyan)}
-.status{margin-left:auto;display:flex;gap:8px;align-items:center;font-size:12px;color:var(--muted)}
-.dot{width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 10px var(--green)}
-aside{background:#0d131a;border-right:1px solid var(--line);padding:14px;overflow:auto}
-section{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px;margin-bottom:10px}
-h3{font-size:12px;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);margin:0 0 10px}
-label{display:block;font-size:11px;color:var(--muted);margin:8px 0 4px}
-select,input,button{width:100%;border:1px solid #334252;background:#0b1117;color:var(--text);border-radius:7px;padding:9px;font-size:13px}
-button{cursor:pointer;background:#14202a}button:hover{border-color:var(--cyan)}
-.grid2{display:grid;grid-template-columns:1fr 1fr;gap:7px}.actions{display:grid;grid-template-columns:1fr 1fr;gap:7px}
-.primary{background:#0d3440;border-color:#17677a}.danger{border-color:#71303a;background:#281318}
-main{position:relative;display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:10px;min-width:0}
-.view{position:relative;background:#0b1016;border:1px solid var(--line);border-radius:12px;overflow:hidden;min-width:0}
-.viewhead{position:absolute;z-index:5;top:10px;left:12px;font-size:12px;color:var(--muted);background:#0b1016cc;padding:5px 8px;border-radius:5px}
-canvas{width:100%;height:100%;display:block}.badge{position:absolute;right:12px;top:10px;z-index:5;padding:7px 11px;border-radius:7px;font-weight:800;font-size:12px}
-.safe{background:#0d3325;color:#54f2ae;border:1px solid #1e7653}.collision{background:#3a1117;color:#ff6672;border:1px solid #8b303b}
-.info{position:absolute;bottom:10px;left:10px;right:10px;display:flex;gap:8px;flex-wrap:wrap;z-index:4}
-.chip{font-size:11px;background:#101923dd;border:1px solid var(--line);padding:6px 8px;border-radius:6px;color:#b9c5d2}
-footer{grid-column:1/3;border-top:1px solid var(--line);font-size:10px;color:#687787;display:flex;align-items:center;padding:0 14px}
-.small{font-size:10px;color:#718090;line-height:1.35}.slider{padding:0}
-@media(max-width:900px){.app{grid-template-columns:230px 1fr}main{grid-template-columns:1fr}.view:nth-child(2){display:none}}
-</style>
-</head>
+:root{--bg:#080d14;--panel:#111b27;--panel2:#162333;--line:#26394c;--txt:#eef6ff;--muted:#91a5ba;--cyan:#35d8f2;--blue:#528cff;--violet:#a77bff;--green:#40e0a0;--orange:#ffb454;--red:#ff5367}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 50% -15%,#18304a 0,#0a111b 44%,#070b11 100%);color:var(--txt);font-family:Inter,system-ui,Arial,sans-serif;min-height:100vh}
+button,input,select{font:inherit}button{cursor:pointer;color:inherit}
+.top{height:68px;display:flex;align-items:center;padding:0 clamp(16px,4vw,54px);border-bottom:1px solid #243548aa;background:#08111bcc;backdrop-filter:blur(14px);position:sticky;top:0;z-index:20}
+.brand{font-weight:900;letter-spacing:.11em;font-size:17px}.brand b{color:var(--cyan)}.brand small{display:block;font-size:9px;color:#8299b0;letter-spacing:.22em;margin-top:2px}
+.topright{margin-left:auto;color:#9eb2c6;font-size:12px;display:flex;gap:8px;align-items:center}.live{width:8px;height:8px;background:var(--green);border-radius:50%;box-shadow:0 0 12px var(--green)}
+.wrap{max-width:1440px;margin:auto;padding:26px clamp(14px,4vw,54px) 40px}
+.hero{display:grid;grid-template-columns:1fr 1.08fr;gap:26px;align-items:center;min-height:390px}
+.eyebrow{font-size:11px;color:var(--cyan);letter-spacing:.22em;font-weight:800}.intro h1{font-size:clamp(32px,5vw,58px);line-height:1.02;margin:13px 0 14px;letter-spacing:-.045em}.intro h1 span{color:var(--cyan)}.intro p{color:#a7b8c9;max-width:470px;line-height:1.65;font-size:14px}
+.cta{display:flex;gap:10px;flex-wrap:wrap;margin-top:23px}.btn{border:1px solid #35506a;background:#142337;border-radius:12px;padding:12px 17px;font-weight:750;font-size:13px;transition:.2s;display:inline-flex;gap:9px;align-items:center}.btn:hover{transform:translateY(-2px);border-color:var(--cyan);box-shadow:0 8px 24px #21c9ed22}.btn.primary{background:linear-gradient(110deg,#0a829d,#386be0);border:0;box-shadow:0 8px 25px #188dbb33}
+.machine-stage{height:340px;position:relative;border:1px solid #2a4055;border-radius:22px;overflow:hidden;background:radial-gradient(ellipse at 50% 78%,#1d3c54 0,#102337 38%,#0c1724 78%);box-shadow:inset 0 0 50px #39bde311,0 25px 65px #0005}
+.machine-stage:before{content:"";position:absolute;inset:0;background-image:linear-gradient(#4c76921b 1px,transparent 1px),linear-gradient(90deg,#4c76921b 1px,transparent 1px);background-size:28px 28px;mask-image:linear-gradient(transparent,#000)}
+.stage-tag{position:absolute;top:16px;left:18px;font-size:10px;letter-spacing:.16em;color:#91b3ca}
+.machine{position:absolute;width:min(82%,510px);height:260px;left:50%;top:52%;transform:translate(-50%,-50%)}
+.machine svg{width:100%;height:100%;overflow:visible}
+.ram{transform-origin:50% 0;animation:ram 3.6s ease-in-out infinite}
+.sheet{transform-origin:50% 50%;animation:sheet 3.6s ease-in-out infinite}
+@keyframes ram{0%,18%,100%{transform:translateY(-3px)}48%,65%{transform:translateY(27px)}}
+@keyframes sheet{0%,18%,100%{transform:rotate(0)}48%,65%{transform:rotate(-9deg)}}
+.glow{filter:drop-shadow(0 0 8px #20d7ff88)}
+.stage-caption{position:absolute;right:16px;bottom:14px;color:#9bb5ca;font-size:10px;letter-spacing:.1em}
+.section-head{display:flex;align-items:end;justify-content:space-between;margin:25px 0 14px}.section-head h2{font-size:16px;margin:0}.section-head span{font-size:11px;color:var(--muted)}
+.tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:13px}
+.tile{position:relative;text-align:left;min-height:148px;padding:18px;border:1px solid #2a4055;border-radius:16px;background:linear-gradient(145deg,#152437,#0e1825);overflow:hidden;transition:.22s}
+.tile:after{content:"";position:absolute;width:110px;height:110px;border-radius:50%;right:-38px;bottom:-50px;background:var(--accent);filter:blur(35px);opacity:.18}
+.tile:hover{transform:translateY(-4px);border-color:var(--accent);box-shadow:0 14px 30px #0005}
+.ico{width:43px;height:43px;border-radius:13px;display:grid;place-items:center;background:color-mix(in srgb,var(--accent) 17%,#122235);color:var(--accent);margin-bottom:15px}
+.ico svg{width:24px;height:24px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;transition:.3s}.tile:hover .ico svg{transform:rotate(-9deg) scale(1.13)}
+.tile strong{display:block;font-size:14px}.tile small{display:block;color:#91a6ba;font-size:11px;margin-top:5px;line-height:1.4}
+.workspace{display:none;margin-top:20px}.workspace.active{display:block}.home.hidden{display:none}
+.toolbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:12px}.toolbar .btn{padding:9px 12px}.back{margin-right:auto}
+.layout{display:grid;grid-template-columns:270px 1fr;gap:13px}
+.controls,.screen{border:1px solid #2a4055;border-radius:15px;background:#0e1824;padding:15px;min-width:0}
+.controls h3{font-size:11px;color:#91a8bd;letter-spacing:.15em;margin:0 0 12px}
+label{display:block;font-size:11px;color:#9eb1c4;margin:10px 0 5px}input,select{width:100%;background:#09121d;color:#eef6ff;border:1px solid #34495d;border-radius:8px;padding:9px;font-size:12px}
+.twocol{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.control-buttons{display:flex;gap:7px;margin-top:12px}.control-buttons button{flex:1}
+.screen{padding:0;overflow:hidden;min-height:450px;position:relative;background:radial-gradient(ellipse at 50% 65%,#142b3e,#09121d 70%)}
+.screen-head{display:flex;align-items:center;justify-content:space-between;padding:12px 15px;border-bottom:1px solid #26394c;font-size:11px;color:#9cb2c6}
+.pill{padding:6px 9px;border-radius:7px;background:#103729;color:var(--green);font-weight:800}.pill.bad{background:#411922;color:#ff7b88}
+.views{display:grid;grid-template-columns:1fr 1fr;min-height:405px}.view{position:relative;min-width:0}.view+ .view{border-left:1px solid #26394c}.view-title{position:absolute;top:12px;left:14px;color:#8fa8bd;font-size:10px;letter-spacing:.13em}
+canvas{display:block;width:100%;height:100%;min-height:405px;touch-action:pan-y}
+.statusline{padding:9px 14px;border-top:1px solid #26394c;color:#9db0c3;font-size:11px}
+.library{display:none;margin-top:16px;border:1px solid #2a4055;border-radius:15px;background:#0e1824;padding:18px}.library.active{display:block}.library h3{margin-top:0}
+.footer{text-align:center;color:#60778d;font-size:10px;padding:20px}
+@media(max-width:850px){.hero{grid-template-columns:1fr;gap:16px}.machine-stage{height:270px}.tiles{grid-template-columns:repeat(2,1fr)}.layout{grid-template-columns:1fr}.controls{display:grid;grid-template-columns:1fr 1fr;gap:0 12px}.controls h3{grid-column:1/-1}.controls .wide{grid-column:1/-1}.views{grid-template-columns:1fr}.view+ .view{border-left:0;border-top:1px solid #26394c}.screen{min-height:650px}}
+@media(max-width:480px){.top{height:58px}.topright{font-size:10px}.tiles{gap:9px}.tile{padding:13px;min-height:135px}.intro h1{font-size:36px}.machine-stage{height:230px}.controls{grid-template-columns:1fr 1fr}.views{min-height:600px}.view canvas{min-height:300px}}
+</style></head>
 <body>
-<div class="app">
-<header><div class="logo">PLENETAL <span>PRO BASIC</span> <small style="color:#647384">/ COLLISION BETA</small></div>
-<div class="status"><span class="dot"></span> Motor geométrico activo</div></header>
-<aside>
-<section><h3>Máquina</h3>
-<label>Modelo</label><select id="machine"><option>TRUMPF TruBend V85</option><option>Bystronic 100 t</option></select>
-<div class="small" id="machineInfo">Configuración de trabajo orientativa para la beta. Los datos oficiales se incorporarán al catálogo definitivo.</div>
+<header class="top"><div class="brand">PLENETAL <b>PRO BASIC</b><small>PRESS BRAKE SIMULATION</small></div><div class="topright"><i class="live"></i> SISTEMA PREPARADO</div></header>
+<div class="wrap">
+<div class="home" id="home">
+<section class="hero">
+<div class="intro"><div class="eyebrow">INGENIERÍA DE PLEGADO · ENTORNO CAD/CAM</div><h1>Programa. Simula.<br><span>Comprueba.</span></h1><p>Prepara tus operaciones de plegado, selecciona el utillaje y visualiza la pieza antes de llevarla a máquina. Un entorno claro, directo y visual.</p><div class="cta"><button class="btn primary" onclick="openSim()">▶ &nbsp; Abrir simulador</button><button class="btn" onclick="openLibrary()">▦ &nbsp; Biblioteca de útiles</button></div></div>
+<div class="machine-stage"><div class="stage-tag">SIMULACIÓN CINEMÁTICA · DEMO</div><div class="machine">
+<svg viewBox="0 0 520 270" aria-label="Animación de plegadora"><defs><linearGradient id="steel" x2="0" y2="1"><stop stop-color="#9fb4c5"/><stop offset="1" stop-color="#40576b"/></linearGradient><linearGradient id="cyan" x2="0" y2="1"><stop stop-color="#55edff"/><stop offset="1" stop-color="#1686bd"/></linearGradient></defs>
+<path d="M80 28H440L468 55V76H52V55Z" fill="url(#steel)" stroke="#b3d2e5" stroke-width="2"/><path d="M105 76H415V103H105Z" fill="#405a70"/><path d="M120 103H400V120H120Z" fill="#1b3449"/>
+<path d="M65 75V218H99V110H421V218H455V75" fill="#344b60" stroke="#8da9bd" stroke-width="3"/><path d="M80 216H440V240H80Z" fill="url(#steel)" stroke="#b3d2e5" stroke-width="2"/>
+<path d="M180 214L340 214L320 230H200Z" fill="#263e53" stroke="#6e91a9"/>
+<g class="ram"><path d="M220 76H300V157L270 198L250 198L220 157Z" fill="url(#cyan)" stroke="#8cf4ff" stroke-width="2" class="glow"/><path d="M250 198H270L260 211Z" fill="#a8f8ff"/></g>
+<g class="sheet"><path d="M260 211L385 211" stroke="#e2edf5" stroke-width="5" stroke-linecap="round" class="glow"/><path d="M260 211L220 169" stroke="#e2edf5" stroke-width="5" stroke-linecap="round"/></g>
+<path d="M185 239H335" stroke="#43d7f1" stroke-width="2" stroke-dasharray="5 7" opacity=".7"/>
+</svg></div><div class="stage-caption">TRABAJO EN PROGRESO <span style="color:var(--cyan)">●</span></div></div>
 </section>
-<section><h3>Herramientas</h3>
-<label>Punzón</label><select id="punch"><option value="30|100|30|8">MECOS recto 30° / H100</option><option value="88|100|88|5">MECOS 88° / H100</option><option value="90|100|90|6">MECOS 90° / H100</option><option value="86|100|86|5">MECOS 86° / H100</option></select>
-<label>Matriz</label><select id="die"><option value="50|50|88">MECOS V50 / 88° / H50</option><option value="32|32|88">MECOS V32 / 88° / H50</option><option value="40|40|88">MECOS V40 / 88° / H50</option><option value="24|24|88">MECOS V24 / 88° / H50</option></select>
-</section>
-<section><h3>Chapa / plegado</h3>
-<div class="grid2"><div><label>Grosor (mm)</label><input id="thk" type="number" value="2" step=".1" min=".5"></div><div><label>Ángulo (°)</label><input id="angle" type="number" value="90" step=".1" min="10" max="170"></div></div>
-<label>Longitud de ala (mm)</label><input id="leg" type="number" value="80" step=".1" min="5">
-<label>Posición de carrera Y (mm)</label><input id="stroke" class="slider" type="range" value="50" min="0" max="100" step=".1">
-<div class="actions" style="margin-top:9px"><button id="minus">−</button><button id="plus">+</button></div>
-</section>
-<section><h3>Secuencia</h3>
-<label>Programa</label><select id="sequence"><option>Omega 50 / 80 / 120 / 80 / 50</option><option>L — 80 / 90°</option><option>U — 80 / 90° / 80</option><option>Z — 80 / 90° / 80</option></select>
-<div class="actions" style="margin-top:9px"><button id="prev">◀ Paso</button><button id="next">Paso ▶</button></div>
-</section>
-<section><h3>Simulación</h3>
-<div class="actions"><button class="primary" id="play">▶ Simular</button><button id="reset">↺ Reiniciar</button></div>
-</section>
-</aside>
-<main>
-<div class="view"><div class="viewhead">2D · SECCIÓN DE PLEGADO</div><div id="badge2" class="badge safe">SIN COLISIÓN</div><canvas id="c2"></canvas>
-<div class="info"><span class="chip" id="dim">Ángulo 90.0° · t 2.0 mm · V50</span><span class="chip" id="step">Paso 1 / 5</span><span class="chip" id="depth">Carrera 50.0 mm</span></div></div>
-<div class="view"><div class="viewhead">3D · VISTA CAD/CAM</div><div id="badge3" class="badge safe">SIN COLISIÓN</div><canvas id="c3"></canvas>
-<div class="info"><span class="chip">Arrastra para girar</span><span class="chip">Rueda / pellizco para zoom</span></div></div>
-</main>
-<footer>Plenetal Pro Basic · Beta de simulación geométrica · AMS — prototipo de trabajo · Los datos de herramientas se muestran como configuración beta y deben validarse contra planos oficiales antes de producción.</footer>
+<div class="section-head"><h2>Centro de trabajo</h2><span>Selecciona un módulo para comenzar</span></div>
+<div class="tiles">
+<button class="tile" style="--accent:#36d9f2" onclick="openSim()"><span class="ico"><svg viewBox="0 0 24 24"><path d="M3 5h18M6 5v6l6 8 6-8V5M4 20h16"/></svg></span><strong>Simulación 2D / 3D</strong><small>Programa pliegues y comprueba interferencias.</small></button>
+<button class="tile" style="--accent:#a77bff" onclick="openLibrary()"><span class="ico"><svg viewBox="0 0 24 24"><path d="M4 4h16v16H4zM8 8h8M8 12h8M8 16h5"/></svg></span><strong>Biblioteca de útiles</strong><small>Consulta y selecciona punzones y matrices.</small></button>
+<button class="tile" style="--accent:#ffb454" onclick="openSim()"><span class="ico"><svg viewBox="0 0 24 24"><path d="M4 19V5h16v14zM8 15l3-4 2 2 3-5"/></svg></span><strong>Máquinas</strong><small>Configura la plegadora de trabajo.</small></button>
+<button class="tile" style="--accent:#40e0a0" onclick="openSim()"><span class="ico"><svg viewBox="0 0 24 24"><path d="M4 18l5-5 3 3 8-9M15 7h5v5"/></svg></span><strong>Programa de pieza</strong><small>Define cotas, ángulos y secuencia de plegado.</small></button>
 </div>
-<script src="https://cdn.jsdelivr.net/npm/three@0.164.1/build/three.min.js"></script>
+</div>
+<div class="workspace" id="workspace">
+<div class="toolbar"><button class="btn back" onclick="goHome()">← Menú principal</button><button class="btn primary" onclick="simulate()">▶ Simular plegado</button><button class="btn" onclick="resetSim()">↺ Restablecer</button></div>
+<div class="layout">
+<aside class="controls">
+<h3>CONFIGURACIÓN DE PLEGADO</h3>
+<div class="wide"><label>Máquina</label><select id="machine"><option>TRUMPF TruBend V85</option><option>Bystronic 100 toneladas</option></select></div>
+<div><label>Punzón</label><select id="punch"><option>Recto 30° · MECOS (demo)</option><option>88° · MECOS (demo)</option><option>90° · MECOS (demo)</option><option>86° · MECOS (demo)</option></select></div>
+<div><label>Matriz</label><select id="die"><option value="50">MECOS V50 (demo)</option><option value="40">MECOS V40 (demo)</option><option value="32">MECOS V32 (demo)</option><option value="24">MECOS V24 (demo)</option></select></div>
+<div><label>Grosor chapa (mm)</label><input id="thick" type="number" min=".5" step=".1" value="2"></div>
+<div><label>Ángulo (°)</label><input id="angle" type="number" min="10" max="170" step=".1" value="90"></div>
+<div><label>Ala (mm)</label><input id="leg" type="number" min="5" value="80"></div>
+<div class="wide"><label>Avance del punzón</label><input id="stroke" type="range" min="0" max="100" value="35"></div>
+<div class="wide control-buttons"><button class="btn" onclick="changeStroke(-5)">− Carrera</button><button class="btn" onclick="changeStroke(5)">+ Carrera</button></div>
+</aside>
+<div class="screen"><div class="screen-head"><span>VISUALIZACIÓN DE PROCESO</span><span id="collision" class="pill">SIN COLISIÓN</span></div>
+<div class="views"><div class="view"><div class="view-title">2D · SECCIÓN TRANSVERSAL</div><canvas id="view2d"></canvas></div><div class="view"><div class="view-title">3D · VISTA ISOMÉTRICA</div><canvas id="view3d"></canvas></div></div>
+<div class="statusline" id="readout">Ángulo 90.0° · Espesor 2.0 mm · Matriz V50 · Carrera 35%</div></div>
+</div></div>
+<div class="library" id="library"><div class="toolbar"><button class="btn back" onclick="goHome()">← Menú principal</button></div><h3>Biblioteca inicial de utillaje</h3><p style="color:#9eb2c6;font-size:13px">Familias de demostración para probar la interfaz. Las geometrías y dimensiones definitivas se incorporarán referencia por referencia a partir de planos oficiales verificados; esta biblioteca todavía no es un catálogo técnico completo.</p><div class="tiles"><div class="tile"><strong>Punzones 30°</strong><small>Perfiles rectos y variantes</small></div><div class="tile"><strong>Punzones 86° / 88° / 90°</strong><small>Familias de ángulo</small></div><div class="tile"><strong>Matrices V24 / V32</strong><small>Aberturas de matriz</small></div><div class="tile"><strong>Matrices V40 / V50</strong><small>Aberturas de matriz</small></div></div></div>
+<div class="footer">PLENETAL PRO BASIC · AMS · Prototipo de simulación. Verificar los modelos de máquina y utillaje contra documentación oficial antes de uso industrial.</div>
+</div>
 <script>
 const $=id=>document.getElementById(id);
-let step=1, playing=false, angle=90, stroke=50, rotX=.55,rotY=-.65,zoom=1;
-const c2=$('c2'),x2=c2.getContext('2d'); let dpr=devicePixelRatio||1;
-function resize(){[c2].forEach(c=>{c.width=c.clientWidth*dpr;c.height=c.clientHeight*dpr}); renderer.setSize($('c3').clientWidth,$('c3').clientHeight,false); camera.aspect=$('c3').clientWidth/$('c3').clientHeight;camera.updateProjectionMatrix();draw2D()}
-window.addEventListener('resize',resize);
-
-const renderer=new THREE.WebGLRenderer({canvas:$('c3'),antialias:true}); renderer.setPixelRatio(Math.min(devicePixelRatio,2));
-const scene=new THREE.Scene();scene.background=new THREE.Color(0x0b1016);
-const camera=new THREE.PerspectiveCamera(42,1,.1,1000);camera.position.set(150,110,210);
-scene.add(new THREE.AmbientLight(0xffffff,.75));const dl=new THREE.DirectionalLight(0xffffff,1.2);dl.position.set(100,180,150);scene.add(dl);
-const grid=new THREE.GridHelper(300,30,0x26313d,0x18222c);grid.rotation.x=0;scene.add(grid);
-let group=new THREE.Group();scene.add(group);
-function mat(col,metal=0.2){return new THREE.MeshStandardMaterial({color:col,metalness:metal,roughness:.38})}
-function rebuild3D(collision=false){
-while(group.children.length)group.remove(group.children[0]);
-let V=parseFloat($('die').value.split('|')[0]), t=parseFloat($('thk').value);
-let die=new THREE.Mesh(new THREE.BoxGeometry(150,12,30),mat(0x475462,.7));die.position.set(0,0,0);group.add(die);
-let v1=new THREE.Mesh(new THREE.BoxGeometry(150,38,5),mat(0x596674,.7));v1.position.set(-V/2,20,0);v1.rotation.z=-.25;group.add(v1);
-let v2=v1.clone();v2.position.x=V/2;v2.rotation.z=.25;group.add(v2);
-let punch=new THREE.Mesh(new THREE.BoxGeometry(150,50,7),mat(collision?0xff3344:0x27c6e8,.65));punch.position.set(0,stroke*.35+45,0);punch.rotation.z=0;group.add(punch);
-let sheet=new THREE.Mesh(new THREE.BoxGeometry(120,t,65),mat(0xc7d0d9,.35));sheet.position.set(-35,13,0);sheet.rotation.z=-THREE.MathUtils.degToRad(angle-90);group.add(sheet);
-let sheet2=new THREE.Mesh(new THREE.BoxGeometry(65,t,65),mat(0xc7d0d9,.35));sheet2.position.set(25,28,0);sheet2.rotation.z=THREE.MathUtils.degToRad(90-angle);group.add(sheet2);
-group.rotation.x=rotX;group.rotation.y=rotY;group.scale.setScalar(zoom);
+function openSim(){ $('home').classList.add('hidden');$('library').classList.remove('active');$('workspace').classList.add('active');drawAll(); }
+function openLibrary(){ $('home').classList.add('hidden');$('workspace').classList.remove('active');$('library').classList.add('active'); }
+function goHome(){ $('home').classList.remove('hidden');$('workspace').classList.remove('active');$('library').classList.remove('active'); }
+let stroke=35, anim=false;
+const c2=$('view2d'),c3=$('view3d');
+function setup(c){let r=c.getBoundingClientRect(),d=Math.min(devicePixelRatio||1,2);c.width=Math.max(1,r.width*d);c.height=Math.max(1,r.height*d);let ctx=c.getContext('2d');ctx.setTransform(d,0,0,d,0,0);return {ctx,w:r.width,h:r.height};}
+function params(){return {v:+$('die').value,t:+$('thick').value||2,a:+$('angle').value||90,l:+$('leg').value||80,s:+$('stroke').value||0};}
+function draw2(){let {ctx,x,w,h}=Object.assign(setup(c2),{});let p=params();ctx.clearRect(0,0,w,h);ctx.strokeStyle='#172b3c';for(let x=0;x<w;x+=24){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,h);ctx.stroke()}for(let y=0;y<h;y+=24){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(w,y);ctx.stroke()}
+let scale=Math.min(w/230,h/260),cx=w/2,base=h*.72,V=p.v*scale,py=base-60*scale+(100-p.s)*.38*scale;
+ctx.fillStyle='#526d82';ctx.beginPath();ctx.moveTo(cx-105*scale,base);ctx.lineTo(cx-V/2,base);ctx.lineTo(cx,base+19*scale);ctx.lineTo(cx+V/2,base);ctx.lineTo(cx+105*scale,base);ctx.lineTo(cx+105*scale,base+14*scale);ctx.lineTo(cx-105*scale,base+14*scale);ctx.fill();
+ctx.fillStyle='#20bdda';ctx.beginPath();ctx.moveTo(cx-42*scale,py-55*scale);ctx.lineTo(cx+42*scale,py-55*scale);ctx.lineTo(cx+8*scale,py);ctx.lineTo(cx,py+9*scale);ctx.lineTo(cx-8*scale,py);ctx.closePath();ctx.fill();
+let len=Math.min(105,p.l)*scale,rad=(180-p.a)*Math.PI/180;
+ctx.strokeStyle='#e5edf4';ctx.lineWidth=Math.max(2,p.t*scale);ctx.lineCap='round';ctx.beginPath();ctx.moveTo(cx-len,py);ctx.lineTo(cx,py);ctx.lineTo(cx+Math.cos(rad)*len,py-Math.sin(rad)*len);ctx.stroke();
+ctx.fillStyle='#9eb6c9';ctx.font='11px Arial';ctx.fillText('V'+p.v+' mm',cx-V/2,base+31);ctx.fillText('Punzón',cx-22,py-67*scale);ctx.fillText(p.a.toFixed(1)+'°',cx+28,py-12);
 }
-function draw2D(){
-let W=c2.clientWidth,H=c2.clientHeight;x2.setTransform(dpr,0,0,dpr,0,0);x2.clearRect(0,0,W,H);
-x2.strokeStyle='#18222c';x2.lineWidth=1;for(let i=0;i<W;i+=30){x2.beginPath();x2.moveTo(i,0);x2.lineTo(i,H);x2.stroke()}for(let i=0;i<H;i+=30){x2.beginPath();x2.moveTo(0,i);x2.lineTo(W,i);x2.stroke()}
-let V=parseFloat($('die').value.split('|')[0]), t=parseFloat($('thk').value), a=parseFloat($('angle').value);
-let cx=W*.52, base=H*.70, s=Math.min(W/230,H/180);
-x2.lineCap='round';x2.lineJoin='round';
-x2.fillStyle='#556270';x2.beginPath();x2.moveTo(cx-100*s,base);x2.lineTo(cx- V/2*s,base);x2.lineTo(cx,base+18*s);x2.lineTo(cx+V/2*s,base);x2.lineTo(cx+100*s,base);x2.lineTo(cx+100*s,base+12*s);x2.lineTo(cx-100*s,base+12*s);x2.fill();
-let strokePx=(100-stroke)*.65*s;let py=base-55*s-strokePx;
-x2.fillStyle='#20c8e8';x2.beginPath();x2.moveTo(cx-45*s,py-55*s);x2.lineTo(cx+45*s,py-55*s);x2.lineTo(cx+8*s,py);x2.lineTo(cx,py+8*s);x2.lineTo(cx-8*s,py);x2.closePath();x2.fill();
-let L=parseFloat($('leg').value)*s;let ar=(a*Math.PI/180);let xEnd=cx+Math.cos(Math.PI-ar)*L,yEnd=py+Math.sin(Math.PI-ar)*L;
-x2.strokeStyle='#d7e0e8';x2.lineWidth=Math.max(2,t*s);x2.beginPath();x2.moveTo(cx-L,py);x2.lineTo(cx,py);x2.lineTo(xEnd,yEnd);x2.stroke();
-x2.fillStyle='#91a0b1';x2.font='12px Arial';x2.fillText('V '+V+' mm',cx-V*s/2,base+30*s);x2.fillText('H punzón '+$('punch').value.split('|')[1]+' mm',cx-55*s,py-68*s);
-x2.strokeStyle='#22d3ee';x2.lineWidth=1;x2.beginPath();x2.arc(cx,py,30,0,ar);x2.stroke();x2.fillText(a.toFixed(1)+'°',cx+34,py-8);
-let coll = stroke<12 && (V < t*7 || a<45 || a>165); setBadge(coll); 
-$('dim').textContent=`Ángulo ${a.toFixed(1)}° · t ${t.toFixed(1)} mm · V${V}`;
-$('depth').textContent=`Carrera ${stroke.toFixed(1)} mm`;
-rebuild3D(coll);
+function draw3(){let {ctx,w,h}=setup(c3),p=params();ctx.clearRect(0,0,w,h);let cx=w/2,cy=h*.59,s=Math.min(w/240,h/300),rot= -0.38;
+function proj(x,y,z){let X=x*Math.cos(rot)-z*Math.sin(rot),Z=x*Math.sin(rot)+z*Math.cos(rot);return [cx+X*s,cy+(y*.72-Z*.55)*s]}
+function poly(points,fill,stroke='#6c8da6'){ctx.beginPath();points.forEach((q,i)=>{let a=proj(...q);i?ctx.lineTo(...a):ctx.moveTo(...a)});ctx.closePath();ctx.fillStyle=fill;ctx.fill();ctx.strokeStyle=stroke;ctx.lineWidth=1.4;ctx.stroke()}
+let v=p.v;poly([[-95,0,-24],[-v/2,0,-24],[0,18,-24],[v/2,0,-24],[95,0,-24],[95,0,24],[-95,0,24]],'#435d73');
+poly([[-v/2,0,-24],[-v/2,34,-24],[-v/2,34,24],[-v/2,0,24]],'#617f96');poly([[v/2,0,-24],[v/2,34,-24],[v/2,34,24],[v/2,0,24]],'#617f96');
+let y=40+(100-p.s)*.35;poly([[-43,y,-27],[43,y,-27],[43,y,27],[-43,y,27]],'#1cb8d6');poly([[-43,y,-27],[0,y-42,-27],[0,y-42,27],[-43,y,-27]],'#32d9ef');
+poly([[-78,19,-22],[0,19,-22],[0,19,22],[-78,19,22]],'#dce6ed','#ffffff');poly([[0,19,-22],[45,50,-22],[45,50,22],[0,19,22]],'#dce6ed','#ffffff');
+ctx.fillStyle='#9bb2c6';ctx.font='11px Arial';ctx.fillText('MODELO 3D INTERACTIVO',12, h-15);
 }
-function setBadge(c){for(const id of ['badge2','badge3']){$(id).className='badge '+(c?'collision':'safe');$(id).textContent=c?'⚠ COLISIÓN':'✓ SIN COLISIÓN'}}
-function tick(){if(playing){stroke-=1.4;if(stroke<=0){stroke=0;playing=false} $('stroke').value=stroke;draw2D();requestAnimationFrame(tick)}}
-$('stroke').oninput=e=>{stroke=+e.target.value;draw2D()};$('angle').oninput=e=>{angle=+e.target.value;draw2D()};
-$('thk').oninput=draw2D;$('leg').oninput=draw2D;$('die').onchange=draw2D;$('punch').onchange=draw2D;$('machine').onchange=draw2D;
-$('play').onclick=()=>{stroke=100;$('stroke').value=100;playing=true;tick()};$('reset').onclick=()=>{playing=false;stroke=50;$('stroke').value=50;draw2D()};
-$('minus').onclick=()=>{stroke=Math.max(0,stroke-5);$('stroke').value=stroke;draw2D()};$('plus').onclick=()=>{stroke=Math.min(100,stroke+5);$('stroke').value=stroke;draw2D()};
-$('next').onclick=()=>{step=Math.min(5,step+1);$('step').textContent=`Paso ${step} / 5`;draw2D()};$('prev').onclick=()=>{step=Math.max(1,step-1);$('step').textContent=`Paso ${step} / 5`;draw2D()};
-$('c3').addEventListener('pointerdown',e=>{let sx=e.clientX,sy=e.clientY;const move=q=>{rotY+=(q.clientX-sx)*.008;rotX+=(q.clientY-sy)*.008;sx=q.clientX;sy=q.clientY;rebuild3D(false)};const up=()=>{window.removeEventListener('pointermove',move);window.removeEventListener('pointerup',up)};window.addEventListener('pointermove',move);window.addEventListener('pointerup',up)});
-$('c3').addEventListener('wheel',e=>{e.preventDefault();zoom=Math.max(.5,Math.min(2,zoom*(e.deltaY>0?.92:1.08)));rebuild3D(false)},{passive:false});
-function animate(){requestAnimationFrame(animate);renderer.render(scene,camera)}animate();resize();draw2D();
+function drawAll(){if(!$('workspace').classList.contains('active'))return;draw2();draw3();let p=params();let coll=p.s>91 && (p.v<p.t*7 || p.a<35 || p.a>160);$('collision').textContent=coll?'⚠ POSIBLE COLISIÓN':'✓ SIN COLISIÓN';$('collision').className='pill'+(coll?' bad':'');$('readout').textContent=`Ángulo ${p.a.toFixed(1)}° · Espesor ${p.t.toFixed(1)} mm · Matriz V${p.v} · Carrera ${p.s.toFixed(1)}%`; }
+function changeStroke(d){$('stroke').value=Math.max(0,Math.min(100,+$('stroke').value+d));drawAll()}
+function simulate(){if(anim)return;anim=true;let v=+$('stroke').value;function step(){v=Math.min(100,v+1.5);$('stroke').value=v;drawAll();if(v<100)requestAnimationFrame(step);else anim=false}step()}
+function resetSim(){$('stroke').value=0;drawAll()}
+['die','thick','angle','leg','stroke','punch','machine'].forEach(id=>$(id).addEventListener('input',drawAll));
+window.addEventListener('resize',drawAll);drawAll();
 </script>
 </body></html>

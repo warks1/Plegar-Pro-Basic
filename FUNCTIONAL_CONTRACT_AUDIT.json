@@ -1,0 +1,35 @@
+{
+  "generatedAt": "2026-08-02T21:11:02.606Z",
+  "results": [
+    {
+      "name": "Historial táctil",
+      "file": "src/components/AppShell.tsx",
+      "ok": true,
+      "missing": []
+    },
+    {
+      "name": "Programador multiparámetro",
+      "file": "src/features/programming/PartProgrammerPage.tsx",
+      "ok": true,
+      "missing": []
+    },
+    {
+      "name": "Programación 3D táctil",
+      "file": "src/features/programming/Programming3DPage.tsx",
+      "ok": true,
+      "missing": []
+    },
+    {
+      "name": "Simulación según referencia",
+      "file": "src/features/simulation/SimulationPage.tsx",
+      "ok": true,
+      "missing": []
+    },
+    {
+      "name": "Sincronización central",
+      "file": "src/store/useAppStore.ts",
+      "ok": true,
+      "missing": []
+    }
+  ]
+}

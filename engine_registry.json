@@ -1,0 +1,45 @@
+{
+  "schema_version": "1.0",
+  "engines": [
+    {
+      "id": 1,
+      "name": "Industrial Kernel"
+    },
+    {
+      "id": 2,
+      "name": "Geometry Engine"
+    },
+    {
+      "id": 3,
+      "name": "Physics Engine"
+    },
+    {
+      "id": 4,
+      "name": "Process Engine"
+    },
+    {
+      "id": 5,
+      "name": "Knowledge Graph"
+    },
+    {
+      "id": 6,
+      "name": "Decision Engine"
+    },
+    {
+      "id": 7,
+      "name": "AI Orchestrator"
+    },
+    {
+      "id": 8,
+      "name": "Visual Engine"
+    },
+    {
+      "id": 9,
+      "name": "Integration Bus"
+    },
+    {
+      "id": 10,
+      "name": "Evolution Layer"
+    }
+  ]
+}

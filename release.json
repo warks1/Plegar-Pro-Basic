@@ -1,0 +1,10 @@
+{
+  "product": "Plegar Pro",
+  "version": "28.1.2",
+  "build": "2026.07.14-2812",
+  "name": "Beta Funcional",
+  "base": "28.1.1",
+  "cumulative": true,
+  "standalone_html": true,
+  "preserves_previous_modules": true
+}

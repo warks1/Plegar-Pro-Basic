@@ -1,0 +1,17 @@
+{
+  "product": "Plegar Pro",
+  "version": "1.0.0",
+  "channel": "Professional Core RC2",
+  "build": "2026.07.17-1002",
+  "base_version": "1.0.0 RC1",
+  "deployment": "GitHub Pages / Web Server",
+  "offline_enabled": true,
+  "cumulative": true,
+  "production_ready": false,
+  "features": [
+    "Unified Project State",
+    "3D Piece Programmer",
+    "Consolidated Menu",
+    "Robust Touch/Mouse Orbit"
+  ]
+}

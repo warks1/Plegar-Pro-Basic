@@ -1,0 +1,12 @@
+PLEGAR PRO UPDATE 0.21.3 - CORRECTED LAUNCHER
+
+1. Close Plegar Pro and all 127.0.0.1 browser tabs.
+2. Extract this entire folder. Do not run it from inside the ZIP.
+3. Double-click ACTUALIZAR_PLEGAR_PRO.bat.
+4. Wait for UPDATE COMPLETED SUCCESSFULLY.
+5. Open the existing Plegar Pro desktop shortcut.
+
+This revision corrects the CMD encoding failure shown as:
+"Actualizacion is not recognized as an internal or external command".
+
+The BAT file is ASCII-only and all update logic runs in update.ps1.

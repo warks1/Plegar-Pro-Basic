@@ -1,0 +1,62 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://plegarpro.local/schemas/work-order-v1.json",
+  "title": "Plegar Pro Work Order",
+  "type": "object",
+  "required": [
+    "id",
+    "ref",
+    "name",
+    "revision",
+    "material",
+    "thickness",
+    "qty",
+    "status"
+  ],
+  "properties": {
+    "id": {
+      "type": "string"
+    },
+    "ref": {
+      "type": "string",
+      "minLength": 1
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1
+    },
+    "client": {
+      "type": "string"
+    },
+    "revision": {
+      "type": "string"
+    },
+    "material": {
+      "type": "string"
+    },
+    "thickness": {
+      "type": "number",
+      "exclusiveMinimum": 0
+    },
+    "qty": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "due": {
+      "type": "string"
+    },
+    "priority": {
+      "enum": [
+        "Normal",
+        "Alta",
+        "Urgente"
+      ]
+    },
+    "status": {
+      "type": "string"
+    },
+    "history": {
+      "type": "array"
+    }
+  }
+}

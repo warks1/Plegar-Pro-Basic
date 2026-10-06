@@ -1,0 +1,6 @@
+PLEGAR PRO v0.24.2 - PROFESSIONAL SIMULATION CORE
+
+1. Cierre Plegar Pro y todas las ventanas de CMD relacionadas.
+2. Ejecute INSTALAR_PLEGAR_PRO.bat desde una carpeta descomprimida.
+3. La instalación se realiza en una carpeta nueva y no elimina versiones anteriores.
+4. La nueva versión incluye cámara libre real, zoom con rueda, reproducción que se detiene al final, cotas ampliadas y una escena industrial mejorada.

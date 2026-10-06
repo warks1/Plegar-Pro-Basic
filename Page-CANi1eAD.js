@@ -1,0 +1,1 @@
+import{a as e}from"./index-BejcmiWV.js";var t=e();function n({title:e,subtitle:n,actions:r,children:i}){return(0,t.jsxs)(t.Fragment,{children:[(0,t.jsxs)(`div`,{className:`page-title`,children:[(0,t.jsxs)(`div`,{children:[(0,t.jsx)(`h1`,{children:e}),n&&(0,t.jsx)(`p`,{children:n})]}),(0,t.jsx)(`div`,{children:r})]}),i]})}export{n as t};

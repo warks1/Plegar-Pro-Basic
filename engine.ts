@@ -1,11 +1,18 @@
-import type {Project} from '../../types/domain';
-export function evaluateQualityGate(e:any){const p:Project=e.project;const checks=[
-{id:'geometry',label:'Geometría definida',ok:p.bends.length>0&&p.width>0&&p.length>0&&p.thickness>0,detail:`${p.bends.length} plegados · ${p.width} × ${p.length} × ${p.thickness} mm`,severity:'critical'},
-{id:'tooling',label:'Máquina y utillaje seleccionados',ok:!!(e.selectedMachineId&&e.selectedPunchId&&e.selectedDieId),detail:`${e.selectedMachineId} · ${e.selectedPunchId} · ${e.selectedDieId}`,severity:'critical'},
-{id:'drawing',label:'Plano aprobado',ok:e.documents.some((x:any)=>x.projectId===p.id&&x.category==='drawing'&&x.status==='approved'),detail:'Comprobación documental',severity:'critical'},
-{id:'revision',label:'Revisión aprobada',ok:e.revisions.some((x:any)=>x.projectId===p.id&&x.approved),detail:'Línea base técnica',severity:'major'},
-{id:'route',label:'Ruta validada',ok:e.routes.some((x:any)=>x.projectId===p.id&&x.status!=='draft'),detail:'Ruta de fabricación',severity:'major'},
-{id:'order',label:'Orden de fabricación',ok:e.orders.some((x:any)=>x.projectId===p.id),detail:'Orden asociada',severity:'major'},
-{id:'quality',label:'Plan de calidad',ok:e.quality.some((x:any)=>x.projectId===p.id),detail:'Control dimensional',severity:'major'},
-{id:'release',label:'Liberación registrada',ok:e.releases.some((x:any)=>x.projectId===p.id&&x.status==='released'),detail:'Liberación',severity:'major'},
-];const blocking=checks.filter(x=>!x.ok&&x.severity==='critical').length;const score=Math.round(checks.reduce((s,x)=>s+(x.ok?(x.severity==='critical'?3:2):0),0)/checks.reduce((s,x)=>s+(x.severity==='critical'?3:2),0)*100);return{checks,score,blocking,openIssues:0,readyForRc:blocking===0&&checks.every(x=>x.ok)}}
+import type {Machine,Project,Tool} from '../../types/domain';
+export type CollisionSeverity='blocking'|'warning'|'info';
+export interface CollisionFinding{id:string;bendId?:string;severity:CollisionSeverity;title:string;detail:string;recommendation:string;}
+export function evaluateBendCollisions(project:Project,machine:Machine,punch:Tool,die:Tool):CollisionFinding[]{
+ const out:CollisionFinding[]=[]; const stack=punch.height+die.height+project.thickness;
+ if(stack>machine.daylightMm) out.push({id:'stack',severity:'blocking',title:'Altura de montaje incompatible',detail:`Montaje ${stack.toFixed(1)} mm > apertura ${machine.daylightMm} mm.`,recommendation:'Seleccione una máquina con mayor apertura o herramientas más bajas.'});
+ project.bends.forEach((b,i)=>{
+  if(b.length>machine.lengthMm) out.push({id:`length-${b.id}`,bendId:b.id,severity:'blocking',title:`P${b.order}: longitud fuera de máquina`,detail:`El pliegue requiere ${b.length} mm y la máquina admite ${machine.lengthMm} mm.`,recommendation:'Cambie de máquina o divida la operación.'});
+  if(b.backgaugeX<Math.max(8,project.thickness*3)) out.push({id:`gauge-${b.id}`,bendId:b.id,severity:'warning',title:`P${b.order}: apoyo de tope reducido`,detail:`Tope X ${b.backgaugeX} mm con espesor ${project.thickness} mm.`,recommendation:'Revise estabilidad y considere apoyo alternativo.'});
+  const minV=Math.max(project.thickness*6,4);
+  if((die.v??0)<minV) out.push({id:`die-${b.id}`,bendId:b.id,severity:'warning',title:`P${b.order}: apertura V muy cerrada`,detail:`V${die.v??0} frente a recomendación mínima V${minV.toFixed(0)}.`,recommendation:'Compruebe tonelaje, radio y riesgo de marcado.'});
+  if(b.angle<35 && punch.angle>=b.angle) out.push({id:`angle-${b.id}`,bendId:b.id,severity:'blocking',title:`P${b.order}: punzón sin holgura angular`,detail:`Punzón ${punch.angle}° para ángulo objetivo ${b.angle}°.`,recommendation:'Use un punzón más agudo.'});
+  if(i>0){const prev=project.bends[i-1];const gap=Math.abs(b.position-prev.position);const flange=Math.min(gap,b.position,project.length-b.position);if(flange<stack*.35)out.push({id:`flange-${b.id}`,bendId:b.id,severity:'warning',title:`P${b.order}: posible colisión de ala`,detail:`Ala estimada ${flange.toFixed(1)} mm; montaje ${stack.toFixed(1)} mm.`,recommendation:'Revise la orientación y cambie la secuencia si es necesario.'});}
+ });
+ if(!project.bends.length)out.push({id:'no-bends',severity:'info',title:'Sin pliegues para analizar',detail:'La pieza todavía no contiene operaciones de plegado.',recommendation:'Añada pliegues en Desarrollo o Programación 2D.'});
+ return out;
+}
+export function collisionSummary(items:CollisionFinding[]){return{blocking:items.filter(x=>x.severity==='blocking').length,warnings:items.filter(x=>x.severity==='warning').length,info:items.filter(x=>x.severity==='info').length,ready:!items.some(x=>x.severity==='blocking')}}

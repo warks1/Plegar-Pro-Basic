@@ -1,0 +1,1 @@
+import type {ReactNode} from 'react';export function Page({title,subtitle,actions,children}:{title:string;subtitle?:string;actions?:ReactNode;children:ReactNode}){return <><div className="page-title"><div><h1>{title}</h1>{subtitle&&<p>{subtitle}</p>}</div><div>{actions}</div></div>{children}</>}

@@ -41,3 +41,31 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+
+      - name: Smoke-test live page and critical JavaScript bundles
+        env:
+          PAGE_URL: ${{ steps.deployment.outputs.page_url }}
+        run: |
+          set -euo pipefail
+          test -n "$PAGE_URL"
+          tempdir="$(mktemp -d)"
+          trap 'rm -rf "$tempdir"' EXIT
+          curl --fail --silent --show-error --location --retry 6 --retry-all-errors --retry-delay 2 "$PAGE_URL" -o "$tempdir/index.html"
+          grep -q 'id="root"' "$tempdir/index.html"
+          grep -q 'assets/index-BejcmiWV.js' "$tempdir/index.html"
+          for asset in \
+            assets/index-BejcmiWV.js \
+            assets/index-kS27Z77S.css \
+            assets/concept-two-v024.css \
+            assets/boot-guard.js \
+            assets/navigation-v024.js \
+            assets/Programming2DPage-DZQa639B.js \
+            assets/Programming3DPage-B-9iLBwM.js \
+            assets/CollisionsPage-Dloo_dLz.js; do
+            code="$(curl --silent --show-error --location --output /dev/null --write-out '%{http_code}' --retry 6 --retry-all-errors --retry-delay 2 "${PAGE_URL%/}/$asset")"
+            if [ "$code" != "200" ]; then
+              echo "Recurso publicado no disponible ($code): $asset"
+              exit 1
+            fi
+          done
+          echo "Prueba HTTP de GitHub Pages: OK · HTML de inicio y 8 recursos críticos responden 200."

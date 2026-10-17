@@ -37,14 +37,15 @@ function DashboardPage(){
  const [force,setForce]=React.useState(32.5);
  const bend=bends[Math.min(step,Math.max(0,bends.length-1))];
  const [positioning,setPositioning]=React.useState(false);
+ const [finished,setFinished]=React.useState(false);
  const angle=bend?.angle||90;
  const sequence=["Posicionar chapa",...bends.map((b,i)=>"Plegado "+(b.order||i+1)),"Pieza terminada"];
- const activeStep=positioning?0:Math.min(step+1,sequence.length-1);
+ const activeStep=finished?sequence.length-1:positioning?0:Math.min(step+1,sequence.length-2);
  const visibleTools=toolTab==="PUNZONES"?tools.filter(t=>t.kind==="punch"):toolTab==="MATRICES"?tools.filter(t=>t.kind==="die"):tools.slice(0,7);
  React.useEffect(()=>{if(!playing)return;const timer=window.setInterval(()=>setStep(s=>s>=Math.max(0,bends.length-1)?0:s+1),1000);return()=>window.clearInterval(timer)},[playing,bends.length]);
  React.useEffect(()=>{if(bends.length)setStep(s=>Math.min(s,bends.length-1));else setStep(0)},[bends.length]);
  const goto=(path)=>navigate(path);
- const next=()=>setStep(s=>Math.min(Math.max(0,bends.length-1),s+1));
+ const next=()=>{setPositioning(false);setFinished(false);setStep(s=>Math.min(Math.max(0,bends.length-1),s+1))};
  const previous=()=>setStep(s=>Math.max(0,s-1));
  const share=async()=>{try{await navigator.clipboard.writeText(window.location.href);window.alert("Enlace del espacio de trabajo copiado.")}catch{window.prompt("Copia el enlace del espacio de trabajo:",window.location.href)}};
  const toggle=k=>setToggles(v=>({...v,[k]:!v[k]}));
@@ -74,12 +75,12 @@ function DashboardPage(){
      jsxs("section",{className:"pp-simulation pp-panel",children:[
       jsxs("header",{className:"pp-section-heading",children:[jsxs("div",{children:[jsx("h1",{children:"SIMULACIÓN 3D"}),jsx("p",{children:"Visualización realista de la máquina y la secuencia de plegado"})]}),jsx("button",{title:"Cerrar panel",onClick:()=>goto("/simulacion-3d"),children:"×"})]}),
       jsxs("div",{className:"pp-player",children:[
-       jsx("button",{title:playing?"Pausar":"Reproducir",onClick:()=>{setPositioning(false);setPlaying(v=>!v)},children:playing?"Ⅱ":"▶"}),
-       jsx("button",{title:"Reiniciar",onClick:()=>{setPlaying(false);setPositioning(true);setStep(0)},children:"H"}),
-       jsx("button",{title:"Paso anterior",onClick:()=>{setPositioning(false);previous()},children:"◀◀"}),
+       jsx("button",{title:playing?"Pausar":"Reproducir",onClick:()=>{setPositioning(false);setFinished(false);setPlaying(v=>!v)},children:playing?"Ⅱ":"▶"}),
+       jsx("button",{title:"Reiniciar",onClick:()=>{setPlaying(false);setFinished(false);setPositioning(true);setStep(0)},children:"H"}),
+       jsx("button",{title:"Paso anterior",onClick:()=>{setPositioning(false);setFinished(false);previous()},children:"◀◀"}),
        jsx("button",{title:"Plegado anterior",onClick:()=>{setPositioning(false);previous()},children:"↶"}),
        jsx("button",{title:"Plegado siguiente",onClick:()=>{setPositioning(false);next()},children:"▶▶"}),
-       jsx("button",{title:"Avance rápido",onClick:()=>{setPositioning(false);setStep(Math.max(0,bends.length-1))},children:"»"}),
+       jsx("button",{title:"Avance rápido",onClick:()=>{setPositioning(false);setFinished(true);setStep(Math.max(0,bends.length-1))},children:"»"}),
        jsx("b",{children:"Paso "+(step+1)+" / "+Math.max(1,bends.length)}),
        jsx("span",{children:positioning?"Posicionar chapa":bend?"Plegado "+(bend.order||step+1)+" de "+bends.length:"Posicionar chapa"}),
        jsx("label",{children:["Velocidad",jsx("select",{defaultValue:"1.0x",children:["0.5x","1.0x","1.5x","2.0x"].map(v=>jsx("option",{children:v},v))})]})
@@ -100,7 +101,7 @@ function DashboardPage(){
          jsxs("div",{className:"pp-console",children:[jsx("div",{children:"XPERT"}),jsx("b",{children:"Y1 · Y2"}),jsx("small",{children:"32.5 t"})]})
         ]}),
         jsxs("div",{className:"pp-axis-cube",style:{display:toggles.Ejes?"":"none"},children:[jsx("span",{children:"Z"}),jsx("i",{}),jsx("b",{children:"Y"}),jsx("em",{children:"X"})]}),
-        jsxs("div",{className:"pp-sequence",children:[jsx("h2",{children:"SECUENCIA DE PLEGADO"}),jsx("div",{className:"pp-sequence-list",children:sequence.map((label,i)=>jsxs("button",{className:i===activeStep?"active":"",onClick:()=>{setPlaying(false);setPositioning(i===0);setStep(Math.max(0,Math.min(bends.length-1,i-1)))},children:[jsx("b",{children:i+1}),jsx("svg",{viewBox:"0 0 72 38",children:jsx("path",{d:"M4 20h22l9-10h14l8 10h12",fill:"none",stroke:"currentColor",strokeWidth:"4",strokeLinejoin:"round"})}),jsx("span",{children:label})]},i))})]})
+        jsxs("div",{className:"pp-sequence",children:[jsx("h2",{children:"SECUENCIA DE PLEGADO"}),jsx("div",{className:"pp-sequence-list",children:sequence.map((label,i)=>jsxs("button",{className:i===activeStep?"active":"",onClick:()=>{setPlaying(false);setPositioning(i===0);setFinished(i===sequence.length-1);setStep(Math.max(0,Math.min(bends.length-1,i-1)))},children:[jsx("b",{children:i+1}),jsx("svg",{viewBox:"0 0 72 38",children:jsx("path",{d:"M4 20h22l9-10h14l8 10h12",fill:"none",stroke:"currentColor",strokeWidth:"4",strokeLinejoin:"round"})}),jsx("span",{children:label})]},i))})]})
        ]}),
        jsxs("aside",{className:"pp-info",children:[
         jsxs("header",{children:[jsx("b",{children:"INFORMACIÓN"}),jsx("button",{onClick:e=>e.currentTarget.closest(".pp-info").classList.toggle("collapsed"),children:"⌄"})]}),

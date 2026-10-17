@@ -314,3 +314,30 @@ input:focus,select:focus,textarea:focus{outline:2px solid #1685cf66!important;bo
 .reconstructed-sheet span{color:#ecf8fd!important;background:#0a1b29!important;border:1px solid #2c6887!important}
 .cad-preview-canvas{background:#07111b!important;border-color:#2b607d!important;border-radius:5px!important;box-shadow:inset 0 0 22px #1685ca24,0 8px 18px #0006!important}
 .calculator-layout .multi-bend-calculator{gap:10px!important}
+
+/* Proporciones de herramienta y matriz según la referencia de simulación 2D */
+.sim2d-reference{background-color:#080f17!important}
+.sim2d-reference:before{content:"";position:absolute;z-index:0;left:9%;top:0;width:10%;height:62%;background:linear-gradient(90deg,#65727a,#cbd3d7 36%,#78858c 72%,#37434a);border:1px solid #b7c4ca;box-shadow:0 8px 15px #000a}
+.sim2d-punch{left:30%!important;top:0!important;width:40%!important;height:59%!important;clip-path:polygon(0 0,100% 0,100% 57%,56% 100%,44% 100%,0 57%)!important;border-radius:0 0 3px 3px!important}
+.sim2d-punch i{inset:0 0 auto!important;height:9%!important;background:linear-gradient(90deg,#69767d,#eef3f5 24%,#87949a 55%,#e4e9eb 77%,#536067)!important}
+.sim2d-sheet{top:55%!important;width:calc(50% - 92px)!important;height:11px!important}
+.sim2d-die{left:27%!important;top:64%!important;width:46%!important;height:24%!important;clip-path:polygon(0 0,31% 0,43% 38%,50% 65%,57% 38%,69% 0,100% 0,100% 100%,0 100%)!important;border-radius:3px!important}
+.sim2d-angle{left:calc(50% + 22px)!important;top:42%!important;font-size:24px!important}
+.sim2d-angle:before{content:"";position:absolute;left:-49px;top:11px;width:47px;height:24px;border-top:2px solid #65e979;border-radius:50%;transform:rotate(-25deg)}
+.sim2d-angle:after{content:"";position:absolute;left:-7px;top:36px;width:10px;height:10px;border-left:2px solid #65e979;border-bottom:2px solid #65e979;transform:rotate(30deg)}
+.sim3d-top{top:8%!important;height:18%!important;left:12%!important;right:12%!important;padding:0 22px!important;display:flex!important;justify-content:space-between!important;align-items:center!important}
+.sim3d-ram{top:27%!important;height:13%!important}
+.sim3d-ram:after{content:"";position:absolute;left:1%;right:1%;bottom:-16%;height:22%;background:repeating-linear-gradient(90deg,#12181c 0 18px,#667178 19px 23px,#151b20 24px 32px);border:1px solid #89959a;box-shadow:0 4px 8px #0009}
+.sim3d-tool{top:40%!important;height:12%!important}
+.sim3d-table{top:66%!important;height:9%!important}
+.sim3d-part{top:56%!important}
+.sim-ref-sequence .mini-part{width:100%;height:66px;margin:8px auto 10px;transform:perspective(230px) rotateX(58deg)!important}
+.sim-ref-sequence .mini-part:before{content:"";position:absolute;z-index:1;left:25%;right:25%;top:17px;height:35px;background:linear-gradient(145deg,#edf3f5,#a4b4bb 42%,#60747e)!important;border:1px solid #e1edf1;box-shadow:inset 0 1px #fff9,0 7px 12px #0007}
+.sim-ref-sequence .mini-part i,.sim-ref-sequence .mini-part b{z-index:2;height:35px!important;background:linear-gradient(180deg,#e4ecef,#99aab1 52%,#576b75)!important;border:1px solid #e2edf1!important}
+.sim-ref-sequence .mini-part i{left:15%!important;right:50%!important}
+.sim-ref-sequence .mini-part b{left:50%!important;right:15%!important}
+.sim-ref-sequence .stage-0 i,.sim-ref-sequence .stage-0 b{transform:rotate(0)!important}
+.sim-ref-sequence .stage-1 i{transform:rotate(-24deg)!important}
+.sim-ref-sequence .stage-2 b{transform:rotate(34deg)!important}
+.sim-ref-sequence .stage-3 i{transform:rotate(-50deg)!important}
+@media(max-width:760px){.sim2d-punch{width:42%!important;left:29%!important}.sim2d-die{left:20%!important;width:60%!important}.sim3d-top{height:17%!important}.sim3d-ram:after{display:none}}

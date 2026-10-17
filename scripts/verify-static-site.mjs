@@ -53,6 +53,13 @@ const guard = read('assets/boot-guard.js');
 for (const fragment of ['.startup-splash', '.module-loader', '15000', 'unhandledrejection']) {
   if (!guard.includes(fragment)) failures.push(`El diagnóstico de arranque no cubre: ${fragment}`);
 }
+const navigation = read('assets/navigation-v024.js');
+if (!navigation.includes('version&&version.textContent!==versionLabel')) {
+  failures.push('El observador de navegación debe evitar volver a escribir el texto de versión.');
+}
+if (!navigation.includes('function appBasePath()')) {
+  failures.push('El botón Volver no conserva la subruta de GitHub Pages.');
+}
 for (const cssFile of ['assets/index-kS27Z77S.css', 'assets/concept-two-v024.css']) {
   const css = read(cssFile);
   for (const match of css.matchAll(/url\(\s*["']?([^)"']+)["']?\s*\)/g)) {

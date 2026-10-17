@@ -53,6 +53,9 @@ const guard = read('assets/boot-guard.js');
 for (const fragment of ['.startup-splash', '.module-loader', '15000', 'unhandledrejection']) {
   if (!guard.includes(fragment)) failures.push(`El diagnóstico de arranque no cubre: ${fragment}`);
 }
+const bundleText = read('assets/index-BejcmiWV.js');
+if (!bundleText.includes('[`/colisiones`,`Colisiones`')) failures.push('El módulo de colisiones no está accesible desde el menú publicado.');
+if (!bundleText.includes('[`Colisiones`,`/colisiones`]')) failures.push('La búsqueda global no ofrece el módulo de colisiones.');
 const navigation = read('assets/navigation-v024.js');
 if (!navigation.includes('version&&version.textContent!==versionLabel')) {
   failures.push('El observador de navegación debe evitar volver a escribir el texto de versión.');

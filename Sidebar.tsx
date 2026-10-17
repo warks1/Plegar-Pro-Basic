@@ -9,7 +9,7 @@ import {
 type Item=[string,string,ComponentType<{size?:number}>];
 const engineering:Item[]=[
   ['/','Inicio',Home],['/proyectos','Proyectos',FolderKanban],['/importacion','Importar',FileUp],['/programador-pieza','Programar pieza',ClipboardList],
-  ['/programacion-2d','Programación 2D',ScanLine],['/programacion-3d','Programación 3D',Box],['/cad-cam-3d','Diseño CAD/CAM 3D',DraftingCompass],
+  ['/programacion-2d','Programación 2D',ScanLine],['/programacion-3d','Programación 3D',Box],['/cad-cam-3d','Diseño CAD/CAM 3D',DraftingCompass],['/colisiones','Colisiones',Box],
   ['/simulacion-2d','Simulación 2D',PlaySquare],['/simulacion-3d','Simulación 3D',Box],['/curva-perfecta','Curva perfecta',Radius],
   ['/desarrollo','Desarrollo',Workflow],['/calculadora-desarrollo','Calculadora de desarrollo',Gauge],['/comparador-v','Comparador V',Scale3D],
   ['/utillaje','Utillaje',Wrench],['/bibliotecas','Máquinas y bibliotecas',Library],['/registro-cad','Registro CAD',FileBox],['/catalogos-tecnicos','Catálogos técnicos',DatabaseZap],['/fuentes-oficiales','Fuentes oficiales',DatabaseZap],['/materiales','Materiales',Layers3]

@@ -77,6 +77,7 @@ function SimulationPage({mode}){
         },label))}),
         jsxs("svg",{className:"sim2d-drawing",viewBox:"0 0 900 560",role:"img","aria-label":"Simulación 2D del punzón y la matriz V seleccionados",children:[
           jsx("defs",{children:[
+            jsx("pattern",{id:"sim2d-grid",width:"40",height:"40",patternUnits:"userSpaceOnUse",children:jsx("path",{d:"M40 0H0V40",fill:"none",stroke:"#3d696d",strokeWidth:"1",opacity:".3"})}),
             jsx("linearGradient",{id:"sim2d-punch-metal",x1:"0",x2:"1",y1:"0",y2:"1",children:[
               jsx("stop",{offset:"0%",stopColor:"#d8c4dc"}),jsx("stop",{offset:"50%",stopColor:"#b7a0bf"}),jsx("stop",{offset:"100%",stopColor:"#8a7895"})
             ]}),
@@ -85,26 +86,25 @@ function SimulationPage({mode}){
             ]})
           ]}),
           jsx("rect",{width:"900",height:"560",fill:"#628b91"}),
-          jsx("path",{d:"M0 0H900V560H0Z",fill:"url(#sim2d-grid)"}),
-          jsx("path",{d:"M0 0H900V560H0Z",fill:"url(#sim2d-grid)"}),
-          jsx("path",{d:"M45 352H398",stroke:"#b8d9dd","stroke-width":"1","stroke-dasharray":"5 8",opacity:".35"}),
-          jsx("path",{d:"M502 352H855",stroke:"#b8d9dd","stroke-width":"1","stroke-dasharray":"5 8",opacity:".35"}),
-          jsx("path",{d:"M450 110V445",stroke:"#c2dfe0","stroke-width":"1","stroke-dasharray":"5 7",opacity:".45"}),
-          jsx("path",{d:"M75 351H400L450 "+(351+foldDepth)+"L500 351H825",fill:"none",stroke:"#e5eff0","stroke-width":"4","stroke-linecap":"round","stroke-linejoin":"round",className:"sim2d-workpiece"}),
-          jsx("path",{d:"M450 "+(351+foldDepth)+"L450 440",stroke:"#eaf5f4","stroke-width":"1.5","stroke-dasharray":"4 5",opacity:".6"}),
-          jsx("path",{d:"M"+(450-dieWidth/2)+" 375H"+(450-dieV/2)+"L450 426L"+(450+dieV/2)+" 375H"+(450+dieWidth/2)+"V468H"+(450-dieWidth/2)+"Z",fill:"url(#sim2d-die-metal)",stroke:"#81778a","stroke-width":"2"}),
+          jsx("rect",{x:"0",y:"0",width:"900",height:"560",fill:"url(#sim2d-grid)"}),
+          jsx("path",{d:"M45 352H398",stroke:"#b8d9dd",strokeWidth:"1",strokeDasharray:"5 8",opacity:".35"}),
+          jsx("path",{d:"M502 352H855",stroke:"#b8d9dd",strokeWidth:"1",strokeDasharray:"5 8",opacity:".35"}),
+          jsx("path",{d:"M450 110V445",stroke:"#c2dfe0",strokeWidth:"1",strokeDasharray:"5 7",opacity:".45"}),
+          jsx("path",{d:"M450 "+(351+foldDepth)+"L450 440",stroke:"#eaf5f4",strokeWidth:"1.5",strokeDasharray:"4 5",opacity:".6"}),
+          jsx("path",{d:"M"+(450-dieWidth/2)+" 375H"+(450-dieV/2)+"L450 426L"+(450+dieV/2)+" 375H"+(450+dieWidth/2)+"V468H"+(450-dieWidth/2)+"Z",fill:"url(#sim2d-die-metal)",stroke:"#81778a",strokeWidth:"2"}),
           jsx("path",{d:"M"+(450-dieWidth/2-12)+" 375H"+(450-dieWidth/2)+"V468H"+(450-dieWidth/2-12)+"Z",fill:"#526e60"}),
           jsx("path",{d:"M"+(450+dieWidth/2)+" 375H"+(450+dieWidth/2+12)+"V468H"+(450+dieWidth/2)+"Z",fill:"#526e60"}),
-          jsx("path",{d:"M"+(450-punchWidth/2)+" "+punchShoulder+"H"+(450+punchWidth/2)+"V"+(punchShoulder+48)+"L450 "+(punchShoulder+48+punchTipDepth)+"L"+(450-punchWidth/2)+" "+(punchShoulder+48)+"Z",fill:"url(#sim2d-punch-metal)",stroke:"#e4d7e5","stroke-width":"2",className:"sim2d-tool-shape"}),
+          jsx("path",{d:"M"+(450-punchWidth/2)+" "+punchShoulder+"H"+(450+punchWidth/2)+"V"+(punchShoulder+48)+"L450 "+(punchShoulder+48+punchTipDepth)+"L"+(450-punchWidth/2)+" "+(punchShoulder+48)+"Z",fill:"url(#sim2d-punch-metal)",stroke:"#e4d7e5",strokeWidth:"2",className:"sim2d-tool-shape"}),
           jsx("path",{d:"M"+(450-punchWidth*.2)+" "+(punchShoulder+48)+"V"+(punchShoulder+118)+"H"+(450+punchWidth*.2)+"V"+(punchShoulder+48),fill:"#a48ead",opacity:".85"}),
-          jsx("path",{d:"M450 130V"+(punchShoulder-4),stroke:"#263e3f","stroke-width":"10",opacity:".9"}),
-          jsx("circle",{cx:"450",cy:String(351+foldDepth),r:"5",fill:"#e6f5f1",stroke:"#425e5e","stroke-width":"2"}),
-          jsx("path",{d:"M"+(450-dieV/2)+" 441H"+(450+dieV/2),stroke:"#a9e7e0","stroke-width":"2"}),
+          jsx("path",{d:"M450 130V"+(punchShoulder-4),stroke:"#263e3f",strokeWidth:"10",opacity:".9"}),
+          jsx("path",{d:"M75 351H400L450 "+(351+foldDepth)+"L500 351H825",fill:"none",stroke:"#e5eff0",strokeWidth:"4",strokeLinecap:"round",strokeLinejoin:"round",className:"sim2d-workpiece"}),
+          jsx("circle",{cx:"450",cy:String(351+foldDepth),r:"5",fill:"#e6f5f1",stroke:"#425e5e",strokeWidth:"2"}),
+          jsx("path",{d:"M"+(450-dieV/2)+" 441H"+(450+dieV/2),stroke:"#a9e7e0",strokeWidth:"2"}),
           jsx("text",{x:"450",y:"500",textAnchor:"middle",className:"sim2d-die-label",children:"MATRIZ V"+(die?.v||"—")+" · "+(die?.angle||"—")+"°"}),
           jsx("text",{x:"450",y:"80",textAnchor:"middle",className:"sim2d-punch-label",children:(punch?.name||"Punzón")+" · "+(punch?.angle||"—")+"°"}),
           jsx("text",{x:"535",y:String(343+foldDepth/2),className:"sim2d-angle",children:angle+"°"}),
-          jsx("path",{d:"M517 "+(349+foldDepth/2)+"l-11 12 14 2",fill:"none",stroke:"#b6f47a","stroke-width":"2"}),
-          jsx("path",{d:"M80 328v-13m0 0-5 6m5-6 5 6M820 328v-13m0 0-5 6m5-6 5 6",stroke:"#d6e7e4","stroke-width":"1.5",fill:"none",opacity:".75"})
+          jsx("path",{d:"M517 "+(349+foldDepth/2)+"l-11 12 14 2",fill:"none",stroke:"#b6f47a",strokeWidth:"2"}),
+          jsx("path",{d:"M80 328v-13m0 0-5 6m5-6 5 6M820 328v-13m0 0-5 6m5-6 5 6",stroke:"#d6e7e4",strokeWidth:"1.5",fill:"none",opacity:".75"})
         ]}),
         jsxs("div",{className:"sim2d-selection",children:[
           jsxs("label",{children:[jsx("span",{children:"Punzón seleccionado"}),jsx("select",{value:punch?.id||"",onChange:event=>state.setPunch?.(event.target.value),children:tools.filter(item=>item.kind==="punch").map(item=>jsx("option",{value:item.id,children:item.name},item.id))})]}),

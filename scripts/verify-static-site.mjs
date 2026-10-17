@@ -26,6 +26,9 @@ const index = read('index.html');
 const fallback = read('404.html');
 if (!index.includes('id="root"')) failures.push('index.html no contiene #root.');
 if (!index.includes('location.hostname.endsWith(\'.github.io\')')) failures.push('index.html no calcula la base de GitHub Pages.');
+for (const cacheBuster of ['assets/boot-guard.js?v=20261017-startup-2','assets/index-BejcmiWV.js?v=20261017-router-2','assets/navigation-v024.js?v=20261017-observer-fix']) {
+  if (!index.includes(cacheBuster)) failures.push(`Falta actualizar la versión de caché de ${cacheBuster}.`);
+}
 if (fallback !== index) failures.push('404.html no coincide con index.html; las rutas directas pueden fallar.');
 const htmlResources = [...index.matchAll(/(?:src|href)=["']([^"']+)["']/g)]
   .map((match) => match[1])

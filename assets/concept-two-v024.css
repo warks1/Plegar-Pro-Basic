@@ -300,3 +300,17 @@ input:focus,select:focus,textarea:focus{outline:2px solid #1685cf66!important;bo
 .programmer-sheet-3d .programmer-flange{background:linear-gradient(135deg,#e4ecef,#96a9b2 55%,#53656e)!important;border-left:2px solid #46c6ed!important}
 .sim3d-wall{background:repeating-linear-gradient(0deg,transparent 0 54px,#59b8e11a 55px 56px),repeating-linear-gradient(90deg,transparent 0 88px,#59b8e113 89px 90px),linear-gradient(180deg,#1d2d39,#0a1721 72%,#050b11)!important}
 .sim3d-reference:before{z-index:0}
+
+/* Dibujos auxiliares: pliegues, desarrollos y geometría importada */
+.multi-bend-sketch{background:radial-gradient(ellipse at 50% 44%,#142a3b,#06101a 76%)!important;border:1px solid #254760;border-radius:8px}
+.multi-bend-sketch .sketch-segment{background:linear-gradient(180deg,#dce7eb,#8fa1a9 46%,#546872 100%)!important;border-color:#d8e6eb!important;color:#f1f8fb!important;box-shadow:inset 0 1px #fff8,0 10px 20px #0009!important}
+.multi-bend-sketch .sketch-segment-wrap i{background:linear-gradient(90deg,#546770,#d0dce1 40%,#71838a)!important;color:#eaf5fa!important;border-left:2px solid #38c7ef;box-shadow:0 9px 17px #0009!important}
+.multi-bend-sketch .sketch-segment-wrap i b{color:#c7f3ff;background:#0a1b29e8;border:1px solid #28607a;border-radius:4px;padding:3px}
+.program-svg polyline{stroke:#43c9ee!important;filter:drop-shadow(0 0 5px #1685ca)}
+.program-svg .preview-bend{stroke:#71e491!important}
+.reconstruction-preview{background:radial-gradient(ellipse at 50% 40%,#142b3f,#07111b 74%)!important;border-color:#2a4d67!important}
+.reconstructed-sheet{background-color:#293f50!important;background-image:linear-gradient(145deg,#dfe8ec 0%,#a7b7bf 37%,#6d808a 72%,#d6dfe3 100%),linear-gradient(#36566b44 1px,transparent 1px),linear-gradient(90deg,#36566b44 1px,transparent 1px)!important;background-size:auto,20px 20px,20px 20px!important;background-blend-mode:normal,screen,screen!important;border:1px solid #e5edf0!important;box-shadow:inset 0 0 18px #fff4,0 18px 32px #0009!important}
+.reconstructed-sheet i{border-left:3px dashed #42cef1!important;filter:drop-shadow(0 0 4px #1fa5d6)}
+.reconstructed-sheet span{color:#ecf8fd!important;background:#0a1b29!important;border:1px solid #2c6887!important}
+.cad-preview-canvas{background:#07111b!important;border-color:#2b607d!important;border-radius:5px!important;box-shadow:inset 0 0 22px #1685ca24,0 8px 18px #0006!important}
+.calculator-layout .multi-bend-calculator{gap:10px!important}

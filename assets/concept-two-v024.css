@@ -359,3 +359,7 @@ input:focus,select:focus,textarea:focus{outline:2px solid #1685cf66!important;bo
 .sim3d-console b{position:relative;z-index:2;color:#5ed5fa!important;text-shadow:0 0 6px #24b6ed}
 .sim3d-console:after{background:linear-gradient(135deg,#101a20,#59666d)!important}
 .sim3d-reference{box-shadow:inset 0 -60px 75px #0008}
+
+.project-thumbnail{filter:drop-shadow(0 5px 9px #0009);border:1px solid #2b526c!important;border-radius:7px!important}
+.project-thumbnail [fill]:not([fill="none"]){filter:drop-shadow(0 0 2px #52c5ec66)}
+.calculator-layout.multi-bend-calculator .multi-bend-sketch{background:radial-gradient(ellipse at 50% 45%,#172c3e,#07111b 76%)!important;border:1px solid #25465f;border-radius:8px}

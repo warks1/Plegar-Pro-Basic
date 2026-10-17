@@ -7,16 +7,21 @@ if (!baseUrl) {
 }
 
 const errors = [];
-const consoleErrors = [];
-const failedRequests = [];
+const consoleMessages = [];
 const failedResources = [];
 const browser = await chromium.launch({ headless: true });
 
 try {
   const page = await browser.newPage({ viewport: { width: 1365, height: 900 } });
   page.on('pageerror', (error) => errors.push(error.stack || error.message));
-  page.on('console', (message) => { if (message.type() === 'error') consoleErrors.push(message.text()); });
-  page.on('requestfailed', (request) => failedRequests.push(`${request.url()} — ${request.failure()?.errorText || 'request failed'}`));
+  page.on('console', (message) => {
+    if (message.type() === 'error' || message.type() === 'warning') {
+      consoleMessages.push(`[${message.type()}] ${message.text()}`);
+    }
+  });
+  page.on('requestfailed', (request) => {
+    failedResources.push(`REQUEST FAILED ${request.url()} · ${request.failure()?.errorText || 'unknown'}`);
+  });
   page.on('response', (response) => {
     const url = response.url();
     if (url.startsWith(baseUrl) && response.status() >= 400 && !new URL(url).pathname.endsWith('/favicon.ico')) {
@@ -25,27 +30,37 @@ try {
   });
 
   await page.goto(baseUrl, { waitUntil: 'domcontentloaded', timeout: 60000 });
-  try {
-    await page.locator('.app-shell').waitFor({ state: 'visible', timeout: 30000 });
-  } catch (error) {
-    const diagnostic = await page.evaluate(() => ({
+  await page.waitForTimeout(18000);
+
+  const diagnostic = await page.evaluate(() => {
+    const root = document.getElementById('root');
+    const base = document.querySelector('base');
+    return {
       url: location.href,
-      title: document.title,
-      bodyText: document.body.innerText.slice(0, 5000),
-      rootHtml: document.querySelector('#root')?.innerHTML.slice(0, 7000) || 'NO #root',
-      resources: performance.getEntriesByType('resource').map((entry) => entry.name).filter((url) => /\\.js(?:$|\\?)|\\.css(?:$|\\?)/.test(url)).slice(-50),
-    })).catch((evaluationError) => ({ evaluationError: String(evaluationError) }));
-    console.error('DIAGNÓSTICO DE ARRANQUE: ' + JSON.stringify({
-      diagnostic,
-      pageErrors: errors,
-      consoleErrors,
-      failedRequests,
-      failedResources,
-      timeout: String(error),
-    }, null, 2));
-    await page.screenshot({ path: '/tmp/plegar-startup-failure.png', fullPage: true }).catch(() => {});
-    throw error;
+      base: base?.href || null,
+      readyState: document.readyState,
+      rootText: root?.innerText?.slice(0, 3000) || '',
+      rootHtml: root?.innerHTML?.slice(0, 5000) || '',
+      shell: Boolean(root?.querySelector('.app-shell')),
+      splash: Boolean(root?.querySelector('.startup-splash')),
+      failurePanel: Boolean(root?.querySelector('[role="alert"]')),
+      scripts: [...document.scripts].map(s => ({src:s.src,type:s.type,loaded:!!s.dataset.loaded})),
+      stylesheetCount: document.styleSheets.length,
+    };
+  });
+
+  const diagnosticText = JSON.stringify({
+    ...diagnostic,
+    pageErrors: errors,
+    consoleMessages: consoleMessages.slice(-30),
+    failedResources: failedResources.slice(-30),
+  }, null, 2);
+  console.log('DIAGNÓSTICO DE ARRANQUE:\\n' + diagnosticText);
+
+  if (!diagnostic.shell) {
+    throw new Error('La interfaz no ha montado .app-shell. Se adjunta el diagnóstico de DOM, consola y recursos arriba.');
   }
+
   const initialTitle = (await page.locator('.content').innerText()).trim();
   if (!initialTitle) throw new Error('La aplicación montó el marco, pero el contenido de Inicio está vacío.');
 
@@ -76,8 +91,9 @@ try {
   const mobile = await browser.newPage({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true });
   mobile.on('pageerror', (error) => errors.push(error.stack || error.message));
   await mobile.goto(baseUrl, { waitUntil: 'domcontentloaded', timeout: 60000 });
-  await mobile.locator('.app-shell').waitFor({ state: 'visible', timeout: 30000 });
-  await mobile.waitForTimeout(300);
+  await mobile.waitForTimeout(6000);
+  const mobileShell = await mobile.locator('.app-shell').count();
+  if (!mobileShell) throw new Error('La interfaz no ha montado en móvil. Texto: ' + (await mobile.locator('#root').innerText().catch(()=>'#root no encontrado')));
   const dimensions = await mobile.evaluate(() => ({
     width: window.innerWidth,
     documentWidth: document.documentElement.scrollWidth,
@@ -87,10 +103,10 @@ try {
     throw new Error(`Desbordamiento horizontal en móvil: ${JSON.stringify(dimensions)}`);
   }
 
-  if (errors.length) throw new Error('Errores JavaScript del navegador:\n' + errors.join('\n---\n'));
-  if (failedResources.length) throw new Error('Recursos con error HTTP:\n' + failedResources.join('\n'));
+  if (errors.length) throw new Error('Errores JavaScript del navegador:\\n' + errors.join('\\n---\\n'));
+  if (failedResources.length) throw new Error('Recursos con error HTTP o de red:\\n' + failedResources.join('\\n'));
 
-  console.log('Prueba de navegador: OK · Inicio montado · Programación 2D/3D y Colisiones navegables · prefijo Pages conservado · móvil sin desplazamiento horizontal.');
+  console.log('Prueba de navegador: OK · Inicio montado · Programación 2D/3D y Colisiones navegables · prefijo Pages conservado · móvil sin desbordamiento horizontal.');
 } finally {
   await browser.close();
 }

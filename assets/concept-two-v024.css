@@ -341,3 +341,21 @@ input:focus,select:focus,textarea:focus{outline:2px solid #1685cf66!important;bo
 .sim-ref-sequence .stage-2 b{transform:rotate(34deg)!important}
 .sim-ref-sequence .stage-3 i{transform:rotate(-50deg)!important}
 @media(max-width:760px){.sim2d-punch{width:42%!important;left:29%!important}.sim2d-die{left:20%!important;width:60%!important}.sim3d-top{height:17%!important}.sim3d-ram:after{display:none}}
+
+/* Detalle de prensa plegadora: travesaño, soportes y superficie de trabajo */
+.sim3d-top{flex-direction:column!important;justify-content:center!important;gap:4px!important;background:linear-gradient(180deg,#343b40 0%,#1a2025 22%,#0b1014 100%)!important;border-color:#59656b!important;box-shadow:inset 0 2px #c6d0d555,inset 0 -5px #030608,0 15px 25px #000c!important}
+.sim3d-top span{font-size:11px!important;letter-spacing:.18em!important;text-transform:uppercase!important;color:#b9c6cc!important}
+.sim3d-top b{font-size:16px!important;letter-spacing:.07em!important;color:#f4f7f8!important;text-shadow:0 1px 3px #000}
+.sim3d-top:before,.sim3d-top:after{content:"";position:absolute;z-index:2;top:10%;width:7%;height:78%;background:linear-gradient(90deg,#8e241e,#f05a45 38%,#8b201b);border:1px solid #ff8b70;box-shadow:inset 0 2px #ffc0a077,0 6px 12px #000b}
+.sim3d-top:before{left:0}.sim3d-top:after{right:0}
+.sim3d-ram{background:repeating-linear-gradient(90deg,#737e83 0 3px,#d7dfe2 4px 28px,#849198 29px 34px)!important}
+.sim3d-ram:before{content:"";position:absolute;left:0;right:0;top:12%;height:10%;background:linear-gradient(#f4f7f8,#75838a,#c5cdd0);box-shadow:0 1px 2px #0008}
+.sim3d-table{background:repeating-linear-gradient(90deg,#5e6a70 0 2px,#c5cdd0 3px 24px,#7a878d 25px 30px)!important;box-shadow:inset 0 2px #fff9,inset 0 -8px 14px #27343a88,0 8px 18px #0009!important}
+.sim3d-table:after{content:"";position:absolute;left:1%;right:1%;bottom:-90%;height:85%;background:linear-gradient(90deg,#20292e,#7c878c 14%,#3e484d 25%,#aeb8bc 50%,#303a40 75%,#768187 90%,#171e22);border:1px solid #68767d;box-shadow:0 9px 18px #0009}
+.sim3d-column{background:linear-gradient(90deg,#252e33 0%,#7c878c 13%,#d5dcdf 27%,#808b90 57%,#333d42 100%)!important;border-color:#b9c4c9!important}
+.sim3d-part i{height:12px!important}
+.sim3d-part i.center{height:18px!important}
+.sim3d-console{background:linear-gradient(90deg,#222b30,#89949a 42%,#252d32)!important;border-color:#9da9af!important}
+.sim3d-console b{position:relative;z-index:2;color:#5ed5fa!important;text-shadow:0 0 6px #24b6ed}
+.sim3d-console:after{background:linear-gradient(135deg,#101a20,#59666d)!important}
+.sim3d-reference{box-shadow:inset 0 -60px 75px #0008}

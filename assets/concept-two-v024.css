@@ -363,3 +363,9 @@ input:focus,select:focus,textarea:focus{outline:2px solid #1685cf66!important;bo
 .project-thumbnail{filter:drop-shadow(0 5px 9px #0009);border:1px solid #2b526c!important;border-radius:7px!important}
 .project-thumbnail [fill]:not([fill="none"]){filter:drop-shadow(0 0 2px #52c5ec66)}
 .calculator-layout.multi-bend-calculator .multi-bend-sketch{background:radial-gradient(ellipse at 50% 45%,#172c3e,#07111b 76%)!important;border:1px solid #25465f;border-radius:8px}
+
+/* Mantener la proporción amplia del área de máquina de las capturas */
+.sim2d-reference{width:min(860px,94%)!important;height:420px!important}
+.sim3d-reference{width:min(980px,96%)!important;height:510px!important}
+@media(max-width:1100px){.sim2d-reference{height:390px!important}.sim3d-reference{height:470px!important}}
+@media(max-width:760px){.sim2d-reference{height:300px!important}.sim3d-reference{height:340px!important}}

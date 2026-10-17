@@ -110,7 +110,7 @@ function SimulationPage({mode}){
         jsx("span",{children:index+1}),
         jsx("div",{className:"mini-part stage-"+Math.min(index,3),children:[jsx("i",{}),jsx("b",{})]}),
         jsx("strong",{children:label})
-      ]},label))}
+       ]},label))})
     ]})
   ]})});
 }

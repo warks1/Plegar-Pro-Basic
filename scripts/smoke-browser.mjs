@@ -29,7 +29,12 @@ try {
     }
   });
 
-  await page.goto(baseUrl, { waitUntil: 'domcontentloaded', timeout: 60000 });
+  const navigation = await page.goto(baseUrl, { waitUntil: 'commit', timeout: 60000 });
+  console.log('RESPUESTA INICIAL:', JSON.stringify({
+    status: navigation?.status() ?? null,
+    url: navigation?.url() ?? baseUrl,
+    contentType: navigation?.headers()['content-type'] ?? null,
+  }));
   await page.waitForTimeout(18000);
 
   const diagnostic = await page.evaluate(() => {

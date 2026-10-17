@@ -34,7 +34,7 @@ function SimulationPage({mode}){
   const bend=bends[step];
   const angle=bend?.angle??90;
   const sequence=["Posicionar chapa",...bends.map(item=>"Plegado "+item.order),"Pieza terminada"];
-  const activeSequence=finished?sequence.length-1:positioning?0:step+1;
+  const activeSequence=finished?sequence.length-1:(positioning||!bends.length)?0:step+1;
   const changeStep=next=>{setPlaying(false);setFinished(false);setPositioning(false);setStep(Math.max(0,Math.min(count-1,next)))};
   const rows=[
     ["Máquina",machine?.name||"Sin máquina"],

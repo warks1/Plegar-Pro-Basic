@@ -164,7 +164,7 @@ input:focus,select:focus,textarea:focus{outline:2px solid #1685cf66!important;bo
 @media(prefers-reduced-motion:reduce){*,*:before,*:after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
 
 /* Vistas de trabajo 2D y 3D */
-.engineering-grid{grid-template-columns:minmax(0,1fr) 320px!important;gap:10px!important;align-items:start}
+.engineering-grid:has(.canvas-panel),.engineering-grid:has(.programming3d-viewer){grid-template-columns:minmax(0,1fr) 320px!important;gap:10px!important;align-items:start}
 .programming-actions{flex-wrap:wrap;gap:7px!important;margin-bottom:9px!important;padding:8px!important;background:#0a1928!important;border:1px solid #21435d!important;border-radius:8px!important}
 .programming-actions button{min-height:34px!important;padding:6px 10px!important;border-radius:6px!important;background:#10243a!important;border:1px solid #294c68!important;color:#e1edf5!important}
 .programming-actions button.active{background:#1269ad!important;border-color:#2b8bc9!important}
@@ -198,5 +198,5 @@ input:focus,select:focus,textarea:focus{outline:2px solid #1685cf66!important;bo
 .form label{color:#b3c6d3!important;font-size:12px!important}
 .form input,.form select{min-height:34px!important;padding:7px!important}
 .hint{color:#90a8b9!important}
-@media(max-width:1050px){.engineering-grid{grid-template-columns:minmax(0,1fr) 280px!important}}
-@media(max-width:760px){.engineering-grid{grid-template-columns:1fr!important}.programming-form{max-height:none!important}.canvas-panel{min-height:370px!important}.program-svg{min-height:350px}.programming3d-viewer{min-height:470px!important}.dimension-strip{max-width:92%}}
+@media(max-width:1050px){.engineering-grid:has(.canvas-panel),.engineering-grid:has(.programming3d-viewer){grid-template-columns:minmax(0,1fr) 280px!important}}
+@media(max-width:760px){.engineering-grid:has(.canvas-panel),.engineering-grid:has(.programming3d-viewer){grid-template-columns:1fr!important}.programming-form{max-height:none!important}.canvas-panel{min-height:370px!important}.program-svg{min-height:350px}.programming3d-viewer{min-height:470px!important}.dimension-strip{max-width:92%}}

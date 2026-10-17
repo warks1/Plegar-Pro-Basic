@@ -19,9 +19,10 @@ function SimulationPage({mode}){
   const [playing,setPlaying]=React.useState(false);
   const [zoom,setZoom]=React.useState(1);
   const [finished,setFinished]=React.useState(false);
+  const [positioning,setPositioning]=React.useState(false);
   React.useEffect(()=>{
     if(!playing)return;
-    const timer=window.setInterval(()=>setStep(current=>current>=count-1?0:current+1),900);
+    const timer=window.setInterval(()=>setStep(current=>{if(current>=count-1){window.clearInterval(timer);setPlaying(false);setFinished(true);return current}return current+1}),900);
     return()=>window.clearInterval(timer);
   },[playing,count]);
   const machine=machines.find(item=>item.id===state.selectedMachineId)||machines[0];
@@ -30,8 +31,8 @@ function SimulationPage({mode}){
   const bend=bends[step];
   const angle=bend?.angle??90;
   const sequence=["Posicionar chapa",...bends.map(item=>"Plegado "+item.order),"Pieza terminada"];
-  const activeSequence=finished?sequence.length-1:step+1;
-  const changeStep=next=>{setPlaying(false);setFinished(false);setStep(Math.max(0,Math.min(count-1,next)))};
+  const activeSequence=finished?sequence.length-1:positioning?0:step+1;
+  const changeStep=next=>{setPlaying(false);setFinished(false);setPositioning(false);setStep(Math.max(0,Math.min(count-1,next)))};
   const rows=[
     ["Máquina",machine?.name||"Sin máquina"],
     ["Punzón",punch?.name||"Sin punzón"],
@@ -76,14 +77,14 @@ function SimulationPage({mode}){
   return jsx(Page,{title:is3d?"Simulación 3D":"Simulación 2D",subtitle:is3d?"Visualización realista de la máquina y la secuencia de plegado":"Secuencia de plegado en vista plana",children:jsx("div",{className:"sim-ref-shell",children:[
     jsxs("div",{className:"sim-ref-player",children:[
       jsxs("div",{className:"sim-ref-controls",children:[
-        jsx("button",{type:"button","aria-label":playing?"Pausar":"Reproducir",onClick:()=>setPlaying(value=>!value),children:playing?"Ⅱ":"▶"}),
-        jsx("button",{type:"button","aria-label":"Reiniciar",onClick:()=>{setPlaying(false);setFinished(false);setStep(0)},children:"↺"}),
+        jsx("button",{type:"button","aria-label":playing?"Pausar":"Reproducir",onClick:()=>setPlaying(value=>{if(!value){setPositioning(false);setFinished(false)}return !value}),children:playing?"Ⅱ":"▶"}),
+        jsx("button",{type:"button","aria-label":"Reiniciar",onClick:()=>{setPlaying(false);setFinished(false);setPositioning(true);setStep(0)},children:"↺"}),
         jsx("button",{type:"button","aria-label":"Paso anterior",onClick:()=>changeStep(step-1),children:"◀"}),
         jsx("button",{type:"button","aria-label":"Paso siguiente",onClick:()=>changeStep(step+1),children:"▶▶"})
       ]}),
       jsx("strong",{children:"Paso "+(step+1)+" / "+count}),
-      jsx("span",{children:bend?"Plegado "+bend.order+" de "+count:finished?"Pieza terminada":"Sin plegados"}),
-      jsx("div",{className:"sim-ref-progress","aria-label":"Progreso de la simulación",children:jsx("i",{style:{width:((step+1)/count*100)+"%"}})})
+      jsx("span",{children:positioning?"Posicionar chapa":finished?"Pieza terminada":bend?"Plegado "+bend.order+" de "+count:"Sin plegados"}),
+      jsx("div",{className:"sim-ref-progress","aria-label":"Progreso de la simulación",children:jsx("i",{style:{width:(finished?100:positioning?0:(step+1)/count*100)+"%"}})})
     ]}),
     jsxs("div",{className:"sim-ref-body",children:[
       toolsRail,
@@ -102,9 +103,9 @@ function SimulationPage({mode}){
       jsx("h3",{children:"SECUENCIA DE PLEGADO"}),
       jsx("div",{children:sequence.map((label,index)=>jsxs("button",{type:"button",className:index===activeSequence?"active":"",onClick:()=>{
         setPlaying(false);
-        if(index===0){setFinished(false);setStep(0)}
-        else if(index===sequence.length-1){setFinished(true);setStep(count-1)}
-        else {setFinished(false);setStep(index-1)}
+        if(index===0){setFinished(false);setPositioning(true);setStep(0)}
+        else if(index===sequence.length-1){setPositioning(false);setFinished(true);setStep(count-1)}
+        else {setPositioning(false);setFinished(false);setStep(index-1)}
       },children:[
         jsx("span",{children:index+1}),
         jsx("div",{className:"mini-part stage-"+Math.min(index,3),children:[jsx("i",{}),jsx("b",{})]}),

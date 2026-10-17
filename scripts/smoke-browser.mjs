@@ -7,12 +7,16 @@ if (!baseUrl) {
 }
 
 const errors = [];
+const consoleErrors = [];
+const failedRequests = [];
 const failedResources = [];
 const browser = await chromium.launch({ headless: true });
 
 try {
   const page = await browser.newPage({ viewport: { width: 1365, height: 900 } });
   page.on('pageerror', (error) => errors.push(error.stack || error.message));
+  page.on('console', (message) => { if (message.type() === 'error') consoleErrors.push(message.text()); });
+  page.on('requestfailed', (request) => failedRequests.push(`${request.url()} — ${request.failure()?.errorText || 'request failed'}`));
   page.on('response', (response) => {
     const url = response.url();
     if (url.startsWith(baseUrl) && response.status() >= 400 && !new URL(url).pathname.endsWith('/favicon.ico')) {
@@ -21,7 +25,27 @@ try {
   });
 
   await page.goto(baseUrl, { waitUntil: 'domcontentloaded', timeout: 60000 });
-  await page.locator('.app-shell').waitFor({ state: 'visible', timeout: 30000 });
+  try {
+    await page.locator('.app-shell').waitFor({ state: 'visible', timeout: 30000 });
+  } catch (error) {
+    const diagnostic = await page.evaluate(() => ({
+      url: location.href,
+      title: document.title,
+      bodyText: document.body.innerText.slice(0, 5000),
+      rootHtml: document.querySelector('#root')?.innerHTML.slice(0, 7000) || 'NO #root',
+      resources: performance.getEntriesByType('resource').map((entry) => entry.name).filter((url) => /\\.js(?:$|\\?)|\\.css(?:$|\\?)/.test(url)).slice(-50),
+    })).catch((evaluationError) => ({ evaluationError: String(evaluationError) }));
+    console.error('DIAGNÓSTICO DE ARRANQUE: ' + JSON.stringify({
+      diagnostic,
+      pageErrors: errors,
+      consoleErrors,
+      failedRequests,
+      failedResources,
+      timeout: String(error),
+    }, null, 2));
+    await page.screenshot({ path: '/tmp/plegar-startup-failure.png', fullPage: true }).catch(() => {});
+    throw error;
+  }
   const initialTitle = (await page.locator('.content').innerText()).trim();
   if (!initialTitle) throw new Error('La aplicación montó el marco, pero el contenido de Inicio está vacío.');
 

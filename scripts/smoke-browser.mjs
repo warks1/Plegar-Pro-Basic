@@ -15,7 +15,7 @@ try {
   const page = await browser.newPage({ viewport: { width: 1365, height: 900 } });
   page.on('pageerror', (error) => errors.push(error.stack || error.message));
   page.on('console', (message) => {
-    if (message.type() === 'error' || message.type() === 'warning') {
+    if (message.type() === 'error' && !message.text().includes('Failed to load resource')) {
       consoleMessages.push(`[${message.type()}] ${message.text()}`);
     }
   });
@@ -67,6 +67,9 @@ try {
   if (!diagnostic.shell) {
     throw new Error('La interfaz no ha montado .app-shell. Se adjunta el diagnóstico de DOM, consola y recursos arriba.');
   }
+  if (diagnostic.failurePanel) {
+    throw new Error('La aplicación ha mostrado el panel interno de error de React; revisa el diagnóstico de arranque anterior.');
+  }
 
   const initialTitle = (await page.locator('.content').innerText()).trim();
   if (!initialTitle) throw new Error('La aplicación montó el marco, pero el contenido de Inicio está vacío.');
@@ -111,6 +114,7 @@ try {
   }
 
   if (errors.length) throw new Error('Errores JavaScript del navegador:\\n' + errors.join('\\n---\\n'));
+  if (consoleMessages.length) throw new Error('Errores de consola del navegador:\\n' + consoleMessages.join('\\n---\\n'));
   if (failedResources.length) throw new Error('Recursos con error HTTP o de red:\\n' + failedResources.join('\\n'));
 
   console.log('Prueba de navegador: OK · Inicio montado · Programación 2D/3D y Colisiones navegables · prefijo Pages conservado · móvil sin desbordamiento horizontal.');

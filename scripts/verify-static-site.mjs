@@ -46,6 +46,9 @@ for (const dependency of dependencies) {
 if (!bundle.includes('new URL(e,new URL("../",import.meta.url)).pathname')) {
   failures.push('El cargador de módulos no conserva la ruta base de GitHub Pages.');
 }
+if (!bundle.includes("basename:document.querySelector(`base`)?.getAttribute(`href`)||`/`")) {
+  failures.push('El enrutador no hereda la ruta base del sitio de GitHub Pages.');
+}
 const guard = read('assets/boot-guard.js');
 for (const fragment of ['.startup-splash', '.module-loader', '15000', 'unhandledrejection']) {
   if (!guard.includes(fragment)) failures.push(`El diagnóstico de arranque no cubre: ${fragment}`);

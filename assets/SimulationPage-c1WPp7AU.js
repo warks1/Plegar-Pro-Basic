@@ -16,10 +16,13 @@ function SimulationPage({mode}){
   const bends=project.bends||[];
   const count=Math.max(1,bends.length);
   const [step,setStep]=React.useState(()=>{try{const raw=window.localStorage.getItem("plegarpro-simulation-step:"+project.id);if(raw===null)return Math.min(1,count-1);const saved=Number(raw);return Number.isFinite(saved)?Math.max(0,Math.min(count-1,saved)):Math.min(1,count-1)}catch{return Math.min(1,count-1)}});
-  const [playing,setPlaying]=React.useState(false);
+  const [playing,setPlaying]=React.useState(()=>{try{return window.sessionStorage.getItem("plegarpro-simulation-playing:"+project.id)==="true"}catch{return false}});
   const [zoom,setZoom]=React.useState(1);
   const [finished,setFinished]=React.useState(false);
   const [positioning,setPositioning]=React.useState(false);
+  React.useEffect(()=>{
+    try{window.sessionStorage.setItem("plegarpro-simulation-playing:"+project.id,String(playing))}catch{}
+  },[project.id,playing]);
   React.useEffect(()=>{
     try{window.localStorage.setItem("plegarpro-simulation-step:"+project.id,String(step))}catch{}
     window.dispatchEvent(new CustomEvent("plegarpro:simulation-step",{detail:{projectId:project.id,step}}));

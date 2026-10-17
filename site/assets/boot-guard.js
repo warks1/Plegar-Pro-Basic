@@ -15,7 +15,6 @@
     if (!force && root.childElementCount > 0 && root.textContent.trim() && !loading) return;
 
     shown = true;
-    root.replaceChildren();
     const panel = document.createElement('main');
     panel.setAttribute('role', 'alert');
     panel.style.cssText = 'box-sizing:border-box;min-height:100vh;padding:24px;display:flex;align-items:center;justify-content:center;background:#eef3f8;color:#172536;font:16px system-ui,sans-serif';
@@ -44,7 +43,11 @@
     actions.append(reload, home);
     card.append(title, message, detail, actions);
     panel.append(card);
-    root.append(panel);
+    panel.style.position = 'fixed';
+    panel.style.inset = '0';
+    panel.style.zIndex = '2147483647';
+    panel.style.overflow = 'auto';
+    document.body.append(panel);
   };
 
   window.addEventListener('error', (event) => {

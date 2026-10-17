@@ -632,3 +632,14 @@ body:has(.pp-workbench){overflow:hidden;background:#050913!important;color:#e8ef
 .sim2d-angle-readout small{font-size:8px;letter-spacing:.1em}
 .sim2d-angle-readout strong{font-size:16px;color:#b7f393}
 @media(max-width:760px){.sim-ref-2d .sim-ref-body{grid-template-columns:1fr!important;min-height:450px!important}.sim-ref-2d .sim-ref-tools{display:none!important}.sim2d-selection{left:3%;right:3%;grid-template-columns:1fr 1fr}.sim2d-angle-readout{display:none}.sim2d-drawing .sim2d-punch-label,.sim2d-drawing .sim2d-die-label{font-size:16px}}
+
+/* Vista 3D frontal-perspectiva de la TRUMPF, ligada al mismo ciclo que 2D */
+.sim3d-reference{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;min-width:0!important;min-height:0!important;margin:0!important;transform-origin:center center;overflow:hidden!important;background:radial-gradient(ellipse at 48% 42%,#24384a 0,#101b27 58%,#07111a 100%)!important;box-shadow:inset 0 -60px 75px #0008}
+.sim3d-machine-svg{display:block;width:100%;height:100%;filter:drop-shadow(0 14px 18px #0009)}
+.sim3d-machine-svg text{font-family:Inter,Arial,sans-serif}
+.sim3d-machine-svg [stroke-width="2"]{vector-effect:non-scaling-stroke}
+.sim3d-moving-ram{transition:transform .48s cubic-bezier(.2,.75,.25,1);transform-box:view-box;transform-origin:50% 0}
+.sim3d-workpiece{filter:drop-shadow(0 0 8px #53bfff88)}
+.sim-ref-shell:not(.sim-ref-2d) .sim-ref-stage{position:relative;overflow:hidden;background:radial-gradient(ellipse at 50% 42%,#24394c,#08111b 76%)!important}
+.sim-ref-shell:not(.sim-ref-2d) .sim-ref-data{z-index:3;background:#08131fe8!important;backdrop-filter:blur(8px)}
+@media(max-width:760px){.sim3d-reference{min-height:0!important}.sim3d-machine-svg{min-height:100%}}

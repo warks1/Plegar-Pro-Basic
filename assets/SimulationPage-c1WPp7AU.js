@@ -97,7 +97,7 @@ function SimulationPage({mode}){
           jsx("path",{d:"M"+(450-punchWidth/2)+" "+punchShoulder+"H"+(450+punchWidth/2)+"V"+(punchShoulder+48)+"L450 "+(punchShoulder+48+punchTipDepth)+"L"+(450-punchWidth/2)+" "+(punchShoulder+48)+"Z",fill:"url(#sim2d-punch-metal)",stroke:"#e4d7e5",strokeWidth:"2",className:"sim2d-tool-shape"}),
           jsx("path",{d:"M"+(450-punchWidth*.2)+" "+(punchShoulder+48)+"V"+(punchShoulder+118)+"H"+(450+punchWidth*.2)+"V"+(punchShoulder+48),fill:"#a48ead",opacity:".85"}),
           jsx("path",{d:"M450 130V"+(punchShoulder-4),stroke:"#263e3f",strokeWidth:"10",opacity:".9"}),
-          jsx("path",{d:"M75 351H400L450 "+(351+foldDepth)+"L500 351H825",fill:"none",stroke:"#e5eff0",strokeWidth:"4",strokeLinecap:"round",strokeLinejoin:"round",className:"sim2d-workpiece"}),
+          jsx("path",{key:"sheet-"+step+"-"+angle,d:"M75 351H400L450 "+(351+foldDepth)+"L500 351H825",fill:"none",stroke:"#e5eff0",strokeWidth:"4",strokeLinecap:"round",strokeLinejoin:"round",className:"sim2d-workpiece",children:jsx("animate",{attributeName:"d",from:"M75 351H400L450 351L500 351H825",to:"M75 351H400L450 "+(351+foldDepth)+"L500 351H825",dur:"450ms",fill:"freeze"})}),
           jsx("circle",{cx:"450",cy:String(351+foldDepth),r:"5",fill:"#e6f5f1",stroke:"#425e5e",strokeWidth:"2"}),
           jsx("path",{d:"M"+(450-dieV/2)+" 441H"+(450+dieV/2),stroke:"#a9e7e0",strokeWidth:"2"}),
           jsx("text",{x:"450",y:"500",textAnchor:"middle",className:"sim2d-die-label",children:"MATRIZ V"+(die?.v||"—")+" · "+(die?.angle||"—")+"°"}),

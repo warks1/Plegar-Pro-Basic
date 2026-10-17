@@ -560,3 +560,8 @@ body:has(.pp-workbench){overflow:hidden;background:#050913!important;color:#e8ef
 .pp-workbench .pp-materials tbody tr{cursor:pointer;transition:background .18s ease}
 .pp-workbench .pp-materials tbody tr:hover,.pp-workbench .pp-materials tbody tr.is-selected{background:#2e5c9b55}
 @keyframes pp-guide-pulse{0%,100%{opacity:.35}50%{opacity:.8}}
+
+.pp-workbench .pp-measure-overlay{position:absolute;left:20%;top:24%;z-index:5;display:flex;gap:22px;padding:8px 12px;border:1px solid #69baff88;border-radius:5px;background:#07111de8;color:#b8ddff;font:11px ui-monospace,monospace;box-shadow:0 0 18px #3388ff55;pointer-events:none;animation:pp-measure-in .28s ease-out}
+.pp-workbench .pp-measure-overlay::before{content:"";position:absolute;left:0;right:0;top:50%;height:1px;background:#63baffaa;z-index:-1}
+.pp-workbench .pp-sections button.selected{box-shadow:0 0 0 1px #5996ff,0 0 14px #347bff55}
+@keyframes pp-measure-in{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}

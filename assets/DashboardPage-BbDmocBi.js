@@ -42,7 +42,7 @@ function DashboardPage(){
  const sequence=["Posicionar chapa",...bends.map((b,i)=>"Plegado "+(b.order||i+1)),"Pieza terminada"];
  const activeStep=finished?sequence.length-1:positioning?0:Math.min(step+1,sequence.length-2);
  const visibleTools=toolTab==="PUNZONES"?tools.filter(t=>t.kind==="punch"):toolTab==="MATRICES"?tools.filter(t=>t.kind==="die"):tools.slice(0,7);
- React.useEffect(()=>{if(!playing)return;const timer=window.setInterval(()=>setStep(s=>s>=Math.max(0,bends.length-1)?0:s+1),1000);return()=>window.clearInterval(timer)},[playing,bends.length]);
+ React.useEffect(()=>{if(!playing)return;if(step>=Math.max(0,bends.length-1)){setPlaying(false);setFinished(true);setPositioning(false);return}const timer=window.setTimeout(()=>setStep(s=>s+1),1000);return()=>window.clearTimeout(timer)},[playing,step,bends.length]);
  React.useEffect(()=>{if(bends.length)setStep(s=>Math.min(s,bends.length-1));else setStep(0)},[bends.length]);
  const goto=(path)=>navigate(path);
  const next=()=>{setPositioning(false);setFinished(false);setStep(s=>Math.min(Math.max(0,bends.length-1),s+1))};

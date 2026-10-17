@@ -270,3 +270,33 @@ input:focus,select:focus,textarea:focus{outline:2px solid #1685cf66!important;bo
 .sim3d-console{position:absolute;z-index:6;right:2%;bottom:16%;width:13%;height:22%;display:grid;place-items:center;background:linear-gradient(90deg,#202a30,#58646a,#20282d);border:1px solid #78848a;color:#39c7fa;font-size:10px;box-shadow:0 8px 18px #0008}
 .sim3d-console:after{content:"";position:absolute;left:15%;right:15%;bottom:12%;height:24%;background:linear-gradient(135deg,#12191e,#36444a);border:1px solid #748087;transform:skewY(-8deg)}
 @media(max-width:760px){.sim-ref-stage{min-height:330px}.sim2d-reference{height:270px}.sim3d-reference{height:300px}.sim3d-console{display:none}.sim3d-column.left{left:8%}.sim3d-column.right{right:8%}}
+
+/* Correcciones de render para piezas HTML y SVG reales del proyecto */
+.development-flat .sheet{
+  position:relative;min-height:240px;padding:0!important;overflow:hidden;
+  background-color:#173047!important;
+  background-image:linear-gradient(145deg,#edf4f7 0%,#9eafb7 34%,#647781 68%,#cbd6db 100%),linear-gradient(#244a6355 1px,transparent 1px),linear-gradient(90deg,#244a6355 1px,transparent 1px)!important;
+  background-blend-mode:normal,screen,screen!important;background-size:auto,24px 24px,24px 24px!important;
+  border:1px solid #d5e5eb!important;border-radius:3px!important;
+  box-shadow:inset 0 0 24px #fff4,0 14px 28px #0008!important
+}
+.development-flat .bend-line{width:3px!important;top:0!important;bottom:0!important;background:#148bc3!important;box-shadow:0 0 9px #1eb7f1!important}
+.development-flat .bend-line.negative{background:#44d0f0!important}
+.development-flat .bend-line span{color:#f3fbff!important;background:#0b4f77!important;border:1px solid #68c9ee}
+.development-flat .bend-line small{color:#fff!important;background:#071724dc!important;border:1px solid #4382a0!important;border-radius:4px;padding:3px 5px;white-space:nowrap}
+.development-folded .folded-base{background:linear-gradient(145deg,#f1f5f7,#a5b4bb 30%,#687b84 72%,#d6dfe3)!important;border:1px solid #e6f0f3!important;box-shadow:inset 0 0 18px #fff6,0 20px 35px #0009!important}
+.development-folded .folded-flange{color:#eaf6fb!important;border-color:#e5f2f6!important;box-shadow:inset 0 2px #fff8,0 8px 16px #0008!important}
+.cadcam-sketch .cadcam-part{fill:#4e91bb!important;fill-opacity:.76!important;stroke:#e0f1f7!important;stroke-width:2.5px!important}
+.cadcam-sketch .cadcam-bend{stroke:#41cff3!important;stroke-width:3px!important;stroke-dasharray:8 6!important}
+.cadcam-sketch .cadcam-bend.negative{stroke:#88dcf5!important}
+.cadcam-sketch .cadcam-hole{fill:#07131d!important;stroke:#d3e9f1!important;stroke-width:2.5px!important}
+.cadcam-model .cad-face{background:linear-gradient(145deg,#eff4f6 0%,#b8c6cc 24%,#71858e 58%,#d5dfe3 78%,#596b74 100%)!important;border-color:#e9f2f5!important;box-shadow:inset 0 2px 7px #fff9,inset 0 -12px 18px #1d303b66,0 22px 38px #000a!important}
+.cadcam-model .cad-flange{background:linear-gradient(135deg,#e3eaed,#98a9b1 52%,#596a73)!important}
+.cadcam-model .cad-bend-3d{background:linear-gradient(180deg,#4cd4ff,#087cb7)!important;box-shadow:0 0 9px #27b8ef!important}
+.programmer-sheet-2d{background-color:#1c3448!important;background-image:linear-gradient(145deg,#e9eff2 0%,#b6c3c9 38%,#71858f 70%,#d6dfe3 100%),linear-gradient(#36556b55 1px,transparent 1px),linear-gradient(90deg,#36556b55 1px,transparent 1px)!important;background-size:auto,22px 22px,22px 22px!important;background-blend-mode:normal,screen,screen!important;border-color:#e0ebef!important;border-radius:4px!important}
+.programmer-sheet-2d .programmer-bend-line{background:#1389c1!important;box-shadow:0 0 9px #33c3f0!important}
+.programmer-sheet-2d .programmer-bend-line.selected{background:#50d5ff!important}
+.programmer-sheet-3d .programmer-3d-part{background:linear-gradient(145deg,#f0f5f7,#9eafb7 44%,#687b84 72%,#d2dce0)!important;border:1px solid #e3edf0!important;box-shadow:inset 0 1px #fff9,0 20px 45px #000a!important}
+.programmer-sheet-3d .programmer-flange{background:linear-gradient(135deg,#e4ecef,#96a9b2 55%,#53656e)!important;border-left:2px solid #46c6ed!important}
+.sim3d-wall{background:repeating-linear-gradient(0deg,transparent 0 54px,#59b8e11a 55px 56px),repeating-linear-gradient(90deg,transparent 0 88px,#59b8e113 89px 90px),linear-gradient(180deg,#1d2d39,#0a1721 72%,#050b11)!important}
+.sim3d-reference:before{z-index:0}

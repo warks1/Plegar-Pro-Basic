@@ -1,87 +1,97 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="960" viewBox="0 0 1600 960" role="img" aria-labelledby="title desc">
-<title id="title">Boceto Plegar Pro: pantalla de inicio e interfaz principal</title><desc id="desc">Concepto de aplicación industrial moderna para diseño y simulación de plegado de chapa.</desc>
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1000" viewBox="0 0 1600 1000" role="img" aria-labelledby="title desc">
+<title id="title">Plegar Pro — concepto llamativo de inicio e interfaz</title><desc id="desc">Boceto con una pantalla de bienvenida industrial y el panel principal de producción.</desc>
 <defs>
- <linearGradient id="bg" x2="1" y2="1"><stop stop-color="#050b14"/><stop offset=".55" stop-color="#0b1a29"/><stop offset="1" stop-color="#07111b"/></linearGradient>
- <linearGradient id="panel" x2="1" y2="1"><stop stop-color="#10243a"/><stop offset="1" stop-color="#091522"/></linearGradient>
- <linearGradient id="blue" x2="0" y2="1"><stop stop-color="#44dcff"/><stop offset=".5" stop-color="#168bdf"/><stop offset="1" stop-color="#1459bd"/></linearGradient>
- <linearGradient id="steel" x2="0" y2="1"><stop stop-color="#f5f8f9"/><stop offset=".28" stop-color="#b9c6cc"/><stop offset=".58" stop-color="#667a84"/><stop offset=".8" stop-color="#d9e2e5"/><stop offset="1" stop-color="#566871"/></linearGradient>
- <linearGradient id="beam" x2="0" y2="1"><stop stop-color="#4a5358"/><stop offset=".25" stop-color="#1b2227"/><stop offset="1" stop-color="#080d11"/></linearGradient>
- <linearGradient id="red" x2="1" y2="1"><stop stop-color="#ff765d"/><stop offset=".45" stop-color="#dc332b"/><stop offset="1" stop-color="#671715"/></linearGradient>
- <radialGradient id="cyan"><stop stop-color="#168cd4" stop-opacity=".42"/><stop offset="1" stop-color="#0a1622" stop-opacity="0"/></radialGradient>
- <pattern id="grid" width="26" height="26" patternUnits="userSpaceOnUse"><path d="M26 0H0V26" fill="none" stroke="#46b6e9" stroke-opacity=".12"/></pattern>
- <filter id="shadow" x="-.3" y="-.3" width="1.6" height="1.8"><feGaussianBlur in="SourceAlpha" stdDeviation="10"/><feOffset dy="9"/><feComponentTransfer><feFuncA type="linear" slope=".36"/></feComponentTransfer><feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+ <linearGradient id="bg" x2="1" y2="1"><stop stop-color="#030914"/><stop offset=".45" stop-color="#08172a"/><stop offset="1" stop-color="#050b17"/></linearGradient>
+ <linearGradient id="glass" x2="1" y2="1"><stop stop-color="#112d49"/><stop offset=".55" stop-color="#0a1c31"/><stop offset="1" stop-color="#071220"/></linearGradient>
+ <linearGradient id="electric" x2="0" y2="1"><stop stop-color="#56eaff"/><stop offset=".4" stop-color="#168dff"/><stop offset="1" stop-color="#435aff"/></linearGradient>
+ <radialGradient id="aura"><stop stop-color="#148dff" stop-opacity=".54"/><stop offset=".55" stop-color="#13cfff" stop-opacity=".13"/><stop offset="1" stop-color="#06111e" stop-opacity="0"/></radialGradient>
+ <pattern id="grid" width="24" height="24" patternUnits="userSpaceOnUse"><path d="M24 0H0V24" fill="none" stroke="#42ccff" stroke-opacity=".17" stroke-width=".8"/></pattern>
+ <filter id="glow" x="-.5" y="-.5" width="2" height="2"><feGaussianBlur stdDeviation="8" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+ <filter id="shadow" x="-.3" y="-.3" width="1.6" height="1.8"><feGaussianBlur in="SourceAlpha" stdDeviation="12"/><feOffset dy="10"/><feComponentTransfer><feFuncA type="linear" slope=".5"/></feComponentTransfer><feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+ <linearGradient id="alert" x2="1"><stop stop-color="#ff5465"/><stop offset="1" stop-color="#aa2749"/></linearGradient>
 </defs>
-<rect width="1600" height="960" fill="url(#bg)"/><circle cx="350" cy="390" r="500" fill="url(#cyan)"/><circle cx="1250" cy="570" r="650" fill="url(#cyan)"/>
-<text x="64" y="50" fill="#83a6ba" font-family="Arial,sans-serif" font-size="12" font-weight="700" letter-spacing="3">PLEGAR PRO  /  CONCEPTO VISUAL</text><text x="64" y="91" fill="#f1f7fa" font-family="Arial,sans-serif" font-size="27" font-weight="700">Una entrada clara. Un taller bajo control.</text>
-<!-- launch screen -->
-<rect x="55" y="120" width="470" height="785" rx="24" fill="#081421" stroke="#2b5e7d" stroke-width="1.5" filter="url(#shadow)"/><rect x="73" y="138" width="434" height="749" rx="16" fill="url(#bg)" stroke="#1c3c54"/><rect x="73" y="138" width="434" height="749" rx="16" fill="url(#grid)"/>
-<text x="103" y="180" fill="#55d6f6" font-family="Arial,sans-serif" font-size="10" font-weight="700" letter-spacing="2">01  /  INICIO</text>
-<!-- logo -->
-<path d="M104 233l52-30 49 27v56l-51 29-50-29z" fill="#0b2233" stroke="#40c8f3" stroke-width="2"/><path d="M121 261l34-25 33 17v22l-32 19-35-19z" fill="url(#steel)"/><path d="M138 257l18-13 17 9v13l-17 10-18-10z" fill="#10263a"/>
-<text x="226" y="246" fill="#f4f8fa" font-family="Arial,sans-serif" font-size="25" font-weight="800" letter-spacing="2">PLEGAR</text><text x="227" y="278" fill="#49d8f7" font-family="Arial,sans-serif" font-size="30" font-weight="800" letter-spacing="5">PRO</text><text x="228" y="297" fill="#819db0" font-family="Arial,sans-serif" font-size="8" letter-spacing="2">SHEET METAL ENGINEERING</text>
-<!-- start machine scene -->
-<rect x="95" y="325" width="390" height="305" rx="10" fill="#07111b" stroke="#28536e"/><rect x="95" y="325" width="390" height="305" rx="10" fill="url(#grid)"/><circle cx="290" cy="485" r="180" fill="url(#cyan)"/>
-<path d="M112 595h355l-22 17H134z" fill="#172a36" stroke="#496474"/>
-<g filter="url(#shadow)">
- <path d="M139 382h300v50H139z" fill="url(#beam)" stroke="#67767d"/><path d="M154 432h270v34H154z" fill="url(#steel)" stroke="#edf3f5"/>
- <path d="M158 432h18v151h-18zM405 432h18v151h-18z" fill="url(#steel)" stroke="#cbd7dc"/>
- <path d="M218 466h145l-18 42h-109z" fill="url(#steel)" stroke="#edf4f6"/>
- <path d="M196 520h185v20H196z" fill="url(#steel)" stroke="#e1eaed"/>
- <path d="M202 509l52 20 36 32 35-32 53-20v19l-51 22-37 35-37-35-51-22z" fill="url(#blue)" stroke="#8ceaff" stroke-width="2"/>
- <path d="M174 560h238v19H174z" fill="url(#steel)" stroke="#e5edf0"/>
- <path d="M139 383h21v51h-21zM418 383h21v51h-21z" fill="url(#red)" stroke="#ffad94"/>
- <path d="M182 584h18v30h-18zM384 584h18v30h-18z" fill="#34434b" stroke="#809098"/>
+<rect width="1600" height="1000" fill="url(#bg)"/><circle cx="470" cy="430" r="590" fill="url(#aura)"/><circle cx="1300" cy="520" r="640" fill="url(#aura)"/>
+<text x="58" y="45" fill="#74dfff" font-family="Arial,sans-serif" font-size="11" font-weight="700" letter-spacing="3">PLEGAR PRO  /  NUEVA EXPERIENCIA</text>
+<text x="58" y="84" fill="#f6fbff" font-family="Arial,sans-serif" font-size="26" font-weight="800">El taller, con toda su energía en una sola pantalla.</text>
+<text x="58" y="106" fill="#8baac4" font-family="Arial,sans-serif" font-size="11">Bienvenida cinematográfica + panel de control para el trabajo diario</text>
+<!-- welcome screen -->
+<rect x="48" y="130" width="490" height="800" rx="22" fill="#0a1b2c" stroke="#32cfff" stroke-opacity=".8" stroke-width="1.5" filter="url(#shadow)"/>
+<rect x="57" y="139" width="472" height="782" rx="17" fill="url(#glass)" stroke="#245b83"/>
+<text x="83" y="175" fill="#70deff" font-family="Arial,sans-serif" font-size="10" font-weight="700" letter-spacing="2">01  /  PANTALLA DE INICIO</text>
+<rect x="75" y="194" width="436" height="247" rx="12" fill="#04101c" stroke="#288ac0" stroke-width="1.5" filter="url(#glow)"/>
+<image href="./hero-approved.png" x="76" y="195" width="434" height="245" preserveAspectRatio="xMidYMid slice"/>
+<rect x="76" y="195" width="434" height="245" rx="12" fill="none" stroke="#55d9ff" stroke-opacity=".65"/>
+<text x="84" y="472" fill="#f5fbff" font-family="Arial,sans-serif" font-size="28" font-weight="800">Tu siguiente pieza</text>
+<text x="84" y="506" fill="#f5fbff" font-family="Arial,sans-serif" font-size="28" font-weight="800">empieza aqui.</text>
+<text x="84" y="535" fill="#a4bdd2" font-family="Arial,sans-serif" font-size="12">Disena, simula y fabrica con precision.</text>
+<text x="84" y="555" fill="#a4bdd2" font-family="Arial,sans-serif" font-size="12">Todo tu proceso conectado en Plegar Pro.</text>
+<rect x="83" y="584" width="420" height="57" rx="10" fill="url(#electric)" filter="url(#glow)"/>
+<text x="293" y="619" text-anchor="middle" fill="#fff" font-family="Arial,sans-serif" font-size="14" font-weight="800" letter-spacing=".6">ENTRAR AL TALLER  →</text>
+<rect x="83" y="658" width="203" height="74" rx="9" fill="#102a43" stroke="#2582b7"/>
+<circle cx="106" cy="684" r="11" fill="#0c496c" stroke="#4ad8ff"/><text x="106" y="688" text-anchor="middle" fill="#9aedff" font-family="Arial,sans-serif" font-size="10">✓</text>
+<text x="126" y="682" fill="#eaf6fc" font-family="Arial,sans-serif" font-size="10" font-weight="700">MAQUINA CONECTADA</text>
+<text x="101" y="714" fill="#79e7ba" font-family="Arial,sans-serif" font-size="10">●  Xpert Pro 100 · Lista</text>
+<rect x="297" y="658" width="206" height="74" rx="9" fill="#102a43" stroke="#2582b7"/>
+<circle cx="320" cy="684" r="11" fill="#193f6a" stroke="#448eff"/><text x="320" y="688" text-anchor="middle" fill="#b7cbff" font-family="Arial,sans-serif" font-size="10">✦</text>
+<text x="340" y="682" fill="#eaf6fc" font-family="Arial,sans-serif" font-size="10" font-weight="700">ESPACIO DE TRABAJO</text>
+<text x="315" y="714" fill="#8ecbff" font-family="Arial,sans-serif" font-size="10">12 proyectos activos</text>
+<path d="M84 767H502" stroke="#235070"/>
+<text x="84" y="798" fill="#73dfff" font-family="Arial,sans-serif" font-size="10" font-weight="700" letter-spacing="1.4">PLEGAR PRO  ·  SUITE INDUSTRIAL</text>
+<text x="84" y="822" fill="#7896ad" font-family="Arial,sans-serif" font-size="10">Diseno de chapa  /  Simulacion  /  Produccion</text>
+<circle cx="87" cy="866" r="4" fill="#55e5a4" filter="url(#glow)"/><text x="100" y="870" fill="#a8c0d1" font-family="Arial,sans-serif" font-size="10">Sistema preparado para comenzar</text>
+<!-- dashboard screen -->
+<rect x="568" y="130" width="984" height="800" rx="22" fill="#091a2c" stroke="#32cfff" stroke-opacity=".8" stroke-width="1.5" filter="url(#shadow)"/>
+<rect x="578" y="140" width="964" height="780" rx="16" fill="#071321" stroke="#244e70"/>
+<!-- side rail -->
+<path d="M594 140H780V920H594Q578 920 578 904V156Q578 140 594 140" fill="#09192a"/><path d="M780 140V920" stroke="#1d4665"/>
+<path d="M596 159l20-12 20 12v24l-20 12-20-12z" fill="#0e314d" stroke="#50d9ff" stroke-width="1.4" filter="url(#glow)"/>
+<path d="M605 177l11-9 11 6v9l-11 7-11-7z" fill="#bceeff"/>
+<text x="644" y="169" fill="#f6fbff" font-family="Arial,sans-serif" font-size="14" font-weight="800" letter-spacing="1">PLEGAR PRO</text><text x="645" y="185" fill="#51d7ff" font-family="Arial,sans-serif" font-size="7" font-weight="700" letter-spacing="1.6">INDUSTRIAL SUITE</text>
+<text x="598" y="219" fill="#5793b8" font-family="Arial,sans-serif" font-size="8" font-weight="700" letter-spacing="1.2">ESPACIO DE TRABAJO</text>
+<rect x="590" y="229" width="174" height="35" rx="8" fill="url(#electric)" filter="url(#glow)"/><text x="610" y="251" fill="#fff" font-family="Arial,sans-serif" font-size="10" font-weight="800">⌂  Inicio</text>
+<g font-family="Arial,sans-serif" font-size="10" fill="#b7cad8">
+ <text x="610" y="294">▤  Proyectos</text><text x="610" y="328">⇧  Importar</text><text x="610" y="362">⌗  Programar pieza</text><text x="610" y="396">⌘  Programacion 2D</text>
+ <text x="610" y="430">◈  Programacion 3D</text><text x="610" y="464">▧  Diseno CAD/CAM</text><text x="610" y="498">▷  Simulacion 2D</text><text x="610" y="532">◉  Simulacion 3D</text>
+ <text x="610" y="566">⌁  Desarrollo</text><text x="610" y="600">⚙  Produccion</text><text x="610" y="634">✓  Calidad</text><text x="610" y="668">▦  Materiales</text>
 </g>
-<text x="289" y="371" text-anchor="middle" fill="#dce7ec" font-family="Arial,sans-serif" font-size="10" font-weight="700" letter-spacing="1.3">XPERT PRO 100  ·  PLEGADO PRECISO</text>
-<circle cx="116" cy="657" r="4" fill="#4de2a1"/><text x="129" y="661" fill="#a9c1cf" font-family="Arial,sans-serif" font-size="10">Máquina conectada  ·  Sistema listo</text>
-<text x="104" y="711" fill="#f2f7fa" font-family="Arial,sans-serif" font-size="22" font-weight="700">Diseña. Pliega. Produce.</text><text x="104" y="736" fill="#91aabb" font-family="Arial,sans-serif" font-size="11">Del primer boceto a la pieza terminada, en un solo flujo.</text>
-<rect x="103" y="768" width="220" height="46" rx="8" fill="url(#blue)"/><text x="213" y="796" text-anchor="middle" fill="#fff" font-family="Arial,sans-serif" font-size="12" font-weight="700">ABRIR PROYECTO</text><rect x="333" y="768" width="150" height="46" rx="8" fill="#10243a" stroke="#2c5775"/><text x="408" y="796" text-anchor="middle" fill="#d8e8f1" font-family="Arial,sans-serif" font-size="11" font-weight="700">EXPLORAR DEMO</text>
-<text x="104" y="852" fill="#607f92" font-family="Arial,sans-serif" font-size="9" letter-spacing="1.4">V52.0  ·  EDICIÓN INDUSTRIAL</text>
-<!-- dashboard frame -->
-<rect x="565" y="120" width="980" height="785" rx="24" fill="#081421" stroke="#2b5e7d" stroke-width="1.5" filter="url(#shadow)"/><rect x="583" y="138" width="944" height="749" rx="16" fill="#07111b" stroke="#1c3c54"/>
-<!-- sidebar -->
-<path d="M599 138h179v749H599q-16 0-16-16V154q0-16 16-16" fill="#091827"/><path d="M778 138v749" stroke="#1d4059"/>
-<path d="M604 159l18-11 18 10v21l-18 11-18-11z" fill="#0b2335" stroke="#35b9e5"/><text x="651" y="170" fill="#eff6fa" font-family="Arial,sans-serif" font-size="13" font-weight="800" letter-spacing="1">PLEGAR PRO</text><text x="652" y="185" fill="#69cae8" font-family="Arial,sans-serif" font-size="7" letter-spacing="1.5">INDUSTRIAL SUITE</text>
-<text x="604" y="218" fill="#5f7e91" font-family="Arial,sans-serif" font-size="8" font-weight="700" letter-spacing="1.4">ESPACIO DE TRABAJO</text><rect x="597" y="229" width="165" height="32" rx="7" fill="#125f9c" stroke="#31a5dd"/><rect x="603" y="235" width="3" height="20" rx="2" fill="#5ce1ff"/><text x="616" y="249" fill="#fff" font-family="Arial,sans-serif" font-size="10" font-weight="700">⌂  Inicio</text>
-<g font-family="Arial,sans-serif" font-size="10" fill="#abc0ce"><text x="616" y="289">▤  Proyectos</text><text x="616" y="321">⇧  Importar</text><text x="616" y="353">⌗  Programar pieza</text><text x="616" y="385">⌘  Programación 2D</text><text x="616" y="417">◈  Programación 3D</text><text x="616" y="449">▧  Diseño CAD/CAM</text><text x="616" y="481">▷  Simulación 2D</text><text x="616" y="513">◉  Simulación 3D</text><text x="616" y="545">⌁  Desarrollo</text><text x="616" y="577">⚙  Producción</text><text x="616" y="609">✓  Calidad</text><text x="616" y="641">▦  Materiales</text></g>
-<rect x="600" y="848" width="160" height="25" rx="6" fill="#0d1f2e" stroke="#22465d"/><circle cx="614" cy="860" r="3.5" fill="#4de2a1"/><text x="625" y="864" fill="#9eb7c6" font-family="Arial,sans-serif" font-size="8">Sistema operativo</text>
-<!-- toolbar -->
-<rect x="778" y="138" width="749" height="49" fill="#091522"/><path d="M778 187h749" stroke="#1e4059"/><text x="799" y="167" fill="#9db3c0" font-family="Arial,sans-serif" font-size="10">⌂  /  Inicio</text>
-<rect x="1001" y="151" width="260" height="25" rx="6" fill="#07111b" stroke="#284b65"/><text x="1013" y="168" fill="#728c9e" font-family="Arial,sans-serif" font-size="9">⌕  Buscar en Plegar Pro...</text>
-<circle cx="1300" cy="163" r="11" fill="#10263a" stroke="#315875"/><text x="1300" y="167" text-anchor="middle" fill="#51d6fa" font-family="Arial,sans-serif" font-size="11">◉</text><text x="1320" y="160" fill="#edf4f8" font-family="Arial,sans-serif" font-size="8" font-weight="700">AMS ENGINEERING</text><text x="1320" y="173" fill="#7e9cad" font-family="Arial,sans-serif" font-size="7">Administrador</text><circle cx="1490" cy="162" r="13" fill="#146bab"/><text x="1490" y="166" text-anchor="middle" fill="#fff" font-family="Arial,sans-serif" font-size="9" font-weight="700">AM</text>
-<!-- dashboard heading and kpis -->
-<text x="799" y="215" fill="#eff6f9" font-family="Arial,sans-serif" font-size="18" font-weight="700">Panel de control</text><text x="799" y="232" fill="#849fb1" font-family="Arial,sans-serif" font-size="9">Tu taller, de un vistazo · Miércoles, 17 de octubre</text>
+<rect x="594" y="861" width="169" height="36" rx="8" fill="#0c263a" stroke="#246089"/><circle cx="611" cy="879" r="4" fill="#58e6a6" filter="url(#glow)"/><text x="624" y="883" fill="#aec5d4" font-family="Arial,sans-serif" font-size="8">Sistema operativo</text>
+<!-- top toolbar -->
+<rect x="780" y="140" width="762" height="51" fill="#0a1929"/><path d="M780 191H1542" stroke="#1e4664"/>
+<text x="801" y="171" fill="#9ebbd0" font-family="Arial,sans-serif" font-size="10">⌂  /  Inicio</text>
+<rect x="1005" y="153" width="270" height="27" rx="7" fill="#06111d" stroke="#2a5b7c"/><text x="1018" y="171" fill="#7095af" font-family="Arial,sans-serif" font-size="9">⌕  Buscar en Plegar Pro...</text>
+<circle cx="1311" cy="166" r="12" fill="#11304a" stroke="#3488b6"/><text x="1311" y="170" text-anchor="middle" fill="#61dcff" font-family="Arial,sans-serif" font-size="11">◉</text>
+<text x="1333" y="163" fill="#f2f8fb" font-family="Arial,sans-serif" font-size="8" font-weight="800">AMS ENGINEERING</text><text x="1333" y="176" fill="#83a7bc" font-family="Arial,sans-serif" font-size="7">Administrador</text><circle cx="1506" cy="166" r="14" fill="url(#electric)" stroke="#73e5ff"/><text x="1506" y="170" text-anchor="middle" fill="#fff" font-family="Arial,sans-serif" font-size="9" font-weight="800">AM</text>
+<!-- header -->
+<text x="801" y="220" fill="#f4f9fc" font-family="Arial,sans-serif" font-size="19" font-weight="800">Panel de control</text><text x="801" y="238" fill="#83a4bc" font-family="Arial,sans-serif" font-size="9">Tu taller, de un vistazo · Produccion en tiempo real</text>
+<!-- kpis -->
 <g font-family="Arial,sans-serif">
-<rect x="799" y="245" width="132" height="64" rx="7" fill="url(#panel)" stroke="#275d82"/><text x="810" y="262" fill="#91acbd" font-size="7" font-weight="700">PROYECTOS ACTIVOS</text><text x="810" y="291" fill="#f4f8fa" font-size="21" font-weight="700">12</text><text x="852" y="290" fill="#5de0a2" font-size="7">+2 hoy</text>
-<rect x="939" y="245" width="132" height="64" rx="7" fill="url(#panel)" stroke="#275d82"/><text x="950" y="262" fill="#91acbd" font-size="7" font-weight="700">ÓRDENES</text><text x="950" y="291" fill="#f4f8fa" font-size="21" font-weight="700">07</text><text x="991" y="290" fill="#8bb0c4" font-size="7">en curso</text>
-<rect x="1079" y="245" width="132" height="64" rx="7" fill="url(#panel)" stroke="#275d82"/><text x="1090" y="262" fill="#91acbd" font-size="7" font-weight="700">PIEZAS FABRICADAS</text><text x="1090" y="291" fill="#f4f8fa" font-size="21" font-weight="700">1.248</text><text x="1152" y="290" fill="#5de0a2" font-size="7">este mes</text>
-<rect x="1219" y="245" width="132" height="64" rx="7" fill="#211820" stroke="#85434c"/><text x="1230" y="262" fill="#d7a5aa" font-size="7" font-weight="700">INCIDENCIAS</text><text x="1230" y="291" fill="#ff7780" font-size="21" font-weight="700">02</text><text x="1270" y="290" fill="#d5a5aa" font-size="7">atención</text>
-<rect x="1359" y="245" width="132" height="64" rx="7" fill="url(#panel)" stroke="#275d82"/><text x="1370" y="262" fill="#91acbd" font-size="7" font-weight="700">RECORDATORIOS</text><text x="1370" y="291" fill="#f4f8fa" font-size="21" font-weight="700">05</text><text x="1412" y="290" fill="#8bb0c4" font-size="7">próximos</text></g>
-<!-- hero machine -->
-<rect x="799" y="324" width="510" height="332" rx="9" fill="#07131f" stroke="#286082"/><rect x="799" y="324" width="510" height="332" rx="9" fill="url(#grid)"/><circle cx="1050" cy="490" r="230" fill="url(#cyan)"/>
-<path d="M815 609h478l-28 25H844z" fill="#132632" stroke="#476271"/>
-<g filter="url(#shadow)">
-<path d="M850 386h420v59H850z" fill="url(#beam)" stroke="#68777e"/><path d="M877 444h366v39H877z" fill="url(#steel)" stroke="#e7eef1"/>
-<path d="M877 444h20v153h-20zM1223 444h20v153h-20z" fill="url(#steel)" stroke="#dae4e8"/>
-<path d="M966 482h190l-22 44h-147z" fill="url(#steel)" stroke="#e6edef"/><path d="M944 535h239v20H944z" fill="url(#steel)" stroke="#e5edef"/>
-<path d="M950 525l62 21 38 35 36-35 68-21v20l-65 24-39 39-40-39-61-24z" fill="url(#blue)" stroke="#79e3ff" stroke-width="2"/>
-<path d="M920 582h286v18H920z" fill="url(#steel)" stroke="#edf3f5"/>
-<path d="M850 386h25v59h-25zM1245 386h25v59h-25z" fill="url(#red)" stroke="#ffa18a"/>
-<path d="M904 601h20v31h-20zM1203 601h20v31h-20z" fill="#35434a" stroke="#86939a"/></g>
-<text x="1060" y="378" text-anchor="middle" fill="#dfe9ed" font-family="Arial,sans-serif" font-size="10" font-weight="700" letter-spacing="1.3">BYSTRONIC XPERT PRO 100</text>
-<rect x="817" y="593" width="202" height="47" rx="7" fill="#071522eF" stroke="#2b688d"/><circle cx="831" cy="608" r="4" fill="#51e4a0"/><text x="842" y="611" fill="#5edfff" font-family="Arial,sans-serif" font-size="7" font-weight="700">PROYECTO ACTIVO</text><text x="831" y="628" fill="#eef6fa" font-family="Arial,sans-serif" font-size="10" font-weight="700">Soporte lateral  ·  Acero S235JR</text>
-<!-- machine info -->
-<rect x="1323" y="324" width="168" height="332" rx="9" fill="url(#panel)" stroke="#214861"/><text x="1338" y="348" fill="#dceaf1" font-family="Arial,sans-serif" font-size="9" font-weight="700">MÁQUINA CONECTADA</text><circle cx="1473" cy="345" r="4" fill="#4ce29c"/>
-<rect x="1338" y="367" width="138" height="124" rx="6" fill="#07111b" stroke="#1c4056"/>
-<path d="M1362 397h90v18h-90z" fill="url(#beam)"/><path d="M1370 415h74v10h-74z" fill="url(#steel)"/><path d="M1373 425h7v39h-7zM1434 425h7v39h-7z" fill="url(#steel)"/><path d="M1380 460h54v7h-54z" fill="url(#steel)"/><path d="M1386 450l18 7 10 10 10-10 17-7v6l-17 7-10 12-11-12-17-7z" fill="url(#blue)"/><path d="M1362 397h8v19h-8zM1444 397h8v19h-8z" fill="url(#red)"/>
-<text x="1338" y="510" fill="#eaf3f7" font-family="Arial,sans-serif" font-size="9" font-weight="700">XPERT PRO 100</text><text x="1338" y="531" fill="#84a1b3" font-family="Arial,sans-serif" font-size="7">FUERZA</text><text x="1338" y="547" fill="#f1f7fa" font-family="Arial,sans-serif" font-size="10" font-weight="700">100 t</text><text x="1401" y="531" fill="#84a1b3" font-family="Arial,sans-serif" font-size="7">LONGITUD</text><text x="1401" y="547" fill="#f1f7fa" font-family="Arial,sans-serif" font-size="10" font-weight="700">3100 mm</text>
-<rect x="1338" y="565" width="138" height="29" rx="6" fill="#106eae" stroke="#2e9ed2"/><text x="1407" y="583" text-anchor="middle" fill="#fff" font-family="Arial,sans-serif" font-size="8" font-weight="700">ABRIR SIMULACIÓN</text><text x="1338" y="620" fill="#90aabb" font-family="Arial,sans-serif" font-size="7">●  Lista para producción</text>
-<!-- projects and materials -->
-<rect x="799" y="671" width="430" height="196" rx="9" fill="url(#panel)" stroke="#21455f"/><text x="816" y="694" fill="#dce9f0" font-family="Arial,sans-serif" font-size="10" font-weight="700">PROYECTOS RECIENTES</text>
-<g font-family="Arial,sans-serif"><rect x="816" y="708" width="125" height="137" rx="7" fill="#0a1927" stroke="#21445d"/><path d="M833 774l24-17 25 13 23-18 20 12" fill="none" stroke="url(#steel)" stroke-width="7" stroke-linejoin="round"/><text x="829" y="805" fill="#ecf3f7" font-size="9" font-weight="700">Soporte lateral</text><text x="829" y="821" fill="#8ca8b8" font-size="8">S235JR · 2 mm</text><text x="829" y="836" fill="#607c8e" font-size="7">hace 12 min</text>
-<rect x="950" y="708" width="125" height="137" rx="7" fill="#0a1927" stroke="#21445d"/><path d="M967 774l23-17 25 13 23-18 21 12" fill="none" stroke="url(#steel)" stroke-width="7" stroke-linejoin="round"/><text x="963" y="805" fill="#ecf3f7" font-size="9" font-weight="700">Carcasa equipo</text><text x="963" y="821" fill="#8ca8b8" font-size="8">AISI 304 · 1.5 mm</text><text x="963" y="836" fill="#607c8e" font-size="7">ayer</text>
-<rect x="1084" y="708" width="125" height="137" rx="7" fill="#0a1927" stroke="#21445d"/><path d="M1101 774l24-17 25 13 22-18 21 12" fill="none" stroke="url(#steel)" stroke-width="7" stroke-linejoin="round"/><text x="1097" y="805" fill="#ecf3f7" font-size="9" font-weight="700">Panel eléctrico</text><text x="1097" y="821" fill="#8ca8b8" font-size="8">Aluminio · 3 mm</text><text x="1097" y="836" fill="#607c8e" font-size="7">hace 2 días</text></g>
-<rect x="1244" y="671" width="247" height="196" rx="9" fill="url(#panel)" stroke="#21455f"/><text x="1261" y="694" fill="#dce9f0" font-family="Arial,sans-serif" font-size="10" font-weight="700">MATERIALES FAVORITOS</text>
-<g font-family="Arial,sans-serif" font-size="8"><circle cx="1269" cy="722" r="4" fill="#36bcec"/><text x="1281" y="725" fill="#dce8ee">Acero S235JR</text><text x="1474" y="725" text-anchor="end" fill="#9bb1c0">2.00 mm</text><circle cx="1269" cy="748" r="4" fill="#54d9f1"/><text x="1281" y="751" fill="#dce8ee">Inox AISI 304</text><text x="1474" y="751" text-anchor="end" fill="#9bb1c0">1.50 mm</text><circle cx="1269" cy="774" r="4" fill="#b1cad4"/><text x="1281" y="777" fill="#dce8ee">Aluminio 5754</text><text x="1474" y="777" text-anchor="end" fill="#9bb1c0">2.50 mm</text><circle cx="1269" cy="800" r="4" fill="#62a9cf"/><text x="1281" y="803" fill="#dce8ee">Acero S355JR</text><text x="1474" y="803" text-anchor="end" fill="#9bb1c0">3.00 mm</text></g>
-<rect x="799" y="879" width="692" height="1" fill="#1e4057"/><text x="800" y="894" fill="#6d8a9e" font-family="Arial,sans-serif" font-size="7">SISTEMA OPERATIVO   ·   BASE DE DATOS LOCAL   ·   ÚLTIMA COPIA: HOY 09:42</text><text x="1490" y="894" text-anchor="end" fill="#55cbed" font-family="Arial,sans-serif" font-size="7" font-weight="700">V52.0  /  INDUSTRIAL</text>
+ <rect x="801" y="250" width="133" height="66" rx="8" fill="url(#glass)" stroke="#2795d0"/><text x="812" y="267" fill="#9dc0d3" font-size="7" font-weight="700">PROYECTOS ACTIVOS</text><text x="812" y="298" fill="#f5fbff" font-size="22" font-weight="800">12</text><text x="849" y="297" fill="#5bf0ad" font-size="7">+2 hoy</text>
+ <rect x="941" y="250" width="133" height="66" rx="8" fill="url(#glass)" stroke="#2795d0"/><text x="952" y="267" fill="#9dc0d3" font-size="7" font-weight="700">ORDENES</text><text x="952" y="298" fill="#f5fbff" font-size="22" font-weight="800">07</text><text x="993" y="297" fill="#8acfff" font-size="7">en curso</text>
+ <rect x="1081" y="250" width="133" height="66" rx="8" fill="url(#glass)" stroke="#2795d0"/><text x="1092" y="267" fill="#9dc0d3" font-size="7" font-weight="700">PIEZAS FABRICADAS</text><text x="1092" y="298" fill="#f5fbff" font-size="22" font-weight="800">1.248</text><text x="1151" y="297" fill="#5bf0ad" font-size="7">este mes</text>
+ <rect x="1221" y="250" width="133" height="66" rx="8" fill="#261827" stroke="#ff536f"/><text x="1232" y="267" fill="#e7a3b1" font-size="7" font-weight="700">INCIDENCIAS</text><text x="1232" y="298" fill="#ff7189" font-size="22" font-weight="800">02</text><text x="1273" y="297" fill="#eca7b3" font-size="7">requieren atencion</text>
+ <rect x="1361" y="250" width="133" height="66" rx="8" fill="url(#glass)" stroke="#2795d0"/><text x="1372" y="267" fill="#9dc0d3" font-size="7" font-weight="700">RECORDATORIOS</text><text x="1372" y="298" fill="#f5fbff" font-size="22" font-weight="800">05</text><text x="1412" y="297" fill="#8acfff" font-size="7">proximos</text>
+</g>
+<!-- hero photo -->
+<rect x="801" y="330" width="510" height="329" rx="10" fill="#06111d" stroke="#36bff1" stroke-width="1.5" filter="url(#glow)"/>
+<image href="./hero-approved.png" x="803" y="332" width="506" height="325" preserveAspectRatio="xMidYMid slice"/>
+<rect x="803" y="332" width="506" height="325" rx="9" fill="url(#grid)" opacity=".18"/>
+<rect x="817" y="594" width="230" height="49" rx="8" fill="#06182beF" stroke="#45cfff" stroke-width="1.2"/>
+<circle cx="833" cy="610" r="4" fill="#53efa6" filter="url(#glow)"/><text x="846" y="613" fill="#57dcff" font-family="Arial,sans-serif" font-size="7" font-weight="800" letter-spacing=".7">PROYECTO ACTIVO</text><text x="831" y="631" fill="#f3f9fc" font-family="Arial,sans-serif" font-size="10" font-weight="700">Soporte lateral · Acero S235JR · 2 mm</text>
+<!-- machine card -->
+<rect x="1325" y="330" width="169" height="329" rx="10" fill="url(#glass)" stroke="#2b79a7" stroke-width="1.2"/>
+<text x="1340" y="354" fill="#e8f6fc" font-family="Arial,sans-serif" font-size="9" font-weight="800">MAQUINA CONECTADA</text><circle cx="1476" cy="351" r="4" fill="#50efa8" filter="url(#glow)"/>
+<rect x="1340" y="371" width="139" height="132" rx="7" fill="#06111d" stroke="#215271"/><image href="./hero-approved.png" x="1341" y="372" width="137" height="130" preserveAspectRatio="xMidYMid slice"/>
+<text x="1340" y="523" fill="#f4f9fb" font-family="Arial,sans-serif" font-size="9" font-weight="800">XPERT PRO 100</text><text x="1340" y="544" fill="#83a8bf" font-family="Arial,sans-serif" font-size="7">FUERZA</text><text x="1340" y="560" fill="#f2f8fb" font-family="Arial,sans-serif" font-size="10" font-weight="800">100 t</text><text x="1404" y="544" fill="#83a8bf" font-family="Arial,sans-serif" font-size="7">LONGITUD</text><text x="1404" y="560" fill="#f2f8fb" font-family="Arial,sans-serif" font-size="10" font-weight="800">3100 mm</text>
+<rect x="1340" y="575" width="139" height="29" rx="7" fill="url(#electric)" stroke="#5de3ff"/><text x="1409" y="593" text-anchor="middle" fill="#fff" font-family="Arial,sans-serif" font-size="7" font-weight="800">ABRIR SIMULACION</text><text x="1340" y="628" fill="#8db1c6" font-family="Arial,sans-serif" font-size="7">●  Lista para produccion</text>
+<!-- bottom dashboard -->
+<rect x="801" y="674" width="430" height="194" rx="10" fill="url(#glass)" stroke="#26749e"/>
+<text x="818" y="698" fill="#eaf5fa" font-family="Arial,sans-serif" font-size="10" font-weight="800">PROYECTOS RECIENTES</text>
+<g font-family="Arial,sans-serif">
+ <rect x="818" y="711" width="124" height="139" rx="7" fill="#0a1a2a" stroke="#275575"/><path d="M833 780l24-18 23 14 22-24 22 13" fill="none" stroke="#d5e4ea" stroke-width="7" stroke-linejoin="round"/><text x="831" y="811" fill="#edf6fa" font-size="8" font-weight="800">Soporte lateral</text><text x="831" y="827" fill="#92b0c2" font-size="7">S235JR · 2 mm</text><text x="831" y="840" fill="#627f93" font-size="7">hace 12 min</text>
+ <rect x="950" y="711" width="124" height="139" rx="7" fill="#0a1a2a" stroke="#275575"/><path d="M965 780l24-18 23 14 22-24 22 13" fill="none" stroke="#d5e4ea" stroke-width="7" stroke-linejoin="round"/><text x="963" y="811" fill="#edf6fa" font-size="8" font-weight="800">Carcasa equipo</text><text x="963" y="827" fill="#92b0c2" font-size="7">AISI 304 · 1.5 mm</text><text x="963" y="840" fill="#627f93" font-size="7">ayer</text>
+ <rect x="1082" y="711" width="132" height="139" rx="7" fill="#0a1a2a" stroke="#275575"/><path d="M1098 780l24-18 23 14 22-24 26 13" fill="none" stroke="#d5e4ea" stroke-width="7" stroke-linejoin="round"/><text x="1096" y="811" fill="#edf6fa" font-size="8" font-weight="800">Panel electrico</text><text x="1096" y="827" fill="#92b0c2" font-size="7">Aluminio · 3 mm</text><text x="1096" y="840" fill="#627f93" font-size="7">hace 2 dias</text>
+</g>
+<rect x="1246" y="674" width="248" height="194" rx="10" fill="url(#glass)" stroke="#26749e"/><text x="1263" y="698" fill="#eaf5fa" font-family="Arial,sans-serif" font-size="10" font-weight="800">MATERIALES FAVORITOS</text>
+<g font-family="Arial,sans-serif" font-size="8"><circle cx="1271" cy="726" r="4" fill="#38d2ff"/><text x="1284" y="729" fill="#e2edf3">Acero S235JR</text><text x="1477" y="729" text-anchor="end" fill="#a9c5d4">2.00 mm</text><circle cx="1271" cy="752" r="4" fill="#5c9fff"/><text x="1284" y="755" fill="#e2edf3">Inox AISI 304</text><text x="1477" y="755" text-anchor="end" fill="#a9c5d4">1.50 mm</text><circle cx="1271" cy="778" r="4" fill="#8deaff"/><text x="1284" y="781" fill="#e2edf3">Aluminio 5754</text><text x="1477" y="781" text-anchor="end" fill="#a9c5d4">2.50 mm</text><circle cx="1271" cy="804" r="4" fill="#b7c8ff"/><text x="1284" y="807" fill="#e2edf3">Acero S355JR</text><text x="1477" y="807" text-anchor="end" fill="#a9c5d4">3.00 mm</text></g>
+<rect x="801" y="880" width="693" height="1" fill="#225173"/><circle cx="808" cy="895" r="3" fill="#54e5a4"/><text x="818" y="898" fill="#7f9eb2" font-family="Arial,sans-serif" font-size="7">SISTEMA OPERATIVO  ·  BASE LOCAL  ·  ULTIMA COPIA: HOY 09:42</text><text x="1490" y="898" text-anchor="end" fill="#4fd9ff" font-family="Arial,sans-serif" font-size="7" font-weight="800">V52.0  /  INDUSTRIAL</text>
 </svg>

@@ -22,9 +22,12 @@ function SimulationPage({mode}){
   const [positioning,setPositioning]=React.useState(false);
   React.useEffect(()=>{
     if(!playing)return;
-    const timer=window.setInterval(()=>setStep(current=>{if(current>=count-1){window.clearInterval(timer);setPlaying(false);setFinished(true);return current}return current+1}),900);
+    const timer=window.setInterval(()=>setStep(current=>Math.min(count-1,current+1)),900);
     return()=>window.clearInterval(timer);
   },[playing,count]);
+  React.useEffect(()=>{
+    if(playing&&step>=count-1){setPlaying(false);setFinished(true)}
+  },[playing,step,count]);
   const machine=machines.find(item=>item.id===state.selectedMachineId)||machines[0];
   const punch=tools.find(item=>item.id===state.selectedPunchId&&item.kind==="punch")||tools.find(item=>item.kind==="punch");
   const die=tools.find(item=>item.id===state.selectedDieId&&item.kind==="die")||tools.find(item=>item.kind==="die");

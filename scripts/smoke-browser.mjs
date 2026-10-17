@@ -89,12 +89,25 @@ try {
     if (expectedBase && !path.startsWith(expectedBase + '/')) {
       throw new Error(`La navegación ha escapado del prefijo de GitHub Pages: ${path}`);
     }
-    await page.locator('.content').waitFor({ state: 'visible' });
-    await page.waitForTimeout(700);
-    const content = (await page.locator('.content').innerText()).trim();
-    if (!content) throw new Error(`El módulo ${route.suffix} no muestra contenido.`);
-    if (await page.locator('.module-loader').count()) {
-      throw new Error(`El módulo ${route.suffix} se ha quedado atascado en Cargando módulo…`);
+    await page.waitForTimeout(900);
+    const routeDiagnostic = await page.evaluate(() => ({
+      url: location.href,
+      rootText: document.getElementById('root')?.innerText?.slice(0, 1800) || '',
+      rootHtml: document.getElementById('root')?.innerHTML?.slice(0, 2400) || '',
+      contentCount: document.querySelectorAll('.content').length,
+      appError: document.querySelector('.app-error')?.innerText?.slice(0, 1200) || '',
+      loader: document.querySelector('.module-loader')?.innerText || '',
+    }));
+    if (routeDiagnostic.appError) {
+      throw new Error(`El módulo ${route.suffix} muestra un error de React:\\n${JSON.stringify(routeDiagnostic, null, 2)}`);
+    }
+    if (!routeDiagnostic.contentCount) {
+      throw new Error(`El módulo ${route.suffix} ha perdido el contenedor .content:\\n${JSON.stringify(routeDiagnostic, null, 2)}`);
+    }
+    const content = (await page.locator('.content').innerText({ timeout: 3000 })).trim();
+    if (!content) throw new Error(`El módulo ${route.suffix} no muestra contenido.\\n${JSON.stringify(routeDiagnostic, null, 2)}`);
+    if (routeDiagnostic.loader) {
+      throw new Error(`El módulo ${route.suffix} se ha quedado atascado en ${routeDiagnostic.loader}`);
     }
   }
 

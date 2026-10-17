@@ -584,3 +584,26 @@ body:has(.pp-workbench){overflow:hidden;background:#050913!important;color:#e8ef
 
 .pp-workbench .pp-empty-tool{grid-column:1/-1;margin:12px 4px;padding:10px;border:1px dashed #30435d;border-radius:5px;color:#8497ae;text-align:center;font-size:8px}
 .pp-workbench .pp-tool-list{align-items:stretch}
+
+/* Center-stage press brake layout, matching the reference composition */
+.pp-workbench .pp-sim-content{position:relative;display:grid;grid-template-columns:minmax(0,1fr) 188px;grid-template-rows:minmax(0,1fr);gap:0}
+.pp-workbench .pp-machine-stage{grid-column:1/-1;grid-row:1;background:radial-gradient(ellipse at 48% 43%,#35495d 0,#1b2b3a 42%,#0a121c 100%)}
+.pp-workbench .pp-machine-art{left:3%;right:3%;top:2%;height:92%;filter:drop-shadow(0 16px 22px #000b)}
+.pp-workbench .pp-press-header{left:12%;right:11%;height:22%;background:linear-gradient(180deg,#303a42 0,#121920 43%,#080c11 100%);box-shadow:inset 0 2px #e1edf044,0 12px 28px #000d}
+.pp-workbench .pp-red-cap{height:23%;width:7%;background:linear-gradient(90deg,#8d261f,#ff624f 48%,#a52a20);box-shadow:inset 0 1px #ffd1c988,0 8px 18px #000b}
+.pp-workbench .pp-press-ram{top:22%;height:9%;transition:transform .38s cubic-bezier(.22,.72,.2,1),filter .2s ease}
+.pp-workbench .pp-finger-row{top:30%;height:17%}
+.pp-workbench .pp-press-table{top:51%;height:9%;box-shadow:0 10px 22px #000c,inset 0 1px #fff9}
+.pp-workbench .pp-column{width:8%;background:linear-gradient(90deg,#141b20,#bec9ce 24%,#6b777e 57%,#171e23);box-shadow:inset 0 0 11px #000c,0 4px 15px #0009}
+.pp-workbench .pp-workpiece{left:31%;right:26%;top:49%;height:20%;z-index:8}
+.pp-workbench .pp-workpiece i{height:14px;width:36%;box-shadow:inset 0 1px #fff9,0 0 7px #70bfff66;transition:transform .55s cubic-bezier(.2,.75,.25,1)}
+.pp-workbench .pp-workpiece i:first-child{transform:rotate(calc(0deg - var(--pp-angle)));transform-origin:right center}
+.pp-workbench .pp-workpiece i:nth-child(2){height:18px;transform:translateY(3px)}
+.pp-workbench .pp-workpiece i:nth-child(3){transform:rotate(var(--pp-angle));transform-origin:left center}
+.pp-workbench .pp-console{right:1%;top:47%;width:9%;height:37%}
+.pp-workbench .pp-machine-art.is-running .pp-press-ram{animation:none}
+.pp-workbench .pp-machine-art.is-pressing .pp-press-ram{filter:brightness(1.35);box-shadow:0 7px 22px #4cb8ff88,0 4px 8px #0009}
+.pp-workbench .pp-info{grid-column:2;grid-row:1;z-index:12;align-self:start;justify-self:stretch;max-height:calc(100% - 78px);margin:6px 6px 72px 0;background:rgba(6,13,22,.9);backdrop-filter:blur(9px);box-shadow:0 10px 30px #0009;border-color:#52657a88}
+.pp-workbench .pp-stage-guides{z-index:1}
+@media(max-width:1100px){.pp-workbench .pp-sim-content{grid-template-columns:minmax(0,1fr) 160px}.pp-workbench .pp-info{margin-right:4px;padding:6px}}
+@media(max-width:760px){.pp-workbench .pp-sim-content{grid-template-columns:minmax(0,1fr) 136px}.pp-workbench .pp-info{max-height:calc(100% - 76px);margin:4px 4px 70px 0}.pp-workbench .pp-machine-art{left:1%;right:1%;height:88%}}

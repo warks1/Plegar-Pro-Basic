@@ -46,6 +46,12 @@ function SimulationPage({mode}){
     ["Ángulo actual",angle+"°"],
     ["Y actual",(bend?.backgaugeY??bend?.position??"—")+" mm"]
   ];
+  const punchWidth=Math.max(42,Math.min(120,(punch?.width||30)*1.8));
+  const punchShoulder=270-Math.max(55,Math.min(120,(punch?.height||120)*.55));
+  const punchTipDepth=Math.max(34,Math.min(90,Math.tan(Math.max(15,Math.min(88,(punch?.angle||88)/2))*Math.PI/180)*punchWidth*.72));
+  const dieWidth=Math.max(70,Math.min(170,(die?.width||56)*1.65));
+  const dieV=Math.max(35,Math.min(130,(die?.v||16)*3.1));
+  const foldDepth=Math.max(20,Math.min(92,38+(90-Math.abs(angle))*1.8));
   const scene=is3d
     ? jsx("div",{className:"sim3d-reference",style:{transform:"scale("+zoom+")"},children:jsxs("div",{className:"sim3d-machine",children:[
         jsx("div",{className:"sim3d-wall"}),
@@ -62,13 +68,49 @@ function SimulationPage({mode}){
           jsx("i",{className:"left"}),jsx("i",{className:"center"}),jsx("i",{className:"right"})
         ]})
       ]})})
-    : jsx("div",{className:"sim2d-reference stage-"+Math.min(step+1,3),style:{transform:"scale("+zoom+")"},children:[
-        jsx("div",{className:"sim2d-punch",children:jsx("i",{})}),
-        jsx("div",{className:"sim2d-centerline"}),
-        jsx("div",{className:"sim2d-sheet",style:{transform:"rotate(-"+Math.max(0,90-angle)+"deg)"}}),
-        jsx("div",{className:"sim2d-sheet right",style:{transform:"rotate("+Math.max(0,90-angle)+"deg)"}}),
-        jsx("div",{className:"sim2d-die"}),
-        jsx("div",{className:"sim2d-angle",children:angle+"°"})
+    : jsxs("div",{className:"sim2d-reference",style:{transform:"scale("+zoom+")"},children:[
+        jsx("div",{className:"sim2d-step-tabs",children:sequence.slice(0,9).map((label,index)=>jsx("button",{
+          type:"button",className:index===activeSequence?"active":"",
+          "aria-label":"Ir a "+label,
+          onClick:()=>{setPlaying(false);if(index===0){setFinished(false);setPositioning(true);setStep(0)}else if(index===sequence.length-1){setPositioning(false);setFinished(true);setStep(count-1)}else{setPositioning(false);setFinished(false);setStep(index-1)}},
+          children:index+1
+        },label))}),
+        jsxs("svg",{className:"sim2d-drawing",viewBox:"0 0 900 560",role:"img","aria-label":"Simulación 2D del punzón y la matriz V seleccionados",children:[
+          jsx("defs",{children:[
+            jsx("linearGradient",{id:"sim2d-punch-metal",x1:"0",x2:"1",y1:"0",y2:"1",children:[
+              jsx("stop",{offset:"0%",stopColor:"#d8c4dc"}),jsx("stop",{offset:"50%",stopColor:"#b7a0bf"}),jsx("stop",{offset:"100%",stopColor:"#8a7895"})
+            ]}),
+            jsx("linearGradient",{id:"sim2d-die-metal",x1:"0",x2:"0",y1:"0",y2:"1",children:[
+              jsx("stop",{offset:"0%",stopColor:"#bba7c0"}),jsx("stop",{offset:"100%",stopColor:"#776881"})
+            ]})
+          ]}),
+          jsx("rect",{width:"900",height:"560",fill:"#628b91"}),
+          jsx("path",{d:"M0 0H900V560H0Z",fill:"url(#sim2d-grid)"}),
+          jsx("path",{d:"M0 0H900V560H0Z",fill:"url(#sim2d-grid)"}),
+          jsx("path",{d:"M45 352H398",stroke:"#b8d9dd","stroke-width":"1","stroke-dasharray":"5 8",opacity:".35"}),
+          jsx("path",{d:"M502 352H855",stroke:"#b8d9dd","stroke-width":"1","stroke-dasharray":"5 8",opacity:".35"}),
+          jsx("path",{d:"M450 110V445",stroke:"#c2dfe0","stroke-width":"1","stroke-dasharray":"5 7",opacity:".45"}),
+          jsx("path",{d:"M75 351H400L450 "+(351+foldDepth)+"L500 351H825",fill:"none",stroke:"#e5eff0","stroke-width":"4","stroke-linecap":"round","stroke-linejoin":"round",className:"sim2d-workpiece"}),
+          jsx("path",{d:"M450 "+(351+foldDepth)+"L450 440",stroke:"#eaf5f4","stroke-width":"1.5","stroke-dasharray":"4 5",opacity:".6"}),
+          jsx("path",{d:"M"+(450-dieWidth/2)+" 375H"+(450-dieV/2)+"L450 426L"+(450+dieV/2)+" 375H"+(450+dieWidth/2)+"V468H"+(450-dieWidth/2)+"Z",fill:"url(#sim2d-die-metal)",stroke:"#81778a","stroke-width":"2"}),
+          jsx("path",{d:"M"+(450-dieWidth/2-12)+" 375H"+(450-dieWidth/2)+"V468H"+(450-dieWidth/2-12)+"Z",fill:"#526e60"}),
+          jsx("path",{d:"M"+(450+dieWidth/2)+" 375H"+(450+dieWidth/2+12)+"V468H"+(450+dieWidth/2)+"Z",fill:"#526e60"}),
+          jsx("path",{d:"M"+(450-punchWidth/2)+" "+punchShoulder+"H"+(450+punchWidth/2)+"V"+(punchShoulder+48)+"L450 "+(punchShoulder+48+punchTipDepth)+"L"+(450-punchWidth/2)+" "+(punchShoulder+48)+"Z",fill:"url(#sim2d-punch-metal)",stroke:"#e4d7e5","stroke-width":"2",className:"sim2d-tool-shape"}),
+          jsx("path",{d:"M"+(450-punchWidth*.2)+" "+(punchShoulder+48)+"V"+(punchShoulder+118)+"H"+(450+punchWidth*.2)+"V"+(punchShoulder+48),fill:"#a48ead",opacity:".85"}),
+          jsx("path",{d:"M450 130V"+(punchShoulder-4),stroke:"#263e3f","stroke-width":"10",opacity:".9"}),
+          jsx("circle",{cx:"450",cy:String(351+foldDepth),r:"5",fill:"#e6f5f1",stroke:"#425e5e","stroke-width":"2"}),
+          jsx("path",{d:"M"+(450-dieV/2)+" 441H"+(450+dieV/2),stroke:"#a9e7e0","stroke-width":"2"}),
+          jsx("text",{x:"450",y:"500",textAnchor:"middle",className:"sim2d-die-label",children:"MATRIZ V"+(die?.v||"—")+" · "+(die?.angle||"—")+"°"}),
+          jsx("text",{x:"450",y:"80",textAnchor:"middle",className:"sim2d-punch-label",children:(punch?.name||"Punzón")+" · "+(punch?.angle||"—")+"°"}),
+          jsx("text",{x:"535",y:String(343+foldDepth/2),className:"sim2d-angle",children:angle+"°"}),
+          jsx("path",{d:"M517 "+(349+foldDepth/2)+"l-11 12 14 2",fill:"none",stroke:"#b6f47a","stroke-width":"2"}),
+          jsx("path",{d:"M80 328v-13m0 0-5 6m5-6 5 6M820 328v-13m0 0-5 6m5-6 5 6",stroke:"#d6e7e4","stroke-width":"1.5",fill:"none",opacity:".75"})
+        ]}),
+        jsxs("div",{className:"sim2d-selection",children:[
+          jsxs("label",{children:[jsx("span",{children:"Punzón seleccionado"}),jsx("select",{value:punch?.id||"",onChange:event=>state.setPunch?.(event.target.value),children:tools.filter(item=>item.kind==="punch").map(item=>jsx("option",{value:item.id,children:item.name},item.id))})]}),
+          jsxs("label",{children:[jsx("span",{children:"Matriz V seleccionada"}),jsx("select",{value:die?.id||"",onChange:event=>state.setDie?.(event.target.value),children:tools.filter(item=>item.kind==="die").map(item=>jsx("option",{value:item.id,children:item.name},item.id))})]}),
+          jsxs("div",{className:"sim2d-angle-readout",children:[jsx("small",{children:"ÁNGULO"}),jsx("strong",{children:angle+"°"})]})
+        ]})
       ]});
   const toolsRail=jsx("div",{className:"sim-ref-tools","aria-label":"Herramientas de vista",children:[
     jsx("button",{type:"button","aria-label":"Acercar",onClick:()=>setZoom(value=>Math.min(1.5,value+.1)),children:"＋"}),
@@ -77,7 +119,7 @@ function SimulationPage({mode}){
     jsx("button",{type:"button","aria-label":"Paso anterior",onClick:()=>changeStep(step-1),children:"‹"}),
     jsx("button",{type:"button","aria-label":"Paso siguiente",onClick:()=>changeStep(step+1),children:"›"})
   ]});
-  return jsx(Page,{title:is3d?"Simulación 3D":"Simulación 2D",subtitle:is3d?"Visualización realista de la máquina y la secuencia de plegado":"Secuencia de plegado en vista plana",children:jsx("div",{className:"sim-ref-shell",children:[
+  return jsx(Page,{title:is3d?"Simulación 3D":"Simulación 2D",subtitle:is3d?"Visualización realista de la máquina y la secuencia de plegado":"Secuencia de plegado en vista plana",children:jsx("div",{className:is3d?"sim-ref-shell":"sim-ref-shell sim-ref-2d",children:[
     jsxs("div",{className:"sim-ref-player",children:[
       jsxs("div",{className:"sim-ref-controls",children:[
         jsx("button",{type:"button","aria-label":playing?"Pausar":"Reproducir",onClick:()=>setPlaying(value=>{if(!value){setPositioning(false);setFinished(false)}return !value}),children:playing?"Ⅱ":"▶"}),

@@ -25,6 +25,17 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v4
 
+      - name: Set up Node.js for browser verification
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install locked dependencies and Chromium
+        run: |
+          npm ci --ignore-scripts
+          npx playwright install chromium
+
       - name: Verify published assets and module references
         run: node scripts/verify-static-site.mjs
 
@@ -69,3 +80,8 @@ jobs:
             fi
           done
           echo "Prueba HTTP de GitHub Pages: OK · HTML de inicio y 8 recursos críticos responden 200."
+
+      - name: Verify actual browser launch and engineering module navigation
+        env:
+          PAGE_URL: ${{ steps.deployment.outputs.page_url }}
+        run: node scripts/smoke-browser.mjs "$PAGE_URL"

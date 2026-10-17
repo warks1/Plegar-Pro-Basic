@@ -36,9 +36,11 @@ function DashboardPage(){
  const [toggles,setToggles]=React.useState({Ejes:true,Guías:true,Cotas:true,Malla:true,Restricciones:true});
  const [force,setForce]=React.useState(32.5);
  const bend=bends[Math.min(step,Math.max(0,bends.length-1))];
+ const [positioning,setPositioning]=React.useState(false);
  const angle=bend?.angle||90;
  const sequence=["Posicionar chapa",...bends.map((b,i)=>"Plegado "+(b.order||i+1)),"Pieza terminada"];
- const activeStep=Math.min(step+1,sequence.length-1);
+ const activeStep=positioning?0:Math.min(step+1,sequence.length-1);
+ const visibleTools=toolTab==="PUNZONES"?tools.filter(t=>t.kind==="punch"):toolTab==="MATRICES"?tools.filter(t=>t.kind==="die"):tools.slice(0,7);
  React.useEffect(()=>{if(!playing)return;const timer=window.setInterval(()=>setStep(s=>s>=Math.max(0,bends.length-1)?0:s+1),1000);return()=>window.clearInterval(timer)},[playing,bends.length]);
  React.useEffect(()=>{if(bends.length)setStep(s=>Math.min(s,bends.length-1));else setStep(0)},[bends.length]);
  const goto=(path)=>navigate(path);
@@ -53,8 +55,8 @@ function DashboardPage(){
    jsxs("button",{className:"pp-brand",onClick:()=>goto("/"),children:[jsx("span",{className:"pp-logo",children:"P"}),jsxs("span",{children:[jsx("b",{children:"PLEGAR PRO"}),jsx("small",{children:"PROFESSIONAL"})]})]}),
    jsxs("label",{className:"pp-project-select",children:[jsx("span",{className:"pp-project-icon",children:"▧"}),jsxs("span",{children:[jsx("small",{children:"PROYECTO ACTIVO"}),jsx("select",{value:project.id||"",onChange:e=>setActiveProject(e.target.value),children:projects.map(p=>jsx("option",{value:p.id,children:p.name},p.id))})]}),jsx("span",{className:"pp-synced",children:"●  Sincronizado  ▾"})]}),
    jsxs("div",{className:"pp-top-actions",children:[
-    jsx("button",{title:"Deshacer",onClick:()=>window.dispatchEvent(new KeyboardEvent("keydown",{key:"z",ctrlKey:true})),children:jsxs("span",{children:["↶",jsx("small",{children:"Deshacer"})]})}),
-    jsx("button",{title:"Rehacer",onClick:()=>window.dispatchEvent(new KeyboardEvent("keydown",{key:"y",ctrlKey:true})),children:jsxs("span",{children:["↷",jsx("small",{children:"Rehacer"})]})}),
+    jsx("button",{title:"Deshacer",onClick:()=>state.undo?.(),children:jsxs("span",{children:["↶",jsx("small",{children:"Deshacer"})]})}),
+    jsx("button",{title:"Rehacer",onClick:()=>state.redo?.(),children:jsxs("span",{children:["↷",jsx("small",{children:"Rehacer"})]})}),
     jsx("button",{title:"Guardar proyecto",onClick:()=>{setSaved(true);window.setTimeout(()=>setSaved(false),1800)},children:jsxs("span",{children:["▣",jsx("small",{children:saved?"Guardado":"Guardar"})]})}),
     jsx("button",{title:"Compartir",onClick:share,children:jsxs("span",{children:["⌘",jsx("small",{children:"Compartir"})]})}),
     jsx("button",{title:"Notificaciones",onClick:()=>goto("/notificaciones"),children:jsxs("span",{children:["♧",jsx("i",{className:"pp-badge",children:"3"}),jsx("small",{children:"Mapa"})]})})
@@ -72,20 +74,20 @@ function DashboardPage(){
      jsxs("section",{className:"pp-simulation pp-panel",children:[
       jsxs("header",{className:"pp-section-heading",children:[jsxs("div",{children:[jsx("h1",{children:"SIMULACIÓN 3D"}),jsx("p",{children:"Visualización realista de la máquina y la secuencia de plegado"})]}),jsx("button",{title:"Cerrar panel",onClick:()=>goto("/simulacion-3d"),children:"×"})]}),
       jsxs("div",{className:"pp-player",children:[
-       jsx("button",{title:playing?"Pausar":"Reproducir",onClick:()=>setPlaying(v=>!v),children:playing?"Ⅱ":"▶"}),
-       jsx("button",{title:"Reiniciar",onClick:()=>{setPlaying(false);setStep(0)},children:"H"}),
-       jsx("button",{title:"Paso anterior",onClick:previous,children:"◀◀"}),
-       jsx("button",{title:"Plegado anterior",onClick:previous,children:"↶"}),
-       jsx("button",{title:"Plegado siguiente",onClick:next,children:"▶▶"}),
-       jsx("button",{title:"Avance rápido",onClick:()=>setStep(Math.max(0,bends.length-1)),children:"»"}),
+       jsx("button",{title:playing?"Pausar":"Reproducir",onClick:()=>{setPositioning(false);setPlaying(v=>!v)},children:playing?"Ⅱ":"▶"}),
+       jsx("button",{title:"Reiniciar",onClick:()=>{setPlaying(false);setPositioning(true);setStep(0)},children:"H"}),
+       jsx("button",{title:"Paso anterior",onClick:()=>{setPositioning(false);previous()},children:"◀◀"}),
+       jsx("button",{title:"Plegado anterior",onClick:()=>{setPositioning(false);previous()},children:"↶"}),
+       jsx("button",{title:"Plegado siguiente",onClick:()=>{setPositioning(false);next()},children:"▶▶"}),
+       jsx("button",{title:"Avance rápido",onClick:()=>{setPositioning(false);setStep(Math.max(0,bends.length-1))},children:"»"}),
        jsx("b",{children:"Paso "+(step+1)+" / "+Math.max(1,bends.length)}),
-       jsx("span",{children:bend?"Plegado "+(bend.order||step+1)+" de "+bends.length:"Posicionar chapa"}),
+       jsx("span",{children:positioning?"Posicionar chapa":bend?"Plegado "+(bend.order||step+1)+" de "+bends.length:"Posicionar chapa"}),
        jsx("label",{children:["Velocidad",jsx("select",{defaultValue:"1.0x",children:["0.5x","1.0x","1.5x","2.0x"].map(v=>jsx("option",{children:v},v))})]})
       ]}),
       jsxs("div",{className:"pp-sim-content",children:[
        jsxs("div",{className:"pp-machine-stage",children:[
-        jsx("div",{className:"pp-stage-grid"}),
-        jsxs("div",{className:"pp-machine-art",children:[
+        jsx("div",{className:"pp-stage-grid",style:{display:toggles.Malla?"":"none"}}),
+        jsxs("div",{className:"pp-machine-art",style:{transform:view==="Lateral"?"scaleX(.7) skewY(-3deg)":view==="Superior"?"scale(.82) rotateX(55deg)":view==="Frontal"?"scaleX(1.04)":"",transition:"transform .2s ease"},children:[
          jsx("div",{className:"pp-press-header",children:jsx("strong",{children:machineName})}),
          jsx("div",{className:"pp-red-cap pp-red-left"}),
          jsx("div",{className:"pp-red-cap pp-red-right"}),
@@ -97,8 +99,8 @@ function DashboardPage(){
          jsx("div",{className:"pp-workpiece",style:{"--pp-angle":Math.max(0,90-angle)+"deg"},children:[jsx("i",{}),jsx("i",{}),jsx("i",{})]}),
          jsxs("div",{className:"pp-console",children:[jsx("div",{children:"XPERT"}),jsx("b",{children:"Y1 · Y2"}),jsx("small",{children:"32.5 t"})]})
         ]}),
-        jsxs("div",{className:"pp-axis-cube",children:[jsx("span",{children:"Z"}),jsx("i",{}),jsx("b",{children:"Y"}),jsx("em",{children:"X"})]}),
-        jsxs("div",{className:"pp-sequence",children:[jsx("h2",{children:"SECUENCIA DE PLEGADO"}),jsx("div",{className:"pp-sequence-list",children:sequence.map((label,i)=>jsxs("button",{className:i===activeStep?"active":"",onClick:()=>{setPlaying(false);setStep(Math.max(0,Math.min(bends.length-1,i-1)))},children:[jsx("b",{children:i+1}),jsx("svg",{viewBox:"0 0 72 38",children:jsx("path",{d:"M4 20h22l9-10h14l8 10h12",fill:"none",stroke:"currentColor",strokeWidth:"4",strokeLinejoin:"round"})}),jsx("span",{children:label})]},i))})]})
+        jsxs("div",{className:"pp-axis-cube",style:{display:toggles.Ejes?"":"none"},children:[jsx("span",{children:"Z"}),jsx("i",{}),jsx("b",{children:"Y"}),jsx("em",{children:"X"})]}),
+        jsxs("div",{className:"pp-sequence",children:[jsx("h2",{children:"SECUENCIA DE PLEGADO"}),jsx("div",{className:"pp-sequence-list",children:sequence.map((label,i)=>jsxs("button",{className:i===activeStep?"active":"",onClick:()=>{setPlaying(false);setPositioning(i===0);setStep(Math.max(0,Math.min(bends.length-1,i-1)))},children:[jsx("b",{children:i+1}),jsx("svg",{viewBox:"0 0 72 38",children:jsx("path",{d:"M4 20h22l9-10h14l8 10h12",fill:"none",stroke:"currentColor",strokeWidth:"4",strokeLinejoin:"round"})}),jsx("span",{children:label})]},i))})]})
        ]}),
        jsxs("aside",{className:"pp-info",children:[
         jsxs("header",{children:[jsx("b",{children:"INFORMACIÓN"}),jsx("button",{onClick:e=>e.currentTarget.closest(".pp-info").classList.toggle("collapsed"),children:"⌄"})]}),
@@ -137,7 +139,7 @@ function DashboardPage(){
      ]}),
      jsxs("section",{className:"pp-libraries",children:[
       jsxs("section",{className:"pp-library-card pp-machines",children:[jsxs("header",{children:[jsx("h2",{children:"BIBLIOTECA DE MÁQUINAS"}),jsx("button",{onClick:()=>goto("/bibliotecas"),children:"Ver todas"})]}),jsx("div",{className:"pp-machine-list",children:machines.slice(0,5).map((m,i)=>jsxs("button",{className:i===0?"selected":"",onClick:()=>goto("/bibliotecas"),children:[jsx("div",{className:"pp-machine-thumb",children:jsx("div",{className:"pp-machine-drawing",children:[jsx("i",{}),jsx("b",{}),jsx("span",{})]})}),jsx("small",{children:m.manufacturer+" "+m.name})]},m.id))})]}),
-       jsxs("section",{className:"pp-library-card pp-tooling",children:[jsxs("header",{children:[jsx("h2",{children:"UTILLAJE"}),jsx("div",{children:["PUNZONES","MATRICES","ADAPTADORES","ACCESORIOS"].map(v=>jsx("button",{className:toolTab===v?"active":"",onClick:()=>setToolTab(v),children:v},v))})]}),jsx("div",{className:"pp-tool-list",children:tools.filter(t=>toolTab==="PUNZONES"?t.kind==="punch":t.kind==="MATRICES"||t.kind==="MATRICES"?t.kind==="die":t.kind==="die").slice(0,7).map(t=>jsxs("button",{onClick:()=>goto("/utillaje"),children:[jsx("span",{className:"pp-tool-drawing",children:jsx("i",{})}),jsx("small",{children:t.name.split(" ").slice(0,3).join(" ")})]},t.id))})]}),
+       jsxs("section",{className:"pp-library-card pp-tooling",children:[jsxs("header",{children:[jsx("h2",{children:"UTILLAJE"}),jsx("div",{children:["PUNZONES","MATRICES","ADAPTADORES","ACCESORIOS"].map(v=>jsx("button",{className:toolTab===v?"active":"",onClick:()=>setToolTab(v),children:v},v))})]}),jsx("div",{className:"pp-tool-list",children:visibleTools.slice(0,7).map(t=>jsxs("button",{onClick:()=>goto("/utillaje"),children:[jsx("span",{className:"pp-tool-drawing",children:jsx("i",{})}),jsx("small",{children:t.name.split(" ").slice(0,3).join(" ")})]},t.id))})]}),
        jsxs("section",{className:"pp-library-card pp-materials",children:[jsxs("header",{children:[jsx("h2",{children:"MATERIALES"}),jsx("button",{onClick:()=>goto("/materiales"),children:"Ver todos"})]}),jsxs("table",{children:[jsx("thead",{children:jsx("tr",{children:["MATERIAL","ESPESOR (mm)","LÍMITE ELÁSTICO (MPa)","RESISTENCIA (MPa)","K-FACTOR"].map(v=>jsx("th",{children:v},v))})}),jsx("tbody",{children:MATERIALS.map(row=>jsx("tr",{children:row.map((v,i)=>jsx("td",{children:v},i))},row[0]))})]})]})
      ]})
     ]})

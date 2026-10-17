@@ -22,9 +22,11 @@ try {
   page.on('requestfailed', (request) => {
     failedResources.push(`REQUEST FAILED ${request.url()} · ${request.failure()?.errorText || 'unknown'}`);
   });
+  const appOrigin = new URL(baseUrl).origin;
   page.on('response', (response) => {
     const url = response.url();
-    if (url.startsWith(baseUrl) && response.status() >= 400 && !new URL(url).pathname.endsWith('/favicon.ico')) {
+    const parsed = new URL(url);
+    if (parsed.origin === appOrigin && response.status() >= 400 && !parsed.pathname.endsWith('/favicon.ico')) {
       failedResources.push(`${response.status()} ${url}`);
     }
   });

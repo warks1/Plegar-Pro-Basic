@@ -239,3 +239,34 @@ input:focus,select:focus,textarea:focus{outline:2px solid #1685cf66!important;bo
 .project-thumbnail{background:radial-gradient(ellipse at center,#1a3449,#07111b 76%)!important;border:1px solid #28506b!important}
 .project-thumbnail svg{filter:drop-shadow(0 4px 8px #0008)}
 @media(max-width:760px){.cadcam-sketch,.cadcam-3d-stage,.programmer-viewport,.development-workspace{background-size:18px 18px,18px 18px,auto!important}}
+
+/* Escena de plegado: proporciones y piezas construidas para las referencias */
+.sim-ref-stage{position:relative;display:grid;place-items:center;min-width:0;min-height:470px;overflow:hidden}
+.sim2d-reference{position:relative;width:min(760px,94%);height:340px;transform-origin:center center;overflow:hidden;border:1px solid #304858;border-radius:5px}
+.sim2d-punch{position:absolute;z-index:3;left:calc(50% - 25px);top:12%;width:50px;height:33%;clip-path:polygon(0 0,100% 0,100% 70%,58% 100%,42% 100%,0 70%);border-radius:2px}
+.sim2d-punch i{position:absolute;inset:0 8px auto;height:20%;background:linear-gradient(90deg,#fff5,#64727a,#fff5)}
+.sim2d-centerline{position:absolute;z-index:1;left:50%;top:42%;height:24%;border-left:1px dashed #c5d5dc66}
+.sim2d-sheet{position:absolute;z-index:4;left:calc(50% - 4px);top:43%;width:calc(50% - 72px);height:10px;transform-origin:right center;border-radius:2px}
+.sim2d-sheet.right{left:50%;transform-origin:left center}
+.sim2d-die{position:absolute;z-index:2;left:calc(50% - 108px);top:60%;width:216px;height:66px;clip-path:polygon(0 30%,32% 30%,50% 100%,68% 30%,100% 30%,100% 100%,0 100%);border-radius:4px}
+.sim2d-angle{position:absolute;z-index:5;left:calc(50% + 48px);top:38%;font-size:20px;font-weight:800}
+.sim-ref-overlay{position:absolute;left:12px;bottom:10px;display:flex;gap:7px;flex-wrap:wrap}
+.sim-ref-overlay span{padding:5px 8px;border:1px solid #36566c;border-radius:4px;background:#07131fe8;color:#d2e3ed;font-size:11px}
+.sim3d-reference{position:relative;width:min(860px,96%);height:420px;overflow:hidden;transform-origin:center center;border:1px solid #304858;border-radius:5px;perspective:900px}
+.sim3d-machine{position:absolute;z-index:1;inset:0}
+.sim3d-top{position:absolute;z-index:4;left:15%;right:15%;top:11%;height:13%;display:flex;align-items:center;justify-content:space-between;padding:0 18px;color:#dce5e8;font-size:12px}
+.sim3d-top b{font-size:14px;letter-spacing:.04em}
+.sim3d-column{position:absolute;z-index:2;top:22%;bottom:17%;width:7%;background:linear-gradient(90deg,#303a40,#aab4b9 30%,#505a60 80%,#242d32);border:1px solid #77848a;box-shadow:inset 0 0 10px #0009}
+.sim3d-column.left{left:18%}.sim3d-column.right{right:18%}
+.sim3d-red{position:absolute;z-index:3;top:22%;height:14%;width:9%;clip-path:polygon(0 0,100% 0,100% 100%,0 100%,15% 55%);border-radius:3px}
+.sim3d-red.left{left:12%}.sim3d-red.right{right:12%;transform:scaleX(-1)}
+.sim3d-ram{position:absolute;z-index:4;left:25%;right:25%;top:24%;height:13%}
+.sim3d-tool{position:absolute;z-index:4;left:45%;top:37%;width:10%;height:13%;clip-path:polygon(0 0,100% 0,58% 100%,42% 100%);background:linear-gradient(90deg,#4c585e,#d6dfe2,#56636a);filter:drop-shadow(0 6px 5px #0009)}
+.sim3d-table{position:absolute;z-index:2;left:18%;right:18%;top:62%;height:9%}
+.sim3d-part{position:absolute;z-index:5;left:36%;top:52%;width:28%;height:10%;display:flex;align-items:flex-start;justify-content:center;filter:drop-shadow(0 0 14px #139dff)}
+.sim3d-part i{display:block;width:34%;height:12px;transform-origin:right center;transform:rotate(calc(var(--fold)*-1));border-radius:1px}
+.sim3d-part i.center{width:32%;transform:none}
+.sim3d-part i.right{transform-origin:left center;transform:rotate(var(--fold))}
+.sim3d-console{position:absolute;z-index:6;right:2%;bottom:16%;width:13%;height:22%;display:grid;place-items:center;background:linear-gradient(90deg,#202a30,#58646a,#20282d);border:1px solid #78848a;color:#39c7fa;font-size:10px;box-shadow:0 8px 18px #0008}
+.sim3d-console:after{content:"";position:absolute;left:15%;right:15%;bottom:12%;height:24%;background:linear-gradient(135deg,#12191e,#36444a);border:1px solid #748087;transform:skewY(-8deg)}
+@media(max-width:760px){.sim-ref-stage{min-height:330px}.sim2d-reference{height:270px}.sim3d-reference{height:300px}.sim3d-console{display:none}.sim3d-column.left{left:8%}.sim3d-column.right{right:8%}}

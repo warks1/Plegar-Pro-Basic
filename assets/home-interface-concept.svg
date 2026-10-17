@@ -1,105 +1,250 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1000" viewBox="0 0 1600 1000" role="img" aria-labelledby="title desc">
-<title id="title">Plegar Pro — interfaz industrial premium</title>
-<desc id="desc">Concepto de producto con pantalla de inicio y centro de operaciones en grafito, acero y naranja de seguridad.</desc>
+<svg xmlns="http://www.w3.org/2000/svg" width="1536" height="1024" viewBox="0 0 1536 1024" role="img" aria-labelledby="title desc">
+<title id="title">Panel de plegado y simulación industrial 3D</title>
+<desc id="desc">Recreación de la interfaz de Plegar Pro basada en la referencia del usuario: simulación de prensa plegadora, CAD, cálculo y bibliotecas integrados en un único espacio de trabajo.</desc>
 <defs>
- <linearGradient id="canvas" x2="1" y2="1"><stop stop-color="#111416"/><stop offset=".55" stop-color="#202426"/><stop offset="1" stop-color="#111416"/></linearGradient>
- <linearGradient id="panel" x2="0" y2="1"><stop stop-color="#303638"/><stop offset="1" stop-color="#202526"/></linearGradient>
- <linearGradient id="steel" x2="1" y2="1"><stop stop-color="#dce0df"/><stop offset=".4" stop-color="#8e9999"/><stop offset=".7" stop-color="#e7e9e7"/><stop offset="1" stop-color="#788282"/></linearGradient>
- <linearGradient id="amber" x2="1"><stop stop-color="#ffb33f"/><stop offset="1" stop-color="#e97819"/></linearGradient>
- <linearGradient id="photoFade" x2="0" y2="1"><stop offset=".27" stop-color="#101516" stop-opacity="0"/><stop offset="1" stop-color="#101516" stop-opacity=".94"/></linearGradient>
- <pattern id="finegrid" width="32" height="32" patternUnits="userSpaceOnUse"><path d="M32 0H0V32" fill="none" stroke="#d5d9d7" stroke-opacity=".09" stroke-width=".7"/></pattern>
- <filter id="shadow" x="-.2" y="-.2" width="1.4" height="1.5"><feGaussianBlur in="SourceAlpha" stdDeviation="14"/><feOffset dy="10"/><feComponentTransfer><feFuncA type="linear" slope=".42"/></feComponentTransfer><feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge></filter>
- <filter id="soft"><feGaussianBlur stdDeviation="22"/></filter>
+ <linearGradient id="bg" x2="0" y2="1"><stop stop-color="#050812"/><stop offset="1" stop-color="#08111e"/></linearGradient>
+ <linearGradient id="panel" x2="0" y2="1"><stop stop-color="#0d1624"/><stop offset="1" stop-color="#080f19"/></linearGradient>
+ <linearGradient id="header" x2="0" y2="1"><stop stop-color="#070c16"/><stop offset="1" stop-color="#0c1420"/></linearGradient>
+ <linearGradient id="blue" x2="1" y2="1"><stop stop-color="#296aff"/><stop offset="1" stop-color="#1744c3"/></linearGradient>
+ <linearGradient id="violet" x2="1" y2="1"><stop stop-color="#8a42ff"/><stop offset="1" stop-color="#5524c9"/></linearGradient>
+ <linearGradient id="steel" x2="0" y2="1"><stop stop-color="#e9eef2"/><stop offset=".35" stop-color="#aab6c1"/><stop offset=".68" stop-color="#667682"/><stop offset="1" stop-color="#cbd4da"/></linearGradient>
+ <linearGradient id="ram" x2="0" y2="1"><stop stop-color="#161d25"/><stop offset=".26" stop-color="#414c56"/><stop offset=".63" stop-color="#11171e"/><stop offset="1" stop-color="#080d12"/></linearGradient>
+ <linearGradient id="red" x2="1"><stop stop-color="#ff604d"/><stop offset="1" stop-color="#a8251e"/></linearGradient>
+ <linearGradient id="viewport" x2="0" y2="1"><stop stop-color="#18283a"/><stop offset=".48" stop-color="#101b29"/><stop offset="1" stop-color="#090f18"/></linearGradient>
+ <linearGradient id="sheen" x2="1" y2="1"><stop stop-color="#fff" stop-opacity=".65"/><stop offset=".35" stop-color="#91b9df" stop-opacity=".22"/><stop offset="1" stop-color="#fff" stop-opacity=".06"/></linearGradient>
+ <pattern id="grid" width="32" height="32" patternUnits="userSpaceOnUse"><path d="M32 0H0V32" fill="none" stroke="#69a9ec" stroke-opacity=".13" stroke-width=".8"/></pattern>
+ <filter id="shadow" x="-.2" y="-.2" width="1.5" height="1.6"><feGaussianBlur in="SourceAlpha" stdDeviation="7"/><feOffset dy="4"/><feComponentTransfer><feFuncA type="linear" slope=".5"/></feComponentTransfer><feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+ <filter id="glow"><feGaussianBlur stdDeviation="4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+ <g id="ico"><circle r="10" fill="#13253b" stroke="#314d71"/></g>
 </defs>
-<rect width="1600" height="1000" fill="url(#canvas)"/>
-<circle cx="1030" cy="290" r="250" fill="#e48024" opacity=".07" filter="url(#soft)"/>
-<path d="M0 122H1600" stroke="#75807f" stroke-opacity=".24"/>
-<text x="56" y="48" fill="#e7e9e7" font-family="Arial,sans-serif" font-size="11" font-weight="700" letter-spacing="3">PLEGAR PRO  /  PRODUCT DESIGN SYSTEM</text>
-<text x="56" y="88" fill="#f4f3ee" font-family="Arial,sans-serif" font-size="27" font-weight="700">Precision, control, production.</text>
-<text x="56" y="108" fill="#9ba3a2" font-family="Arial,sans-serif" font-size="11" letter-spacing=".4">Interfaz de nueva generacion para el taller conectado</text>
-<rect x="1330" y="39" width="213" height="37" rx="4" fill="#272d2e" stroke="#586161"/><circle cx="1350" cy="57" r="4" fill="#ef952b"/><text x="1364" y="61" fill="#d8dcda" font-family="Arial,sans-serif" font-size="9" font-weight="700" letter-spacing="1">CONCEPTO  /  V.02</text>
-
-<!-- START / welcome -->
-<rect x="48" y="150" width="480" height="798" rx="8" fill="#161b1c" stroke="#586161" filter="url(#shadow)"/>
-<rect x="49" y="151" width="478" height="50" rx="7" fill="#202627"/>
-<path d="M49 201H527" stroke="#4c5555"/>
-<path d="M69 175l13-13 13 13-13 13z" fill="none" stroke="url(#amber)" stroke-width="2"/>
-<path d="M76 175l6-6 6 6-6 6z" fill="#f29a2b"/>
-<text x="105" y="174" fill="#f1f2ee" font-family="Arial,sans-serif" font-size="12" font-weight="700" letter-spacing="1.5">PLEGAR PRO</text><text x="105" y="188" fill="#899392" font-family="Arial,sans-serif" font-size="7" letter-spacing="1.6">INDUSTRIAL SOFTWARE</text>
-<text x="72" y="227" fill="#ed9b37" font-family="Arial,sans-serif" font-size="8" font-weight="700" letter-spacing="2">01  /  WELCOME SCREEN</text>
-<rect x="70" y="242" width="436" height="278" rx="5" fill="#0e1213" stroke="#515a5a"/>
-<image href="./hero-approved.png" x="71" y="243" width="434" height="276" preserveAspectRatio="xMidYMid slice"/>
-<rect x="71" y="243" width="434" height="276" rx="4" fill="url(#photoFade)"/>
-<rect x="86" y="261" width="120" height="23" rx="2" fill="#171c1d" fill-opacity=".88" stroke="#7d8583" stroke-opacity=".55"/>
-<circle cx="99" cy="272" r="3" fill="#ee962e"/><text x="109" y="275" fill="#e7e9e6" font-family="Arial,sans-serif" font-size="7" font-weight="700" letter-spacing="1">SMART FABRICATION</text>
-<text x="88" y="445" fill="#f4f3ef" font-family="Arial,sans-serif" font-size="29" font-weight="700">Fabricar mejor.</text>
-<text x="88" y="478" fill="#f4f3ef" font-family="Arial,sans-serif" font-size="29" font-weight="700">Con cada detalle.</text>
-<text x="89" y="499" fill="#c3c9c6" font-family="Arial,sans-serif" font-size="10">Diseno, simulacion y produccion bajo control.</text>
-<rect x="87" y="544" width="418" height="54" rx="3" fill="url(#amber)"/>
-<text x="108" y="576" fill="#1c1c19" font-family="Arial,sans-serif" font-size="10" font-weight="800" letter-spacing="1">ABRIR CENTRO DE OPERACIONES</text><path d="M475 564l8 7-8 7" fill="none" stroke="#24221d" stroke-width="1.7"/>
-<path d="M87 623H505" stroke="#464f4f"/>
-<text x="88" y="651" fill="#aab1af" font-family="Arial,sans-serif" font-size="8" font-weight="700" letter-spacing="1.4">ESTADO DE PLANTA</text>
-<rect x="87" y="667" width="202" height="75" rx="4" fill="#202728" stroke="#4c5655"/><circle cx="107" cy="689" r="7" fill="#253d32" stroke="#67ba7a"/><circle cx="107" cy="689" r="2.5" fill="#74d38a"/><text x="123" y="689" fill="#e1e5e2" font-family="Arial,sans-serif" font-size="8" font-weight="700">PLEGADORA XPERT PRO</text><text x="101" y="722" fill="#86c68e" font-family="Arial,sans-serif" font-size="8">OPERATIVA</text><text x="270" y="722" text-anchor="end" fill="#aab2af" font-family="Arial,sans-serif" font-size="8">100 t</text>
-<rect x="300" y="667" width="205" height="75" rx="4" fill="#202728" stroke="#4c5655"/><path d="M318 684h12m-6-6v12" stroke="#f0a13d" stroke-width="1.5"/><text x="341" y="689" fill="#e1e5e2" font-family="Arial,sans-serif" font-size="8" font-weight="700">ESPACIO DE TRABAJO</text><text x="315" y="722" fill="#b5bdba" font-family="Arial,sans-serif" font-size="8">12 proyectos activos</text>
-<text x="88" y="791" fill="#7f8987" font-family="Arial,sans-serif" font-size="8" letter-spacing="1.2">INGENIERIA  /  PRECISION  /  PRODUCCION</text>
-<path d="M88 815H505" stroke="#3d4746"/>
-<circle cx="96" cy="841" r="3" fill="#70c784"/><text x="108" y="844" fill="#9ca5a2" font-family="Arial,sans-serif" font-size="8">Sistema conectado · Ultima sincronizacion 09:42</text>
-<text x="88" y="906" fill="#626c6b" font-family="Arial,sans-serif" font-size="7" letter-spacing="1">© PLEGAR PRO 2026</text><text x="505" y="906" text-anchor="end" fill="#626c6b" font-family="Arial,sans-serif" font-size="7">ESP / METRIC</text>
-
-<!-- OPERATIONS dashboard -->
-<rect x="560" y="150" width="992" height="798" rx="8" fill="#171c1d" stroke="#586161" filter="url(#shadow)"/>
+<rect width="1536" height="1024" fill="url(#bg)"/>
+<!-- app top bar -->
+<rect x="0" y="0" width="1536" height="55" fill="url(#header)"/><path d="M0 55H1536" stroke="#233349"/>
+<path d="M22 16l12-12 12 12-12 12z" fill="none" stroke="#50a9ff" stroke-width="2.2"/><path d="M27 16l7-7 7 7-7 7z" fill="#8c57ff"/>
+<text x="55" y="22" fill="#f3f7ff" font-family="Arial,sans-serif" font-size="14" font-weight="800" letter-spacing=".8">PLEGAR PRO</text><text x="56" y="37" fill="#55aaff" font-family="Arial,sans-serif" font-size="7" font-weight="700" letter-spacing="1.7">PROFESSIONAL</text>
+<rect x="328" y="8" width="320" height="38" rx="7" fill="#0e1725" stroke="#27364b"/><circle cx="348" cy="27" r="8" fill="#15243a" stroke="#40516a"/><text x="348" y="30" text-anchor="middle" fill="#d4e4fb" font-family="Arial,sans-serif" font-size="8">▧</text><text x="365" y="21" fill="#aeb9c7" font-family="Arial,sans-serif" font-size="6.5">PROYECTO ACTIVO</text><text x="365" y="33" fill="#f0f3f8" font-family="Arial,sans-serif" font-size="8" font-weight="700">SOPORTE_SALIDA_VENTILACION</text><path d="M516 18v20M541 18v20" stroke="#28364a"/><circle cx="555" cy="27" r="3.5" fill="#35d783"/><text x="566" y="30" fill="#55dc96" font-family="Arial,sans-serif" font-size="8">Sincronizado</text><path d="M629 24l4 4 4-4" fill="none" stroke="#99a6b5"/>
+<!-- header actions -->
+<g font-family="Arial,sans-serif" text-anchor="middle">
+ <path d="M710 17a8 8 0 1 0 3 11M708 14v7h7" fill="none" stroke="#d5e0ef" stroke-width="1.4"/><text x="711" y="43" fill="#c2cbd8" font-size="6.5">Deshacer</text>
+ <path d="M772 17a8 8 0 1 1-3 11M774 14v7h-7" fill="none" stroke="#d5e0ef" stroke-width="1.4"/><text x="773" y="43" fill="#c2cbd8" font-size="6.5">Rehacer</text>
+ <path d="M829 16h13l3 3v13h-16zM832 16v6h10v-6M832 32v-7h10v7" fill="none" stroke="#d5e0ef" stroke-width="1.2"/><text x="836" y="43" fill="#c2cbd8" font-size="6.5">Guardar</text>
+ <circle cx="891" cy="24" r="8" fill="none" stroke="#d5e0ef"/><circle cx="891" cy="24" r="2" fill="#d5e0ef"/><path d="M891 16v-4m7 8 4-2m-3 9 4 2m-13 3v4m-7-8-4 2m3-9-4-2" stroke="#d5e0ef"/><text x="891" y="43" fill="#c2cbd8" font-size="6.5">Compartir</text>
+ <path d="M947 31V19l7-5 7 5v12h-14m4 0v-7h5v7" fill="none" stroke="#d5e0ef"/><circle cx="961" cy="15" r="5" fill="#e33652"/><text x="961" y="17" fill="#fff" font-size="6">3</text><text x="954" y="43" fill="#c2cbd8" font-size="6.5">Mapa</text>
+</g>
+<circle cx="994" cy="27" r="13" fill="#173d94" stroke="#3474ed"/><text x="994" y="30" text-anchor="middle" fill="#fff" font-family="Arial,sans-serif" font-size="8" font-weight="700">AM</text><text x="1013" y="23" fill="#f0f3f8" font-family="Arial,sans-serif" font-size="8" font-weight="700">AMS ENGINEERING</text><text x="1013" y="35" fill="#a4b0c0" font-family="Arial,sans-serif" font-size="7">Administrador</text>
+<g fill="none" stroke="#b4c2d2" stroke-width="1.2"><circle cx="1384" cy="25" r="7"/><path d="M1382 23a2 2 0 1 1 4 0c0 2-2 2-2 4m0 3v1"/><path d="M1424 20l2-3 3 1 2-1 3 3 3-1 1 4-2 2 1 3-4 2-2-2-3 1-2-3 1-3z"/><circle cx="1469" cy="25" r="8"/><path d="M1469 20v6l4 2"/></g>
 <!-- sidebar -->
-<rect x="561" y="151" width="192" height="796" rx="7" fill="#202627"/>
-<path d="M753 151V947" stroke="#414b4a"/>
-<path d="M581 178l12-12 12 12-12 12z" fill="none" stroke="url(#amber)" stroke-width="2"/><path d="M587 178l6-6 6 6-6 6z" fill="#ef9a30"/>
-<text x="616" y="175" fill="#f1f2ee" font-family="Arial,sans-serif" font-size="11" font-weight="700" letter-spacing="1.3">PLEGAR PRO</text><text x="616" y="188" fill="#87918e" font-family="Arial,sans-serif" font-size="6.5" letter-spacing="1.3">INDUSTRIAL SOFTWARE</text>
-<text x="580" y="225" fill="#79827f" font-family="Arial,sans-serif" font-size="7" font-weight="700" letter-spacing="1.3">WORKSPACE</text>
-<rect x="573" y="238" width="168" height="35" rx="3" fill="#3b3023"/><rect x="573" y="238" width="3" height="35" fill="#f0a03b"/><text x="590" y="260" fill="#f2b25e" font-family="Arial,sans-serif" font-size="9" font-weight="700">▦  Overview</text>
-<g font-family="Arial,sans-serif" font-size="8.5" fill="#b4bcba">
- <text x="590" y="300">▤  Projects</text><text x="590" y="333">⇧  Import files</text><text x="590" y="366">⌗  Part programming</text><text x="590" y="399">⌘  2D programming</text><text x="590" y="432">◈  3D programming</text><text x="590" y="465">▧  CAD / CAM design</text><text x="590" y="498">▷  2D simulation</text><text x="590" y="531">◉  3D simulation</text><text x="590" y="564">⌁  Development</text><text x="590" y="597">⚙  Production</text><text x="590" y="630">✓  Quality control</text><text x="590" y="663">▦  Materials library</text>
-</g>
-<path d="M575 697H739" stroke="#444d4c"/><text x="581" y="720" fill="#79827f" font-family="Arial,sans-serif" font-size="7" font-weight="700" letter-spacing="1.2">PLANT STATUS</text>
-<circle cx="586" cy="744" r="3.5" fill="#70c784"/><text x="598" y="747" fill="#ccd1ce" font-family="Arial,sans-serif" font-size="8">Connected</text><text x="726" y="747" text-anchor="end" fill="#828c89" font-family="Arial,sans-serif" font-size="7">2 machines</text>
-<rect x="575" y="875" width="164" height="51" rx="4" fill="#292f30" stroke="#454f4e"/><circle cx="594" cy="900" r="12" fill="#414a49"/><text x="594" y="903" text-anchor="middle" fill="#e8e9e5" font-family="Arial,sans-serif" font-size="8" font-weight="700">AM</text><text x="614" y="896" fill="#e6e9e6" font-family="Arial,sans-serif" font-size="8" font-weight="700">AMS Engineering</text><text x="614" y="910" fill="#818b88" font-family="Arial,sans-serif" font-size="7">Administrator</text>
-<!-- top bar -->
-<rect x="754" y="151" width="797" height="50" fill="#202627"/><path d="M754 201H1551" stroke="#424c4b"/>
-<text x="779" y="181" fill="#aeb7b4" font-family="Arial,sans-serif" font-size="8">Plant / <tspan fill="#f0f1ed" font-weight="700">Overview</tspan></text>
-<rect x="1167" y="162" width="187" height="27" rx="3" fill="#171c1d" stroke="#4a5554"/><text x="1180" y="179" fill="#7f8986" font-family="Arial,sans-serif" font-size="8">⌕  Search workspace</text>
-<circle cx="1381" cy="175" r="10" fill="#303737" stroke="#515b59"/><text x="1381" y="179" text-anchor="middle" fill="#b4bcba" font-family="Arial,sans-serif" font-size="9">?</text><circle cx="1413" cy="175" r="10" fill="#303737" stroke="#515b59"/><text x="1413" y="179" text-anchor="middle" fill="#b4bcba" font-family="Arial,sans-serif" font-size="8">3</text>
-<circle cx="1470" cy="175" r="13" fill="#494c47"/><text x="1470" y="179" text-anchor="middle" fill="#f0aa4c" font-family="Arial,sans-serif" font-size="8" font-weight="700">AM</text>
-<!-- title / controls -->
-<text x="779" y="235" fill="#f2f3ef" font-family="Arial,sans-serif" font-size="19" font-weight="700">Good morning, Alex.</text>
-<text x="779" y="254" fill="#929c99" font-family="Arial,sans-serif" font-size="8">Here is your production overview for today, 18 October 2026.</text>
-<rect x="1390" y="222" width="136" height="30" rx="3" fill="#e9922e"/><text x="1458" y="241" text-anchor="middle" fill="#211f1a" font-family="Arial,sans-serif" font-size="8" font-weight="800" letter-spacing=".4">＋  NEW PROJECT</text>
-<!-- summary strip -->
+<rect x="12" y="57" width="168" height="891" rx="9" fill="#090f19" stroke="#202c3e"/>
 <g font-family="Arial,sans-serif">
- <rect x="779" y="274" width="174" height="82" rx="4" fill="#252c2d" stroke="#485251"/><text x="794" y="295" fill="#a4adaa" font-size="7" font-weight="700" letter-spacing=".8">ACTIVE PROJECTS</text><text x="794" y="332" fill="#f2f3ef" font-size="25" font-weight="700">12</text><text x="824" y="331" fill="#8ac695" font-size="7">↑ 2 this week</text><path d="M919 334l5-10 5 4 6-15" fill="none" stroke="#8ac695" stroke-width="1.4"/>
- <rect x="961" y="274" width="174" height="82" rx="4" fill="#252c2d" stroke="#485251"/><text x="976" y="295" fill="#a4adaa" font-size="7" font-weight="700" letter-spacing=".8">JOBS IN PROGRESS</text><text x="976" y="332" fill="#f2f3ef" font-size="25" font-weight="700">07</text><text x="1006" y="331" fill="#adb6b3" font-size="7">3 due today</text><rect x="1079" y="319" width="39" height="4" rx="2" fill="#444c4b"/><rect x="1079" y="319" width="28" height="4" rx="2" fill="#e99b3b"/>
- <rect x="1143" y="274" width="174" height="82" rx="4" fill="#252c2d" stroke="#485251"/><text x="1158" y="295" fill="#a4adaa" font-size="7" font-weight="700" letter-spacing=".8">PARTS PRODUCED</text><text x="1158" y="332" fill="#f2f3ef" font-size="25" font-weight="700">1,248</text><text x="1220" y="331" fill="#8ac695" font-size="7">this month</text><path d="M1280 335l5-9 5 3 5-13" fill="none" stroke="#8ac695" stroke-width="1.4"/>
- <rect x="1325" y="274" width="201" height="82" rx="4" fill="#292624" stroke="#6e5940"/><text x="1340" y="295" fill="#bfaa91" font-size="7" font-weight="700" letter-spacing=".8">MACHINE AVAILABILITY</text><text x="1340" y="332" fill="#f2f3ef" font-size="25" font-weight="700">94<tspan font-size="13">%</tspan></text><circle cx="1484" cy="318" r="17" fill="none" stroke="#51463a" stroke-width="3"/><circle cx="1484" cy="318" r="17" fill="none" stroke="#e99b3b" stroke-width="3" stroke-dasharray="100 107" transform="rotate(-90 1484 318)"/>
+ <text x="24" y="78" fill="#76859a" font-size="7" font-weight="700">DISEÑO Y PROGRAMACIÓN</text>
+ <g fill="#d3dce9" font-size="8.5">
+ <text x="52" y="106">⌂  Inicio</text><text x="52" y="137">▧  Programar pieza</text><text x="52" y="169">▱  Programación 2D</text><text x="52" y="201">◈  Programación 3D</text><text x="52" y="233">▧  Diseño CAD/CAM 3D</text>
+ </g>
+ <rect x="18" y="120" width="156" height="30" rx="6" fill="url(#violet)" stroke="#9464ff" stroke-opacity=".7"/><text x="52" y="138" fill="#fff" font-size="8.5" font-weight="700">▧  Programar pieza</text>
+ <text x="24" y="261" fill="#76859a" font-size="7" font-weight="700">SIMULACIÓN</text>
+ <text x="52" y="287" fill="#d3dce9" font-size="8.5">▧  Simulación 2D</text>
+ <rect x="18" y="296" width="156" height="30" rx="6" fill="url(#blue)" stroke="#5298ff"/><text x="52" y="315" fill="#fff" font-size="8.5" font-weight="700">⬡  Simulación 3D</text>
+ <text x="24" y="349" fill="#76859a" font-size="7" font-weight="700">HERRAMIENTAS</text>
+ <g fill="#d3dce9" font-size="8.5"><text x="52" y="376">▦  Calculadora desarrollo</text><text x="52" y="408">⌘  Curva perfecta</text></g>
+ <text x="24" y="435" fill="#76859a" font-size="7" font-weight="700">BIBLIOTECAS</text>
+ <g fill="#d3dce9" font-size="8.5"><text x="52" y="462">⚙  Máquinas</text><text x="52" y="494">♧  Utillaje</text><text x="52" y="526">⬡  Materiales</text><text x="52" y="558">♙  Proveedores</text></g>
+ <text x="24" y="585" fill="#76859a" font-size="7" font-weight="700">AJUSTES</text>
+ <g fill="#d3dce9" font-size="8.5"><text x="52" y="612">⚙  Ajustes</text><text x="52" y="644">✦  IA Asistente</text></g>
 </g>
-<!-- production focus / photo -->
-<rect x="779" y="373" width="490" height="287" rx="4" fill="#1b2021" stroke="#4a5453"/>
-<text x="795" y="397" fill="#e8eae6" font-family="Arial,sans-serif" font-size="9" font-weight="700">PRODUCTION FLOOR</text><text x="1252" y="397" text-anchor="end" fill="#b2bab7" font-family="Arial,sans-serif" font-size="7">LIVE VIEW  •  09:42:16</text>
-<rect x="794" y="412" width="460" height="232" rx="3" fill="#101415"/><image href="./hero-approved.png" x="795" y="413" width="458" height="230" preserveAspectRatio="xMidYMid slice"/><rect x="795" y="413" width="458" height="230" fill="url(#finegrid)"/>
-<rect x="810" y="427" width="146" height="23" rx="2" fill="#191e1f" fill-opacity=".9" stroke="#7a817d"/><circle cx="822" cy="439" r="3" fill="#77c985"/><text x="832" y="442" fill="#e9ece8" font-family="Arial,sans-serif" font-size="7" font-weight="700" letter-spacing=".7">LINE 01  /  RUNNING</text>
-<rect x="810" y="592" width="427" height="38" rx="2" fill="#151a1b" fill-opacity=".94"/><text x="823" y="608" fill="#c0c7c4" font-family="Arial,sans-serif" font-size="7">CURRENT JOB</text><text x="823" y="622" fill="#f0f1ed" font-family="Arial,sans-serif" font-size="9" font-weight="700">Side bracket  /  S235JR  /  2.0 mm</text><text x="1223" y="618" text-anchor="end" fill="#f0aa4c" font-family="Arial,sans-serif" font-size="8" font-weight="700">68% COMPLETE</text>
-<!-- machine status -->
-<rect x="1283" y="373" width="243" height="287" rx="4" fill="#252c2d" stroke="#485251"/>
-<text x="1299" y="397" fill="#e8eae6" font-family="Arial,sans-serif" font-size="9" font-weight="700">MACHINE STATUS</text><circle cx="1495" cy="394" r="3" fill="#77c985"/><text x="1507" y="397" text-anchor="end" fill="#91c59a" font-family="Arial,sans-serif" font-size="7">ONLINE</text>
-<rect x="1299" y="412" width="211" height="109" rx="3" fill="#171c1d" stroke="#495250"/><image href="./hero-approved.png" x="1300" y="413" width="209" height="107" preserveAspectRatio="xMidYMid slice"/><rect x="1300" y="413" width="209" height="107" fill="#0d1112" opacity=".23"/>
-<text x="1299" y="546" fill="#f0f1ed" font-family="Arial,sans-serif" font-size="10" font-weight="700">XPERT PRO 100</text><text x="1299" y="563" fill="#8d9794" font-family="Arial,sans-serif" font-size="7">PRESS BRAKE  /  CELL 01</text>
-<path d="M1299 577H1510" stroke="#46504f"/>
-<text x="1299" y="596" fill="#8f9996" font-family="Arial,sans-serif" font-size="7">TONNAGE</text><text x="1510" y="596" text-anchor="end" fill="#e4e7e3" font-family="Arial,sans-serif" font-size="8" font-weight="700">100 t</text><text x="1299" y="614" fill="#8f9996" font-family="Arial,sans-serif" font-size="7">WORKING LENGTH</text><text x="1510" y="614" text-anchor="end" fill="#e4e7e3" font-family="Arial,sans-serif" font-size="8" font-weight="700">3,100 mm</text><text x="1299" y="642" fill="#80c58b" font-family="Arial,sans-serif" font-size="7">●  Ready for production</text>
-<!-- bottom -->
-<rect x="779" y="677" width="490" height="231" rx="4" fill="#252c2d" stroke="#485251"/>
-<text x="795" y="701" fill="#e8eae6" font-family="Arial,sans-serif" font-size="9" font-weight="700">RECENT PROJECTS</text><text x="1253" y="701" text-anchor="end" fill="#e6a14b" font-family="Arial,sans-serif" font-size="7" font-weight="700">VIEW ALL  →</text>
+<g fill="none" stroke="#9fb6d4" stroke-width="1.5">
+ <path d="M29 99h14v12H29zM31 96v6m10-6v6"/><path d="M29 128l7-5 7 5v12H29zM33 135h6v5"/><path d="M29 160h14v11H29zM32 164h8m-8 4h8"/><path d="M29 192l7-7 7 7-7 7z"/><path d="M29 224h14v14H29zM32 227l8 8m0-8-8 8"/><circle cx="36" cy="278" r="7"/><path d="M29 303l7-4 7 4v14l-7 4-7-4z"/><path d="M29 366h14v12H29zM32 370h8m-8 4h8"/><circle cx="36" cy="400" r="7"/><path d="M29 454l7-6 7 6-7 6z"/><path d="M29 486h14v14H29zM32 489h8v8h-8z"/><path d="M29 518l7-5 7 5v10l-7 5-7-5z"/><circle cx="36" cy="550" r="6"/><path d="M29 604l7-6 7 6-7 6z"/><path d="M36 636v-12m-5 5 5-5 5 5m-10 7h10"/>
+</g>
+<path d="M20 668H172" stroke="#273447"/>
+<rect x="18" y="679" width="156" height="256" rx="7" fill="#0d1521" stroke="#26364d"/><text x="29" y="699" fill="#9eacbd" font-family="Arial,sans-serif" font-size="7" font-weight="700">PROYECTO ACTUAL</text><text x="160" y="699" fill="#8b9bb0" font-family="Arial,sans-serif" font-size="10">×</text>
+<text x="29" y="722" fill="#eef3fa" font-family="Arial,sans-serif" font-size="8" font-weight="700">SOPORTE_SALIDA...</text><text x="29" y="739" fill="#a6b4c4" font-family="Arial,sans-serif" font-size="7">Acero S235JR · 2.00 mm</text>
+<!-- miniature sheet part -->
+<path d="M42 813l38-27 31 19 27-17v36l-26 18-31-17-39 25z" fill="url(#steel)" stroke="#e5edf2" stroke-width="1.2" filter="url(#shadow)"/><path d="M80 786v39m31-20v37m-69-29 38-27 31 19" fill="none" stroke="#8299ad" stroke-width="1"/>
+<rect x="27" y="884" width="138" height="33" rx="6" fill="#172943" stroke="#31518a"/><text x="96" y="904" text-anchor="middle" fill="#e6effd" font-family="Arial,sans-serif" font-size="8">Cambiar proyecto</text>
+<!-- workbench top area -->
+<rect x="190" y="57" width="1080" height="488" rx="8" fill="url(#panel)" stroke="#24344b"/>
+<text x="207" y="79" fill="#eff4fb" font-family="Arial,sans-serif" font-size="12" font-weight="800">SIMULACIÓN 3D</text><text x="207" y="94" fill="#9daec1" font-family="Arial,sans-serif" font-size="7.5">Visualización realista de la máquina y la secuencia de plegado</text>
+<path d="M1249 68l8 8-8 8" fill="none" stroke="#ced8e5"/><path d="M1257 68l-8 8 8 8" fill="none" stroke="#ced8e5"/>
+<!-- playback -->
+<rect x="202" y="106" width="866" height="34" rx="5" fill="#0a121d" stroke="#24364e"/>
+<g><rect x="208" y="110" width="35" height="26" rx="4" fill="#172334" stroke="#354963"/><path d="M221 116l12 7-12 7z" fill="#e7eef8"/>
+<rect x="248" y="110" width="35" height="26" rx="4" fill="#172334" stroke="#354963"/><path d="M260 116h3v14h-3zm6 0h3v14h-3z" fill="#d4deeb"/>
+<rect x="288" y="110" width="35" height="26" rx="4" fill="#172334" stroke="#354963"/><path d="M300 117l8 6-8 6zm8 0l8 6-8 6z" fill="#d4deeb"/>
+<rect x="328" y="110" width="35" height="26" rx="4" fill="#172334" stroke="#354963"/><path d="M351 117l-8 6 8 6zm-8 0l-8 6 8 6z" fill="#d4deeb"/>
+<rect x="368" y="110" width="35" height="26" rx="4" fill="#2052d2" stroke="#4387ff"/><path d="M380 117l8 6-8 6zm8 0l8 6-8 6z" fill="#fff"/>
+<rect x="408" y="110" width="35" height="26" rx="4" fill="#172334" stroke="#354963"/><path d="M421 117l8 6-8 6zm8 0l8 6-8 6z" fill="#d4deeb"/>
+</g>
+<text x="463" y="128" fill="#e9eff8" font-family="Arial,sans-serif" font-size="9" font-weight="700">Paso 2 / 3</text><text x="536" y="128" fill="#96a7bb" font-family="Arial,sans-serif" font-size="8">Plegado 2 de 3</text>
+<text x="972" y="127" fill="#c8d4e1" font-family="Arial,sans-serif" font-size="7">Velocidad</text><rect x="1011" y="111" width="48" height="24" rx="4" fill="#101b2a" stroke="#344660"/><text x="1022" y="127" fill="#edf3fb" font-family="Arial,sans-serif" font-size="8">1.0x</text><path d="M1048 120l4 4 4-4" fill="none" stroke="#b9c8d9"/>
+<!-- simulation viewport -->
+<rect x="202" y="148" width="866" height="389" rx="4" fill="url(#viewport)" stroke="#263a52"/>
+<rect x="202" y="148" width="866" height="389" fill="url(#grid)" opacity=".46"/>
+<!-- machine back wall / floor -->
+<path d="M215 172H1057V445H215z" fill="#131c27" stroke="#273544"/>
+<path d="M215 172H1057V202H215z" fill="#1a232d"/>
+<path d="M215 202H1057M215 241H1057M215 280H1057M215 319H1057M215 358H1057M215 397H1057" stroke="#71859b" stroke-opacity=".07"/>
+<path d="M250 172V445M310 172V445M370 172V445M430 172V445M490 172V445M550 172V445M610 172V445M670 172V445M730 172V445M790 172V445M850 172V445M910 172V445M970 172V445M1030 172V445" stroke="#71859b" stroke-opacity=".06"/>
+<!-- press frame, perspective -->
+<path d="M330 226H934L995 252V382H934V285H375V382H330z" fill="#252e36" stroke="#66737d" stroke-width="2" filter="url(#shadow)"/>
+<path d="M330 226H934L995 252H392z" fill="url(#ram)" stroke="#7b8991"/>
+<path d="M340 230H924L968 248H392z" fill="#111820" stroke="#7a858a"/>
+<rect x="383" y="225" width="37" height="79" rx="2" fill="url(#red)" stroke="#ff917c"/><path d="M386 229h31v7h-31z" fill="#ffb3a2" opacity=".6"/>
+<path d="M899 228h39l50 22v57h-39v-47h-50z" fill="url(#red)" stroke="#ff8b71" stroke-width="1.5"/><path d="M905 232h28l39 18h-28z" fill="#ffb7a6" opacity=".5"/>
+<text x="572" y="251" fill="#e2e8eb" font-family="Arial,sans-serif" font-size="11" font-weight="700">Bystronic Xpert Pro 100</text>
+<!-- ram & fingers -->
+<path d="M411 285H900V304H411z" fill="url(#steel)" stroke="#c7d2d8"/><path d="M411 301H900V314H411z" fill="#303941" stroke="#65737b"/>
+<g fill="url(#ram)" stroke="#65717a">
+ <path d="M428 314h29v49h-29z"/><path d="M469 314h29v49h-29z"/><path d="M510 314h29v49h-29z"/><path d="M551 314h29v49h-29z"/><path d="M592 314h29v49h-29z"/><path d="M633 314h29v49h-29z"/><path d="M674 314h29v49h-29z"/><path d="M715 314h29v49h-29z"/><path d="M756 314h29v49h-29z"/><path d="M797 314h29v49h-29z"/><path d="M838 314h29v49h-29z"/>
+</g>
+<path d="M385 367H915V391H385z" fill="url(#steel)" stroke="#cbd4d9"/>
+<path d="M384 390H916V403H384z" fill="#59656d"/>
+<!-- columns and legs -->
+<path d="M349 251h32v141h-32zM914 253h34v139h-34z" fill="url(#steel)" stroke="#d0d8dc"/><path d="M333 391h66v18h-66zM899 391h68v18h-68z" fill="#202830" stroke="#707c82"/>
+<path d="M358 410h20v49h-20zM923 410h22v49h-22z" fill="#424d54" stroke="#929da2"/>
+<path d="M312 458h675v14H312z" fill="url(#ram)" stroke="#65727a"/><path d="M335 471h35v15h-35zm582 0h39v15h-39z" fill="#171e24"/>
+<!-- working bed -->
+<path d="M410 374H891L931 411H391z" fill="url(#steel)" stroke="#e4e9ec"/>
+<path d="M433 384H893L922 405H408z" fill="#6e7b83" opacity=".8"/>
+<!-- bent sheet workpiece -->
+<path d="M475 388L585 388L614 354L723 354L756 389L832 389L832 401L750 401L715 367L621 367L592 401L475 401z" fill="#8ec3f2" fill-opacity=".8" stroke="#4e9aff" stroke-width="2" filter="url(#glow)"/>
+<path d="M475 388L585 388L614 354L723 354L756 389" fill="none" stroke="#e4f2ff" stroke-opacity=".8" stroke-width="2"/>
+<circle cx="686" cy="367" r="4" fill="#45d8ff"/><path d="M686 367l38-21" stroke="#69e78e" stroke-width="1.4"/><text x="729" y="345" fill="#74ed91" font-family="Arial,sans-serif" font-size="12" font-weight="700">68°</text>
+<!-- console -->
+<path d="M950 321h54v92h-54z" fill="url(#ram)" stroke="#9aa5ab"/><path d="M956 330h42v27h-42z" fill="#152e43" stroke="#61b7e7"/><rect x="960" y="334" width="34" height="18" fill="#1b4c71"/><path d="M961 342h9m3-4 5 4 5-7 7 8" fill="none" stroke="#5fd7ff"/><circle cx="966" cy="368" r="3" fill="#f1aa40"/><circle cx="981" cy="368" r="3" fill="#4bdc8d"/><path d="M967 413h21v44h-21zM957 457h41v8h-41z" fill="#20282e" stroke="#79848a"/>
+<!-- viewport overlay toolbar -->
+<rect x="210" y="157" width="32" height="181" rx="6" fill="#0a1320" fill-opacity=".96" stroke="#314257"/>
+<g fill="none" stroke="#d8e5f3" stroke-width="1.2">
+ <circle cx="226" cy="177" r="6"/><path d="M221 177h10m-5-5v10"/>
+ <path d="M220 202l6-5 6 5-6 5zM220 199v8m12-8v8"/>
+ <circle cx="226" cy="227" r="6"/><path d="M223 229a4 4 0 0 0 7 0m-4-6v4"/>
+ <circle cx="226" cy="253" r="5"/><path d="M230 257l4 4m-7-8 3 0 0 3"/>
+ <circle cx="226" cy="279" r="5"/><path d="M226 276v4m-2-2h4"/>
+ <path d="M219 300h14v12h-14zM222 303h8v6h-8z"/><path d="M224 322h5m-2-3v6"/>
+</g>
+<!-- xyz cube -->
+<path d="M235 483l23-13 22 12v28l-23 13-22-13z" fill="#0a1522" fill-opacity=".85" stroke="#64839c"/><path d="M258 470v26m-23-13 23 13 22-14m-22 14v27" fill="none" stroke="#4eb8ff"/><text x="254" y="466" fill="#62c4ff" font-family="Arial,sans-serif" font-size="9">Z</text><text x="283" y="496" fill="#ff6161" font-family="Arial,sans-serif" font-size="8">X</text><text x="235" y="503" fill="#7aec7b" font-family="Arial,sans-serif" font-size="8">Y</text>
+<!-- step sequence within viewport -->
+<rect x="284" y="444" width="764" height="82" rx="6" fill="#07101beF" stroke="#33465e"/>
+<text x="297" y="459" fill="#f0f5fc" font-family="Arial,sans-serif" font-size="7" font-weight="800">SECUENCIA DE PLEGADO</text>
 <g font-family="Arial,sans-serif">
- <rect x="795" y="716" width="145" height="174" rx="3" fill="#1b2021" stroke="#414b4a"/><rect x="807" y="728" width="121" height="78" rx="2" fill="#333b3a"/><path d="M819 776l27-25 23 17 22-28 25 19" fill="none" stroke="url(#steel)" stroke-width="6" stroke-linejoin="round"/><text x="807" y="829" fill="#e8eae6" font-size="8" font-weight="700">Side bracket</text><text x="807" y="845" fill="#8e9995" font-size="7">S235JR  ·  2.0 mm</text><circle cx="811" cy="869" r="3" fill="#e99b3b"/><text x="821" y="872" fill="#a7b0ad" font-size="7">Updated 12 min ago</text>
- <rect x="950" y="716" width="145" height="174" rx="3" fill="#1b2021" stroke="#414b4a"/><rect x="962" y="728" width="121" height="78" rx="2" fill="#333b3a"/><path d="M974 776l27-25 23 17 22-28 25 19" fill="none" stroke="url(#steel)" stroke-width="6" stroke-linejoin="round"/><text x="962" y="829" fill="#e8eae6" font-size="8" font-weight="700">Control enclosure</text><text x="962" y="845" fill="#8e9995" font-size="7">AISI 304  ·  1.5 mm</text><circle cx="966" cy="869" r="3" fill="#73807d"/><text x="976" y="872" fill="#a7b0ad" font-size="7">Updated yesterday</text>
- <rect x="1105" y="716" width="148" height="174" rx="3" fill="#1b2021" stroke="#414b4a"/><rect x="1117" y="728" width="124" height="78" rx="2" fill="#333b3a"/><path d="M1129 776l27-25 23 17 22-28 25 19" fill="none" stroke="url(#steel)" stroke-width="6" stroke-linejoin="round"/><text x="1117" y="829" fill="#e8eae6" font-size="8" font-weight="700">Electrical panel</text><text x="1117" y="845" fill="#8e9995" font-size="7">Aluminium  ·  3.0 mm</text><circle cx="1121" cy="869" r="3" fill="#73807d"/><text x="1131" y="872" fill="#a7b0ad" font-size="7">Updated 2 days ago</text>
+ <rect x="421" y="450" width="132" height="66" rx="5" fill="#101b2a" stroke="#2b3c52"/><circle cx="435" cy="461" r="9" fill="#29384a"/><text x="435" y="464" text-anchor="middle" fill="#fff" font-size="8" font-weight="700">1</text><path d="M447 483l29-12 31 12-20 13z" fill="url(#steel)" stroke="#b8c8d4"/><text x="444" y="509" fill="#b8c6d5" font-size="6.5">Posicionar chapa</text>
+ <rect x="560" y="450" width="132" height="66" rx="5" fill="#101b2a" stroke="#2b3c52"/><circle cx="574" cy="461" r="9" fill="#29384a"/><text x="574" y="464" text-anchor="middle" fill="#fff" font-size="8" font-weight="700">2</text><path d="M585 483l29-12 31 12-20 13z" fill="url(#steel)" stroke="#b8c8d4"/><path d="M616 471v19" stroke="#56baff"/><text x="583" y="509" fill="#b8c6d5" font-size="6.5">Plegado 1</text>
+ <rect x="699" y="448" width="137" height="69" rx="5" fill="#10264b" stroke="#418bff" stroke-width="1.6" filter="url(#glow)"/><circle cx="714" cy="461" r="9" fill="#2362e6"/><text x="714" y="464" text-anchor="middle" fill="#fff" font-size="8" font-weight="700">3</text><path d="M728 483l27-12 29 12-18 13z" fill="url(#steel)" stroke="#e3edf5"/><path d="M756 471v18" stroke="#67c9ff"/><text x="723" y="509" fill="#eef5ff" font-size="6.5" font-weight="700">Plegado 2 · 30°</text>
+ <rect x="843" y="450" width="132" height="66" rx="5" fill="#101b2a" stroke="#2b3c52"/><circle cx="857" cy="461" r="9" fill="#29384a"/><text x="857" y="464" text-anchor="middle" fill="#fff" font-size="8" font-weight="700">4</text><path d="M870 483l29-12 31 12-20 13z" fill="url(#steel)" stroke="#b8c8d4"/><path d="M901 471v19" stroke="#56baff"/><text x="867" y="509" fill="#b8c6d5" font-size="6.5">Plegado 3 · 90°</text>
+ <rect x="982" y="450" width="57" height="66" rx="5" fill="#101b2a" stroke="#2b3c52"/><circle cx="996" cy="461" r="9" fill="#29384a"/><text x="996" y="464" text-anchor="middle" fill="#fff" font-size="8" font-weight="700">5</text><path d="M1003 483l14-8 15 8-9 12z" fill="url(#steel)" stroke="#b8c8d4"/><text x="991" y="509" fill="#b8c6d5" font-size="6.2">Pieza</text>
 </g>
-<rect x="1283" y="677" width="243" height="231" rx="4" fill="#252c2d" stroke="#485251"/><text x="1299" y="701" fill="#e8eae6" font-family="Arial,sans-serif" font-size="9" font-weight="700">MATERIAL LIBRARY</text><text x="1510" y="701" text-anchor="end" fill="#89938f" font-family="Arial,sans-serif" font-size="7">4 FAVORITES</text>
-<g font-family="Arial,sans-serif" font-size="8"><path d="M1299 718H1510M1299 759H1510M1299 800H1510M1299 841H1510" stroke="#454e4d"/><circle cx="1308" cy="739" r="4" fill="#b5b8b4"/><text x="1322" y="736" fill="#e0e4e0">S235JR steel</text><text x="1322" y="749" fill="#89938f" font-size="7">Structural steel</text><text x="1510" y="742" text-anchor="end" fill="#c1c8c4">2.00 mm</text><circle cx="1308" cy="780" r="4" fill="#d9dcd6"/><text x="1322" y="777" fill="#e0e4e0">AISI 304 stainless</text><text x="1322" y="790" fill="#89938f" font-size="7">Stainless steel</text><text x="1510" y="783" text-anchor="end" fill="#c1c8c4">1.50 mm</text><circle cx="1308" cy="821" r="4" fill="#c8aa75"/><text x="1322" y="818" fill="#e0e4e0">Aluminium 5754</text><text x="1322" y="831" fill="#89938f" font-size="7">Aluminium alloy</text><text x="1510" y="824" text-anchor="end" fill="#c1c8c4">2.50 mm</text><circle cx="1308" cy="862" r="4" fill="#9da4a0"/><text x="1322" y="859" fill="#e0e4e0">S355JR steel</text><text x="1322" y="872" fill="#89938f" font-size="7">High strength</text><text x="1510" y="865" text-anchor="end" fill="#c1c8c4">3.00 mm</text></g>
-<path d="M779 924H1526" stroke="#434c4b"/><circle cx="785" cy="936" r="2.5" fill="#7bc68a"/><text x="795" y="939" fill="#808b87" font-family="Arial,sans-serif" font-size="6.5" letter-spacing=".5">ALL SYSTEMS OPERATIONAL  /  LOCAL WORKSPACE  /  LAST BACKUP TODAY 09:42</text><text x="1526" y="939" text-anchor="end" fill="#89938f" font-family="Arial,sans-serif" font-size="6.5">PLEGAR PRO  ·  INDUSTRIAL EDITION  ·  5.2.0</text>
+<path d="M303 522H1008" stroke="#263d5d" stroke-width="2"/><path d="M303 522H704" stroke="#2779f8" stroke-width="2.5"/><circle cx="704" cy="522" r="3.5" fill="#54aaff"/>
+<!-- information sidebar -->
+<rect x="1080" y="106" width="182" height="438" rx="6" fill="#0a121e" stroke="#27364d"/>
+<text x="1094" y="126" fill="#edf3fa" font-family="Arial,sans-serif" font-size="8" font-weight="800">INFORMACIÓN</text><path d="M1247 119l4 4-4 4" fill="none" stroke="#9baabc"/>
+<g font-family="Arial,sans-serif" font-size="7">
+ <text x="1094" y="151" fill="#a7b5c5">Máquina</text><text x="1248" y="151" text-anchor="end" fill="#e3eaf3">Bystronic Xpert Pro 100</text>
+ <text x="1094" y="174" fill="#a7b5c5">Punzon</text><text x="1248" y="174" text-anchor="end" fill="#e3eaf3">88° R1</text>
+ <text x="1094" y="197" fill="#a7b5c5">Matriz</text><text x="1248" y="197" text-anchor="end" fill="#e3eaf3">V16 68°</text>
+ <text x="1094" y="220" fill="#a7b5c5">Material</text><text x="1248" y="220" text-anchor="end" fill="#e3eaf3">Acero S235JR</text>
+ <text x="1094" y="243" fill="#a7b5c5">Espesor</text><text x="1248" y="243" text-anchor="end" fill="#e3eaf3">2.00 mm</text>
+ <text x="1094" y="266" fill="#a7b5c5">Longitud</text><text x="1248" y="266" text-anchor="end" fill="#e3eaf3">1000 mm</text>
+ <text x="1094" y="289" fill="#a7b5c5">Fuerza actual</text><text x="1248" y="289" text-anchor="end" fill="#e3eaf3">32.5 Ton</text>
+ <text x="1094" y="312" fill="#a7b5c5">Ángulo actual</text><text x="1248" y="312" text-anchor="end" fill="#e3eaf3">68°</text>
+ <text x="1094" y="335" fill="#a7b5c5">Estado</text><text x="1248" y="335" text-anchor="end" fill="#33d58b">Plegando</text>
+</g>
+<path d="M1093 347H1249" stroke="#26354a"/>
+<text x="1094" y="367" fill="#edf3fa" font-family="Arial,sans-serif" font-size="7.5" font-weight="800">SENSORES EN TIEMPO REAL</text>
+<g font-family="Arial,sans-serif" text-anchor="middle">
+ <text x="1134" y="390" fill="#aab6c5" font-size="6.5">Fuerza (Ton)</text><text x="1207" y="390" fill="#aab6c5" font-size="6.5">Ángulo (°)</text>
+ <path d="M1104 432a30 30 0 0 1 60 0" fill="none" stroke="#28394e" stroke-width="5"/><path d="M1104 432a30 30 0 0 1 47-25" fill="none" stroke="#20c977" stroke-width="5"/><text x="1134" y="426" fill="#f1f6fc" font-size="11" font-weight="700">32,5</text><text x="1134" y="441" fill="#8f9eb0" font-size="5.5">0                 100</text>
+ <path d="M1177 432a30 30 0 0 1 60 0" fill="none" stroke="#28394e" stroke-width="5"/><path d="M1177 432a30 30 0 0 1 47-25" fill="none" stroke="#20c977" stroke-width="5"/><text x="1207" y="426" fill="#f1f6fc" font-size="11" font-weight="700">68°</text><text x="1207" y="441" fill="#8f9eb0" font-size="5.5">0                 90</text>
+ <text x="1170" y="460" fill="#aab6c5" font-size="6">Posición Y (mm)</text><rect x="1095" y="466" width="151" height="4" rx="2" fill="#25354b"/><rect x="1095" y="466" width="77" height="4" rx="2" fill="url(#violet)"/><text x="1170" y="482" fill="#e5edf5" font-size="7">112,80</text>
+</g>
+<!-- view / tools right rail -->
+<rect x="1282" y="57" width="242" height="488" rx="8" fill="url(#panel)" stroke="#24344b"/>
+<text x="1299" y="79" fill="#eff4fb" font-family="Arial,sans-serif" font-size="8" font-weight="800">VISTA</text>
+<g font-family="Arial,sans-serif" font-size="8.5" fill="#d0dbe9">
+ <path d="M1301 104l8-5 8 5v9l-8 5-8-5z" fill="none" stroke="#aebed0"/><text x="1330" y="112">Frontal</text>
+ <path d="M1301 137l8-5 8 5v9l-8 5-8-5z" fill="none" stroke="#aebed0"/><text x="1330" y="145">Lateral</text>
+ <path d="M1301 170l8-5 8 5v9l-8 5-8-5z" fill="none" stroke="#aebed0"/><text x="1330" y="178">Superior</text>
+ <path d="M1301 203l8-5 8 5v9l-8 5-8-5z" fill="none" stroke="#aebed0"/><text x="1330" y="211">Isométrica</text>
+</g>
+<path d="M1298 230H1507" stroke="#27364b"/><text x="1299" y="251" fill="#eff4fb" font-family="Arial,sans-serif" font-size="7.5" font-weight="800">HERRAMIENTAS VISUALES</text>
+<g fill="#101b2a" stroke="#34465f">
+ <rect x="1298" y="264" width="31" height="29" rx="5"/><rect x="1336" y="264" width="31" height="29" rx="5"/><rect x="1374" y="264" width="31" height="29" rx="5"/><rect x="1412" y="264" width="31" height="29" rx="5"/><rect x="1450" y="264" width="31" height="29" rx="5"/><rect x="1487" y="264" width="25" height="29" rx="5"/>
+</g>
+<g fill="none" stroke="#d4e0ed" stroke-width="1.1"><circle cx="1313" cy="278" r="6"/><path d="M1309 278l4-4 4 4-4 4z"/><circle cx="1351" cy="278" r="6"/><path d="M1347 281l4-7 4 7m-6-2h4"/><circle cx="1389" cy="278" r="6"/><path d="M1387 277a2 2 0 1 1 4 0c0 2-2 2-2 4m0 2v1"/><path d="M1422 278h12m-6-6v12"/><path d="M1460 278l6-5 6 5-6 5z"/><rect x="1493" y="272" width="13" height="11" rx="2"/></g>
+<g font-family="Arial,sans-serif" font-size="7" fill="#b5c2d1">
+ <text x="1300" y="320">Ejes</text><text x="1403" y="320">Guías</text><text x="1300" y="349">Cotas</text><text x="1403" y="349">Malla</text><text x="1300" y="378">Restricción</text>
+</g>
+<g><rect x="1359" y="312" width="24" height="12" rx="6" fill="#214887"/><circle cx="1376" cy="318" r="5" fill="#80b4ff"/><rect x="1462" y="312" width="24" height="12" rx="6" fill="#214887"/><circle cx="1479" cy="318" r="5" fill="#80b4ff"/><rect x="1359" y="341" width="24" height="12" rx="6" fill="#214887"/><circle cx="1376" cy="347" r="5" fill="#80b4ff"/><rect x="1462" y="341" width="24" height="12" rx="6" fill="#214887"/><circle cx="1479" cy="347" r="5" fill="#80b4ff"/><rect x="1359" y="370" width="24" height="12" rx="6" fill="#214887"/><circle cx="1376" cy="376" r="5" fill="#80b4ff"/></g>
+<path d="M1298 396H1507" stroke="#27364b"/><text x="1299" y="418" fill="#eff4fb" font-family="Arial,sans-serif" font-size="7.5" font-weight="800">SECCIÓN</text>
+<g fill="#101b2a" stroke="#34465f"><rect x="1299" y="431" width="34" height="34" rx="5"/><rect x="1341" y="431" width="34" height="34" rx="5"/><rect x="1383" y="431" width="34" height="34" rx="5" stroke="#3b7aff"/><rect x="1425" y="431" width="34" height="34" rx="5"/><rect x="1467" y="431" width="34" height="34" rx="5"/></g>
+<g fill="none" stroke="#c5d5e7" stroke-width="1.2"><path d="M1307 455v-13l9-5 9 5v13m-18 0 9 5 9-5m-9-18v18"/><path d="M1349 455v-13l9-5 9 5v13m-18 0 9 5 9-5"/><path d="M1391 455v-13l9-5 9 5v13m-18 0 9 5 9-5m-9-18v18"/><path d="M1433 455v-13l9-5 9 5v13m-18 0 9 5 9-5"/><path d="M1475 455l9-10 9 10-9 5z"/></g>
+<!-- lower left programming cards -->
+<rect x="190" y="557" width="368" height="391" rx="8" fill="url(#panel)" stroke="#24344b"/>
+<text x="204" y="580" fill="#eff4fb" font-family="Arial,sans-serif" font-size="11" font-weight="800">PROGRAMACIÓN 2D / 3D</text><text x="204" y="595" fill="#9baabe" font-family="Arial,sans-serif" font-size="7">Edición sincronizada de la pieza</text>
+<rect x="200" y="605" width="199" height="205" rx="6" fill="#09121e" stroke="#22344c"/><text x="210" y="623" fill="#edf3fa" font-family="Arial,sans-serif" font-size="7.5" font-weight="800">VISTA 2D</text><rect x="209" y="631" width="181" height="167" fill="#07111c"/><rect x="209" y="631" width="181" height="167" fill="url(#grid)" opacity=".65"/>
+<!-- 2D dimension drawing -->
+<path d="M237 672H351V693H320V752H279V693H237z" fill="none" stroke="#95a4b8" stroke-width="1.2"/><path d="M278 672v81m42-60v59" stroke="#a855f7" stroke-dasharray="4 3"/><path d="M237 662H351M237 659v6m114-6v6" stroke="#b5c8dc"/><text x="282" y="658" fill="#d8e4f0" font-family="Arial,sans-serif" font-size="6">120,00</text><path d="M229 672v81m-3-81h6m-6 81h6" stroke="#b5c8dc"/><text x="223" y="718" transform="rotate(-90 223 718)" fill="#d8e4f0" font-family="Arial,sans-serif" font-size="6">90,00</text><text x="266" y="690" fill="#55e695" font-family="Arial,sans-serif" font-size="6">P2 -90°</text><text x="323" y="690" fill="#bb77ff" font-family="Arial,sans-serif" font-size="6">P3 90°</text><text x="277" y="785" fill="#bac8d7" font-family="Arial,sans-serif" font-size="6">200,00</text>
+<rect x="409" y="605" width="139" height="205" rx="6" fill="#09121e" stroke="#22344c"/><text x="419" y="623" fill="#edf3fa" font-family="Arial,sans-serif" font-size="7.5" font-weight="800">VISTA 3D</text><path d="M442 680l46-28 37 19-42 29z" fill="url(#steel)" stroke="#e1eaf2"/><path d="M442 680v43l41 24v-47m42-29v43l-42 33m-41-24 40-5 43-24" fill="none" stroke="#c6d1da" stroke-width="1.2"/><circle cx="441" cy="679" r="7" fill="#225ce2"/><text x="441" y="682" text-anchor="middle" fill="#fff" font-family="Arial,sans-serif" font-size="7">1</text><circle cx="527" cy="673" r="7" fill="#225ce2"/><text x="527" y="676" text-anchor="middle" fill="#fff" font-family="Arial,sans-serif" font-size="7">3</text><path d="M433 749l13-7 13 7v15l-13 7-13-7z" fill="#0d1c2d" stroke="#3888df"/><text x="445" y="760" text-anchor="middle" fill="#53b4ff" font-family="Arial,sans-serif" font-size="7">Z</text>
+<!-- bend table -->
+<rect x="200" y="819" width="348" height="116" rx="5" fill="#09121e" stroke="#25344a"/><text x="210" y="836" fill="#edf3fa" font-family="Arial,sans-serif" font-size="7" font-weight="800">TABLA DE PLIEGUES</text><rect x="205" y="843" width="338" height="18" fill="#111e2e"/><g font-family="Arial,sans-serif" font-size="5.6" fill="#aab8c8"><text x="210" y="855">N°</text><text x="237" y="855">POSICIÓN X</text><text x="291" y="855">LONGITUD</text><text x="345" y="855">ÁNGULO</text><text x="390" y="855">SENTIDO</text><text x="432" y="855">RADIO INT.</text><text x="485" y="855">DIRECCIÓN</text></g>
+<g stroke="#1d2c40"><path d="M205 878H543M205 895H543M205 912H543"/></g><g font-family="Arial,sans-serif" font-size="6" fill="#d8e1ec"><text x="211" y="873">1</text><text x="237" y="873">45,00</text><text x="295" y="873">90,00</text><text x="349" y="873">90°</text><text x="399" y="873" fill="#3edc86">↑</text><text x="435" y="873">2,00</text><text x="485" y="873">Interior</text><text x="211" y="890">2</text><text x="237" y="890">135,00</text><text x="295" y="890">120,00</text><text x="349" y="890">-90°</text><text x="399" y="890" fill="#ff5f5f">↓</text><text x="435" y="890">2,00</text><text x="485" y="890">Interior</text><text x="211" y="907">3</text><text x="237" y="907">255,00</text><text x="295" y="907">45,00</text><text x="349" y="907">90°</text><text x="399" y="907" fill="#3edc86">↑</text><text x="435" y="907">2,00</text><text x="485" y="907">Interior</text></g>
+<rect x="203" y="916" width="73" height="16" rx="4" fill="#13253a" stroke="#2e4c70"/><text x="239" y="927" text-anchor="middle" fill="#d9e7f7" font-family="Arial,sans-serif" font-size="6">＋ Añadir pliegue</text><rect x="281" y="916" width="40" height="16" rx="4" fill="#13253a" stroke="#2e4c70"/><text x="301" y="927" text-anchor="middle" fill="#d9e7f7" font-family="Arial,sans-serif" font-size="6">Editar</text><rect x="326" y="916" width="44" height="16" rx="4" fill="#13253a" stroke="#2e4c70"/><text x="348" y="927" text-anchor="middle" fill="#d9e7f7" font-family="Arial,sans-serif" font-size="6">Eliminar</text><rect x="375" y="916" width="49" height="16" rx="4" fill="#13253a" stroke="#2e4c70"/><text x="399" y="927" text-anchor="middle" fill="#d9e7f7" font-family="Arial,sans-serif" font-size="6">Duplicar</text><rect x="429" y="916" width="38" height="16" rx="4" fill="#13253a" stroke="#2e4c70"/><text x="448" y="927" text-anchor="middle" fill="#d9e7f7" font-family="Arial,sans-serif" font-size="6">Espejo</text><rect x="473" y="916" width="67" height="16" rx="4" fill="#13253a" stroke="#2e4c70"/><text x="506" y="927" text-anchor="middle" fill="#d9e7f7" font-family="Arial,sans-serif" font-size="6">Más⌄</text>
+<!-- calculator panel -->
+<rect x="572" y="557" width="466" height="391" rx="8" fill="url(#panel)" stroke="#24344b"/>
+<text x="586" y="580" fill="#eff4fb" font-family="Arial,sans-serif" font-size="10" font-weight="800">CALCULADORA DE DESARROLLO MULTIPLE</text><text x="586" y="595" fill="#9baabe" font-family="Arial,sans-serif" font-size="7">Cálculo preciso con apertura V por pliegue</text><rect x="952" y="567" width="75" height="21" rx="4" fill="#0e1a29" stroke="#2b3e57"/><text x="989" y="581" text-anchor="middle" fill="#cdd9e7" font-family="Arial,sans-serif" font-size="6.5">Exportar informe</text>
+<!-- calculator values/table -->
+<rect x="583" y="606" width="97" height="234" rx="5" fill="#09121e" stroke="#23344b"/><text x="592" y="624" fill="#e1eaf5" font-family="Arial,sans-serif" font-size="6.5" font-weight="700">PARÁMETROS GENERALES</text>
+<g font-family="Arial,sans-serif" font-size="6" fill="#9eafc2"><text x="592" y="646">Material</text><text x="592" y="681">Espesor (mm)</text><text x="592" y="716">Factor K</text><text x="592" y="751">Cantidad</text></g>
+<g fill="#0e1b2a" stroke="#293d57"><rect x="591" y="651" width="81" height="21" rx="3"/><rect x="591" y="686" width="81" height="21" rx="3"/><rect x="591" y="721" width="81" height="21" rx="3"/><rect x="591" y="756" width="81" height="21" rx="3"/></g><g font-family="Arial,sans-serif" font-size="6.5" fill="#dfe8f2"><text x="597" y="664">Acero S235JR⌄</text><text x="597" y="699">2.00</text><text x="597" y="734">0.38⌄</text><text x="597" y="769">1⌄</text></g><rect x="591" y="793" width="81" height="26" rx="4" fill="url(#blue)"/><text x="632" y="810" text-anchor="middle" fill="#fff" font-family="Arial,sans-serif" font-size="7">Recalcular</text>
+<rect x="687" y="606" width="339" height="234" rx="5" fill="#09121e" stroke="#23344b"/>
+<rect x="690" y="615" width="333" height="24" fill="#121e2d"/>
+<g font-family="Arial,sans-serif" font-size="5.3" fill="#aab7c7"><text x="696" y="630">N°</text><text x="719" y="630">ALA ANT.</text><text x="769" y="630">ÁNGULO</text><text x="816" y="630">SENTIDO</text><text x="855" y="630">ALA POST.</text><text x="909" y="630">V APERTURA</text><text x="965" y="630">RADIO INT.</text><text x="1005" y="630">BA/BD</text></g>
+<g stroke="#1e2e42"><path d="M690 665H1023M690 691H1023M690 717H1023"/></g>
+<g font-family="Arial,sans-serif" font-size="6" fill="#dce5ef"><text x="698" y="656">1</text><text x="720" y="656">45,00</text><text x="773" y="656">90°</text><text x="824" y="656" fill="#3ddd85">↑</text><text x="858" y="656">90,00</text><text x="919" y="656">V12</text><text x="966" y="656">2,24</text><text x="1003" y="656">3,08</text><text x="698" y="682">2</text><text x="720" y="682">90,00</text><text x="773" y="682">-90°</text><text x="824" y="682" fill="#ff5b5e">↓</text><text x="858" y="682">120,00</text><text x="919" y="682">V16</text><text x="966" y="682">3,36</text><text x="1003" y="682">4,56</text><text x="698" y="708">3</text><text x="720" y="708">120,00</text><text x="773" y="708">90°</text><text x="824" y="708" fill="#3ddd85">↑</text><text x="858" y="708">45,00</text><text x="919" y="708">V12</text><text x="966" y="708">2,24</text><text x="1003" y="708">3,08</text></g>
+<!-- flat pattern -->
+<rect x="692" y="726" width="328" height="105" rx="4" fill="#07121d" stroke="#1e3045"/>
+<path d="M705 809V761H761V809H826V761H892V809H955V761H1008" fill="none" stroke="#778b9e" stroke-width="1.2"/>
+<path d="M761 758V811M826 758V811M892 758V811M955 758V811" stroke="#4a9cff" stroke-dasharray="3 3"/><path d="M705 814H1008" stroke="#50a8ff"/><text x="856" y="827" text-anchor="middle" fill="#55b5ff" font-family="Arial,sans-serif" font-size="7">289,28 mm</text>
+<text x="734" y="750" fill="#5acaff" font-family="Arial,sans-serif" font-size="6">P1 90°</text><text x="795" y="750" fill="#b47bff" font-family="Arial,sans-serif" font-size="6">P2 -90°</text><text x="864" y="750" fill="#5acaff" font-family="Arial,sans-serif" font-size="6">P3 90°</text>
+<!-- summary cells -->
+<g font-family="Arial,sans-serif" text-anchor="middle">
+ <rect x="583" y="850" width="84" height="83" rx="5" fill="#0b1725" stroke="#273951"/><text x="625" y="868" fill="#9caec1" font-size="6">Suma tramos</text><text x="625" y="894" fill="#f0f4fa" font-size="11" font-weight="700">300,00 mm</text>
+ <rect x="674" y="850" width="84" height="83" rx="5" fill="#0b1725" stroke="#273951"/><text x="716" y="868" fill="#9caec1" font-size="6">BA total</text><text x="716" y="894" fill="#f0f4fa" font-size="11" font-weight="700">7,84 mm</text>
+ <rect x="765" y="850" width="84" height="83" rx="5" fill="#0b1725" stroke="#273951"/><text x="807" y="868" fill="#9caec1" font-size="6">BD total</text><text x="807" y="894" fill="#f0f4fa" font-size="11" font-weight="700">10,72 mm</text>
+ <rect x="856" y="850" width="84" height="83" rx="5" fill="#0b1725" stroke="#273951"/><text x="898" y="868" fill="#9caec1" font-size="6">Desarrollo por pieza</text><text x="898" y="894" fill="#f0f4fa" font-size="11" font-weight="700">289,28 mm</text>
+ <rect x="947" y="850" width="80" height="83" rx="5" fill="#281d52" stroke="#8059ed"/><text x="987" y="868" fill="#c3a8ff" font-size="6">Desarrollo total</text><text x="987" y="894" fill="#fff" font-size="11" font-weight="700">289,28 mm</text>
+</g>
+<!-- right bottom machine library -->
+<rect x="1050" y="557" width="474" height="149" rx="8" fill="url(#panel)" stroke="#24344b"/>
+<text x="1064" y="580" fill="#eff4fb" font-family="Arial,sans-serif" font-size="9" font-weight="800">BIBLIOTECA DE MÁQUINAS</text><rect x="1450" y="566" width="62" height="21" rx="5" fill="#111d2e" stroke="#273c59"/><text x="1481" y="580" text-anchor="middle" fill="#d9e6f5" font-family="Arial,sans-serif" font-size="6">Ver todas</text>
+<!-- machine thumbnails -->
+<g>
+ <rect x="1062" y="593" width="91" height="100" rx="5" fill="#101b29" stroke="#3676ff"/><rect x="1068" y="600" width="79" height="61" rx="3" fill="#152536"/><path d="M1075 612h61v8h-61zm8 8v26h6v-20h36v20h6v-26" fill="url(#steel)" stroke="#b6c5d0"/><path d="M1075 612h9v14h-9zm48 0h13v14h-13z" fill="url(#red)"/><text x="1107" y="677" text-anchor="middle" fill="#e1eaf5" font-family="Arial,sans-serif" font-size="6.2">Bystronic Xpert Pro 100</text>
+ <rect x="1159" y="593" width="91" height="100" rx="5" fill="#101b29" stroke="#263950"/><rect x="1165" y="600" width="79" height="61" rx="3" fill="#152536"/><path d="M1172 612h61v8h-61zm8 8v26h6v-20h36v20h6v-26" fill="url(#steel)"/><path d="M1172 612h9v14h-9zm48 0h13v14h-13z" fill="#b84031"/><text x="1204" y="677" text-anchor="middle" fill="#c3cedc" font-family="Arial,sans-serif" font-size="6">TRUMPF TruBend 5230</text>
+ <rect x="1256" y="593" width="91" height="100" rx="5" fill="#101b29" stroke="#263950"/><rect x="1262" y="600" width="79" height="61" rx="3" fill="#152536"/><path d="M1269 612h61v8h-61zm8 8v26h6v-20h36v20h6v-26" fill="url(#steel)"/><path d="M1269 612h9v14h-9zm48 0h13v14h-13z" fill="#ca442e"/><text x="1301" y="677" text-anchor="middle" fill="#c3cedc" font-family="Arial,sans-serif" font-size="6">AMADA HG 1003</text>
+ <rect x="1353" y="593" width="91" height="100" rx="5" fill="#101b29" stroke="#263950"/><rect x="1359" y="600" width="79" height="61" rx="3" fill="#152536"/><path d="M1366 612h61v8h-61zm8 8v26h6v-20h36v20h6v-26" fill="url(#steel)"/><path d="M1366 612h9v14h-9zm48 0h13v14h-13z" fill="#667f35"/><text x="1398" y="677" text-anchor="middle" fill="#c3cedc" font-family="Arial,sans-serif" font-size="6">LVD Easy-Form 220/40</text>
+ <rect x="1450" y="593" width="62" height="100" rx="5" fill="#101b29" stroke="#263950"/><rect x="1455" y="600" width="52" height="61" rx="3" fill="#152536"/><path d="M1461 612h40v8h-40zm6 8v26h5v-20h24v20h5v-26" fill="url(#steel)"/><text x="1481" y="677" text-anchor="middle" fill="#c3cedc" font-family="Arial,sans-serif" font-size="5.3">SafanDarley</text>
+</g>
+<!-- tooling library -->
+<rect x="1050" y="715" width="474" height="102" rx="8" fill="url(#panel)" stroke="#24344b"/>
+<text x="1064" y="737" fill="#eff4fb" font-family="Arial,sans-serif" font-size="9" font-weight="800">UTILLAJE</text>
+<g font-family="Arial,sans-serif" font-size="6.2" text-anchor="middle">
+ <rect x="1136" y="723" width="57" height="18" rx="5" fill="#1c3fba"/><text x="1164" y="735" fill="#fff" font-weight="700">PUNZONES</text><rect x="1198" y="723" width="51" height="18" rx="5" fill="#101b29" stroke="#273951"/><text x="1223" y="735" fill="#adbccd">MATRICES</text><rect x="1254" y="723" width="66" height="18" rx="5" fill="#101b29" stroke="#273951"/><text x="1287" y="735" fill="#adbccd">ADAPTADORES</text><rect x="1325" y="723" width="76" height="18" rx="5" fill="#101b29" stroke="#273951"/><text x="1363" y="735" fill="#adbccd">ACCESORIOS</text>
+</g>
+<g fill="url(#steel)" stroke="#70818e">
+ <path d="M1070 750h28v13l-6 7-5 18h-10l4-18-11-5z"/><path d="M1127 750h27v14l-9 10-4 14h-10l5-17-9-4z"/><path d="M1184 750h29v13l-8 10-4 15h-10l5-18-12-5z"/><path d="M1242 750h28v13l-8 12-4 13h-10l5-17-11-5z"/><path d="M1300 750h28v13l-8 12-4 13h-10l5-17-11-5z"/><path d="M1358 750h28v13l-8 12-4 13h-10l5-17-11-5z"/><path d="M1416 750h28v13l-8 12-4 13h-10l5-17-11-5z"/><path d="M1474 750h28v13l-8 12-4 13h-10l5-17-11-5z"/>
+</g>
+<g font-family="Arial,sans-serif" font-size="5.5" fill="#aebccd" text-anchor="middle"><text x="1084" y="806">88° R1</text><text x="1141" y="806">30° R2</text><text x="1198" y="806">R5</text><text x="1256" y="806">135°</text><text x="1314" y="806">Cuello cisne</text><text x="1372" y="806">Gooseneck</text><text x="1430" y="806">Aplanado</text><text x="1488" y="806">V12</text></g>
+<!-- materials library -->
+<rect x="1050" y="826" width="474" height="122" rx="8" fill="url(#panel)" stroke="#24344b"/>
+<text x="1064" y="849" fill="#eff4fb" font-family="Arial,sans-serif" font-size="9" font-weight="800">MATERIALES</text><rect x="1450" y="834" width="62" height="20" rx="5" fill="#111d2e" stroke="#273c59"/><text x="1481" y="848" text-anchor="middle" fill="#d9e6f5" font-family="Arial,sans-serif" font-size="6">Ver todos</text>
+<rect x="1062" y="860" width="450" height="18" fill="#111e2d"/><g font-family="Arial,sans-serif" font-size="5.4" fill="#9eafc1"><text x="1067" y="872">MATERIAL</text><text x="1200" y="872">ESPESOR (mm)</text><text x="1290" y="872">LÍMITE ELÁSTICO (MPa)</text><text x="1400" y="872">RESISTENCIA (MPa)</text><text x="1495" y="872">K-FACTOR</text></g>
+<g stroke="#202f43"><path d="M1062 895H1512M1062 912H1512M1062 929H1512"/></g><g font-family="Arial,sans-serif" font-size="6.2" fill="#d6e0ec"><text x="1067" y="890">Acero S235JR</text><text x="1200" y="890">0.50 - 20.00</text><text x="1310" y="890">235</text><text x="1410" y="890">360 - 510</text><text x="1497" y="890">0.38</text><text x="1067" y="907">Acero Inox AISI 304</text><text x="1200" y="907">0.50 - 15.00</text><text x="1310" y="907">205</text><text x="1410" y="907">515 - 750</text><text x="1497" y="907">0.42</text><text x="1067" y="924">Aluminio 5754</text><text x="1200" y="924">1.00 - 10.00</text><text x="1310" y="924">90</text><text x="1410" y="924">190 - 240</text><text x="1497" y="924">0.33</text></g>
+<!-- bottom navigation / status -->
+<rect x="0" y="958" width="1536" height="66" fill="#060b14" stroke="#26354a"/>
+<g font-family="Arial,sans-serif" text-anchor="middle">
+ <g fill="#9aa9bc" font-size="6.3"><text x="45" y="1007">Inicio</text><text x="123" y="1007">Programar pieza</text><text x="202" y="1007">Prog. 2D</text><text x="279" y="1007">Prog. 3D</text><text x="356" y="1007">CAD/CAM 3D</text><text x="433" y="1007">Simul. 2D</text><text x="510" y="1007">Simul. 3D</text><text x="587" y="1007">Calc. desarrollo</text><text x="664" y="1007">Curva perfecta</text><text x="741" y="1007">Utillaje</text><text x="818" y="1007">Máquinas</text><text x="895" y="1007">Materiales</text><text x="972" y="1007">Proveedores</text><text x="1049" y="1007">Catálogos</text><text x="1126" y="1007">IA Asistente</text></g>
+ <g fill="none" stroke="#a5b8ce" stroke-width="1.3"><path d="M38 981l7-6 7 6v10H38zM42 991v-6h6v6"/><rect x="116" y="976" width="14" height="14" rx="2"/><path d="M196 983l6-7 6 7-6 7zM273 983l6-7 6 7-6 7z"/><path d="M350 978h13v11h-13zM427 978h13v11h-13zM504 978h13v11h-13z"/><circle cx="587" cy="984" r="7"/><path d="M657 984h14m-7-7v14M734 977l7 7-7 7-7-7z"/><path d="M811 978h14v13h-14zM888 977l7-4 7 4v11l-7 4-7-4zM965 977h14v14h-14zM1042 977h14v14h-14zM1119 977l7-7 7 7-7 7z"/></g>
+ <rect x="83" y="964" width="80" height="55" rx="7" fill="#261858" stroke="#814cff"/><rect x="84" y="964" width="78" height="2" fill="#a66aff"/>
+ <g fill="#beadff" stroke="#aa81ff"><rect x="1219" y="968" width="292" height="45" rx="8" fill="#0c1622" stroke="#273950"/></g>
+ <circle cx="1236" cy="982" r="4" fill="none" stroke="#34d18a"/><path d="M1234 982l2 2 4-5" fill="none" stroke="#34d18a"/><text x="1274" y="985" text-anchor="start" fill="#45d790" font-size="7">Sincronizado</text><path d="M1331 982a5 5 0 1 0 4-5m-4 0v4h4" fill="none" stroke="#38c7ee"/><text x="1345" y="985" text-anchor="start" fill="#54c9ec" font-size="7">Conectado</text><text x="1457" y="983" fill="#edf3fa" font-size="9" font-weight="700">17:59</text><text x="1457" y="997" fill="#9daabd" font-size="6.5">02/08/2026</text>
+</g>
 </svg>

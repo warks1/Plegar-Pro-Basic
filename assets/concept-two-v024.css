@@ -643,3 +643,11 @@ body:has(.pp-workbench){overflow:hidden;background:#050913!important;color:#e8ef
 .sim-ref-shell:not(.sim-ref-2d) .sim-ref-stage{position:relative;overflow:hidden;background:radial-gradient(ellipse at 50% 42%,#24394c,#08111b 76%)!important}
 .sim-ref-shell:not(.sim-ref-2d) .sim-ref-data{z-index:3;background:#08131fe8!important;backdrop-filter:blur(8px)}
 @media(max-width:760px){.sim3d-reference{min-height:0!important}.sim3d-machine-svg{min-height:100%}}
+
+/* El carnero completa un ciclo por avance de la secuencia compartida 2D/3D */
+.sim3d-machine-svg .sim3d-moving-ram{transition:transform .42s cubic-bezier(.2,.75,.25,1);transform-box:view-box}
+.sim3d-machine-svg.is-playing .sim3d-moving-ram{animation:sim3d-press-cycle 900ms cubic-bezier(.4,0,.2,1) infinite}
+@keyframes sim3d-press-cycle{0%,100%{transform:translateY(0)}42%{transform:translateY(18px)}68%{transform:translateY(18px)}}
+.sim3d-machine-svg.is-playing .sim3d-workpiece{filter:drop-shadow(0 0 12px #6ad8ff);animation:sim3d-sheet-pulse 900ms ease-in-out infinite}
+@keyframes sim3d-sheet-pulse{0%,100%{opacity:.82}44%,68%{opacity:1}}
+@media(prefers-reduced-motion:reduce){.sim3d-machine-svg.is-playing .sim3d-moving-ram,.sim3d-machine-svg.is-playing .sim3d-workpiece{animation-duration:.01ms!important;animation-iteration-count:1!important}}

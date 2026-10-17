@@ -607,3 +607,28 @@ body:has(.pp-workbench){overflow:hidden;background:#050913!important;color:#e8ef
 .pp-workbench .pp-stage-guides{z-index:1}
 @media(max-width:1100px){.pp-workbench .pp-sim-content{grid-template-columns:minmax(0,1fr) 160px}.pp-workbench .pp-info{margin-right:4px;padding:6px}}
 @media(max-width:760px){.pp-workbench .pp-sim-content{grid-template-columns:minmax(0,1fr) 136px}.pp-workbench .pp-info{max-height:calc(100% - 76px);margin:4px 4px 70px 0}.pp-workbench .pp-machine-art{left:1%;right:1%;height:88%}}
+
+/* Simulación 2D técnica inspirada en la referencia Cybelec */
+.sim-ref-2d .sim-ref-body{grid-template-columns:42px minmax(0,1fr)!important;min-height:540px!important}
+.sim-ref-2d .sim-ref-stage{position:relative;overflow:hidden;background:#628b91!important}
+.sim-ref-2d .sim-ref-stage:before{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(90deg,#24474b18 1px,transparent 1px),linear-gradient(#24474b18 1px,transparent 1px);background-size:32px 32px;opacity:.36}
+.sim-ref-2d .sim-ref-data{display:none!important}
+.sim-ref-2d .sim-ref-tools{z-index:4;align-content:start;gap:7px;padding:12px 5px!important;background:#547d83!important;border-right:1px solid #a8c2c355!important}
+.sim-ref-2d .sim-ref-tools button{width:31px;height:34px;border:0!important;border-radius:3px!important;background:transparent!important;color:#f4fbfa!important;font-size:18px}
+.sim-ref-2d .sim-ref-tools button:hover{background:#315a60!important}
+.sim2d-reference{position:absolute;inset:0;min-width:0;min-height:0;transform-origin:center;transition:transform .2s ease;overflow:hidden;color:#f3f7f4}
+.sim2d-step-tabs{position:absolute;z-index:3;top:5px;left:50%;transform:translateX(-50%);display:flex;gap:3px;max-width:60%;overflow:auto}
+.sim2d-step-tabs button{width:32px;height:25px;flex:0 0 32px;border:1px solid #d0e4e355;border-radius:2px;background:#416d73;color:#eaf4f2;font:11px ui-monospace,monospace;cursor:pointer}
+.sim2d-step-tabs button.active{background:#e3d4e3;color:#203b40;border-color:#f1e4f0}
+.sim2d-drawing{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.sim2d-drawing text{font-family:Arial,sans-serif;fill:#edf5f2}
+.sim2d-drawing .sim2d-punch-label,.sim2d-drawing .sim2d-die-label{font-size:12px;letter-spacing:.8px;paint-order:stroke;stroke:#4d757a;stroke-width:3px;stroke-linejoin:round}
+.sim2d-drawing .sim2d-angle{font-size:25px;font-weight:700;fill:#a8f18a;paint-order:stroke;stroke:#4c7478;stroke-width:4px}
+.sim2d-workpiece{filter:drop-shadow(0 1px 1px #294548);transition:stroke .25s ease}
+.sim2d-selection{position:absolute;left:10%;right:3%;bottom:9px;z-index:3;display:grid;grid-template-columns:minmax(120px,1fr) minmax(120px,1fr) 75px;gap:7px;align-items:end}
+.sim2d-selection label{min-width:0;display:grid;gap:3px;color:#e6f1ed;font-size:9px;text-shadow:0 1px 2px #294548}
+.sim2d-selection select{width:100%;height:27px;min-width:0;padding:3px 6px;border:1px solid #d7e9e288!important;border-radius:3px!important;background:#4c7479!important;color:#f5f8f6!important;font-size:10px}
+.sim2d-angle-readout{display:grid;justify-items:center;gap:1px;padding:4px;border:1px solid #d2e6de55;border-radius:3px;background:#446a70aa;color:#f1f7f3}
+.sim2d-angle-readout small{font-size:8px;letter-spacing:.1em}
+.sim2d-angle-readout strong{font-size:16px;color:#b7f393}
+@media(max-width:760px){.sim-ref-2d .sim-ref-body{grid-template-columns:1fr!important;min-height:450px!important}.sim-ref-2d .sim-ref-tools{display:none!important}.sim2d-selection{left:3%;right:3%;grid-template-columns:1fr 1fr}.sim2d-angle-readout{display:none}.sim2d-drawing .sim2d-punch-label,.sim2d-drawing .sim2d-die-label{font-size:16px}}

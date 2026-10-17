@@ -15,7 +15,7 @@ try {
   page.on('pageerror', (error) => errors.push(error.stack || error.message));
   page.on('response', (response) => {
     const url = response.url();
-    if (url.startsWith(baseUrl) && response.status() >= 400 && !/favicon\\.ico(?:$|\\?)/.test(url)) {
+    if (url.startsWith(baseUrl) && response.status() >= 400 && !new URL(url).pathname.endsWith('/favicon.ico')) {
       failedResources.push(`${response.status()} ${url}`);
     }
   });
@@ -25,7 +25,8 @@ try {
   const initialTitle = (await page.locator('.content').innerText()).trim();
   if (!initialTitle) throw new Error('La aplicación montó el marco, pero el contenido de Inicio está vacío.');
 
-  const expectedBase = new URL(baseUrl).pathname.replace(/\\/$/, '');
+  const basePath = new URL(baseUrl).pathname;
+  const expectedBase = basePath.endsWith('/') ? basePath.slice(0, -1) : basePath;
   const routes = [
     { label: /Programación 2D/, suffix: '/programacion-2d' },
     { label: /Programación 3D/, suffix: '/programacion-3d' },
@@ -62,8 +63,8 @@ try {
     throw new Error(`Desbordamiento horizontal en móvil: ${JSON.stringify(dimensions)}`);
   }
 
-  if (errors.length) throw new Error('Errores JavaScript del navegador:\\n' + errors.join('\\n---\\n'));
-  if (failedResources.length) throw new Error('Recursos con error HTTP:\\n' + failedResources.join('\\n'));
+  if (errors.length) throw new Error('Errores JavaScript del navegador:\n' + errors.join('\n---\n'));
+  if (failedResources.length) throw new Error('Recursos con error HTTP:\n' + failedResources.join('\n'));
 
   console.log('Prueba de navegador: OK · Inicio montado · Programación 2D/3D y Colisiones navegables · prefijo Pages conservado · móvil sin desplazamiento horizontal.');
 } finally {

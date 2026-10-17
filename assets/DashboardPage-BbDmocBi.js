@@ -29,7 +29,7 @@ function DashboardPage(){
  const punch=tools.find(t=>t.id===state.selectedPunchId&&t.kind==="punch")||tools.find(t=>t.kind==="punch");
  const die=tools.find(t=>t.id===state.selectedDieId&&t.kind==="die")||tools.find(t=>t.kind==="die");
  const [step,setStep]=React.useState(0);
- const [playing,setPlaying]=React.useState(false);
+ const [playing,setPlaying]=React.useState(false); const [pressing,setPressing]=React.useState(false);
  const [saved,setSaved]=React.useState(false);
  const [view,setView]=React.useState("Isométrica");
  const [toolTab,setToolTab]=React.useState("PUNZONES");
@@ -43,7 +43,7 @@ function DashboardPage(){
  const activeStep=finished?sequence.length-1:positioning?0:Math.min(step+1,sequence.length-2);
  const visibleTools=toolTab==="PUNZONES"?tools.filter(t=>t.kind==="punch"):toolTab==="MATRICES"?tools.filter(t=>t.kind==="die"):tools.filter(t=>/adaptador|adapter|accessory|accesorio/i.test((t.family||"")+" "+t.name));
  React.useEffect(()=>{const tick=window.setInterval(()=>setClockNow(Date.now()),15000);const on=()=>setOnline(navigator.onLine);window.addEventListener("online",on);window.addEventListener("offline",on);return()=>{window.clearInterval(tick);window.removeEventListener("online",on);window.removeEventListener("offline",on)}},[]);
- React.useEffect(()=>{if(!playing)return;if(step>=Math.max(0,bends.length-1)){setPlaying(false);setFinished(true);setPositioning(false);return}const timer=window.setTimeout(()=>setStep(s=>s+1),1000/Math.max(.25,simSpeed));return()=>window.clearTimeout(timer)},[playing,step,bends.length,simSpeed]);
+ React.useEffect(()=>{if(!playing){setPressing(false);return}if(step>=Math.max(0,bends.length-1)){setPlaying(false);setFinished(true);setPositioning(false);setPressing(false);return}const duration=1000/Math.max(.25,simSpeed);const down=window.setTimeout(()=>setPressing(true),duration*.2);const up=window.setTimeout(()=>{setPressing(false);setStep(s=>s+1)},duration);return()=>{window.clearTimeout(down);window.clearTimeout(up)}},[playing,step,bends.length,simSpeed]);
  React.useEffect(()=>{if(bends.length)setStep(s=>Math.min(s,bends.length-1));else setStep(0)},[bends.length]);
  const goto=(path)=>navigate(path);
  const next=()=>{setPositioning(false);setFinished(false);setStep(s=>Math.min(Math.max(0,bends.length-1),s+1))};
@@ -95,17 +95,17 @@ function DashboardPage(){
       jsxs("div",{className:"pp-sim-content",children:[
        jsxs("div",{className:"pp-machine-stage",children:[
         jsx("div",{className:"pp-stage-grid",style:{display:toggles.Malla?"":"none"}}),jsx("div",{className:"pp-stage-guides",style:{display:toggles.Guías?"":"none"}}),jsx("div",{className:"pp-measure-overlay",style:{display:toggles.Medir?"":"none"},children:["X · "+(project.length||1000)+" mm","Y · "+(project.width||90)+" mm"]}),jsx("div",{className:"pp-stage-dimensions",style:{display:toggles.Cotas?"":"none"},children:(project.width||90)+" mm · "+(project.length||1000)+" mm"}),
-        jsxs("div",{className:"pp-machine-art "+(playing?"is-running":""),style:{"--pp-ram-depth":Math.max(0,(90-angle)*.1)+"px",transform:view==="Lateral"?"scaleX(.7) skewY(-3deg)":view==="Superior"?"scale(.82) rotateX(55deg)":view==="Frontal"?"scaleX(1.04)":"",clipPath:sectionMode===4?"inset(0 0 0 48%)":sectionMode===3?"inset(0 15% 0 0)":"",filter:toggles.Aislar?"brightness(1.15) saturate(1.15)":"",transition:"transform .2s ease,clip-path .3s ease,filter .3s ease"},children:[
+        jsxs("div",{className:"pp-machine-art "+(playing?"is-running":"")+(pressing?" is-pressing":""),style:{"--pp-ram-depth":Math.max(0,(90-angle)*.1)+"px",transform:view==="Lateral"?"scaleX(.7) skewY(-3deg)":view==="Superior"?"scale(.82) rotateX(55deg)":view==="Frontal"?"scaleX(1.04)":"",clipPath:sectionMode===4?"inset(0 0 0 48%)":sectionMode===3?"inset(0 15% 0 0)":"",filter:toggles.Aislar?"brightness(1.15) saturate(1.15)":"",transition:"transform .2s ease,clip-path .3s ease,filter .3s ease"},children:[
          jsx("div",{className:"pp-press-header",children:jsx("strong",{children:machineName})}),
          jsx("div",{className:"pp-red-cap pp-red-left"}),
          jsx("div",{className:"pp-red-cap pp-red-right"}),
-         jsx("div",{className:"pp-press-ram",style:{transform:"translateY(calc(var(--pp-ram-depth, 0px) + "+(playing?"3px":"0px")+"))"}}),
+         jsx("div",{className:"pp-press-ram",style:{transform:"translateY(calc(var(--pp-ram-depth, 0px) + "+(pressing?"28px":"0px")+"))"}}),
          jsx("div",{className:"pp-finger-row",children:Array.from({length:12},(_,i)=>jsx("i",{},i))}),
          jsx("div",{className:"pp-press-table"}),
          jsx("div",{className:"pp-column pp-column-left"}),
          jsx("div",{className:"pp-column pp-column-right"}),
-         jsx("div",{className:"pp-workpiece "+(playing?"is-forming":""),style:{"--pp-angle":Math.max(0,90-angle)+"deg","--pp-step":step},children:[jsx("i",{}),jsx("i",{}),jsx("i",{})]}),
-         jsxs("div",{className:"pp-console",children:[jsx("div",{children:"XPERT"}),jsx("b",{children:"Y1 · Y2"}),jsx("small",{children:"32.5 t"})]})
+         jsx("div",{className:"pp-workpiece "+(playing?"is-forming":""),style:{"--pp-angle":Math.max(0,90-Math.abs(angle))+"deg",top:(47+(yPosition/300)*4)+"%","--pp-step":step},children:[jsx("i",{}),jsx("i",{}),jsx("i",{})]}),
+         jsxs("div",{className:"pp-console",children:[jsx("div",{children:"XPERT"}),jsx("b",{children:"Y1 · Y2"}),jsx("small",{children:computedForce.toFixed(1)+" t"})]})
         ]}),
         jsxs("div",{className:"pp-axis-cube",style:{display:toggles.Ejes?"":"none"},children:[jsx("span",{children:"Z"}),jsx("i",{}),jsx("b",{children:"Y"}),jsx("em",{children:"X"})]}),
         jsxs("div",{className:"pp-sequence",children:[jsx("h2",{children:"SECUENCIA DE PLEGADO"}),jsx("div",{className:"pp-sequence-list",children:sequence.map((label,i)=>jsxs("button",{className:i===activeStep?"active":"",onClick:()=>{setPlaying(false);setPositioning(i===0);setFinished(i===sequence.length-1);setStep(Math.max(0,Math.min(bends.length-1,i-1)))},children:[jsx("b",{children:i+1}),jsx("svg",{viewBox:"0 0 72 38",children:jsx("path",{d:"M4 20h22l9-10h14l8 10h12",fill:"none",stroke:"currentColor",strokeWidth:"4",strokeLinejoin:"round"})}),jsx("span",{children:label})]},i))})]})

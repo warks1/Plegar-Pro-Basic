@@ -200,3 +200,42 @@ input:focus,select:focus,textarea:focus{outline:2px solid #1685cf66!important;bo
 .hint{color:#90a8b9!important}
 @media(max-width:1050px){.engineering-grid:has(.canvas-panel),.engineering-grid:has(.programming3d-viewer){grid-template-columns:minmax(0,1fr) 280px!important}}
 @media(max-width:760px){.engineering-grid:has(.canvas-panel),.engineering-grid:has(.programming3d-viewer){grid-template-columns:1fr!important}.programming-form{max-height:none!important}.canvas-panel{min-height:370px!important}.program-svg{min-height:350px}.programming3d-viewer{min-height:470px!important}.dimension-strip{max-width:92%}}
+
+/* Geometría y acabado común de los bocetos de plegado */
+.development-flat .sheet,.programmer-sheet-2d,.cadcam-part,.project-thumbnail svg [fill]:not([fill="none"]){
+  filter:drop-shadow(0 8px 12px #0008)
+}
+.development-flat .sheet{fill:url(#pp-steel)!important;stroke:#dce9ef!important;stroke-width:2.5}
+.development-flat .bend-line{stroke:#42c8f3!important;stroke-width:3!important;stroke-dasharray:8 5!important;filter:drop-shadow(0 0 4px #1685ca)}
+.development-folded .folded-part,.development-folded .folded-base,.development-folded .folded-flange,
+.programmer-sheet-3d .programmer-3d-part,.programmer-sheet-3d .programmer-flange,
+.cadcam-model .cad-face,.cadcam-model .cad-base,.cadcam-model .cad-flange{
+  background:linear-gradient(145deg,#f1f5f7 0%,#b6c4cb 24%,#748792 58%,#d3dce0 76%,#596b75 100%)!important;
+  border:1px solid #dbe8ed!important;box-shadow:inset 0 1px 5px #fff8,inset 0 -8px 14px #20303b66,0 12px 22px #0008!important
+}
+.development-folded .folded-flange,.programmer-sheet-3d .programmer-flange,.cadcam-model .cad-flange{
+  background:linear-gradient(135deg,#dfe7eb,#8b9da6 48%,#52636c)!important
+}
+.cadcam-sketch,.cadcam-3d-stage,.programmer-viewport,.development-workspace{
+  background-color:#06101a!important;
+  background-image:linear-gradient(#15304755 1px,transparent 1px),linear-gradient(90deg,#15304755 1px,transparent 1px),radial-gradient(ellipse at 50% 42%,#12263a,#050c14 75%)!important;
+  background-size:24px 24px,24px 24px,auto!important
+}
+.cadcam-sketch .cadcam-part{fill:url(#pp-sheet-metal)!important;stroke:#e3edf2!important;stroke-width:2}
+.cadcam-sketch .cadcam-bend,.cadcam-bend-3d,.programmer-bend-line{stroke:#43c7ed!important;stroke-width:3!important;stroke-dasharray:7 5!important;filter:drop-shadow(0 0 4px #1685cf)}
+.cadcam-model .cad-hole-3d,.cadcam-sketch .cadcam-hole{fill:#07111b!important;stroke:#93a9b5!important;stroke-width:2}
+.sim2d-reference{background-color:#080f17!important;background-image:linear-gradient(#263b4b66 1px,transparent 1px),linear-gradient(90deg,#263b4b66 1px,transparent 1px),radial-gradient(ellipse at 50% 46%,#152638,#070d14 74%)!important;background-size:24px 24px,24px 24px,auto!important}
+.sim2d-punch{background:linear-gradient(90deg,#69757c,#e4e9eb 34%,#9da9ae 65%,#515e65)!important;box-shadow:0 5px 14px #000b,inset 0 1px #fff9!important}
+.sim2d-sheet{background:linear-gradient(180deg,#89d2ff 0%,#287dc7 34%,#1262a8 70%,#52b9ef 100%)!important;border:1px solid #b9e8ff!important;box-shadow:0 0 13px #1685cf88!important}
+.sim2d-die{background:linear-gradient(180deg,#d5332d,#8c1d1c 48%,#3d1519)!important;border:1px solid #f15a4d!important;box-shadow:inset 0 3px #ff8b7688,0 8px 16px #0009!important}
+.sim3d-reference{background:radial-gradient(ellipse at 50% 60%,#183247,#07111b 70%)!important}
+.sim3d-reference:before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(0deg,transparent 0 52px,#74b8d014 53px 54px),linear-gradient(180deg,#12283a66,#03080dcc);pointer-events:none}
+.sim3d-wall{position:absolute;inset:0 0 35% 0;background:linear-gradient(180deg,#111d28,#192b39 62%,#0b1722);border-bottom:2px solid #416073}
+.sim3d-top{background:linear-gradient(180deg,#39434a,#20272d 30%,#10161b 100%)!important;border:1px solid #59666d!important;box-shadow:inset 0 2px #c4cdd044,0 8px 18px #0008!important}
+.sim3d-ram,.sim3d-table{background:linear-gradient(90deg,#626d72,#d8dfe2 12%,#929da2 48%,#e0e6e8 72%,#68747a)!important;border:1px solid #e0e7ea!important;box-shadow:inset 0 2px #fff8,inset 0 -8px 14px #27343a88,0 8px 18px #0008!important}
+.sim3d-tool{background:linear-gradient(90deg,#414b50,#d2dade 35%,#737e83 68%,#283238)!important;border:1px solid #d5e0e4!important}
+.sim3d-red{background:linear-gradient(135deg,#ff5b46 0%,#c52722 40%,#641713 100%)!important;border:1px solid #ff8068!important;box-shadow:inset 0 2px #ffb29c66,0 5px 12px #0008!important}
+.sim3d-part i{background:linear-gradient(180deg,#69d5ff,#188de0 35%,#0862b2 72%,#32aef0)!important;border:1px solid #a9ecff!important;box-shadow:0 0 12px #168effaa!important}
+.project-thumbnail{background:radial-gradient(ellipse at center,#1a3449,#07111b 76%)!important;border:1px solid #28506b!important}
+.project-thumbnail svg{filter:drop-shadow(0 4px 8px #0008)}
+@media(max-width:760px){.cadcam-sketch,.cadcam-3d-stage,.programmer-viewport,.development-workspace{background-size:18px 18px,18px 18px,auto!important}}

@@ -87,8 +87,8 @@ function DashboardPage(){
       ]}),
       jsxs("div",{className:"pp-sim-content",children:[
        jsxs("div",{className:"pp-machine-stage",children:[
-        jsx("div",{className:"pp-stage-grid",style:{display:toggles.Malla?"":"none"}}),jsx("div",{className:"pp-stage-guides",style:{display:toggles.Guías?"":"none"}}),jsx("div",{className:"pp-stage-dimensions",style:{display:toggles.Cotas?"":"none"},children:(project.width||90)+" mm · "+(project.length||1000)+" mm"}),
-        jsxs("div",{className:"pp-machine-art "+(playing?"is-running":""),style:{"--pp-ram-depth":Math.max(0,(90-angle)*.1)+"px",transform:view==="Lateral"?"scaleX(.7) skewY(-3deg)":view==="Superior"?"scale(.82) rotateX(55deg)":view==="Frontal"?"scaleX(1.04)":"",transition:"transform .2s ease"},children:[
+        jsx("div",{className:"pp-stage-grid",style:{display:toggles.Malla?"":"none"}}),jsx("div",{className:"pp-stage-guides",style:{display:toggles.Guías?"":"none"}}),jsx("div",{className:"pp-measure-overlay",style:{display:toggles.Medir?"":"none"},children:["X · "+(project.length||1000)+" mm","Y · "+(project.width||90)+" mm"]}),jsx("div",{className:"pp-stage-dimensions",style:{display:toggles.Cotas?"":"none"},children:(project.width||90)+" mm · "+(project.length||1000)+" mm"}),
+        jsxs("div",{className:"pp-machine-art "+(playing?"is-running":""),style:{"--pp-ram-depth":Math.max(0,(90-angle)*.1)+"px",transform:view==="Lateral"?"scaleX(.7) skewY(-3deg)":view==="Superior"?"scale(.82) rotateX(55deg)":view==="Frontal"?"scaleX(1.04)":"",clipPath:sectionMode===4?"inset(0 0 0 48%)":sectionMode===3?"inset(0 15% 0 0)":"",filter:toggles.Aislar?"brightness(1.15) saturate(1.15)":"",transition:"transform .2s ease,clip-path .3s ease,filter .3s ease"},children:[
          jsx("div",{className:"pp-press-header",children:jsx("strong",{children:machineName})}),
          jsx("div",{className:"pp-red-cap pp-red-left"}),
          jsx("div",{className:"pp-red-cap pp-red-right"}),
@@ -115,7 +115,7 @@ function DashboardPage(){
       jsx("h2",{children:"VISTA"}),
       jsx("div",{className:"pp-view-list",children:["Frontal","Lateral","Superior","Isométrica"].map((v,i)=>jsx("button",{className:view===v?"selected":"",onClick:()=>setView(v),children:[jsx("span",{children:["⬡","◇","▱","◈"][i]}),v]},v))}),
       jsx("h2",{className:"pp-subtitle",children:"HERRAMIENTAS VISUALES"}),
-      jsx("div",{className:"pp-tool-buttons",children:["Rotar","Medir","Sección","Ejes","Encuadre","Aislar"].map((v,i)=>jsx("button",{title:v,onClick:()=>i===0?setView(view==="Isométrica"?"Frontal":"Isométrica"):toggle(v),children:["⟳","⌖","◉","✣","⌕","▣"][i]},v))}),
+      jsx("div",{className:"pp-tool-buttons",children:["Rotar","Medir","Sección","Ejes","Encuadre","Aislar"].map((v,i)=>jsx("button",{title:v,onClick:()=>i===0?setView(view==="Isométrica"?"Frontal":"Isométrica"):i===2?setSectionMode(m=>(m+1)%5):i===4?setView("Isométrica"):toggle(v),children:["⟳","⌖","◉","✣","⌕","▣"][i]},v))}),
       jsx("div",{className:"pp-toggle-grid",children:["Ejes","Guías","Cotas","Malla","Restricciones"].map(v=>jsxs("button",{onClick:()=>toggle(v),children:[v,jsx("i",{className:toggles[v]?"on":""})]},v))}),
       jsx("h2",{className:"pp-subtitle",children:"SECCIÓN"}),
       jsx("div",{className:"pp-sections",children:["▧","▤","▥","⬡","⬢"].map((v,i)=>jsx("button",{className:i===sectionMode?"selected":"",title:"Sección "+(i+1),onClick:()=>setSectionMode(i),children:v},i))})

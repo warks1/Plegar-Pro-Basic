@@ -44,6 +44,7 @@ function SimulationPage({mode}){
   ];
   const scene=is3d
     ? jsx("div",{className:"sim3d-reference",style:{transform:"scale("+zoom+")"},children:jsxs("div",{className:"sim3d-machine",children:[
+        jsx("div",{className:"sim3d-wall"}),
         jsx("div",{className:"sim3d-top",children:jsxs(React.Fragment,{children:[jsx("span",{children:machine?.manufacturer||"PLEGAR PRO"}),jsx("b",{children:machine?.name||"Plegadora"})]})}),
         jsx("div",{className:"sim3d-red left"}),
         jsx("div",{className:"sim3d-red right"}),

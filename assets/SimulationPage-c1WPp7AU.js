@@ -15,7 +15,7 @@ function SimulationPage({mode}){
   const is3d=mode==="3d";
   const bends=project.bends||[];
   const count=Math.max(1,bends.length);
-  const [step,setStep]=React.useState(0);
+  const [step,setStep]=React.useState(()=>Math.min(1,count-1));
   const [playing,setPlaying]=React.useState(false);
   const [zoom,setZoom]=React.useState(1);
   const [finished,setFinished]=React.useState(false);
@@ -40,7 +40,7 @@ function SimulationPage({mode}){
     ["Material",project.material||"—"],
     ["Fuerza actual",bend?.forceKnM?bend.forceKnM+" kN":"—"],
     ["Ángulo actual",angle+"°"],
-    ["X actual",(bend?.backgaugeX??bend?.position??"—")+" mm"]
+    ["Y actual",(bend?.backgaugeY??bend?.position??"—")+" mm"]
   ];
   const scene=is3d
     ? jsx("div",{className:"sim3d-reference",style:{transform:"scale("+zoom+")"},children:jsxs("div",{className:"sim3d-machine",children:[
@@ -94,9 +94,7 @@ function SimulationPage({mode}){
       jsxs("aside",{className:"sim-ref-data",children:[
         jsx("h3",{children:"DATOS"}),
         jsx(DataRows,{rows}),
-        jsx("label",{children:["Velocidad",jsx("select",{value:"normal",onChange:()=>{},children:[
-          jsx("option",{value:"lenta",children:"Lenta"}),jsx("option",{value:"normal",children:"Normal"}),jsx("option",{value:"rápida",children:"Rápida"})
-        ]})]})
+        jsx("small",{className:"sim-ref-note",children:"Vista de proceso · unidades en mm"})
       ]})
     ]}),
     jsxs("section",{className:"sim-ref-sequence",children:[

@@ -162,3 +162,41 @@ input:focus,select:focus,textarea:focus{outline:2px solid #1685cf66!important;bo
   .sim-ref-sequence button{min-width:130px!important}
 }
 @media(prefers-reduced-motion:reduce){*,*:before,*:after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
+
+/* Vistas de trabajo 2D y 3D */
+.engineering-grid{grid-template-columns:minmax(0,1fr) 320px!important;gap:10px!important;align-items:start}
+.programming-actions{flex-wrap:wrap;gap:7px!important;margin-bottom:9px!important;padding:8px!important;background:#0a1928!important;border:1px solid #21435d!important;border-radius:8px!important}
+.programming-actions button{min-height:34px!important;padding:6px 10px!important;border-radius:6px!important;background:#10243a!important;border:1px solid #294c68!important;color:#e1edf5!important}
+.programming-actions button.active{background:#1269ad!important;border-color:#2b8bc9!important}
+.programming-actions span{color:#9db3c2!important;font-size:12px!important}
+.canvas-panel{min-height:510px!important;padding:10px!important;background:#08131f!important;border:1px solid #24445f!important;border-radius:9px!important}
+.program-svg{min-height:450px;background:radial-gradient(ellipse at 50% 45%,#112238,#06101a 72%);border:1px solid #1d3b54;border-radius:7px}
+.program-svg rect:first-child{fill:#081522;stroke:#23435c;stroke-width:2}
+.program-svg text{fill:#b6cbd9;font-family:inherit}
+.program-svg .dimension-line{stroke:#32bce9;stroke-width:2}
+.program-svg .dimension-text{fill:#65d4f5;font-size:16px;font-weight:700}
+.program-svg .draggable-bend line{stroke:#3898c5;stroke-width:3;stroke-dasharray:8 5}
+.program-svg .draggable-bend circle{fill:#0e6da9;stroke:#52c7f3;stroke-width:2}
+.program-svg .draggable-bend text{fill:#e8f5fb;font-size:14px;font-weight:700}
+.program-svg .draggable-bend.selected-bend line{stroke:#59ddff;stroke-width:5;filter:drop-shadow(0 0 5px #1685ca)}
+.program-svg .preview-bend{stroke:#63df87;stroke-width:3;stroke-dasharray:7 6}
+.programming3d-viewer{background:radial-gradient(ellipse at 50% 38%,#14273a,#060e17 70%)!important;border:1px solid #294963!important;border-radius:9px!important}
+.programming3d-viewer .part3d{animation:none!important;filter:drop-shadow(0 20px 25px #0008)}
+.programming3d-viewer .face{background:linear-gradient(135deg,#dce4e8,#93a5ad 55%,#596a73)!important;border-color:#d7e5eb!important;box-shadow:inset 0 0 18px #fff2,0 12px 26px #0007!important}
+.programming3d-viewer .dynamic-flange{background:linear-gradient(135deg,#cbd6dc,#80939d 55%,#4d5e67)!important}
+.viewer-tools{gap:6px!important;top:12px!important;left:12px!important}
+.viewer-tools button{min-height:34px!important;padding:6px 9px!important;border-radius:6px!important;background:#10243a!important;border:1px solid #294b65!important;color:#dceaf2!important}
+.viewer-tools button.active{background:#1269ad!important;border-color:#3496d1!important}
+.viewport-help{color:#a9c1d1!important;background:#07131fe8!important;border-color:#294a63!important}
+.dimension-strip span{color:#cfe3ef!important;background:#07131fe8!important;border:1px solid #2a4d67!important;border-radius:6px!important;padding:6px 8px!important;font-size:11px!important}
+.programming-form{max-height:calc(100vh - 130px)!important;padding:13px!important;background:#0b1a29!important;border:1px solid #21435d!important;border-radius:9px!important}
+.programming-form h3,.canvas-panel h3{color:#eaf4fb!important;font-size:14px!important}
+.rows{gap:6px!important}
+.bend-row{grid-template-columns:auto minmax(0,1fr)!important;gap:4px 8px!important;padding:8px!important;background:#0d1d2b!important;border:1px solid #1d3d55!important;border-radius:7px!important;color:#dce8ef!important}
+.bend-row span:last-child{grid-column:2;color:#91aabd!important;font-size:11px!important}
+.bend-row.selected{background:#10304a!important;border-color:#2b8ed1!important;box-shadow:inset 2px 0 #39b9ec!important}
+.form label{color:#b3c6d3!important;font-size:12px!important}
+.form input,.form select{min-height:34px!important;padding:7px!important}
+.hint{color:#90a8b9!important}
+@media(max-width:1050px){.engineering-grid{grid-template-columns:minmax(0,1fr) 280px!important}}
+@media(max-width:760px){.engineering-grid{grid-template-columns:1fr!important}.programming-form{max-height:none!important}.canvas-panel{min-height:370px!important}.program-svg{min-height:350px}.programming3d-viewer{min-height:470px!important}.dimension-strip{max-width:92%}}

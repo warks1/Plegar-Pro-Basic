@@ -17,11 +17,12 @@
     "test:unit": "vitest run --reporter=verbose",
     "typecheck": "tsc -p tsconfig.app.json --noEmit",
     "typecheck:test": "tsc -p tsconfig.test.json --noEmit",
-    "build:strict": "npm run typecheck && vite build",
+    "build:strict": "npm run audit:imports && npm run typecheck && vite build",
     "repair:utf8": "node repair-utf8.mjs",
     "start": "npm run serve",
     "serve": "node servidor-plegar-pro.mjs",
-    "test:smoke": "node scripts/smoke-static-server.mjs"
+    "test:smoke": "node scripts/smoke-static-server.mjs",
+    "audit:imports": "node scripts/audit-router-imports.mjs"
   },
   "dependencies": {
     "@vitejs/plugin-react": "latest",

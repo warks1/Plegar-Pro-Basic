@@ -20,14 +20,14 @@ let browser;
 try {
   let ready = false;
   for (let attempt = 0; attempt < 90; attempt += 1) {
-    if (server.exitCode !== null) throw new Error('Vite terminó antes de estar disponible.');
+    if (server.exitCode !== null) throw new Error('El servidor estático terminó antes de estar disponible.');
     try {
       const response = await fetch(origin);
       if (response.ok) { ready = true; break; }
     } catch {}
     await new Promise(resolve => setTimeout(resolve, 500));
   }
-  if (!ready) throw new Error('Vite no respondió en 45 segundos.');
+  if (!ready) throw new Error('El servidor estático no respondió en 45 segundos.');
 
   browser = await chromium.launch({ headless: true });
   const page = await browser.newPage({ viewport: { width: 1280, height: 900 } });
@@ -41,13 +41,14 @@ try {
   });
 
   for (const route of routes) {
-    await page.goto(origin + route, { waitUntil: 'domcontentloaded', timeout: 30000 });
-    await page.locator('.app-shell').waitFor({ state: 'visible', timeout: 20000 });
-    await page.locator('.content').waitFor({ state: 'visible', timeout: 10000 });
+    console.log(`COMPROBANDO ${route}`);
+    await page.goto(origin + route, { waitUntil: 'commit', timeout: 10000 });
+    await page.locator('.app-shell').waitFor({ state: 'visible', timeout: 5000 });
+    await page.locator('.content').waitFor({ state: 'visible', timeout: 5000 });
     await page.waitForFunction(() => {
       const content = document.querySelector('.content');
       return Boolean(content && content.innerText.trim() && !content.innerText.includes('Cargando módulo…'));
-    }, null, { timeout: 20000 });
+    }, null, { timeout: 5000 });
     const diagnostic = await page.evaluate(() => ({
       title: document.querySelector('.content h1')?.textContent?.trim() || '',
       text: document.querySelector('.content')?.innerText?.trim().slice(0, 160) || '',

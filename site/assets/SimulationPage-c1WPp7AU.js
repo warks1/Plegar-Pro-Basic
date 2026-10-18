@@ -68,15 +68,78 @@ function Simulation3DPage(){
   h('p',{style:styles.help},'Arrastra el progreso o avanza paso a paso. La pieza, el punzón móvil y la vista 2D comparten el mismo estado.'));
  return h(Page,{title:'Simulación 3D',subtitle:'Plegado dinámico de chapa · máquina, utillaje y pieza sincronizados',actions:h('span',{style:{color:'#4ae5a5',fontSize:12}},'●  Motor activo'),children:h('div',{style:styles.workspace},main,info)});
 }
+function Reference2DCanvas({d}) {
+ const activeAngle=Math.round(d.bend.angle*d.blend), ramOffset=d.ram/72*18;
+ const punchLabel=d.punch?.name||d.bend.punchId||"Punzón";
+ const dieLabel=d.die?.name||d.bend.dieId||"Matriz V";
+ const sheetLeftY=100+(143-100)*(1-d.blend*.12);
+ const sheetTipY=50+(143-50)*(1-d.blend);
+ const sheetRightY=143+(d.bend.direction==="negative"?-Math.min(activeAngle,90)*.18:0);
+ const toolHue=(d.bend.order||1)%2===0?"#927e9a":"#9b879f";
+ return h("div",{className:"ref2d-shell"},
+  h("div",{className:"ref2d-top"},
+   h("div",{className:"ref2d-tabs"},...[1,2,3].map(n=>h("button",{key:n,className:"ref2d-tab "+((n===Math.min(3,d.bend.order||1))?"on":""),onClick:()=>d.timeline[1]({progress:clamp(n-1,0,Math.max(0,d.count-1)),playing:false}),title:`Seleccionar paso P${n}`},n))),
+   h("div",{className:"ref2d-machine"},h("span",{className:"ref2d-live"}),"SECCIÓN · ",d.selectedMachine||"PLEGADORA CNC"),
+   h("div",{className:"ref2d-tools"},
+    h("span",{title:"Punzón activo"},h("i",{className:"ref2d-punch-icon"}),punchLabel),
+    h("span",{title:"Matriz V activa"},h("i",{className:"ref2d-die-icon"}),dieLabel))),
+  h("div",{className:"ref2d-work"},
+   h("div",{className:"ref2d-leftbar"},
+    h("button",{onClick:()=>d.timeline[1]({playing:!d.state.playing,progress:d.progress>=d.count?0:d.progress}),title:d.state.playing?"Pausar":"Reproducir"},d.state.playing?"Ⅱ":"▶"),
+    h("button",{onClick:()=>d.timeline[1]({progress:clamp(Math.floor(d.progress)-1,0,d.count),playing:false}),title:"Paso anterior"},"◀"),
+    h("button",{onClick:()=>d.timeline[1]({progress:clamp(Math.floor(d.progress)+1,0,d.count),playing:false}),title:"Paso siguiente"},"⏭"),
+    h("button",{onClick:()=>d.timeline[1]({progress:0,playing:false}),title:"Reiniciar vista"},"↔")),
+   h("svg",{viewBox:"0 0 361 207",className:"ref2d-svg",role:"img","aria-label":`Simulación 2D de plegado, paso ${d.bend.order}, ${activeAngle} grados`},
+    h("defs",null,
+     h("linearGradient",{id:"refPunch",x1:"0",x2:"1"},h("stop",{offset:"0","stopColor":"#8f7c98"}),h("stop",{offset:"1","stopColor":toolHue})),
+     h("filter",{id:"refGlow",x:"-40%",y:"-40%",width:"180%",height:"180%"},h("feGaussianBlur",{stdDeviation:"2",result:"blur"}),h("feMerge",null,h("feMergeNode",{in:"blur"}),h("feMergeNode",{in:"SourceGraphic"}))),
+     h("pattern",{id:"refGrid",width:"36",height:"36",patternUnits:"userSpaceOnUse"},h("path",{d:"M36 0H0V36",fill:"none",stroke:"#a9d8d4","stroke-opacity":".07","stroke-width":".7"}))),
+    h("rect",{width:361,height:207,fill:"#648f95"}),
+    h("rect",{width:361,height:207,fill:"url(#refGrid)"}),
+    h("path",{d:"M29 0V207",stroke:"#b8d1d0","stroke-opacity":".65","stroke-width":"1"}),
+    h("g",{className:"ref2d-frame"},
+     h("g",{className:"ref2d-left-controls",fill:"#e5f4f0"},
+      h("path",{d:"M4 30L19 38L4 46Z"}),h("path",{d:"M8 59L15 55V63Z"}),
+      h("path",{d:"M3 93H20V127H3Z",fill:"none",stroke:"#e5f4f0","stroke-width":"2"}),
+      h("path",{d:"M1 90H22M1 130H22",stroke:"#e5f4f0","stroke-width":"2"})),
+     h("g",{className:"ref2d-stop"},h("rect",{x:78,y:137,width:39,height:17,fill:"#587952"}),h("rect",{x:78,y:137,width:24,height:4,fill:"#75966b"}),h("path",{d:"M104 143H119",stroke:"#354c39","stroke-width":"4"})),
+     h("g",{className:"ref2d-ram",style:{transform:`translateY(${ramOffset}px)`}},
+      h("rect",{x:146,y:17,width:47,height:55,rx:2,fill:"url(#refPunch)",stroke:"#697a7b","stroke-width":"1.3"}),
+      h("rect",{x:159,y:71,width:20,height:65,fill:"#526f51"}),
+      h("path",{d:"M159 132H179L174 144H164Z",fill:"#3d5d45"})),
+     h("g",{className:"ref2d-die"},
+      h("path",{d:"M150 145H158L166 157L174 145H182V178H150Z",fill:"#647d60",stroke:"#516b53","stroke-width":"1"}),
+      h("path",{d:"M158 145L166 157L174 145",fill:"none",stroke:"#a2b5a0","stroke-width":"2"}),
+      h("rect",{x:151,y:179,width:30,height:15,rx:1,fill:"url(#refPunch)",stroke:"#647477","stroke-width":"1"})),
+     h("path",{d:`M122 ${sheetLeftY} L166 143 L263 ${sheetTipY}`,fill:"none",stroke:"#ddf5eb","stroke-width":"1.5","stroke-linejoin":"round",filter:"url(#refGlow)"}),
+     h("path",{d:`M263 ${sheetTipY} l20 19`,fill:"none",stroke:"#8bd897","stroke-width":"2"}),
+     h("path",{d:`M166 143 H303 V${sheetRightY+31}`,fill:"none",stroke:"#d6f4e8","stroke-width":"1.4","stroke-linejoin":"round"}),
+     h("path",{d:`M303 ${sheetRightY+23} V${sheetRightY+32}`,fill:"none",stroke:"#82d28b","stroke-width":"2"}),
+     h("circle",{cx:166,cy:143,r:2.4,fill:"#f4fff7"}),
+     h("path",{d:"M120 101L164 142",stroke:"#edf7f3","stroke-opacity":".4","stroke-width":".8"}),
+     h("g",{className:"ref2d-angle",transform:"translate(204 114)"},
+      h("path",{d:"M0 0 A25 25 0 0 1 18 -17",fill:"none",stroke:"#a4e3ae","stroke-width":"1.3"}),
+      h("text",{x:20,y:-20,fill:"#c7f2c5","font-size":"9","font-weight":"700"},`${activeAngle}°`)),
+     h("g",{className:"ref2d-top-right"},
+      h("circle",{cx:343,cy:15,r:5,fill:"#f0f8f4"}),h("circle",{cx:356,cy:15,r:5,fill:"#f0f8f4"}),
+      h("path",{d:"M335 31Q343 20 351 31M348 31Q356 20 364 31",fill:"none",stroke:"#eff8f4","stroke-width":"5"}),
+      h("rect",{x:335,y:61,width:21,height:5,rx:1,fill:"#e9f5f2"}),h("path",{d:"M357 61l4 0 3 4",fill:"none",stroke:"#e9f5f2","stroke-width":"2"}),
+      h("rect",{x:335,y:94,width:20,height:5,rx:1,fill:"#e9f5f2"}),h("path",{d:"M357 94l4 0 3 4",fill:"none",stroke:"#e9f5f2","stroke-width":"2"})),
+     h("text",{x:91,y:12,fill:"#c4e3df","font-size":"6",opacity:".75"},`P${d.bend.order} · ${d.bend.position} mm`))),
+   h("div",{className:"ref2d-readout"},h("b",null,`P${d.bend.order} · ${activeAngle}°`),h("span",null,`V ${d.die?.width||d.bend.dieId||"—"} · ${punchLabel}`))),
+  h("div",{className:"ref2d-progress"},
+   h("span",null,`P${Math.min(d.count,Math.floor(d.progress)+1)} / ${d.count||1}`),
+   h("input",{type:"range",min:0,max:Math.max(1,d.count),step:.01,value:d.progress,onChange:e=>d.timeline[1]({progress:Number(e.target.value),playing:false}),"aria-label":"Progreso del plegado"}),
+   h("span",null,`${Math.round(d.progress/Math.max(1,d.count)*100)}%`)),
+  h("style",null,`.ref2d-shell{width:100%;color:#e8f3f1;background:#17262d;border:1px solid #738e93;border-radius:7px;overflow:hidden;box-shadow:0 12px 32px #0005;font:11px/1.25 Inter,Segoe UI,sans-serif}.ref2d-top{height:34px;background:#304c54;display:flex;align-items:center;justify-content:space-between;gap:6px;padding:0 7px;border-bottom:1px solid #9ab2b3}.ref2d-tabs{display:flex;align-self:stretch;align-items:flex-start;gap:2px}.ref2d-tab{width:25px;height:17px;border:0;border-radius:0 0 3px 3px;background:#52747a;color:#d9eeeb;font-size:9px;cursor:pointer}.ref2d-tab.on{background:#e1d5e2;color:#263c42}.ref2d-machine{font-size:8px;letter-spacing:.08em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.ref2d-live{display:inline-block;width:6px;height:6px;border-radius:50%;background:#63e59c;margin-right:5px;box-shadow:0 0 7px #63e59c}.ref2d-tools{max-width:36%;display:grid;gap:3px;font-size:7px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.ref2d-tools span{display:flex;align-items:center;gap:4px}.ref2d-punch-icon{width:7px;height:10px;background:#a68ca7;display:inline-block}.ref2d-die-icon{width:9px;height:6px;background:#718d69;display:inline-block;clip-path:polygon(0 0,30% 0,50% 65%,70% 0,100% 0,100% 100%,0 100%)}.ref2d-work{position:relative;display:grid;grid-template-columns:28px minmax(0,1fr);background:#648f95}.ref2d-leftbar{position:absolute;z-index:2;left:0;top:0;bottom:0;width:28px;background:#5a8188;border-right:1px solid #aac3c1;display:flex;flex-direction:column;align-items:center;gap:8px;padding-top:9px}.ref2d-leftbar button{width:22px;height:22px;border:0;background:transparent;color:#eff9f6;font-size:15px;cursor:pointer;border-radius:3px}.ref2d-leftbar button:hover{background:#9fc6c7;color:#183840}.ref2d-svg{display:block;grid-column:1/3;width:100%;height:auto;aspect-ratio:361/207}.ref2d-frame{transform:translateX(0)}.ref2d-ram{transform-box:fill-box;transform-origin:top center;transition:transform .18s ease-out}.ref2d-readout{position:absolute;left:35px;bottom:7px;display:flex;gap:8px;align-items:center;background:#284750d9;border:1px solid #a8c4c1;border-radius:3px;padding:4px 7px;font-size:8px;pointer-events:none}.ref2d-readout span{opacity:.85;max-width:170px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.ref2d-progress{display:grid;grid-template-columns:auto minmax(60px,1fr) auto;gap:8px;align-items:center;padding:7px 9px;background:#233b43;font-size:9px}.ref2d-progress input{width:100%;accent-color:#51d3df}.ref2d-shell button:focus-visible,.ref2d-shell input:focus-visible{outline:2px solid #e7e0ee;outline-offset:1px}@media(max-width:560px){.ref2d-machine{display:none}.ref2d-tools{max-width:60%}.ref2d-top{height:30px}.ref2d-readout{font-size:7px;max-width:85%}}`));
+}
 function Simulation2DPage(){
  const d=baseData();
  const pct=Math.round(d.progress/Math.max(1,d.count)*100);
- const sequencePanel=h('section',{className:'panel',style:styles.panel},h('h3',null,'Secuencia de plegado'),sequence(d.project,d.bend,d.index,d.progress,d.timeline[1]));
- const values=[['Punzón',d.punch?.name||d.bend.punchId],['Matriz V',d.die?.name||d.bend.dieId],['Progreso',`${pct}%`]];
- const details=h('div',{style:{display:'grid',gridTemplateColumns:'repeat(3,minmax(0,1fr))',gap:10}},...values.map(([label,value])=>h('div',{key:label,style:{...styles.badge,display:'grid',gap:5}},h('small',{style:styles.smallLabel},label),h('b',null,value))));
- const viewport=h('section',{className:'panel',style:{...styles.viewport,minHeight:300,background:'#4f7e86'}},h(PressBrakeScene,{bend:d.bend,angleFactor:d.blend,ramDrop:d.ram,compact:true}),h('div',{style:styles.overlay},`P${d.bend.order} · ${Math.round(d.bend.angle*d.blend)}°`));
- const content=h('div',{style:{...styles.main,maxWidth:1180,margin:'0 auto'}},viewport,h(Controls,{timeline:d.timeline,count:d.count,speed:d.speed,setSpeed:d.setSpeed}),sequencePanel,details);
- return h(Page,{title:'Simulación 2D',subtitle:'Sección de plegado con utillaje seleccionado y avance sincronizado',actions:h('span',{style:{color:'#4ae5a5',fontSize:12}},'●  Motor activo'),children:content});
+ const sequencePanel=h('section',{className:'panel',style:{...styles.panel,background:'#09151b'}},h('h3',null,'Secuencia de plegado'),h('p',{style:styles.help},'Cada paso actualiza el ángulo, el punzón y la matriz de la sección.'),sequence(d.project,d.bend,d.index,d.progress,d.timeline[1]));
+ const info=h('div',{style:{display:'flex',flexWrap:'wrap',gap:9,alignItems:'center'}},...[[`P${d.bend.order}`,`${Math.round(d.bend.angle*d.blend)}°`],[`Punzón`,d.punch?.name||d.bend.punchId||'—'],[`Matriz V`,d.die?.name||d.bend.dieId||'—'],[`Avance`,`${pct}%`]].map(([label,value])=>h('div',{key:label,style:{...styles.badge,display:'grid',gap:4,minWidth:120,flex:'1 1 120px'}},h('small',{style:styles.smallLabel},label),h('b',null,value))));
+ const content=h('div',{style:{...styles.main,maxWidth:1180,margin:'0 auto'}},h(Reference2DCanvas,{d}),h(Controls,{timeline:d.timeline,count:d.count,speed:d.speed,setSpeed:d.setSpeed}),sequencePanel,info);
+ return h(Page,{title:'Simulación 2D',subtitle:'Sección de plegado · punzón y matriz seleccionados por paso',actions:h('span',{style:{color:'#4ae5a5',fontSize:12}},'●  Motor activo'),children:content});
 }
 export{Simulation2DPage,Simulation3DPage};
 

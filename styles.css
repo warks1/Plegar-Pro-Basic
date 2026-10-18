@@ -466,3 +466,34 @@ input,select,textarea{background:rgba(4,13,24,.9)!important;border:1px solid rgb
     max-width: 100%;
   }
 }
+
+
+/* Tablet top-bar is the remaining likely intrinsic-width contributor: wrap every control inside its grid cell. */
+@media (min-width: 721px) and (max-width: 1050px) {
+  .approved-shell .approved-topbar,
+  .approved-shell .topbar {
+    display: flex;
+    flex-wrap: wrap !important;
+    align-content: center;
+    width: 100%;
+    min-width: 0 !important;
+    max-width: 100%;
+    overflow-x: clip;
+    box-sizing: border-box;
+  }
+  .approved-shell .approved-topbar > *,
+  .approved-shell .topbar > * {
+    min-width: 0 !important;
+    max-width: 100%;
+  }
+  .approved-shell .approved-topbar .search-wrap,
+  .approved-shell .topbar .search-wrap {
+    flex: 1 1 150px !important;
+    min-width: 0 !important;
+  }
+  .approved-shell .approved-topbar .top-actions,
+  .approved-shell .topbar .top-actions {
+    flex: 0 1 auto;
+    margin-left: auto;
+  }
+}

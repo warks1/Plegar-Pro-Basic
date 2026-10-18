@@ -1,7 +1,7 @@
 import{r as interop,t as loadReact}from"./react-OrosJ8bI.js";
 import{a as jsxFactory,n as useStore,t as useProject}from"./index-BejcmiWV.js";
 import{t as Page}from"./Page-CANi1eAD.js";
-import{n as catalog}from"./catalog-DRcBI5Du.js";
+import{n as catalog,t as machineCatalog}from"./catalog-DRcBI5Du.js";
 const React=interop(loadReact(),1),h=React.createElement,jsx=jsxFactory();
 let bus={progress:0,playing:false};const listeners=new Set();
 function publish(patch){bus={...bus,...patch};listeners.forEach(fn=>fn(bus))}
@@ -11,12 +11,10 @@ const styles={workspace:{display:"grid",gridTemplateColumns:"minmax(0,1fr) 310px
 function polygon(points,fill,stroke="#526974",extra={}){return h("polygon",{points:points.map(p=>p.join(",")).join(" "),fill,stroke,strokeWidth:2,...extra})}
 function machineProfile(id){
  const key=String(id||"truma-v85").toLowerCase();
- if(key.includes("bystronic")||key.includes("by-xpert")||key.includes("by-100"))return {brand:"Bystronic",title:"Bystronic Xpert",colors:["#557287","#29465c","#142a3b"]};
- if(key.includes("amada")||key.includes("hfe")||key.includes("hg1303"))return {brand:"AMADA",title:"AMADA HFE",colors:["#78918b","#4d6762","#263d3a"]};
- if(key.includes("lvd"))return {brand:"LVD",title:"LVD ToolCell",colors:["#758994","#526878","#283b48"]};
- if(key.includes("safan"))return {brand:"SafanDarley",title:"SafanDarley E-Brake",colors:["#747d80","#536367","#273639"]};
- if(key.includes("trumpf")||key.includes("truma"))return {brand:"TRUMPF",title:"TRUMPF TruBend V85",colors:["#607d91","#344f67","#172b3b"]};
- return {brand:"PLEGAR PRO",title:"Plegadora CNC",colors:["#607d91","#344f67","#172b3b"]};
+ const record=machineCatalog.find(m=>String(m.id).toLowerCase()===key);
+ const brand=record?.manufacturer||"PLEGAR PRO";
+ const colors=brand.toLowerCase().includes("bystronic")?["#557287","#29465c","#142a3b"]:brand.toLowerCase().includes("amada")?["#78918b","#4d6762","#263d3a"]:brand.toLowerCase().includes("lvd")?["#758994","#526878","#283b48"]:brand.toLowerCase().includes("safan")?["#747d80","#536367","#273639"]:["#607d91","#344f67","#172b3b"];
+ return {brand,title:record?`${brand} ${record.name}`:(brand==="PLEGAR PRO"?"Plegadora CNC":brand),colors,forceT:record?.forceT,lengthMm:record?.lengthMm,strokeMm:record?.strokeMm};
 }
 function PressBrakeScene({bend,angleFactor,ramDrop,view="isometric",compact=false,punch,die,machine}){const currentMachine=machineProfile(machine),dieHalf=clamp((die?.v??16)*2.2,18,68),dieDepth=clamp(dieHalf*.75,18,48),punchAngle=clamp(punch?.angle??88,20,170),punchTip=clamp(4+8*Math.tan(punchAngle*Math.PI/360),4,18);const sign=bend?.direction==="negative"?-1:1,theta=(180-clamp(bend?.angle??90,1,179))/2*Math.PI/180*clamp(angleFactor,0,1),cx=620,base=compact?140:370,arm=compact?86:190,left=[cx-arm*Math.cos(theta),base-sign*arm*Math.sin(theta)],mid=[cx,base],right=[cx+arm*Math.cos(theta),base-sign*arm*Math.sin(theta)],profile=[left,mid,right],dx=compact?30:78,dy=compact?-15:-38,extruded=[...profile,...profile.slice().reverse().map(([x,y])=>[x+dx,y+dy])],p=(arr)=>arr.map(v=>v.join(",")).join(" "),toolY=compact?82:278+ramDrop,dieTop=compact?153:432;
 const parts=[];
@@ -73,7 +71,7 @@ function Simulation3DPage(){
  const d=baseData();
  const [view,setView]=React.useState('isometric');
  const pct=Math.round(d.progress/Math.max(1,d.count)*100);
- const machineName=machineProfile(d.selectedMachine).title;
+ const machineSpecs=machineProfile(d.selectedMachine),machineName=machineSpecs.title;
  const viewportChildren=[
   h(PressBrakeScene,{bend:d.bend,angleFactor:d.blend,ramDrop:d.ram,view,punch:d.punch,die:d.die,machine:d.selectedMachine}),
   h('div',{style:styles.overlay},h('i',{style:styles.live}),machineName,h('span',{style:{opacity:.58}},'·'),`${d.project.name||'Pieza activa'}`),
@@ -86,6 +84,8 @@ function Simulation3DPage(){
  const main=h('div',{style:styles.main},viewport,h(Controls,{timeline:d.timeline,count:d.count,speed:d.speed,setSpeed:d.setSpeed}),h('div',{style:styles.sectionGrid},sequencePanel,crossPanel));
  const info=h('aside',{className:'panel',style:{...styles.aside,...styles.panel}},h('h3',null,'Parámetros de simulación'),
   h('div',{style:styles.stat},h('span',null,'Máquina'),h('b',null,machineName)),
+  h('div',{style:styles.stat},h('span',null,'Fuerza nominal'),h('b',null,machineSpecs.forceT?`${machineSpecs.forceT} t`:'—')),
+  h('div',{style:styles.stat},h('span',null,'Longitud de plegado'),h('b',null,machineSpecs.lengthMm?`${machineSpecs.lengthMm} mm`:'—')),
   h('div',{style:styles.stat},h('span',null,'Punzón seleccionado'),h('b',null,d.punch?.name||d.bend.punchId||'—')),
   h('div',{style:styles.stat},h('span',null,'Matriz V seleccionada'),h('b',null,d.die?.name||d.bend.dieId||'—')),
   h('div',{style:styles.stat},h('span',null,'Material'),h('b',null,d.project.material||'Acero')),
@@ -110,7 +110,7 @@ function Reference2DCanvas({d}) {
  return h("div",{className:"ref2d-shell"},
   h("div",{className:"ref2d-top"},
    h("div",{className:"ref2d-tabs"},...[1,2,3].map(n=>h("button",{key:n,className:"ref2d-tab "+((n===Math.min(3,d.bend.order||1))?"on":""),onClick:()=>d.timeline[1]({progress:clamp(n-1,0,Math.max(0,d.count-1)),playing:false}),title:`Seleccionar paso P${n}`},n))),
-   h("div",{className:"ref2d-machine"},h("span",{className:"ref2d-live"}),"SECCIÓN · ",d.selectedMachine||"PLEGADORA CNC"),
+   h("div",{className:"ref2d-machine"},h("span",{className:"ref2d-live"}),"SECCIÓN · ",machineProfile(d.selectedMachine).title),
    h("div",{className:"ref2d-tools"},
     h("span",{title:"Punzón activo"},h("i",{className:"ref2d-punch-icon"}),punchLabel),
     h("span",{title:"Matriz V activa"},h("i",{className:"ref2d-die-icon"}),dieLabel))),

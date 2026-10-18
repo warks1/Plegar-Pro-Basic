@@ -754,3 +754,20 @@ button{touch-action:manipulation}
  .pp-workbench .pp-sim-content{grid-template-columns:minmax(0,1fr)!important;grid-template-rows: minmax(220px,70vh) auto!important}
 }
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
+
+
+/* Menú lateral móvil accesible: el botón existente abre/cierra el panel. */
+@media(max-width:700px){
+ .app-shell:not(.sidebar-collapsed) .sidebar,
+ .app-shell:not(.sidebar-collapsed) .approved-sidebar{
+   display:flex!important;position:fixed!important;z-index:1000!important;
+   inset:0 auto 0 0!important;width:min(84vw,300px)!important;max-width:calc(100vw - 44px)!important;
+   height:100dvh!important;max-height:100dvh!important;overflow-y:auto!important;overflow-x:hidden!important;
+   padding:0 10px 16px!important;background:#0b1928!important;
+   box-shadow:12px 0 35px rgba(0,0,0,.48)!important;
+ }
+ .app-shell.sidebar-collapsed .sidebar,
+ .app-shell.sidebar-collapsed .approved-sidebar{display:none!important}
+ .app-shell .menu-button{position:relative;z-index:1002!important;flex:0 0 auto}
+ .app-shell .topbar,.app-shell .approved-topbar{position:sticky;top:0;z-index:1001}
+}

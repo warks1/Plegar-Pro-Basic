@@ -1,229 +1,82 @@
-import{r as interop,t as ReactModule}from"./react-OrosJ8bI.js";
-import{a as runtime,n as useAppStore,t as useActiveProject}from"./index-BejcmiWV.js";
+import{r as interop,t as loadReact}from"./react-OrosJ8bI.js";
+import{a as jsxFactory,n as useStore,t as useProject}from"./index-BejcmiWV.js";
 import{t as Page}from"./Page-CANi1eAD.js";
-import{n as machines,t as tools}from"./catalog-DRcBI5Du.js";
-const React=interop(ReactModule(),1);
-const {jsx,jsxs}=runtime();
-
-function DataRows({rows}){
-  return jsx("dl",{children:rows.map(([label,value])=>jsxs("div",{children:[jsx("dt",{children:label}),jsx("dd",{children:value})]},label))});
+import{n as catalog}from"./catalog-DRcBI5Du.js";
+const React=interop(loadReact(),1),h=React.createElement,jsx=jsxFactory();
+let bus={progress:0,playing:false};const listeners=new Set();
+function publish(patch){bus={...bus,...patch};listeners.forEach(fn=>fn(bus))}
+function useTimeline(){const[state,setState]=React.useState(bus);React.useEffect(()=>{const fn=value=>setState(value);listeners.add(fn);return()=>listeners.delete(fn)},[]);return[state,publish]}
+const clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
+const styles={workspace:{display:"grid",gridTemplateColumns:"minmax(0,1fr) 310px",gap:14,alignItems:"start"},main:{display:"grid",gap:14,minWidth:0},viewport:{position:"relative",overflow:"hidden",minHeight:460,padding:0,background:"linear-gradient(180deg,#f1f1ec,#d4d8d7)",border:"1px solid #557181",borderRadius:14,boxShadow:"0 16px 42px #0008"},svg:{display:"block",width:"100%",height:"auto",minHeight:420},overlay:{position:"absolute",top:12,left:14,display:"flex",gap:8,alignItems:"center",color:"#0b2633",fontSize:12,fontWeight:800,background:"#eff7f2dc",border:"1px solid #64808b",borderRadius:8,padding:"7px 10px"},live:{width:8,height:8,borderRadius:20,background:"#31d89b",boxShadow:"0 0 10px #31d89b"},topControls:{position:"absolute",top:10,right:12,display:"flex",gap:6,flexWrap:"wrap",justifyContent:"end",maxWidth:"62%"},button:{border:"1px solid #4a7184",borderRadius:8,background:"#0b1b29e8",color:"#d9f7ff",padding:"7px 10px",cursor:"pointer",fontSize:11,fontWeight:700},buttonActive:{borderColor:"#36dcff",background:"linear-gradient(135deg,#0e5877,#253b76)",boxShadow:"0 0 12px #1acfff44"},canvasFooter:{position:"absolute",left:12,right:12,bottom:12,display:"flex",gap:8,flexWrap:"wrap",justifyContent:"space-between",alignItems:"end",pointerEvents:"none"},badge:{background:"#07131ddf",color:"#d9f6ff",border:"1px solid #1c7895",borderRadius:8,padding:"7px 10px",fontSize:11},sectionGrid:{display:"grid",gridTemplateColumns:"minmax(0,1.35fr) minmax(250px,.65fr)",gap:14},panel:{padding:16},aside:{display:"grid",gap:12},smallLabel:{fontSize:10,letterSpacing:".12em",color:"#85a7ba"},progress:{width:"100%",accentColor:"#19c9ee"},toolbar:{display:"flex",alignItems:"center",gap:8,flexWrap:"wrap",padding:"12px 14px",background:"#081725",border:"1px solid #21465e",borderRadius:11},steps:{display:"flex",gap:8,overflowX:"auto",padding:"10px 0 2px"},step:{minWidth:105,display:"grid",gap:5,justifyItems:"start",border:"1px solid #1b3a50",borderRadius:9,padding:9,background:"#091724",color:"#cfecfa",cursor:"pointer",textAlign:"left"},stepOn:{borderColor:"#26d8fa",boxShadow:"0 0 14px #25cfff33",background:"#0b2d40"},stat:{display:"flex",justifyContent:"space-between",gap:8,padding:"9px 0",borderBottom:"1px solid #18384b",fontSize:12},help:{color:"#8daabd",fontSize:11,lineHeight:1.5},secondaryView:{background:"linear-gradient(145deg,#0a2938,#06131c)",border:"1px solid #28566b",borderRadius:10,overflow:"hidden",minHeight:205},rangeRow:{display:"grid",gridTemplateColumns:"auto minmax(120px,1fr) auto",gap:10,alignItems:"center",width:"100%"}};
+function polygon(points,fill,stroke="#526974",extra={}){return h("polygon",{points:points.map(p=>p.join(",")).join(" "),fill,stroke,strokeWidth:2,...extra})}
+function PressBrakeScene({bend,angleFactor,ramDrop,view="isometric",compact=false}){const sign=bend?.direction==="negative"?-1:1,theta=(180-clamp(bend?.angle??90,1,179))/2*Math.PI/180*clamp(angleFactor,0,1),cx=620,base=compact?140:370,arm=compact?86:190,left=[cx-arm*Math.cos(theta),base-sign*arm*Math.sin(theta)],mid=[cx,base],right=[cx+arm*Math.cos(theta),base-sign*arm*Math.sin(theta)],profile=[left,mid,right],dx=compact?30:78,dy=compact?-15:-38,extruded=[...profile,...profile.slice().reverse().map(([x,y])=>[x+dx,y+dy])],p=(arr)=>arr.map(v=>v.join(",")).join(" "),toolY=compact?82:278+ramDrop,dieTop=compact?153:432;
+const parts=[];
+parts.push(h("defs",{key:"defs"},h("linearGradient",{id:compact?"steelMini":"steelMain",x1:"0",x2:"1",y1:"0",y2:"1"},h("stop",{offset:"0",stopColor:"#e2e7e7"}),h("stop",{offset:".52",stopColor:"#8f9c9f"}),h("stop",{offset:"1",stopColor:"#59676d"})),h("linearGradient",{id:compact?"orangeMini":"orangeMain",x1:"0",x2:"0",y1:"0",y2:"1"},h("stop",{offset:"0",stopColor:"#ffd147"}),h("stop",{offset:"1",stopColor:"#dd7900"})),h("pattern",{id:compact?"gridMini":"gridMain",width:32,height:32,patternUnits:"userSpaceOnUse"},h("path",{d:"M 32 0 L 0 0 0 32",fill:"none",stroke:"#0d3647",strokeOpacity:.12,strokeWidth:1}))));
+parts.push(h("rect",{key:"bg",width:1200,height:compact?220:650,fill:compact?"#4f7e86":"#e4e7e4"}),h("rect",{key:"grid",width:1200,height:compact?220:650,fill:`url(#${compact?"gridMini":"gridMain"})`}));
+if(!compact){parts.push(h("ellipse",{key:"shadow",cx:620,cy:548,rx:470,ry:40,fill:"#354047",opacity:.22}));
+// Bed, side frames, beam and guide rails of the press brake.
+parts.push(polygon([[95,422],[970,422],[1080,478],[205,478]],"#aab4b6"),polygon([[205,478],[1080,478],[1080,533],[205,533]],"#707c80"),polygon([[95,422],[205,478],[205,533],[95,477]],"#879396"));
+parts.push(polygon([[145,148],[230,148],[260,465],[178,465]],"url(#steelMain)"),polygon([[178,465],[260,465],[284,493],[202,493]],"#65767c"),polygon([[945,148],[1030,148],[1000,465],[918,465]],"url(#steelMain)"),polygon([[918,465],[1000,465],[976,493],[894,493]],"#65767c"));
+parts.push(polygon([[172,118],[953,118],[1037,166],[256,166]],"#879296"),polygon([[256,166],[1037,166],[1037,256],[256,256]],"url(#steelMain)"),polygon([[172,118],[256,166],[256,256],[172,208]],"#778589"));
+parts.push(h("path",{key:"beamline",d:"M256 248 H1037",stroke:"#303b40",strokeWidth:12}),h("path",{key:"beamlight",d:"M270 241 H1024",stroke:"#d2dcdd",strokeWidth:3}));
+for(let x=282;x<1020;x+=42)parts.push(h("rect",{key:`seg${x}`,x,y:254,width:30,height:28,rx:3,fill:"#59666b",stroke:"#b4c0c3",strokeWidth:2}));
+// Workpiece surface and its extruded 3D edge.
+parts.push(polygon(extruded,"#22c8d0", "#135c65",{opacity:.92}),h("polyline",{key:"profile",points:p(profile),fill:"none",stroke:"#19f0ed",strokeWidth:8,strokeLinejoin:"round",strokeLinecap:"round",filter:"drop-shadow(0 0 5px #00eaff)"}),h("polyline",{key:"backprofile",points:p(profile.map(([x,y])=>[x+dx,y+dy])),fill:"none",stroke:"#31aeb6",strokeWidth:3}));
+// Reference holes and the active bend station.
+const holeX=(left[0]+mid[0])/2;parts.push(h("ellipse",{key:"hole",cx:holeX+24,cy:(left[1]+base)/2-18,rx:22,ry:10,fill:"#e0e4df",stroke:"#2a939a",strokeWidth:4,transform:`rotate(-8 ${holeX+24} ${(left[1]+base)/2-18})`}),h("circle",{key:"hole2",cx:right[0]-34,cy:(right[1]+base)/2-16,r:8,fill:"#e3e7e5",stroke:"#278b91",strokeWidth:3}));
+// Lower V die with orange relief.
+parts.push(polygon([[500,dieTop],[570,dieTop],[620,dieTop+54],[670,dieTop],[740,dieTop],[740,dieTop+70],[500,dieTop+70]],"url(#orangeMain)","#8b4c08"),h("path",{key:"vline",d:`M570 ${dieTop} L620 ${dieTop+54} L670 ${dieTop}`,fill:"none",stroke:"#ffe68c",strokeWidth:4}));
+// Moving ram and orange upper punch follow the press cycle.
+parts.push(h("g",{key:"ram",transform:`translate(0 ${ramDrop})`},polygon([[505,toolY],[735,toolY],[777,toolY+22],[547,toolY+22]],"#ffbd26","#8f5205"),polygon([[547,toolY+22],[777,toolY+22],[777,toolY+76],[547,toolY+76]],"url(#orangeMain)","#8f5205"),polygon([[505,toolY],[547,toolY+22],[547,toolY+76],[505,toolY+54]],"#dc8508","#8f5205"),polygon([[547,toolY+76],[777,toolY+76],[700,toolY+112],[620,toolY+112]],"#e9930a","#8f5205"),h("path",{d:`M620 ${toolY+112} L700 ${toolY+112}`,stroke:"#ffe48a",strokeWidth:3}))); 
+// Linear guides, bolts and coordinate labels make the CAD view legible.
+for(let x=220;x<1060;x+=56){parts.push(h("circle",{key:`bolt${x}`,cx:x,cy:500,r:5,fill:"#d5dcdb",stroke:"#546269",strokeWidth:2}))}
+parts.push(h("path",{key:"gauge",d:"M290 390 L885 390 M330 382 V402 M420 382 V402 M510 382 V402 M600 382 V402 M690 382 V402 M780 382 V402",stroke:"#4c626b",strokeWidth:2,opacity:.75}));
+parts.push(h("text",{key:"model",x:610,y:206,textAnchor:"middle",fill:"#edf4f4",fontSize:18,fontWeight:800,letterSpacing:2},"PLEGADORA CNC · SIMULACIÓN DINÁMICA"),h("text",{key:"pmark",x:cx,y:compact?40:325,textAnchor:"middle",fill:compact?"#b5f8ff":"#155065",fontSize:compact?13:18,fontWeight:800},`P${bend?.order??1} · ${Math.round((bend?.angle??90)*clamp(angleFactor,0,1))}°`));
+}else{
+// Synchronized 2D section: the punch, V die and sheet use the same bend angle.
+const midX=620, baseY=dieTop, a=Math.max(0,theta), reach=compact?82:180, yL=baseY-sign*reach*Math.sin(a), xL=midX-reach*Math.cos(a), yR=baseY-sign*reach*Math.sin(a), xR=midX+reach*Math.cos(a);
+parts.push(h("rect",{key:"miniBg",x:0,y:0,width:1200,height:220,fill:"#4f7e86"}),h("g",{key:"2dtools",stroke:"#425c4a",strokeWidth:5},h("rect",{x:midX-54,y:24,width:108,height:45,rx:3,fill:"#f0a51e",stroke:"#6f571d"}),h("path",{d:`M${midX-75} 153 L${midX-32} 153 L${midX} 192 L${midX+32} 153 L${midX+75} 153 L${midX+75} 210 L${midX-75} 210Z`,fill:"#e89a17",stroke:"#755b26",strokeWidth:4})),h("polyline",{key:"2dsheet",points:`${xL},${yL} ${midX},${baseY-1} ${xR},${yR}`,fill:"none",stroke:"#c7ffff",strokeWidth:8,strokeLinejoin:"round",filter:"drop-shadow(0 0 5px #00efff)"}),h("path",{key:"guide",d:`M${midX-235} ${baseY} H${midX+235}`,stroke:"#d4e2df",strokeWidth:2,strokeDasharray:"8 8",opacity:.65}),h("text",{key:"angle",x:midX+104,y:baseY-33,fill:"#a8ffcb",fontSize:30,fontWeight:800},`${Math.round((bend?.angle??90)*clamp(angleFactor,0,1))}°`),h("text",{key:"step",x:30,y:34,fill:"#ecfbff",fontSize:17,fontWeight:700},`P${bend?.order??1} · punzón ${bend?.punchId??"—"} · matriz V ${bend?.dieId??"—"}`));
 }
-
-function SimulationPage({mode}){
-  const project=useActiveProject();
-  const state=useAppStore();
-  const is3d=mode==="3d";
-  const bends=project.bends||[];
-  const count=Math.max(1,bends.length);
-  const [step,setStep]=React.useState(()=>{try{const raw=window.localStorage.getItem("plegarpro-simulation-step:"+project.id);if(raw===null)return Math.min(1,count-1);const saved=Number(raw);return Number.isFinite(saved)?Math.max(0,Math.min(count-1,saved)):Math.min(1,count-1)}catch{return Math.min(1,count-1)}});
-  const [playing,setPlaying]=React.useState(()=>{try{return window.sessionStorage.getItem("plegarpro-simulation-playing:"+project.id)==="true"}catch{return false}});
-  const [zoom,setZoom]=React.useState(1);
-  const [finished,setFinished]=React.useState(false);
-  const [positioning,setPositioning]=React.useState(false);
-  React.useEffect(()=>{
-    try{window.sessionStorage.setItem("plegarpro-simulation-playing:"+project.id,String(playing))}catch{}
-  },[project.id,playing]);
-  React.useEffect(()=>{
-    try{window.localStorage.setItem("plegarpro-simulation-step:"+project.id,String(step))}catch{}
-    window.dispatchEvent(new CustomEvent("plegarpro:simulation-step",{detail:{projectId:project.id,step}}));
-  },[project.id,step]);
-  React.useEffect(()=>{
-    const sync=event=>{if(event.detail?.projectId===project.id&&Number.isFinite(event.detail.step))setStep(Math.max(0,Math.min(count-1,event.detail.step)))};
-    const storage=event=>{if(event.key==="plegarpro-simulation-step:"+project.id&&event.newValue!==null){const value=Number(event.newValue);if(Number.isFinite(value))setStep(Math.max(0,Math.min(count-1,value)))}};
-    window.addEventListener("plegarpro:simulation-step",sync);
-    window.addEventListener("storage",storage);
-    return()=>{window.removeEventListener("plegarpro:simulation-step",sync);window.removeEventListener("storage",storage)};
-  },[project.id,count]);
-  React.useEffect(()=>{
-    if(!playing)return;
-    const timer=window.setInterval(()=>setStep(current=>Math.min(count-1,current+1)),900);
-    return()=>window.clearInterval(timer);
-  },[playing,count]);
-  React.useEffect(()=>{
-    if(playing&&step>=count-1){setPlaying(false);setFinished(true)}
-  },[playing,step,count]);
-  const machine=machines.find(item=>item.id===state.selectedMachineId)||machines[0];
-  const punch=tools.find(item=>item.id===state.selectedPunchId&&item.kind==="punch")||tools.find(item=>item.kind==="punch");
-  const die=tools.find(item=>item.id===state.selectedDieId&&item.kind==="die")||tools.find(item=>item.kind==="die");
-  const bend=bends[step];
-  const angle=bend?.angle??90;
-  const sequence=["Posicionar chapa",...bends.map(item=>"Plegado "+item.order),"Pieza terminada"];
-  const activeSequence=finished?sequence.length-1:(positioning||!bends.length)?0:step+1;
-  const changeStep=next=>{setPlaying(false);setFinished(false);setPositioning(false);setStep(Math.max(0,Math.min(count-1,next)))};
-  const rows=[
-    ["Máquina",machine?.name||"Sin máquina"],
-    ["Punzón",punch?.name||"Sin punzón"],
-    ["Matriz",die?.name||"Sin matriz"],
-    ["Espesor",project.thickness+" mm"],
-    ["Material",project.material||"—"],
-    ["Fuerza actual",bend?.forceKnM?bend.forceKnM+" kN":"—"],
-    ["Ángulo actual",angle+"°"],
-    ["Y actual",(bend?.backgaugeY??bend?.position??"—")+" mm"]
-  ];
-  const punchWidth=Math.max(42,Math.min(120,(punch?.headWidth||punch?.width||30)*1.8));
-  const punchTipWidth=Math.max(0,Math.min(punchWidth*.55,(Number(punch?.tipWidth)||0)*1.8));
-  const punchShoulder=270-Math.max(55,Math.min(120,(punch?.height||120)*.55));
-  const punchTipDepth=Math.max(34,Math.min(90,Math.tan(Math.max(15,Math.min(88,(punch?.angle||88)/2))*Math.PI/180)*punchWidth*.72));
-  const dieWidth=Math.max(70,Math.min(170,(die?.width||56)*1.65));
-  const dieBaseWidth=Math.max(40,Math.min(170,(die?.baseWidth||die?.width||56)*1.65));
-  const dieV=Math.max(35,Math.min(130,(die?.v||16)*3.1));
-  const diePocketDepth=Math.max(20,Math.min(70,(Number(die?.depthMm)||16)*2.7));
-  const diePocketDepth3d=Math.max(10,Math.min(36,(Number(die?.depthMm)||12)*2.35));
-  const dieInsertPx=Math.max(12,Math.min(dieV,(Number(die?.dieInsertWidth)||0)*2.1));
-  const foldDepth=Math.max(20,Math.min(92,38+(90-Math.abs(angle))*1.8));
-  const ramTravel=Math.min(32,Math.max(0,(90-Math.abs(angle))*.7));
-  const machineName=machine?.name||"TrumaBend V85";
-  const machineBrand=machine?.manufacturer||"TRUMPF";
-  const scene=is3d
-    ? jsxs("div",{className:"sim3d-reference",style:{transform:"scale("+zoom+")"},children:[
-        jsxs("svg",{className:"sim3d-machine-svg"+(playing?" is-playing":""),viewBox:"0 0 900 560",role:"img","aria-label":machineBrand+" "+machineName+" en simulación de plegado 3D",children:[
-          jsx("defs",{children:[
-            jsx("linearGradient",{id:"machine-front",x1:"0",x2:"0",y1:"0",y2:"1",children:[jsx("stop",{offset:"0%",stopColor:"#dce5e9"}),jsx("stop",{offset:"45%",stopColor:"#9caeb8"}),jsx("stop",{offset:"100%",stopColor:"#465b6a"})]}),
-            jsx("linearGradient",{id:"machine-side",x1:"0",x2:"1",y1:"0",y2:"0",children:[jsx("stop",{offset:"0%",stopColor:"#30475b"}),jsx("stop",{offset:"55%",stopColor:"#172b3b"}),jsx("stop",{offset:"100%",stopColor:"#0b1723"})]}),
-            jsx("linearGradient",{id:"machine-blue",x1:"0",x2:"0",y1:"0",y2:"1",children:[jsx("stop",{offset:"0%",stopColor:"#315a79"}),jsx("stop",{offset:"100%",stopColor:"#102537"})]}),
-            jsx("linearGradient",{id:"machine-metal",x1:"0",x2:"0",y1:"0",y2:"1",children:[jsx("stop",{offset:"0%",stopColor:"#f0f4f5"}),jsx("stop",{offset:"45%",stopColor:"#8c9ca4"}),jsx("stop",{offset:"100%",stopColor:"#39464e"})]}),
-            jsx("linearGradient",{id:"machine-screen",x1:"0",x2:"1",y1:"0",y2:"1",children:[jsx("stop",{offset:"0%",stopColor:"#0b2941"}),jsx("stop",{offset:"100%",stopColor:"#2aa4cf"})]})
-          ]}),
-          jsx("ellipse",{cx:"462",cy:"444",rx:"350",ry:"46",fill:"#0009"}),
-          jsx("path",{d:"M90 410L180 374L760 371L825 405L730 450L145 452Z",fill:"#111c26",stroke:"#526573",strokeWidth:"2"}),
-          jsx("path",{d:"M150 106L735 86L810 121L810 365L748 402L150 389Z",fill:"url(#machine-side)",stroke:"#7b909c",strokeWidth:"3"}),
-          jsx("path",{d:"M150 106L735 86L735 350L150 370Z",fill:"url(#machine-front)",stroke:"#e1eaee",strokeWidth:"3"}),
-          jsx("path",{d:"M735 86L810 121L810 365L748 402L735 350Z",fill:"url(#machine-side)",stroke:"#6c8190",strokeWidth:"2"}),
-          jsx("path",{d:"M168 122L712 104L712 187L168 202Z",fill:"#b9c8ce",stroke:"#eef3f5",strokeWidth:"2"}),
-          jsx("path",{d:"M171 199L712 185L712 225L171 239Z",fill:"#203645",stroke:"#536d7c",strokeWidth:"2"}),
-          jsx("path",{d:"M187 209L696 196L696 221L187 234Z",fill:"#111a20"}),
-          jsx("path",{d:"M160 239L730 224L730 353L160 369Z",fill:"#203b50",stroke:"#8195a1",strokeWidth:"2"}),
-          jsx("path",{d:"M163 244L727 230L727 253L163 267Z",fill:"#142737"}),
-          jsx("path",{d:"M180 257L707 244L707 269L180 283Z",fill:"url(#machine-metal)",stroke:"#e1e8eb",strokeWidth:"2"}),
-          jsx("path",{d:"M180 283L707 269L707 296L180 311Z",fill:"#253746"}),
-          jsx("path",{d:"M183 297L705 284L705 307L183 321Z",fill:"url(#machine-metal)",stroke:"#9eacb2",strokeWidth:"2"}),
-          jsx("path",{d:"M196 308L680 296L680 342L196 355Z",fill:"#111c25",stroke:"#8998a0",strokeWidth:"2"}),
-          jsx("path",{d:"M205 320L674 308L674 332L205 344Z",fill:"#304653"}),
-          jsx("path",{d:"M194 350L690 337L735 353L226 372Z",fill:"url(#machine-metal)",stroke:"#f1f4f4",strokeWidth:"2"}),
-          jsx("path",{d:"M226 371L735 353L735 379L232 401Z",fill:"url(#machine-side)",stroke:"#758791",strokeWidth:"2"}),
-          jsx("path",{d:"M180 372L232 371L232 403L181 406Z",fill:"#31495a"}),
-          jsx("path",{d:"M690 337L735 353L735 379L690 376Z",fill:"#182a37"}),
-          jsx("path",{d:"M242 367L257 367L257 405L242 406Z",fill:"#0d1922"}),
-          jsx("path",{d:"M655 355L670 354L670 394L655 395Z",fill:"#0d1922"}),
-          jsxs("g",{className:"sim3d-moving-ram",style:{transform:"translateY("+ramTravel+"px)"},children:[
-            jsx("path",{d:"M206 249L681 237L681 267L206 280Z",fill:"url(#machine-metal)",stroke:"#f3f6f7",strokeWidth:"2"}),
-            jsx("path",{d:"M218 279L668 267L668 289L218 301Z",fill:"#53646d",stroke:"#a9b6bc",strokeWidth:"2"}),
-            jsx("path",{d:"M416 295L487 293L478 328L450 348L426 327Z",fill:"url(#machine-front)",stroke:"#ecf1f2",strokeWidth:"2"})
-          ]}),
-          jsx("path",{d:"M238 343L668 332L699 345L267 360Z",fill:"#8f9da4",stroke:"#dce4e7",strokeWidth:"2"}),
-          jsx("path",{d:"M267 360L699 345L699 359L267 375Z",fill:"#3b4b54",stroke:"#73828a",strokeWidth:"2"}),
-          jsx("path",{d:"M"+(450-dieWidth/2)+" 350L"+(450-dieV/2)+" 350L450 "+(350+diePocketDepth3d)+"L"+(450+dieV/2)+" 350L"+(450+dieWidth/2)+" 350L"+(450+dieBaseWidth/2)+" 363L"+(450-dieBaseWidth/2)+" 363Z",fill:"#75848b",stroke:"#d7e0e3",strokeWidth:"2"}),
-          jsx("path",{d:"M306 339L450 "+(339+foldDepth*.42)+"L594 339",fill:"none",stroke:"#c8e8f4",strokeWidth:"5","stroke-linecap":"round","stroke-linejoin":"round",className:"sim3d-workpiece",key:"3d-part-"+step+"-"+angle,children:jsx("animate",{attributeName:"d",from:"M306 339L450 339L594 339",to:"M306 339L450 "+(339+foldDepth*.42)+"L594 339",dur:"450ms",fill:"freeze"})}),
-          jsx("path",{d:"M"+(450-punchWidth/2)+" 303H"+(450+punchWidth/2)+"L"+(450+punchTipWidth/2)+" 340H"+(450-punchTipWidth/2)+"Z",fill:"url(#machine-metal)",stroke:"#edf2f4",strokeWidth:"2"}),
-          jsx("path",{d:"M"+(450-dieInsertPx/2)+" "+(363+diePocketDepth3d*.35)+"H"+(450+dieInsertPx/2),stroke:"#44c5ee",strokeWidth:"2",opacity:".9"}),
-          jsx("path",{d:"M120 108L150 107L150 386L120 392Z",fill:"#193247",stroke:"#6f8795",strokeWidth:"2"}),
-          jsx("path",{d:"M132 128L143 128L143 153L132 154Z",fill:"#8fc8ec"}),
-          jsx("path",{d:"M" +(machineBrand==="TRUMPF"?184:181)+" 137h60v25h-60z",fill:"#1b3c59"}),
-          jsx("text",{x:"214",y:"154",textAnchor:"middle",fill:"#f1f5f7",fontSize:"12",fontWeight:"700",children:machineBrand}),
-          jsx("text",{x:"440",y:"157",textAnchor:"middle",fill:"#263e4d",fontSize:"14",fontWeight:"700",letterSpacing:"2",children:machineName.toUpperCase()}),
-          jsx("path",{d:"M739 143L789 151L789 295L739 286Z",fill:"#0a1520",stroke:"#8596a0",strokeWidth:"2"}),
-          jsx("path",{d:"M745 152L783 158L783 231L745 225Z",fill:"url(#machine-screen)",stroke:"#b7c9d2",strokeWidth:"2"}),
-          jsx("path",{d:"M750 161L778 165M750 171L778 175M750 181L769 184",stroke:"#79e0ff",strokeWidth:"2"}),
-          jsx("circle",{cx:"754",cy:"248",r:"5",fill:"#50db90"}),jsx("circle",{cx:"773",cy:"251",r:"5",fill:"#ffbe50"}),
-          jsx("path",{d:"M730 290L786 300L786 311L730 302Z",fill:"#657781"}),
-          jsx("path",{d:"M275 191h26v7h-26zM320 190h4v7h-4zM342 189h4v7h-4zM364 188h4v7h-4zM386 187h4v7h-4zM408 186h4v7h-4zM430 185h4v7h-4zM452 184h4v7h-4zM474 183h4v7h-4zM496 182h4v7h-4zM518 181h4v7h-4zM540 180h4v7h-4zM562 179h4v7h-4zM584 178h4v7h-4zM606 177h4v7h-4zM628 176h4v7h-4z",fill:"#162938"}),
-          jsx("path",{d:"M157 392H735",stroke:"#9aaab1",strokeWidth:"2",opacity:".6"}),
-          jsx("text",{x:"450",y:"470",textAnchor:"middle",fill:"#c5d9e1",fontSize:"13",letterSpacing:"1.5",children:machineBrand+" · "+machineName}),
-          jsx("text",{x:"450",y:"493",textAnchor:"middle",fill:"#67d8ff",fontSize:"12",children:"PUNZÓN "+(punch?.name||"—")+"   ·   MATRIZ V"+(die?.v||"—")+"   ·   "+angle+"°"}),
-          jsx("path",{d:"M215 421H700",stroke:"#2ac3ff",strokeWidth:"1",strokeDasharray:"5 8",opacity:".25"})
-        ]})
-      ]})
-    : jsxs("div",{className:"sim2d-reference",style:{transform:"scale("+zoom+")"},children:[
-        jsx("div",{className:"sim2d-step-tabs",children:sequence.slice(0,9).map((label,index)=>jsx("button",{
-          type:"button",className:index===activeSequence?"active":"",
-          "aria-label":"Ir a "+label,
-          onClick:()=>{setPlaying(false);if(index===0){setFinished(false);setPositioning(true);setStep(0)}else if(index===sequence.length-1){setPositioning(false);setFinished(true);setStep(count-1)}else{setPositioning(false);setFinished(false);setStep(index-1)}},
-          children:index+1
-        },label))}),
-        jsxs("svg",{className:"sim2d-drawing",viewBox:"0 0 900 560",role:"img","aria-label":"Simulación 2D del punzón y la matriz V seleccionados",children:[
-          jsx("defs",{children:[
-            jsx("pattern",{id:"sim2d-grid",width:"40",height:"40",patternUnits:"userSpaceOnUse",children:jsx("path",{d:"M40 0H0V40",fill:"none",stroke:"#3d696d",strokeWidth:"1",opacity:".3"})}),
-            jsx("linearGradient",{id:"sim2d-punch-metal",x1:"0",x2:"1",y1:"0",y2:"1",children:[
-              jsx("stop",{offset:"0%",stopColor:"#d8c4dc"}),jsx("stop",{offset:"50%",stopColor:"#b7a0bf"}),jsx("stop",{offset:"100%",stopColor:"#8a7895"})
-            ]}),
-            jsx("linearGradient",{id:"sim2d-die-metal",x1:"0",x2:"0",y1:"0",y2:"1",children:[
-              jsx("stop",{offset:"0%",stopColor:"#bba7c0"}),jsx("stop",{offset:"100%",stopColor:"#776881"})
-            ]})
-          ]}),
-          jsx("rect",{width:"900",height:"560",fill:"#628b91"}),
-          jsx("rect",{x:"0",y:"0",width:"900",height:"560",fill:"url(#sim2d-grid)"}),
-          jsx("path",{d:"M45 352H398",stroke:"#b8d9dd",strokeWidth:"1",strokeDasharray:"5 8",opacity:".35"}),
-          jsx("path",{d:"M502 352H855",stroke:"#b8d9dd",strokeWidth:"1",strokeDasharray:"5 8",opacity:".35"}),
-          jsx("path",{d:"M450 110V445",stroke:"#c2dfe0",strokeWidth:"1",strokeDasharray:"5 7",opacity:".45"}),
-          jsx("path",{d:"M450 "+(351+foldDepth)+"L450 440",stroke:"#eaf5f4",strokeWidth:"1.5",strokeDasharray:"4 5",opacity:".6"}),
-          jsx("path",{d:"M"+(450-dieWidth/2)+" 375H"+(450-dieV/2)+"L450 "+(375+diePocketDepth)+"L"+(450+dieV/2)+" 375H"+(450+dieWidth/2)+"L"+(450+dieBaseWidth/2)+" 468H"+(450-dieBaseWidth/2)+"Z",fill:"url(#sim2d-die-metal)",stroke:"#81778a",strokeWidth:"2"}),
-          jsx("path",{d:"M"+(450-dieWidth/2-12)+" 375H"+(450-dieWidth/2)+"V468H"+(450-dieWidth/2-12)+"Z",fill:"#526e60"}),
-          jsx("path",{d:"M"+(450+dieWidth/2)+" 375H"+(450+dieWidth/2+12)+"V468H"+(450+dieWidth/2)+"Z",fill:"#526e60"}),
-          jsx("path",{d:"M"+(450-punchWidth/2)+" "+punchShoulder+"H"+(450+punchWidth/2)+"V"+(punchShoulder+48)+"L"+(450+punchTipWidth/2)+" "+(punchShoulder+48+punchTipDepth)+"H"+(450-punchTipWidth/2)+"L"+(450-punchWidth/2)+" "+(punchShoulder+48)+"Z",fill:"url(#sim2d-punch-metal)",stroke:"#e4d7e5",strokeWidth:"2",className:"sim2d-tool-shape"}),
-          jsx("path",{d:"M"+(450-punchWidth*.2)+" "+(punchShoulder+48)+"V"+(punchShoulder+118)+"H"+(450+punchWidth*.2)+"V"+(punchShoulder+48),fill:"#a48ead",opacity:".85"}),
-          jsx("path",{d:"M450 130V"+(punchShoulder-4),stroke:"#263e3f",strokeWidth:"10",opacity:".9"}),
-          jsx("path",{key:"sheet-"+step+"-"+angle,d:"M75 351H400L450 "+(351+foldDepth)+"L500 351H825",fill:"none",stroke:"#e5eff0",strokeWidth:"4",strokeLinecap:"round",strokeLinejoin:"round",className:"sim2d-workpiece",children:jsx("animate",{attributeName:"d",from:"M75 351H400L450 351L500 351H825",to:"M75 351H400L450 "+(351+foldDepth)+"L500 351H825",dur:"450ms",fill:"freeze"})}),
-          jsx("circle",{cx:"450",cy:String(351+foldDepth),r:"5",fill:"#e6f5f1",stroke:"#425e5e",strokeWidth:"2"}),
-          jsx("path",{d:"M"+(450-dieInsertPx/2)+" 447H"+(450+dieInsertPx/2),stroke:"#a9e7e0",strokeWidth:"2"}),
-          jsx("text",{x:"450",y:"500",textAnchor:"middle",className:"sim2d-die-label",children:"MATRIZ V"+(die?.v||"—")+" · "+(die?.angle||"—")+"°"}),
-          jsx("text",{x:"450",y:"80",textAnchor:"middle",className:"sim2d-punch-label",children:(punch?.name||"Punzón")+" · "+(punch?.angle||"—")+"°"}),
-          jsx("text",{x:"535",y:String(343+foldDepth/2),className:"sim2d-angle",children:angle+"°"}),
-          jsx("path",{d:"M517 "+(349+foldDepth/2)+"l-11 12 14 2",fill:"none",stroke:"#b6f47a",strokeWidth:"2"}),
-          jsx("path",{d:"M80 328v-13m0 0-5 6m5-6 5 6M820 328v-13m0 0-5 6m5-6 5 6",stroke:"#d6e7e4",strokeWidth:"1.5",fill:"none",opacity:".75"})
-        ]}),
-        jsxs("div",{className:"sim2d-selection",children:[
-          jsxs("label",{children:[jsx("span",{children:"Punzón seleccionado"}),jsx("select",{value:punch?.id||"",onChange:event=>state.setPunch?.(event.target.value),children:tools.filter(item=>item.kind==="punch").map(item=>jsx("option",{value:item.id,children:item.name},item.id))})]}),
-          jsxs("label",{children:[jsx("span",{children:"Matriz V seleccionada"}),jsx("select",{value:die?.id||"",onChange:event=>state.setDie?.(event.target.value),children:tools.filter(item=>item.kind==="die").map(item=>jsx("option",{value:item.id,children:item.name},item.id))})]}),
-          jsxs("div",{className:"sim2d-angle-readout",children:[jsx("small",{children:"ÁNGULO"}),jsx("strong",{children:angle+"°"})]})
-        ]})
-      ]});
-  const toolsRail=jsx("div",{className:"sim-ref-tools","aria-label":"Herramientas de vista",children:[
-    jsx("button",{type:"button","aria-label":"Acercar",onClick:()=>setZoom(value=>Math.min(1.5,value+.1)),children:"＋"}),
-    jsx("button",{type:"button","aria-label":"Alejar",onClick:()=>setZoom(value=>Math.max(.7,value-.1)),children:"−"}),
-    jsx("button",{type:"button","aria-label":"Centrar vista",onClick:()=>setZoom(1),children:"⌕"}),
-    jsx("button",{type:"button","aria-label":"Paso anterior",onClick:()=>changeStep(step-1),children:"‹"}),
-    jsx("button",{type:"button","aria-label":"Paso siguiente",onClick:()=>changeStep(step+1),children:"›"})
-  ]});
-  return jsx(Page,{title:is3d?"Simulación 3D":"Simulación 2D",subtitle:is3d?"Visualización realista de la máquina y la secuencia de plegado":"Secuencia de plegado en vista plana",children:jsx("div",{className:is3d?"sim-ref-shell":"sim-ref-shell sim-ref-2d",children:[
-    jsxs("div",{className:"sim-ref-player",children:[
-      jsxs("div",{className:"sim-ref-controls",children:[
-        jsx("button",{type:"button","aria-label":playing?"Pausar":"Reproducir",onClick:()=>setPlaying(value=>{if(!value){setPositioning(false);setFinished(false)}return !value}),children:playing?"Ⅱ":"▶"}),
-        jsx("button",{type:"button","aria-label":"Reiniciar",onClick:()=>{setPlaying(false);setFinished(false);setPositioning(true);setStep(0)},children:"↺"}),
-        jsx("button",{type:"button","aria-label":"Paso anterior",onClick:()=>changeStep(step-1),children:"◀"}),
-        jsx("button",{type:"button","aria-label":"Paso siguiente",onClick:()=>changeStep(step+1),children:"▶▶"})
-      ]}),
-      jsx("strong",{children:"Paso "+(step+1)+" / "+count}),
-      jsx("span",{children:positioning?"Posicionar chapa":finished?"Pieza terminada":bend?"Plegado "+bend.order+" de "+count:"Sin plegados"}),
-      jsx("div",{className:"sim-ref-progress","aria-label":"Progreso de la simulación",children:jsx("i",{style:{width:(finished?100:positioning?0:(step+1)/count*100)+"%"}})})
-    ]}),
-    jsxs("div",{className:"sim-ref-body",children:[
-      toolsRail,
-      jsx("div",{className:"sim-ref-stage",children:[scene,jsx("div",{className:"sim-ref-overlay",children:[
-        jsx("span",{children:project.length+" × "+project.width+" mm"}),
-        jsx("span",{children:"e "+project.thickness+" mm"}),
-        jsx("span",{children:project.material||"Material"})
-      ]})]}),
-      jsxs("aside",{className:"sim-ref-data",children:[
-        jsx("h3",{children:"DATOS"}),
-        jsx(DataRows,{rows}),
-        jsx("small",{className:"sim-ref-note",children:"Vista de proceso · unidades en mm"})
-      ]})
-    ]}),
-    jsxs("section",{className:"sim-ref-sequence",children:[
-      jsx("h3",{children:"SECUENCIA DE PLEGADO"}),
-      jsx("div",{children:sequence.map((label,index)=>jsxs("button",{type:"button",className:index===activeSequence?"active":"",onClick:()=>{
-        setPlaying(false);
-        if(index===0){setFinished(false);setPositioning(true);setStep(0)}
-        else if(index===sequence.length-1){setPositioning(false);setFinished(true);setStep(count-1)}
-        else {setPositioning(false);setFinished(false);setStep(index-1)}
-      },children:[
-        jsx("span",{children:index+1}),
-        jsx("div",{className:"mini-part stage-"+Math.min(index,3),children:[jsx("i",{}),jsx("b",{})]}),
-        jsx("strong",{children:label})
-       ]},label))})
-    ]})
-  ]})});
+const cameraTransform=compact||view==="front"?undefined:view==="side"?"translate(150 0) scale(.75 1)":"skewX(-3) skewY(1)";return h("svg",{viewBox:`0 0 1200 ${compact?220:650}`,role:"img","aria-label":compact?"Sección 2D sincronizada del plegado":"Simulación 3D de plegadora CNC",className:compact?"simulation-2d-svg":"simulation-3d-svg",style:{...styles.svg,minHeight:compact?205:420}},h("g",{transform:cameraTransform},...parts))}
+function Controls({timeline,count,speed,setSpeed}){const[state,send]=timeline;const progress=clamp(state.progress,0,count);return h("div",{style:styles.toolbar},h("button",{style:styles.button,onClick:()=>send({progress:0,playing:false}),title:"Reiniciar"},"⟲"),h("button",{style:{...styles.button,...(state.playing?styles.buttonActive:{})},onClick:()=>send({playing:!state.playing,progress:progress>=count?0:progress}),title:state.playing?"Pausar":"Reproducir"},state.playing?"❚❚":"▶ Reproducir"),h("button",{style:styles.button,onClick:()=>send({progress:clamp(Math.floor(progress)-1,0,count),playing:false}),title:"Paso anterior"},"◀ Paso"),h("button",{style:styles.button,onClick:()=>send({progress:clamp(Math.floor(progress)+1,0,count),playing:false}),title:"Paso siguiente"},"Paso ▶"),h("label",{style:{...styles.smallLabel,marginLeft:6}},"VELOCIDAD"),h("select",{value:speed,onChange:e=>setSpeed(e.target.value),style:{background:"#071521",color:"#dff8ff",border:"1px solid #31566b",borderRadius:7,padding:"7px 9px"}},h("option",{value:"slow"},"0,5×"),h("option",{value:"normal"},"1×"),h("option",{value:"fast"},"2×")),h("div",{style:styles.rangeRow},h("span",{style:styles.smallLabel},`P${Math.min(count,Math.floor(progress)+1)} / ${count||0}`),h("input",{type:"range",min:0,max:Math.max(1,count),step:.01,value:progress,onChange:e=>send({progress:Number(e.target.value),playing:false}),style:styles.progress,"aria-label":"Progreso de simulación"}),h("span",{style:{...styles.badge,minWidth:62,textAlign:"center"}},`${Math.round(progress/Math.max(1,count)*100)}%`)))}
+function usePlayback(timeline,count,speed){const[state,send]=timeline;React.useEffect(()=>{if(!state.playing||count<1)return;let last=0,raf=0;const duration=speed==="slow"?5000:speed==="fast"?1500:2800;const tick=now=>{if(!last)last=now;const next=bus.progress+(now-last)/duration;last=now;if(next>=count){send({progress:count,playing:false});return}send({progress:next});raf=requestAnimationFrame(tick)};raf=requestAnimationFrame(tick);return()=>cancelAnimationFrame(raf)},[state.playing,count,speed])}
+function sequence(project,bend,index,progress,send){const list=project.bends.length?project.bends:[bend];return h("div",{style:styles.steps},...list.map((item,i)=>h("button",{key:item.id||i,type:"button",style:{...styles.step,...(Math.floor(progress)===i?styles.stepOn:{})},onClick:()=>send({progress:i,playing:false})},h("b",{style:{width:27,height:27,display:"grid",placeItems:"center",borderRadius:50,background:"#15526a",color:"#bdf6ff"}},`P${item.order??i+1}`),h("span",null,`${item.angle}° · ${item.direction==="negative"?"−":"+"}`),h("small",{style:{color:"#80a5b8"}},`X ${item.position} mm`))))}
+function baseData(){const project=useProject(),speed=useStore(s=>s.simulationSpeed),setSpeed=useStore(s=>s.setSimulationSpeed),selectedMachine=useStore(s=>s.selectedMachineId),selectedPunch=useStore(s=>s.selectedPunchId),selectedDie=useStore(s=>s.selectedDieId),defaultPunch=catalog.find(x=>x.id===selectedPunch)||catalog.find(x=>x.kind==="punch"),defaultDie=catalog.find(x=>x.id===selectedDie)||catalog.find(x=>x.kind==="die"),bends=project.bends||[],timeline=useTimeline(),count=bends.length;usePlayback(timeline,count,speed);const[state]=timeline,progress=clamp(state.progress,0,Math.max(1,count)),index=count?Math.min(count-1,Math.floor(Math.min(progress,count-.0001))):0,bend=bends[index]||{id:"demo",order:1,angle:90,direction:"positive",position:project.length/2,length:project.width,radius:project.thickness,punchId:selectedPunch,dieId:selectedDie},punch=catalog.find(x=>x.id===bend.punchId)||defaultPunch,die=catalog.find(x=>x.id===bend.dieId)||defaultDie,phase=count?progress-index:0,blend=progress>=index+1?1:phase<.18?0:clamp((phase-.18)/.42,0,1),ram=phase<.18?0:phase<.46?((phase-.18)/.28)*72:phase<.68?72:phase<.86?72*(1-(phase-.68)/.18):0;return{project,speed,setSpeed,selectedMachine,punch,die,bends,timeline,count,state,progress,index,bend,blend,ram}}
+function Simulation3DPage(){
+ const d=baseData();
+ const [view,setView]=React.useState('isometric');
+ const pct=Math.round(d.progress/Math.max(1,d.count)*100);
+ const machineName=d.selectedMachine?.toLowerCase().includes('truma')?'TRUMPF TruBend V85':'Plegadora CNC';
+ const viewportChildren=[
+  h(PressBrakeScene,{bend:d.bend,angleFactor:d.blend,ramDrop:d.ram,view}),
+  h('div',{style:styles.overlay},h('i',{style:styles.live}),machineName,h('span',{style:{opacity:.58}},'·'),`${d.project.name||'Pieza activa'}`),
+  h('div',{style:styles.topControls},...['isometric','front','side'].map(v=>h('button',{key:v,type:'button',style:{...styles.button,...(view===v?styles.buttonActive:{})},onClick:()=>setView(v)},v==='isometric'?'Isométrica':v==='front'?'Frontal':'Lateral'))),
+  h('div',{style:styles.canvasFooter},h('span',{style:styles.badge},`P${d.bend.order} · ${Math.round(d.bend.angle*d.blend)}° · ${d.bend.direction==='negative'?'Plegado negativo':'Plegado positivo'}`),h('span',{style:styles.badge},`Carrera del punzón · ${Math.round(d.ram)} mm`))
+ ];
+ const viewport=h('section',{className:'panel',style:styles.viewport},...viewportChildren);
+ const sequencePanel=h('section',{className:'panel',style:styles.panel},h('h3',null,'Secuencia de plegado'),h('p',{style:styles.help},'Selecciona un paso P para posicionar la chapa; la carrera del punzón se sincroniza con la sección 2D.'),sequence(d.project,d.bend,d.index,d.progress,d.timeline[1]));
+ const crossPanel=h('section',{className:'panel',style:styles.panel},h('h3',null,'Sección 2D sincronizada'),h('div',{style:styles.secondaryView},h(PressBrakeScene,{bend:d.bend,angleFactor:d.blend,ramDrop:d.ram,compact:true})));
+ const main=h('div',{style:styles.main},viewport,h(Controls,{timeline:d.timeline,count:d.count,speed:d.speed,setSpeed:d.setSpeed}),h('div',{style:styles.sectionGrid},sequencePanel,crossPanel));
+ const info=h('aside',{className:'panel',style:{...styles.aside,...styles.panel}},h('h3',null,'Parámetros de simulación'),
+  h('div',{style:styles.stat},h('span',null,'Máquina'),h('b',null,machineName)),
+  h('div',{style:styles.stat},h('span',null,'Punzón seleccionado'),h('b',null,d.punch?.name||d.bend.punchId||'—')),
+  h('div',{style:styles.stat},h('span',null,'Matriz V seleccionada'),h('b',null,d.die?.name||d.bend.dieId||'—')),
+  h('div',{style:styles.stat},h('span',null,'Material'),h('b',null,d.project.material||'Acero')),
+  h('div',{style:styles.stat},h('span',null,'Espesor'),h('b',null,`${d.project.thickness} mm`)),
+  h('div',{style:styles.stat},h('span',null,'Ángulo objetivo'),h('b',null,`${d.bend.angle}°`)),
+  h('div',{style:styles.stat},h('span',null,'Avance'),h('b',null,`${pct}%`)),
+  h('p',{style:styles.help},'Arrastra el progreso o avanza paso a paso. La pieza, el punzón móvil y la vista 2D comparten el mismo estado.'));
+ return h(Page,{title:'Simulación 3D',subtitle:'Plegado dinámico de chapa · máquina, utillaje y pieza sincronizados',actions:h('span',{style:{color:'#4ae5a5',fontSize:12}},'●  Motor activo'),children:h('div',{style:styles.workspace},main,info)});
 }
+function Simulation2DPage(){
+ const d=baseData();
+ const pct=Math.round(d.progress/Math.max(1,d.count)*100);
+ const sequencePanel=h('section',{className:'panel',style:styles.panel},h('h3',null,'Secuencia de plegado'),sequence(d.project,d.bend,d.index,d.progress,d.timeline[1]));
+ const values=[['Punzón',d.punch?.name||d.bend.punchId],['Matriz V',d.die?.name||d.bend.dieId],['Progreso',`${pct}%`]];
+ const details=h('div',{style:{display:'grid',gridTemplateColumns:'repeat(3,minmax(0,1fr))',gap:10}},...values.map(([label,value])=>h('div',{key:label,style:{...styles.badge,display:'grid',gap:5}},h('small',{style:styles.smallLabel},label),h('b',null,value))));
+ const viewport=h('section',{className:'panel',style:{...styles.viewport,minHeight:300,background:'#4f7e86'}},h(PressBrakeScene,{bend:d.bend,angleFactor:d.blend,ramDrop:d.ram,compact:true}),h('div',{style:styles.overlay},`P${d.bend.order} · ${Math.round(d.bend.angle*d.blend)}°`));
+ const content=h('div',{style:{...styles.main,maxWidth:1180,margin:'0 auto'}},viewport,h(Controls,{timeline:d.timeline,count:d.count,speed:d.speed,setSpeed:d.setSpeed}),sequencePanel,details);
+ return h(Page,{title:'Simulación 2D',subtitle:'Sección de plegado con utillaje seleccionado y avance sincronizado',actions:h('span',{style:{color:'#4ae5a5',fontSize:12}},'●  Motor activo'),children:content});
+}
+export{Simulation2DPage,Simulation3DPage};
 
-export function Simulation2DPage(){return jsx(SimulationPage,{mode:"2d"});}
-export function Simulation3DPage(){return jsx(SimulationPage,{mode:"3d"});}

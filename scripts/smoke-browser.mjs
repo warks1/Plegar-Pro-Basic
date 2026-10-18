@@ -199,6 +199,19 @@ try {
   const menuClosed = await mobileSidebar.evaluate((el) => getComputedStyle(el).display === 'none');
   if (!menuClosed) throw new Error('El menú lateral no se cierra después de seleccionar una sección en móvil.');
 
+  // Reutiliza la misma aplicación para revisar un ancho típico de tableta.
+  await mobile.setViewportSize({ width: 768, height: 1024 });
+  await mobile.waitForTimeout(250);
+  const tabletDimensions = await mobile.evaluate(() => ({
+    viewport: document.documentElement.clientWidth,
+    document: document.documentElement.scrollWidth,
+    body: document.body.scrollWidth,
+  }));
+  console.log('DIAGNÓSTICO TABLETA: ' + JSON.stringify(tabletDimensions));
+  if (tabletDimensions.document > tabletDimensions.viewport + 3 || tabletDimensions.body > tabletDimensions.viewport + 3) {
+    throw new Error(`Desbordamiento horizontal en tableta: ${JSON.stringify(tabletDimensions)}`);
+  }
+
   if (errors.length) throw new Error('Errores JavaScript del navegador:\\n' + errors.join('\\n---\\n'));
   if (consoleMessages.length) throw new Error('Errores de consola del navegador:\\n' + consoleMessages.join('\\n---\\n'));
   if (failedResources.length) throw new Error('Recursos con error HTTP o de red:\\n' + failedResources.join('\\n'));

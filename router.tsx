@@ -19,7 +19,8 @@ const pages={
   Programming3D:lazy(()=>import('./Programming3DPage-B-9iLBwM.js').then(m=>({default:m.Programming3DPage}))),
   // @ts-ignore Legacy built bundle is the only checked-in module artifact for this route.
   Simulation2D:lazy(()=>import('./SimulationPage-c1WPp7AU.js').then(m=>({default:m.Simulation2DPage}))),
-  Simulation3D:lazy(()=>import('../features/simulation/SimulationPage').then(m=>({default:m.Simulation3DPage}))),
+  // @ts-ignore Legacy built bundle is the only checked-in module artifact for this route.
+  Simulation3D:lazy(()=>import('./SimulationPage-c1WPp7AU.js').then(m=>({default:m.Simulation3DPage}))),
   // @ts-ignore Legacy built bundle is the only checked-in module artifact for this route.
   Tooling:lazy(()=>import('./ToolingPage-DGUS0WyL.js').then(m=>({default:m.ToolingPage}))),
   // @ts-ignore Legacy built bundle is the only checked-in module artifact for this route.

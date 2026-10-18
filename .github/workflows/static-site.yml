@@ -22,5 +22,9 @@ jobs:
         run: npm ci
       - name: Build React source and recovered module routes
         run: npm run build:strict
+      - name: Install Chromium for source-route browser checks
+        run: npx playwright install --with-deps chromium
+      - name: Smoke-test every source route in Chromium
+        run: node scripts/smoke-source-routes.mjs
       - name: Verify published site and smoke-test server
         run: npm run build

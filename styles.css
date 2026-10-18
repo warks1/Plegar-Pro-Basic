@@ -253,3 +253,16 @@ input,select,textarea{background:rgba(4,13,24,.9)!important;border:1px solid rgb
 .catalog-source-popover a:hover{background:#102a39;border-color:#24bfe4}
 
 .tool-data a{color:#54dbff;text-decoration:none}.tool-data a:hover{text-decoration:underline}
+
+/* CAD finish: stronger perspective, metallic relief and restrained viewport lighting */
+.tool-cad-stage{position:relative;perspective:1100px;transform-style:preserve-3d;background-image:linear-gradient(#73dfff0a 1px,transparent 1px),linear-gradient(90deg,#73dfff0a 1px,transparent 1px),radial-gradient(ellipse at 50% 34%,#174b6a 0,#071827 48%,#02070c 84%);background-size:32px 32px,32px 32px,auto}
+.tool-cad-object{transform-style:preserve-3d;transform-origin:50% 48%;transition:transform .24s cubic-bezier(.2,.7,.2,1);will-change:transform}
+.technical-tool.mode-3d{overflow:visible;filter:drop-shadow(0 28px 24px #000b) drop-shadow(0 0 18px #38caff18)}
+.technical-tool.mode-3d .tool-front-face{stroke:#f0fbff;stroke-width:1.7;stroke-linejoin:round;paint-order:stroke fill}
+.technical-tool .tool-side-face{fill:#203846;stroke:#8ca8b5;stroke-width:1.35;stroke-linejoin:round}
+.technical-tool .tool-back-face{fill:#314c59;stroke:#b2c9d2;stroke-width:1.4;stroke-linejoin:round}
+.technical-tool.mode-3d .tool-nose-highlight{filter:drop-shadow(0 0 8px #22dfff) drop-shadow(0 2px 3px #fff)}
+.technical-tool.mode-3d .cad-dims{filter:drop-shadow(0 0 3px #1ccfff66)}
+.tool-cad-stage:after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(115deg,transparent 28%,#9eefff0a 44%,#42dfff12 50%,transparent 63%);background-size:220% 100%;animation:cad-light-sweep 12s ease-in-out infinite}
+@keyframes cad-light-sweep{0%,100%{background-position:120% 0}50%{background-position:-20% 0}}
+@media(prefers-reduced-motion:reduce){.tool-cad-object,.tool-cad-stage:after{transition:none;animation:none}}

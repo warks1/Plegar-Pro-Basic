@@ -1060,3 +1060,30 @@ body { overflow-x:clip; }
   .startup-splash .startup-live-progress { bottom:clamp(66px,11vh,96px)!important; }
   .startup-splash .startup-live-status { bottom:14px!important; padding:0 8px!important; }
 }
+
+
+/* Keep the complete loading artwork visible on portrait screens; never crop its branding. */
+.startup-splash { background:#01060b!important; }
+.startup-splash .startup-art {
+  object-fit:contain!important;
+  object-position:center center!important;
+}
+@media (orientation:portrait) {
+  .startup-splash .startup-art {
+    object-fit:contain!important;
+    object-position:center center!important;
+  }
+  .startup-splash .startup-live-progress {
+    bottom:max(70px, calc(env(safe-area-inset-bottom) + 58px))!important;
+  }
+  .startup-splash .startup-live-status {
+    bottom:max(12px, env(safe-area-inset-bottom))!important;
+  }
+}
+@media (max-width:700px) {
+  .startup-splash .startup-live-status small {
+    display:block!important;
+    max-width:92vw!important;
+    margin:4px auto 0!important;
+  }
+}

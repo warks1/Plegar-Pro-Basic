@@ -72,7 +72,7 @@ jobs:
             assets/navigation-v024.js \
             assets/Programming2DPage-DZQa639B.js \
             assets/Programming3DPage-B-9iLBwM.js \
-            assets/CollisionsPage-Dloo_dLz.js; do
+            assets/CollisionsPage-Dloo_dLz-fix3.js; do
             code="$(curl --silent --show-error --location --output /dev/null --write-out '%{http_code}' --retry 6 --retry-all-errors --retry-delay 2 "${PAGE_URL%/}/$asset")"
             if [ "$code" != "200" ]; then
               echo "Recurso publicado no disponible ($code): $asset"

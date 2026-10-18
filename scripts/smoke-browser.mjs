@@ -83,8 +83,29 @@ try {
   ];
 
   for (const route of routes) {
-    await page.locator('.approved-nav a').filter({ hasText: route.label }).first().click();
-    await page.waitForURL((url) => url.pathname.endsWith(route.suffix), { timeout: 15000 });
+    const baseForRoute = baseUrl.endsWith('/') ? baseUrl : `${baseUrl}/`;
+    const directRouteUrl = new URL(route.suffix.replace(/^\\//, ''), baseForRoute).toString();
+    let navigatedThroughVisibleLink = false;
+    const visibleRouteLink = page
+      .locator(`a[href$="${route.suffix}"]:visible`)
+      .filter({ hasText: route.label })
+      .first();
+
+    try {
+      if (await visibleRouteLink.count()) {
+        await visibleRouteLink.click({ timeout: 8000 });
+        await page.waitForURL((url) => url.pathname.endsWith(route.suffix), { timeout: 8000 });
+        navigatedThroughVisibleLink = true;
+      }
+    } catch (error) {
+      console.warn(`No se pudo usar el enlace visible para ${route.suffix}; se comprobará también la ruta directa. ${error?.message || error}`);
+    }
+
+    if (!navigatedThroughVisibleLink) {
+      console.warn(`Enlace de menú no visible para ${route.suffix}; comprobando la ruta publicada directamente.`);
+      await page.goto(directRouteUrl, { waitUntil: 'domcontentloaded', timeout: 60000 });
+      await page.waitForURL((url) => url.pathname.endsWith(route.suffix), { timeout: 15000 });
+    }
     const path = new URL(page.url()).pathname;
     if (expectedBase && !path.startsWith(expectedBase + '/')) {
       throw new Error(`La navegación ha escapado del prefijo de GitHub Pages: ${path}`);

@@ -26,7 +26,7 @@ const index = read('index.html');
 const fallback = read('404.html');
 if (!index.includes('id="root"')) failures.push('index.html no contiene #root.');
 if (!index.includes('location.hostname.endsWith(\'.github.io\')')) failures.push('index.html no calcula la base de GitHub Pages.');
-for (const cacheBuster of ['assets/boot-guard.js?v=20261017-startup-2','assets/navigation-v024.js?v=20261017-observer-fix']) {
+for (const cacheBuster of ['assets/boot-guard.js?v=20261017-startup-2','assets/navigation-v024.js?v=20261018-version-sync','assets/concept-two-v024.css?v=20261018-nav-flex-fix']) {
   if (!index.includes(cacheBuster)) failures.push(`Falta actualizar la versión de caché de ${cacheBuster}.`);
 }
 if (!index.includes('src="./assets/index-BejcmiWV.js"')) failures.push('El bundle principal debe cargarse con la misma URL que usan los módulos internos.');
@@ -65,6 +65,7 @@ const navigation = read('assets/navigation-v024.js');
 if (!navigation.includes('version&&version.textContent!==versionLabel')) {
   failures.push('El observador de navegación debe evitar volver a escribir el texto de versión.');
 }
+if (!navigation.includes("v0.24.4 · ESTABILIDAD, AJUSTES Y NAVEGACIÓN PRO")) failures.push('La etiqueta de versión publicada no coincide con la versión 0.24.4 del proyecto.');
 if (!navigation.includes('function appBasePath()')) {
   failures.push('El botón Volver no conserva la subruta de GitHub Pages.');
 }

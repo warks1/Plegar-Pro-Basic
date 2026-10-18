@@ -673,3 +673,9 @@ main.startup-splash{position:fixed!important;inset:0!important;z-index:9999!impo
 .startup-logo-halo{position:absolute;z-index:2;top:8%;left:30%;width:31%;height:46%;pointer-events:none;background:radial-gradient(ellipse at 54% 54%,rgba(18,206,255,.34) 0%,rgba(18,206,255,.14) 35%,transparent 72%);filter:blur(8px);mix-blend-mode:screen;animation:startupLogoHalo 2.8s ease-in-out infinite}
 @keyframes startupLogoHalo{0%,100%{opacity:.38;transform:scale(.96)}50%{opacity:.95;transform:scale(1.04)}}
 @media(prefers-reduced-motion:reduce){.startup-logo-halo{animation:none;opacity:.52;transform:none}}
+
+
+/* Mantiene el menú lateral utilizable cuando la suma de opciones supera la altura disponible. */
+.approved-sidebar{display:flex!important;flex-direction:column!important;min-height:0!important}
+.approved-nav{display:block!important;flex:1 1 auto!important;min-height:0!important;overflow-y:auto!important;overscroll-behavior:contain}
+.approved-nav a{display:flex!important;flex:0 0 auto!important;visibility:visible!important}

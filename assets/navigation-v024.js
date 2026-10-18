@@ -28,7 +28,7 @@ function install(){
     const menu=topbar.querySelector('.menu-button');menu?.after(button);
   }
   const version=document.querySelector('.build-version');
-  const versionLabel='v0.24.0 · BOCETO 2 Y NAVEGACIÓN PRO';
+  const versionLabel='v0.24.4 · ESTABILIDAD, AJUSTES Y NAVEGACIÓN PRO';
   if(version&&version.textContent!==versionLabel)version.textContent=versionLabel;
   document.querySelectorAll('.content > *').forEach(el=>{if(!el.classList.contains('pp-view-ready')){el.classList.add('pp-view-ready');el.animate?.([{opacity:0,transform:'translateY(8px)'},{opacity:1,transform:'none'}],{duration:330,easing:'cubic-bezier(.2,.8,.2,1)'})}});
 }

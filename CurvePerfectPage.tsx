@@ -1,6 +1,6 @@
 import {useMemo,useState} from 'react';
-import {Page} from '../../components/Page';
-import {useActiveProject} from '../../store/useAppStore';
+import {Page} from './Page';
+import {useActiveProject} from './useAppStore';
 
 export function CurvePerfectPage(){
   const project=useActiveProject();

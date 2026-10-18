@@ -84,7 +84,7 @@ try {
 
   for (const route of routes) {
     const baseForRoute = baseUrl.endsWith('/') ? baseUrl : `${baseUrl}/`;
-    const directRouteUrl = new URL(route.suffix.replace(/^\\//, ''), baseForRoute).toString();
+    const directRouteUrl = new URL(route.suffix.slice(1), baseForRoute).toString();
     let navigatedThroughVisibleLink = false;
     const visibleRouteLink = page
       .locator(`a[href$="${route.suffix}"]:visible`)

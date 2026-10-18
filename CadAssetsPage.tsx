@@ -1,8 +1,8 @@
 import {useEffect,useMemo,useRef,useState} from 'react';
-import {Page} from '../../components/Page';
-import {inspectCadFile,type CadInspection} from '../../core/cad/modelInspector';
-import {cadStorageUsage,deleteCadBinary,getCadBinary,saveCadBinary} from '../../core/cad/blobStore';
-import {canClaimOfficialCad,validateDimensions,type DimensionalValidation,type Dimensions3D} from '../../core/cad/dimensionalValidation';
+import {Page} from './Page';
+import {inspectCadFile,type CadInspection} from './modelInspector';
+import {cadStorageUsage,deleteCadBinary,getCadBinary,saveCadBinary} from './blobStore';
+import {canClaimOfficialCad,validateDimensions,type DimensionalValidation,type Dimensions3D} from './dimensionalValidation';
 
 type CadKind='machine'|'punch'|'die'|'assembly';
 type Verification='official'|'validated'|'parametric'|'pending';

@@ -1,7 +1,7 @@
 import {create} from 'zustand';
 import {createJSONStorage,persist,type StateStorage} from 'zustand/middleware';
-import {verifiedSupplierSources} from '../data/officialSources';
-import type {Bend,CameraView,CalendarEvent,Customer,MaintenanceTask,ManufacturingOrder,MaterialRecord,ProductionRecord,Project,QualityInspection,RequirementItem,SimulationSpeed,Supplier,WeldingOperation,ImportedDocument,StockItem,Quote,ManufacturingRoute,NotificationItem,TechnicalMessage,ProjectDocument,ProjectRevision,ReleaseRecord,QualityIssue} from '../types/domain';
+import {verifiedSupplierSources} from './officialSources';
+import type {Bend,CameraView,CalendarEvent,Customer,MaintenanceTask,ManufacturingOrder,MaterialRecord,ProductionRecord,Project,QualityInspection,RequirementItem,SimulationSpeed,Supplier,WeldingOperation,ImportedDocument,StockItem,Quote,ManufacturingRoute,NotificationItem,TechnicalMessage,ProjectDocument,ProjectRevision,ReleaseRecord,QualityIssue} from './domain';
 
 
 const memoryStorageData=new Map<string,string>();

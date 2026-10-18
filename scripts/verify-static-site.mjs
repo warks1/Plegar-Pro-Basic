@@ -26,7 +26,7 @@ const index = read('index.html');
 const fallback = read('404.html');
 if (!index.includes('id="root"')) failures.push('index.html no contiene #root.');
 if (!index.includes('location.hostname.endsWith(\'.github.io\')')) failures.push('index.html no calcula la base de GitHub Pages.');
-for (const cacheBuster of ['assets/boot-guard.js?v=20261017-startup-2','assets/navigation-v024.js?v=20261018-adaptive-offcanvas-v2','assets/concept-two-v024.css?v=20261018-adaptive-offcanvas-v2']) {
+for (const cacheBuster of ['assets/boot-guard.js?v=20261017-startup-2','assets/navigation-v024.js?v=20261018-mobile-nav-close-v4','assets/concept-two-v024.css?v=20261018-adaptive-offcanvas-v3']) {
   if (!index.includes(cacheBuster)) failures.push(`Falta actualizar la versión de caché de ${cacheBuster}.`);
 }
 if (!index.includes('src="./assets/index-BejcmiWV.js"')) failures.push('El bundle principal debe cargarse con la misma URL que usan los módulos internos.');
@@ -65,9 +65,11 @@ const navigation = read('assets/navigation-v024.js');
 const conceptCss = read('assets/concept-two-v024.css');
 if (!navigation.includes("window.matchMedia('(max-width: 700px)')")) failures.push('La navegación móvil debe detectar el ancho de pantalla pequeño.');
 if (!navigation.includes("event.target.closest('.approved-nav a,.sidebar a')")) failures.push('El menú móvil debe cerrarse al seleccionar un enlace lateral.');
-if (!navigation.includes("button.getAttribute('aria-label')==='Contraer menú'")) failures.push('El cierre del menú móvil debe usar el control de navegación existente.');
+if (!navigation.includes("shell&&!shell.classList.contains('sidebar-collapsed')")) failures.push('El cierre del menú móvil debe comprobar el estado real del panel lateral.');
+if (!navigation.includes('window.setTimeout(()=>{const shell=document.querySelector(\'.app-shell\');if(button&&shell&&!shell.classList.contains(\'sidebar-collapsed\'))button.click()},0)')) failures.push('El cierre del menú móvil debe esperar al cambio de ruta y evitar un doble clic.');
 if (!conceptCss.includes('.app-shell:not(.sidebar-collapsed) .approved-sidebar')) failures.push('El panel lateral aprobado debe mostrarse como menú superpuesto en móvil.');
 if (!conceptCss.includes('.app-shell.sidebar-collapsed .approved-sidebar{display:none!important}')) failures.push('El panel lateral debe ocultarse cuando el menú está contraído en móvil.');
+if (!conceptCss.includes('.app-shell.sidebar-collapsed:has(.pp-workbench) .approved-sidebar{display:none!important}')) failures.push('El menú lateral contraído debe seguir oculto en módulos de banco de trabajo.');
 for (const fragment of ['Restaurar el marco principal', 'limitar las cuadrículas al ancho real del móvil', '.app-shell:has(.pp-workbench){display:grid!important']) {
   if (!conceptCss.includes(fragment)) failures.push(`Falta la corrección de navegación/responsive del workbench: ${fragment}.`);
 }

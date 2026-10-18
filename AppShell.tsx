@@ -3,7 +3,7 @@ import {Outlet,useLocation,useNavigate} from 'react-router-dom';
 import {ArrowLeft,ArrowRight,Bell,Home as HomeIcon,Mail,Menu,Search,Undo2,Redo2} from 'lucide-react';
 import {Sidebar} from './Sidebar';
 import {ModuleBoundary} from './ModuleBoundary';
-import {useActiveProject,useAppStore} from '../store/useAppStore';
+import {useActiveProject,useAppStore} from './useAppStore';
 
 const readLocal=(key:string,fallback='')=>{try{return window.localStorage.getItem(key)??fallback}catch{return fallback}};
 const writeLocal=(key:string,value:string)=>{try{window.localStorage.setItem(key,value)}catch{/* storage can be unavailable */}};
@@ -16,12 +16,13 @@ export function AppShell(){
   const [historyMessage,setHistoryMessage]=useState('');
   const [query,setQuery]=useState('');
   const [canForward,setCanForward]=useState(false);
-  const [collapsed,setCollapsed]=useState(()=>readLocal('pp-sidebar-collapsed')==='1');
+  const [collapsed,setCollapsed]=useState(()=>readLocal('pp-sidebar-collapsed')==='1'||(typeof window!=='undefined'&&window.matchMedia('(max-width: 700px)').matches));
   const [lastSync,setLastSync]=useState(()=>readLocal('pp-last-sync','Sin sincronizar'));const [syncing,setSyncing]=useState(false);
   const results=useMemo(()=>query.trim()?searchItems.filter(([label])=>label.toLowerCase().includes(query.toLowerCase())):[],[query]);
   const unread=notifications.filter(x=>!x.read).length;
   useEffect(()=>{const onKey=(e:KeyboardEvent)=>{if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='k'){e.preventDefault();document.querySelector<HTMLInputElement>('.search input')?.focus();}if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='z'&&!e.shiftKey){e.preventDefault();if(history.length){undo();setHistoryMessage('Cambio deshecho')}}if((e.ctrlKey||e.metaKey)&&((e.key.toLowerCase()==='y')||(e.key.toLowerCase()==='z'&&e.shiftKey))){e.preventDefault();if(future.length){redo();setHistoryMessage('Cambio rehecho')}}};window.addEventListener('keydown',onKey);return()=>window.removeEventListener('keydown',onKey)},[history.length,future.length,undo,redo]);
   useEffect(()=>{if(!historyMessage)return;const t=window.setTimeout(()=>setHistoryMessage(''),1800);return()=>window.clearTimeout(t)},[historyMessage]);
+  useEffect(()=>{const timer=window.setTimeout(()=>{if(window.matchMedia('(max-width: 700px)').matches&&!collapsed){writeLocal('pp-sidebar-collapsed','1');setCollapsed(true)}},0);return()=>window.clearTimeout(timer)},[location.pathname,collapsed]);
   const sync=()=>{setSyncing(true);const now=new Date().toLocaleString();writeLocal('pp-last-sync',now);setLastSync(now);window.setTimeout(()=>setSyncing(false),900);addNotification({id:crypto.randomUUID(),title:'Sincronización local completada',detail:`Datos guardados correctamente · ${now}`,type:'success',read:false,createdAt:new Date().toISOString()});};
   const handleUndo=()=>{if(!history.length)return;undo();setHistoryMessage('Cambio deshecho')};
   const handleRedo=()=>{if(!future.length)return;redo();setHistoryMessage('Cambio rehecho')};

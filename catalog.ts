@@ -1,5 +1,5 @@
-import type {Machine,Tool} from '../types/domain';
-export const machines:Machine[]=[
+import type {Machine,Tool} from './domain';
+const catalogMachines:Machine[]=[
 {id:'truma-v85',manufacturer:'TRUMPF',name:'TrumaBend V85',forceT:85,lengthMm:2550,strokeMm:215,daylightMm:385,throatMm:410,axes:['Y1','Y2','X','R','Z1','Z2'],clamp:'TRUMPF',source:'reconstructed',verified:false},
 {id:'by-100-2006',manufacturer:'Bystronic',name:'100 T (2006) · modelo por confirmar',forceT:100,year:2006,lengthMm:3100,strokeMm:200,daylightMm:410,throatMm:400,axes:['Y1','Y2','X','R'],clamp:'European',source:'reconstructed',verified:false},
 {id:'amada-hfe',manufacturer:'AMADA',name:'HFE configurable',forceT:100,lengthMm:3110,strokeMm:200,daylightMm:470,throatMm:420,axes:['Y1','Y2','X','R','Z1','Z2'],clamp:'European',source:'reconstructed',verified:false},
@@ -8,9 +8,11 @@ export const machines:Machine[]=[
 ,{id:'truma-5230',manufacturer:'TRUMPF',name:'TruBend 5230 configurable',forceT:230,lengthMm:3230,strokeMm:445,daylightMm:615,throatMm:420,axes:['Y1','Y2','X','R','Z1','Z2'],clamp:'TRUMPF',source:'reconstructed',verified:false}
 ,{id:'amada-hg1303',manufacturer:'AMADA',name:'HG 1303 configurable',forceT:130,lengthMm:3110,strokeMm:250,daylightMm:520,throatMm:420,axes:['Y1','Y2','X','R','Z1','Z2'],clamp:'European',source:'reconstructed',verified:false}
 ,{id:'lvd-toolcell',manufacturer:'LVD',name:'ToolCell configurable',forceT:135,lengthMm:3050,strokeMm:250,daylightMm:570,throatMm:400,axes:['Y1','Y2','X','R','Z1','Z2'],clamp:'Wila',source:'reconstructed',verified:false}
-,{id:'saf-darley-e-brake',manufacturer:'SafanDarley',name:'E-Brake configurable',forceT:100,lengthMm:3100,strokeMm:300,daylightMm:590,throatMm:300,axes:['Y1','Y2','X','R','Z1','Z2'],clamp:'European',source:'reconstructed',verified:false}
+,{id:'saf-darley-e-brake',manufacturer:'SafanDarley',name:'E-Brake configurable',forceT:100,lengthMm:3100,strokeMm:300,daylightMm:590,throatMm:300,axes:['Y1','Y2','X','R','Z1','Z2'],clamp:'European',source:'reconstructed',verified:false}];
+export const machines:Machine[]=catalogMachines;
 
-,{id:'mec-mec-v6-30',kind:'die',manufacturer:'MECOS',family:'V simple',name:'MEC-V6-30 · V6',angle:30,radius:0,height:0,width:0,v:6,clamp:'Wila',lengths:[],source:'official',verified:true,catalogCode:'V6-30',sourcePage:'Catálogo MECOS 2026',sourceUrl:'https://mecos.es/wp-content/uploads/2026/04/catalogo-general-tecnostamp-utillaje-plegadora-mecos-iberica-deformacion-metal-2026.pdf'}
+export const tools:Tool[]=[
+{id:'mec-mec-v6-30',kind:'die',manufacturer:'MECOS',family:'V simple',name:'MEC-V6-30 · V6',angle:30,radius:0,height:0,width:0,v:6,clamp:'Wila',lengths:[],source:'official',verified:true,catalogCode:'V6-30',sourcePage:'Catálogo MECOS 2026',sourceUrl:'https://mecos.es/wp-content/uploads/2026/04/catalogo-general-tecnostamp-utillaje-plegadora-mecos-iberica-deformacion-metal-2026.pdf'}
 ,{id:'mec-mec-v6-60',kind:'die',manufacturer:'MECOS',family:'V simple',name:'MEC-V6-60 · V6',angle:60,radius:0,height:0,width:0,v:6,clamp:'Wila',lengths:[],source:'official',verified:true,catalogCode:'V6-60',sourcePage:'Catálogo MECOS 2026',sourceUrl:'https://mecos.es/wp-content/uploads/2026/04/catalogo-general-tecnostamp-utillaje-plegadora-mecos-iberica-deformacion-metal-2026.pdf'}
 ,{id:'mec-mec-v6-88',kind:'die',manufacturer:'MECOS',family:'V simple',name:'MEC-V6-88 · V6',angle:88,radius:0,height:0,width:0,v:6,clamp:'Wila',lengths:[],source:'official',verified:true,catalogCode:'V6-88',sourcePage:'Catálogo MECOS 2026',sourceUrl:'https://mecos.es/wp-content/uploads/2026/04/catalogo-general-tecnostamp-utillaje-plegadora-mecos-iberica-deformacion-metal-2026.pdf'}
 ,{id:'mec-mec-v6-90',kind:'die',manufacturer:'MECOS',family:'V simple',name:'MEC-V6-90 · V6',angle:90,radius:0,height:0,width:0,v:6,clamp:'Wila',lengths:[],source:'official',verified:true,catalogCode:'V6-90',sourcePage:'Catálogo MECOS 2026',sourceUrl:'https://mecos.es/wp-content/uploads/2026/04/catalogo-general-tecnostamp-utillaje-plegadora-mecos-iberica-deformacion-metal-2026.pdf'}
@@ -49,8 +51,8 @@ export const machines:Machine[]=[
 ,{id:'mec-mec-p-r30',kind:'punch',manufacturer:'MECOS',family:'Recto',name:'MEC-P-R30 · Recto',angle:30,radius:0,height:0,width:0,clamp:'Wila',lengths:[],source:'official',verified:true,catalogCode:'P-R30',sourcePage:'Catálogo MECOS 2026',sourceUrl:'https://mecos.es/wp-content/uploads/2026/04/catalogo-general-tecnostamp-utillaje-plegadora-mecos-iberica-deformacion-metal-2026.pdf'}
 ,{id:'mec-mec-p-r88',kind:'punch',manufacturer:'MECOS',family:'Recto',name:'MEC-P-R88 · Recto',angle:88,radius:0,height:0,width:0,clamp:'Wila',lengths:[],source:'official',verified:true,catalogCode:'P-R88',sourcePage:'Catálogo MECOS 2026',sourceUrl:'https://mecos.es/wp-content/uploads/2026/04/catalogo-general-tecnostamp-utillaje-plegadora-mecos-iberica-deformacion-metal-2026.pdf'}
 ,{id:'mec-mec-p-pc90',kind:'punch',manufacturer:'MECOS',family:'Pata de cabra',name:'MEC-P-PC90 · Pata de cabra',angle:90,radius:0,height:0,width:0,clamp:'Wila',lengths:[],source:'official',verified:true,catalogCode:'P-PC90',sourcePage:'Catálogo MECOS 2026',sourceUrl:'https://mecos.es/wp-content/uploads/2026/04/catalogo-general-tecnostamp-utillaje-plegadora-mecos-iberica-deformacion-metal-2026.pdf'}
-];
-export const tools:Tool[]=[
+,
+
 {id:'p-tr-88-r1',kind:'punch',manufacturer:'TRUMPF',family:'Recto',name:'Punzón 88° R1',angle:88,radius:1,height:120,width:30,loadKnM:1000,clamp:'Trumpf',lengths:[25,50,100,200,500,835],source:'reconstructed',verified:false},
 {id:'p-tr-goose',kind:'punch',manufacturer:'TRUMPF',family:'Cuello de cisne',name:'Cuello de cisne 86° R1.5',angle:86,radius:1.5,height:165,width:45,loadKnM:800,clamp:'Trumpf',lengths:[25,50,100,200,500],source:'reconstructed',verified:false},
 {id:'p-am-30-r2',kind:'punch',manufacturer:'AMADA',family:'Agudo',name:'Punzón agudo 30° R2',angle:30,radius:2,height:145,width:32,loadKnM:700,clamp:'European',lengths:[10,15,20,40,50,100,200,415,835],source:'reconstructed',verified:false},

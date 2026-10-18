@@ -176,7 +176,7 @@ function resizeSim(){const c=$('simCanvas'),d=Math.min(devicePixelRatio||1,$('qu
 function drawSim(){
   const c=$('simCanvas'),d=c.width/Math.max(1,c.clientWidth),w=c.clientWidth,h=c.clientHeight,x=c.getContext('2d');x.setTransform(d,0,0,d,0,0);x.clearRect(0,0,w,h);
   const bg=x.createLinearGradient(0,0,0,h);bg.addColorStop(0,'#0e2a40');bg.addColorStop(.55,'#071724');bg.addColorStop(1,'#02070b');x.fillStyle=bg;x.fillRect(0,0,w,h);
-  sim.mode==='2d'?draw2D(x,w,h):draw3D(x,w,h);
+  if(sim.mode==='2d') draw2D(x,w,h); else draw3D(x,w,h);
   $('hud').textContent=`${sim.mode.toUpperCase()} · Pliegue ${sim.step+1}/${model.bends.length} · ${Math.round(sim.progress*100)}% · cotas ${$('simDimensionMode').value==='inside'?'interiores':'exteriores'}`;
 }
 function draw2D(x,w,h){
@@ -187,7 +187,7 @@ function draw2D(x,w,h){
   x.font='11px sans-serif';model.wings.forEach((wing,i)=>{const a=pts[i],b=pts[i+1],mx=(a[0]+b[0])/2,my=(a[1]+b[1])/2;x.fillStyle='#9db5c6';x.fillText(`${($('simDimensionMode').value==='inside'?effectiveWing(i,'inside'):wing).toFixed(1)} mm`,mx-20,my-10)});
   x.fillStyle='#67869a';x.fillRect(w*.18,h*.82,w*.64,18);x.fillStyle='#dce6ec';x.beginPath();x.moveTo(w/2-100,h*.78);x.lineTo(w/2,h*.68);x.lineTo(w/2+100,h*.78);x.closePath();x.fill();
 }
-function project3D(p,z,w,h){
+function project3D(p,z){
   const cam=$('camera').value;let ay=-.66,ax=.42;
   if(cam==='front'){ay=0;ax=.04}else if(cam==='side'){ay=-1.35;ax=.12}else if(cam==='top'){ay=0;ax=1.15}
   const X=p[0]*Math.cos(ay)-z*Math.sin(ay),Z=p[0]*Math.sin(ay)+z*Math.cos(ay),Y=p[1]*Math.cos(ax)-Z*Math.sin(ax);
@@ -205,7 +205,7 @@ function draw3D(x,w,h){
   x.fillStyle='#eef5f8';x.beginPath();x.moveTo(w/2-135,h*.34);x.lineTo(w/2+135,h*.34);x.lineTo(w/2,h*.50);x.closePath();x.fill();
   x.fillStyle='#6f899b';x.beginPath();x.moveTo(w/2-145,h*.64);x.lineTo(w/2,h*.50);x.lineTo(w/2+145,h*.64);x.closePath();x.fill();
   // Extruded sheet
-  const raw=foldedPoints(),depth=$('quality').value==='mobile'?12:28,up=raw.map(p=>project3D(p,0,w,h)),down=raw.map(p=>project3D(p,depth,w,h)),all=up.concat(down),mapped=fit(all,w,h,95),u=mapped.slice(0,up.length),l=mapped.slice(up.length),colors=finishColors();
+  const raw=foldedPoints(),depth=$('quality').value==='mobile'?12:28,up=raw.map(p=>project3D(p,0)),down=raw.map(p=>project3D(p,depth)),all=up.concat(down),mapped=fit(all,w,h,95),u=mapped.slice(0,up.length),l=mapped.slice(up.length),colors=finishColors();
   x.shadowColor='#000';x.shadowBlur=16;
   for(let i=0;i<u.length-1;i++){
     const grad=x.createLinearGradient(u[i][0],u[i][1],l[i+1][0],l[i+1][1]);grad.addColorStop(0,colors[1]);grad.addColorStop(.5,colors[0]);grad.addColorStop(1,'#183945');x.fillStyle=grad;
@@ -233,7 +233,7 @@ function calculateCurve(){
   $('curveAdvice').innerHTML=angle>12?'<span class="warn">Aumenta los golpes para conseguir una curva más suave.</span>':'<span class="good">Distribución adecuada como punto de partida.</span>';drawCurve();
 }
 function drawCurve(){
-  if(!lastCurve)return;const d=lastCurve,c=$('curveCanvas'),px=Math.min(devicePixelRatio||1,2),w=c.clientWidth,h=c.clientHeight;c.width=w*px;c.height=h*px;const x=c.getContext('2d');x.setTransform(px,0,0,px,0,0);x.fillStyle='#02080e';x.fillRect(0,0,w,h);const cx=w/2,cy=h*.80,s=Math.min((w-100)/(2*(d.R+d.t)),(h-90)/(d.R+d.t));x.strokeStyle='#42dfbe';x.lineWidth=11;x.lineCap='round';x.beginPath();for(let i=0;i<=d.hits;i++){const a=(-90+i*d.angle)*Math.PI/180,xx=cx+Math.cos(a)*(d.R+d.t*.5)*s,yy=cy+Math.sin(a)*(d.R+d.t*.5)*s;i?x.lineTo(xx,yy):x.moveTo(xx,yy)}x.stroke();
+  if(!lastCurve)return;const d=lastCurve,c=$('curveCanvas'),px=Math.min(devicePixelRatio||1,2),w=c.clientWidth,h=c.clientHeight;c.width=w*px;c.height=h*px;const x=c.getContext('2d');x.setTransform(px,0,0,px,0,0);x.fillStyle='#02080e';x.fillRect(0,0,w,h);const cx=w/2,cy=h*.80,s=Math.min((w-100)/(2*(d.R+d.t)),(h-90)/(d.R+d.t));x.strokeStyle='#42dfbe';x.lineWidth=11;x.lineCap='round';x.beginPath();for(let i=0;i<=d.hits;i++){const a=(-90+i*d.angle)*Math.PI/180,xx=cx+Math.cos(a)*(d.R+d.t*.5)*s,yy=cy+Math.sin(a)*(d.R+d.t*.5)*s;if(i) x.lineTo(xx,yy); else x.moveTo(xx,yy)}x.stroke();
 }
 const tools=[];VLIST.forEach(v=>[30,60,88,90].forEach(a=>tools.push({type:'Matriz',brand:'Mecos',family:'Bystronic',name:`Matriz Mecos V${v} ${a}°`,v,angle:a})));
 tools.push(
@@ -284,5 +284,5 @@ $('files').onchange=()=>{$('fileList').innerHTML=[...$('files').files].map(f=>`<
 $('backup').onclick=()=>download(JSON.stringify(model,null,2),'PlegarPro_v18_7_backup.json','application/json');$('restore').onclick=()=>$('restoreFile').click();$('restoreFile').onchange=async()=>{try{restoreModel(JSON.parse(await $('restoreFile').files[0].text()))}catch(e){alert('No se pudo restaurar: '+e.message)}};
 $('ask').onclick=()=>{const q=$('question').value.trim();if(!q)return;let a='Puedo analizar el programa actual.';if(/exterior|interior/i.test(q))a='Selecciona Interior o Exterior en Programar plegado o Desarrollo. Las cotas exteriores se convierten a cotas efectivas interiores antes de calcular el desarrollo.';else if(/perd|gan|matriz|v\d/i.test(q))a='El Comparador V calcula la diferencia acumulada para todos los pliegues y muestra pérdida o ganancia total y por pestaña.';else if(/3d|2d|simul/i.test(q))a='La simulación 2D y 3D utiliza el mismo programa y muestra la forma que adquiere la pieza en cada operación.';$('chat').innerHTML+=`<p><b>Tú:</b> ${q.replace(/[<>]/g,'')}</p><p><b>IA:</b> ${a}</p>`;$('question').value=''};
 window.addEventListener('resize',()=>{resizeSim();calculateDevelopment();compareV();drawCurve()});
-const saved=localStorage.getItem('plegarpro_v18_7');if(saved){try{model={...model,...JSON.parse(saved)}catch(e){}}
+const saved=localStorage.getItem('plegarpro_v18_7');if(saved){try{model={...model,...JSON.parse(saved)}}catch{/* invalid saved state is ignored */}}
 syncUI();renderProgram();renderTools();compareV();calculateCurve();setTimeout(resizeSim,60);

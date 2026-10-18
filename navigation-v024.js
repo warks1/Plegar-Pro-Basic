@@ -12,7 +12,7 @@ function goBack(){
   try{
     const previous=sessionStorage.getItem('pp.previousRoute');
     if(previous&&previous!==path){history.back();return;}
-  }catch{}
+  }catch{/* session storage may be unavailable */}
   const base=appBasePath();
   const relativePath=path.startsWith(base)?'/'+path.slice(base.length):path;
   const destination=ROUTE_FALLBACKS[relativePath]||'/';
@@ -33,7 +33,7 @@ function install(){
   document.querySelectorAll('.content > *').forEach(el=>{if(!el.classList.contains('pp-view-ready')){el.classList.add('pp-view-ready');el.animate?.([{opacity:0,transform:'translateY(8px)'},{opacity:1,transform:'none'}],{duration:330,easing:'cubic-bezier(.2,.8,.2,1)'})}});
 }
 let last=window.location.pathname;
-try{sessionStorage.setItem('pp.currentRoute',last)}catch{}
-const observer=new MutationObserver(()=>{const current=window.location.pathname;if(current!==last){try{sessionStorage.setItem('pp.previousRoute',last);sessionStorage.setItem('pp.currentRoute',current)}catch{}last=current;}install()});
+try{sessionStorage.setItem('pp.currentRoute',last)}catch{/* session storage may be unavailable */}
+const observer=new MutationObserver(()=>{const current=window.location.pathname;if(current!==last){try{sessionStorage.setItem('pp.previousRoute',last);sessionStorage.setItem('pp.currentRoute',current)}catch{/* session storage may be unavailable */}last=current;}install()});
 observer.observe(document.documentElement,{subtree:true,childList:true});
 window.addEventListener('popstate',install);document.addEventListener('DOMContentLoaded',install);install();

@@ -44,7 +44,7 @@ document.addEventListener('click',event=>{
     if(link){
       const button=document.querySelector('.menu-button');
       /* Deja que React confirme la navegación antes de consultar el estado del botón; evita un doble clic durante el mismo evento. */
-      window.setTimeout(()=>{if(button&&button.getAttribute('aria-label')==='Contraer menú')button.click()},0);
+      window.setTimeout(()=>{const shell=document.querySelector('.app-shell');if(button&&shell&&!shell.classList.contains('sidebar-collapsed'))button.click()},0);
     }
   }
 });

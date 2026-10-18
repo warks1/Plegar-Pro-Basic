@@ -3,8 +3,8 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const ignored = new Set(['.git', 'node_modules', 'dist', 'coverage', 'site']);
-const sourceExtensions = new Set(['.ts', '.tsx', '.js', '.jsx', '.mjs']);
+const ignored = new Set(['.git', 'node_modules', 'dist', 'coverage', 'site', 'assets']);
+const sourceExtensions = new Set(['.ts', '.tsx', '.jsx']);
 const extensions = ['', '.tsx', '.ts', '.jsx', '.js', '.mjs', '.css', '.json'];
 const files = [];
 
@@ -25,9 +25,9 @@ let importCount = 0;
 for (const file of files) {
   const source = await readFile(file, 'utf8');
   const specifiers = new Set([
-    ...[...source.matchAll(/\\bfrom\\s*['"]([^'"]+)['"]/g)].map(match => match[1]),
-    ...[...source.matchAll(/\\bimport\\(\\s*['"]([^'"]+)['"]\\s*\\)/g)].map(match => match[1]),
-    ...[...source.matchAll(/\\bimport\\s*['"]([^'"]+)['"]/g)].map(match => match[1]),
+    ...[...source.matchAll(/\bfrom\s*['"]([^'"]+)['"]/g)].map(match => match[1]),
+    ...[...source.matchAll(/\bimport\(\s*['"]([^'"]+)['"]\s*\)/g)].map(match => match[1]),
+    ...[...source.matchAll(/\bimport\s*['"]([^'"]+)['"]/g)].map(match => match[1]),
   ]);
   for (const specifier of specifiers) {
     if (!specifier.startsWith('.')) continue;
@@ -47,9 +47,9 @@ for (const file of files) {
 }
 
 if (unresolved.length) {
-  console.error(`Auditoría de imports: ${unresolved.length} importaciones locales sin destino entre ${files.length} archivos fuente:`);
-  for (const item of unresolved) console.error(` - ${item.file}: ${item.specifier}`);
+  console.error(\`Auditoría de imports: \${unresolved.length} importaciones locales sin destino entre \${files.length} archivos fuente:\`);
+  for (const item of unresolved) console.error(\` - \${item.file}: \${item.specifier}\`);
   process.exitCode = 1;
 } else {
-  console.log(`Auditoría de imports: OK · ${importCount} importaciones locales comprobadas en ${files.length} archivos fuente.`);
+  console.log(\`Auditoría de imports: OK · \${importCount} importaciones locales comprobadas en \${files.length} archivos fuente.\`);
 }

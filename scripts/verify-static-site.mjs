@@ -26,7 +26,7 @@ const index = read('index.html');
 const fallback = read('404.html');
 if (!index.includes('id="root"')) failures.push('index.html no contiene #root.');
 if (!index.includes('location.hostname.endsWith(\'.github.io\')')) failures.push('index.html no calcula la base de GitHub Pages.');
-for (const cacheBuster of ['assets/boot-guard.js?v=20261017-startup-2','assets/navigation-v024.js?v=20261018-version-sync','assets/concept-two-v024.css?v=20261018-sidebar-scroll-fix']) {
+for (const cacheBuster of ['assets/boot-guard.js?v=20261017-startup-2','assets/navigation-v024.js?v=20261018-version-sync','assets/concept-two-v024.css?v=20261018-workbench-nav-restore']) {
   if (!index.includes(cacheBuster)) failures.push(`Falta actualizar la versión de caché de ${cacheBuster}.`);
 }
 if (!index.includes('src="./assets/index-BejcmiWV.js"')) failures.push('El bundle principal debe cargarse con la misma URL que usan los módulos internos.');

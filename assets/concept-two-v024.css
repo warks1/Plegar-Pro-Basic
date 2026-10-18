@@ -681,3 +681,12 @@ main.startup-splash{position:fixed!important;inset:0!important;z-index:9999!impo
 .approved-nav{display:flex!important;flex:1 1 auto!important;flex-direction:column!important;width:100%!important;height:auto!important;max-height:none!important;min-height:0!important;overflow-y:auto!important;overflow-x:hidden!important;overscroll-behavior:contain;scroll-behavior:auto!important}
 .approved-nav a{display:flex!important;flex:0 0 auto!important;width:100%!important;min-height:39px!important;height:auto!important;visibility:visible!important;opacity:1!important;pointer-events:auto!important}
 .approved-sidebar footer{flex:0 0 auto!important}
+
+
+/* Restaurar el marco principal: un visor de trabajo en el contenido no debe ocultar el menú global. */
+body:has(.pp-workbench){overflow:auto!important;background:linear-gradient(145deg,#07111d 0%,#081421 55%,#07101b 100%)!important;color:#eaf4fb!important}
+.app-shell:has(.pp-workbench){display:grid!important;grid-template-columns:246px minmax(0,1fr)!important;height:auto!important;min-height:100vh!important;overflow:visible!important;background:var(--pp-bg,#07111d)!important}
+.app-shell:has(.pp-workbench) .sidebar,.app-shell:has(.pp-workbench) .approved-sidebar{display:flex!important;grid-column:1!important;grid-row:1 / span 2!important;width:246px!important}
+.app-shell:has(.pp-workbench) .topbar,.app-shell:has(.pp-workbench) .statusbar,.app-shell:has(.pp-workbench) .project-flow{display:flex!important}
+.app-shell:has(.pp-workbench)>main{grid-column:2!important;grid-row:1 / span 2!important;height:auto!important;min-height:100vh!important;overflow:visible!important}
+.app-shell:has(.pp-workbench) .content{height:auto!important;min-height:0!important;padding:15px 17px 56px!important;margin:0!important;overflow:visible!important}

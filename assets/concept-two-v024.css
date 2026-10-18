@@ -991,3 +991,72 @@ body { overflow-x:clip; }
   .pp-workbench { min-width:0!important; width:100%!important; max-width:100%!important; }
   .pp-bottom-bar { max-width:100%!important; }
 }
+
+
+/* Startup must occupy the viewport, not a centered 16:9-sized image. */
+.startup-splash {
+  position:fixed!important;
+  inset:0!important;
+  width:100vw!important;
+  height:100vh!important;
+  height:100dvh!important;
+  min-height:0!important;
+  padding:0!important;
+  overflow:hidden!important;
+  display:block!important;
+  box-sizing:border-box!important;
+}
+.startup-splash .startup-canvas {
+  position:absolute!important;
+  inset:0!important;
+  width:100%!important;
+  height:100%!important;
+  min-height:0!important;
+  max-width:none!important;
+  padding:0!important;
+  margin:0!important;
+  display:block!important;
+  overflow:hidden!important;
+}
+.startup-splash .startup-art {
+  position:absolute!important;
+  inset:0!important;
+  display:block!important;
+  width:100%!important;
+  height:100%!important;
+  max-width:none!important;
+  max-height:none!important;
+  min-width:0!important;
+  min-height:0!important;
+  aspect-ratio:auto!important;
+  object-fit:cover!important;
+  border:0!important;
+  border-radius:0!important;
+}
+.startup-splash .startup-live-progress {
+  position:absolute!important;
+  left:50%!important;
+  bottom:clamp(62px,10vh,110px)!important;
+  transform:translateX(-50%)!important;
+  width:min(620px,84vw)!important;
+  max-width:84vw!important;
+  margin:0!important;
+  z-index:3!important;
+}
+.startup-splash .startup-live-status {
+  position:absolute!important;
+  left:50%!important;
+  bottom:clamp(18px,4vh,42px)!important;
+  transform:translateX(-50%)!important;
+  width:min(760px,92vw)!important;
+  max-width:92vw!important;
+  z-index:3!important;
+  box-sizing:border-box!important;
+}
+.startup-splash .startup-live-status strong,
+.startup-splash .startup-live-status small { overflow-wrap:anywhere!important; }
+@media (max-width:700px) {
+  .startup-splash .startup-art { object-fit:cover!important; }
+  .startup-splash .startup-live-progress { bottom:clamp(66px,11vh,96px)!important; }
+  .startup-splash .startup-live-status { bottom:14px!important; padding:0 8px!important; }
+}

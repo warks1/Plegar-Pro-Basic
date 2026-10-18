@@ -31,6 +31,7 @@ try {
     ['/colisiones', 200, 'text/html', 'id="root"'],
     ['/assets/index-BejcmiWV.js', 200, 'javascript', ''],
     ['/assets/index-kS27Z77S.css', 200, 'text/css', ''],
+    ['/assets/asset-que-no-existe.js', 404, 'text/plain', 'Not found'],
     ['/%2e%2e%2fpackage.json', 403, '', ''],
   ];
   for (const [route, expectedStatus, contentType, expectedText] of checks) {

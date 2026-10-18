@@ -3,7 +3,7 @@ import {Page} from '../../components/Page';
 import {useActiveProject,useAppStore} from '../../store/useAppStore';
 import {machines,tools} from '../../data/catalog';
 
-function CollisionViewport({project,punch,die,angle,collision}:{project:any;punch:any;die:any;angle:number;collision:boolean}){
+function CollisionViewport({project,punch,die,angle,collision}:{project:ReturnType<typeof useActiveProject>;punch:(typeof tools)[number];die:(typeof tools)[number];angle:number;collision:boolean}){
  const cx=380,top=105,bendRad=(180-angle)*Math.PI/360,arm=150,lx=cx-Math.cos(bendRad)*arm,ly=top+Math.sin(bendRad)*arm,rx=cx+Math.cos(bendRad)*arm,ry=top+Math.sin(bendRad)*arm;
  return <div className={`collision-cad-viewport ${collision?'collision-hit':''}`}><svg viewBox="0 0 760 430" role="img" aria-label="Vista CAD de punzón matriz y chapa">
   <rect width="760" height="430" fill="#08131c"/>{Array.from({length:9},(_,i)=><line key={i} x1="0" y1={45+i*42} x2="760" y2={45+i*42} stroke="#6ea0b5" opacity=".18" strokeDasharray="3 8"/>)}

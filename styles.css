@@ -425,3 +425,44 @@ input,select,textarea{background:rgba(4,13,24,.9)!important;border:1px solid rgb
     max-width: none;
   }
 }
+
+
+/* Final containment for intrinsic-width descendants in tablet and phone layouts. */
+@media (max-width: 1050px) {
+  html,
+  body {
+    max-width: 100%;
+    overflow-x: clip !important;
+  }
+  .approved-shell {
+    width: 100%;
+    max-width: 100vw;
+    min-width: 0;
+    overflow-x: clip;
+    grid-template-columns: minmax(0, 264px) minmax(0, 1fr);
+  }
+  .approved-shell.sidebar-collapsed {
+    grid-template-columns: 82px minmax(0, 1fr);
+  }
+  .approved-shell > main {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    overflow-x: clip;
+  }
+  .approved-shell .content {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    overflow-x: clip;
+  }
+  .approved-shell .approved-dashboard * {
+    min-width: 0;
+    max-width: 100%;
+  }
+  .approved-shell .approved-dashboard img,
+  .approved-shell .approved-dashboard svg,
+  .approved-shell .approved-dashboard canvas {
+    max-width: 100%;
+  }
+}

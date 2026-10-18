@@ -36,4 +36,15 @@ let last=window.location.pathname;
 try{sessionStorage.setItem('pp.currentRoute',last)}catch{}
 const observer=new MutationObserver(()=>{const current=window.location.pathname;if(current!==last){try{sessionStorage.setItem('pp.previousRoute',last);sessionStorage.setItem('pp.currentRoute',current)}catch{}last=current;}install()});
 observer.observe(document.documentElement,{subtree:true,childList:true});
+
+/* En móvil el menú lateral funciona como panel superpuesto y se cierra al navegar. */
+document.addEventListener('click',event=>{
+  if(window.matchMedia('(max-width: 700px)').matches&&event.target instanceof Element){
+    const link=event.target.closest('.approved-nav a,.sidebar a');
+    if(link){
+      const button=document.querySelector('.menu-button');
+      if(button&&button.getAttribute('aria-label')==='Contraer menú')button.click();
+    }
+  }
+});
 window.addEventListener('popstate',install);document.addEventListener('DOMContentLoaded',install);install();

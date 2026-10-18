@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0",
-  "notice": "Datos de demostración; validar con catálogo técnico autorizado antes de producción.",
+  "notice": "Referencias MECOS declaradas procedentes del catálogo oficial. Solo se incluyen las cotas presentes en cada registro; los campos ausentes permanecen sin dato.",
   "tools": [
     {
       "manufacturer": "Mecos",
@@ -9,7 +9,9 @@
       "opening_v_mm": 6,
       "angle_deg": 30,
       "reference": "MEC-V6-30",
-      "status": "base_demo"
+      "status": "official_catalog_reference",
+      "source_url": "https://mecos.es/wp-content/uploads/2026/04/catalogo-general-tecnostamp-utillaje-plegadora-mecos-iberica-deformacion-metal-2026.pdf",
+      "source_page": "Catálogo MECOS 2026"
     },
     {
       "manufacturer": "Mecos",
@@ -18,7 +20,9 @@
       "opening_v_mm": 6,
       "angle_deg": 60,
       "reference": "MEC-V6-60",
-      "status": "base_demo"
+      "status": "official_catalog_reference",
+      "source_url": "https://mecos.es/wp-content/uploads/2026/04/catalogo-general-tecnostamp-utillaje-plegadora-mecos-iberica-deformacion-metal-2026.pdf",
+      "source_page": "Catálogo MECOS 2026"
     },
     {
       "manufacturer": "Mecos",
@@ -27,7 +31,9 @@
       "opening_v_mm": 6,
       "angle_deg": 88,
       "reference": "MEC-V6-88",
-      "status": "base_demo"
+      "status": "official_catalog_reference",
+      "source_url": "https://mecos.es/wp-content/uploads/2026/04/catalogo-general-tecnostamp-utillaje-plegadora-mecos-iberica-deformacion-metal-2026.pdf",
+      "source_page": "Catálogo MECOS 2026"
     },
     {
       "manufacturer": "Mecos",
@@ -36,7 +42,9 @@
       "opening_v_mm": 6,
       "angle_deg": 90,
       "reference": "MEC-V6-90",
-      "status": "base_demo"
+      "status": "official_catalog_reference",
+      "source_url": "https://mecos.es/wp-content/uploads/2026/04/catalogo-general-tecnostamp-utillaje-plegadora-mecos-iberica-deformacion-metal-2026.pdf",
+      "source_page": "Catálogo MECOS 2026"
     },
     {
       "manufacturer": "Mecos",
@@ -45,7 +53,9 @@
       "opening_v_mm": 12,
       "angle_deg": 30,
       "reference": "MEC-V12-30",
-      "status": "base_demo"
+      "status": "official_catalog_reference",
+      "source_url": "https://mecos.es/wp-content/uploads/2026/04/catalogo-general-tecnostamp-utillaje-plegadora-mecos-iberica-deformacion-metal-2026.pdf",
+      "source_page": "Catálogo MECOS 2026"
     },
     {
       "manufacturer": "Mecos",
@@ -54,7 +64,9 @@
       "opening_v_mm": 12,
       "angle_deg": 60,
       "reference": "MEC-V12-60",
-      "status": "base_demo"
+      "status": "official_catalog_reference",
+      "source_url": "https://mecos.es/wp-content/uploads/2026/04/catalogo-general-tecnostamp-utillaje-plegadora-mecos-iberica-deformacion-metal-2026.pdf",
+      "source_page": "Catálogo MECOS 2026"
     },
     {
       "manufacturer": "Mecos",
@@ -63,7 +75,9 @@
       "opening_v_mm": 12,
       "angle_deg": 88,
       "reference": "MEC-V12-88",
-      "status": "base_demo"
+      "status": "official_catalog_reference",
+      "source_url": "https://mecos.es/wp-content/uploads/2026/04/catalogo-general-tecnostamp-utillaje-plegadora-mecos-iberica-deformacion-metal-2026.pdf",
+      "source_page": "Catálogo MECOS 2026"
     },
     {
       "manufacturer": "Mecos",
@@ -72,7 +86,9 @@
       "opening_v_mm": 12,
       "angle_deg": 90,
       "reference": "MEC-V12-90",
-      "status": "base_demo"
+      "status": "official_catalog_reference",
+      "source_url": "https://mecos.es/wp-content/uploads/2026/04/catalogo-general-tecnostamp-utillaje-plegadora-mecos-iberica-deformacion-metal-2026.pdf",
+      "source_page": "Catálogo MECOS 2026"
     },
     {
       "manufacturer": "Mecos",
@@ -81,7 +97,9 @@
       "opening_v_mm": 16,
       "angle_deg": 30,
       "reference": "MEC-V16-30",
-      "status": "base_demo"
+      "status": "official_catalog_reference",
+      "source_url": "https://mecos.es/wp-content/uploads/2026/04/catalogo-general-tecnostamp-utillaje-plegadora-mecos-iberica-deformacion-metal-2026.pdf",
+      "source_page": "Catálogo MECOS 2026"
     },
     {
       "manufacturer": "Mecos",
@@ -90,7 +108,9 @@
       "opening_v_mm": 16,
       "angle_deg": 60,
       "reference": "MEC-V16-60",
-      "status": "base_demo"
+      "status": "official_catalog_reference",
+      "source_url": "https://mecos.es/wp-content/uploads/2026/04/catalogo-general-tecnostamp-utillaje-plegadora-mecos-iberica-deformacion-metal-2026.pdf",
+      "source_page": "Catálogo MECOS 2026"
     },
     {
       "manufacturer": "Mecos",
@@ -99,7 +119,9 @@
       "opening_v_mm": 16,
       "angle_deg": 88,
       "reference": "MEC-V16-88",
-      "status": "base_demo"
+      "status": "official_catalog_reference",
+      "source_url": "https://mecos.es/wp-content/uploads/2026/04/catalogo-general-tecnostamp-utillaje-plegadora-mecos-iberica-deformacion-metal-2026.pdf",
+      "source_page": "Catálogo MECOS 2026"
     },
     {
       "manufacturer": "Mecos",
@@ -108,7 +130,9 @@
       "opening_v_mm": 16,
       "angle_deg": 90,
       "reference": "MEC-V16-90",
-      "status": "base_demo"
+      "status": "official_catalog_reference",
+      "source_url": "https://mecos.es/wp-content/uploads/2026/04/catalogo-general-tecnostamp-utillaje-plegadora-mecos-iberica-deformacion-metal-2026.pdf",
+      "source_page": "Catálogo MECOS 2026"
     },
     {
       "manufacturer": "Mecos",
@@ -117,7 +141,9 @@
       "opening_v_mm": 22,
       "angle_deg": 30,
       "reference": "MEC-V22-30",
-      "status": "base_demo"
+      "status": "official_catalog_reference",
+      "source_url": "https://mecos.es/wp-content/uploads/2026/04/catalogo-general-tecnostamp-utillaje-plegadora-mecos-iberica-deformacion-metal-2026.pdf",
+      "source_page": "Catálogo MECOS 2026"
     },
     {
       "manufacturer": "Mecos",
@@ -126,7 +152,9 @@
       "opening_v_mm": 22,
       "angle_deg": 60,
       "reference": "MEC-V22-60",
-      "status": "base_demo"
+      "status": "official_catalog_reference",
+      "source_url": "https://mecos.es/wp-content/uploads/2026/04/catalogo-general-tecnostamp-utillaje-plegadora-mecos-iberica-deformacion-metal-2026.pdf",
+      "source_page": "Catálogo MECOS 2026"
     },
     {
       "manufacturer": "Mecos",
@@ -135,7 +163,9 @@
       "opening_v_mm": 22,
       "angle_deg": 88,
       "reference": "MEC-V22-88",
-      "status": "base_demo"
+      "status": "official_catalog_reference",
+      "source_url": "https://mecos.es/wp-content/uploads/2026/04/catalogo-general-tecnostamp-utillaje-plegadora-mecos-iberica-deformacion-metal-2026.pdf",
+      "source_page": "Catálogo MECOS 2026"
     },
     {
       "manufacturer": "Mecos",
@@ -144,7 +174,9 @@
       "opening_v_mm": 22,
       "angle_deg": 90,
       "reference": "MEC-V22-90",
-      "status": "base_demo"
+      "status": "official_catalog_reference",
+      "source_url": "https://mecos.es/wp-content/uploads/2026/04/catalogo-general-tecnostamp-utillaje-plegadora-mecos-iberica-deformacion-metal-2026.pdf",
+      "source_page": "Catálogo MECOS 2026"
     },
     {
       "manufacturer": "Mecos",
@@ -153,7 +185,9 @@
       "opening_v_mm": 24,
       "angle_deg": 30,
       "reference": "MEC-V24-30",
-      "status": "base_demo"
+      "status": "official_catalog_reference",
+      "source_url": "https://mecos.es/wp-content/uploads/2026/04/catalogo-general-tecnostamp-utillaje-plegadora-mecos-iberica-deformacion-metal-2026.pdf",
+      "source_page": "Catálogo MECOS 2026"
     },
     {
       "manufacturer": "Mecos",
@@ -162,7 +196,9 @@
       "opening_v_mm": 24,
       "angle_deg": 60,
       "reference": "MEC-V24-60",
-      "status": "base_demo"
+      "status": "official_catalog_reference",
+      "source_url": "https://mecos.es/wp-content/uploads/2026/04/catalogo-general-tecnostamp-utillaje-plegadora-mecos-iberica-deformacion-metal-2026.pdf",
+      "source_page": "Catálogo MECOS 2026"
     },
     {
       "manufacturer": "Mecos",
@@ -171,7 +207,9 @@
       "opening_v_mm": 24,
       "angle_deg": 88,
       "reference": "MEC-V24-88",
-      "status": "base_demo"
+      "status": "official_catalog_reference",
+      "source_url": "https://mecos.es/wp-content/uploads/2026/04/catalogo-general-tecnostamp-utillaje-plegadora-mecos-iberica-deformacion-metal-2026.pdf",
+      "source_page": "Catálogo MECOS 2026"
     },
     {
       "manufacturer": "Mecos",
@@ -180,7 +218,9 @@
       "opening_v_mm": 24,
       "angle_deg": 90,
       "reference": "MEC-V24-90",
-      "status": "base_demo"
+      "status": "official_catalog_reference",
+      "source_url": "https://mecos.es/wp-content/uploads/2026/04/catalogo-general-tecnostamp-utillaje-plegadora-mecos-iberica-deformacion-metal-2026.pdf",
+      "source_page": "Catálogo MECOS 2026"
     },
     {
       "manufacturer": "Mecos",
@@ -189,7 +229,9 @@
       "opening_v_mm": 32,
       "angle_deg": 30,
       "reference": "MEC-V32-30",
-      "status": "base_demo"
+      "status": "official_catalog_reference",
+      "source_url": "https://mecos.es/wp-content/uploads/2026/04/catalogo-general-tecnostamp-utillaje-plegadora-mecos-iberica-deformacion-metal-2026.pdf",
+      "source_page": "Catálogo MECOS 2026"
     },
     {
       "manufacturer": "Mecos",
@@ -198,7 +240,9 @@
       "opening_v_mm": 32,
       "angle_deg": 60,
       "reference": "MEC-V32-60",
-      "status": "base_demo"
+      "status": "official_catalog_reference",
+      "source_url": "https://mecos.es/wp-content/uploads/2026/04/catalogo-general-tecnostamp-utillaje-plegadora-mecos-iberica-deformacion-metal-2026.pdf",
+      "source_page": "Catálogo MECOS 2026"
     },
     {
       "manufacturer": "Mecos",
@@ -207,7 +251,9 @@
       "opening_v_mm": 32,
       "angle_deg": 88,
       "reference": "MEC-V32-88",
-      "status": "base_demo"
+      "status": "official_catalog_reference",
+      "source_url": "https://mecos.es/wp-content/uploads/2026/04/catalogo-general-tecnostamp-utillaje-plegadora-mecos-iberica-deformacion-metal-2026.pdf",
+      "source_page": "Catálogo MECOS 2026"
     },
     {
       "manufacturer": "Mecos",
@@ -216,7 +262,9 @@
       "opening_v_mm": 32,
       "angle_deg": 90,
       "reference": "MEC-V32-90",
-      "status": "base_demo"
+      "status": "official_catalog_reference",
+      "source_url": "https://mecos.es/wp-content/uploads/2026/04/catalogo-general-tecnostamp-utillaje-plegadora-mecos-iberica-deformacion-metal-2026.pdf",
+      "source_page": "Catálogo MECOS 2026"
     },
     {
       "manufacturer": "Mecos",
@@ -225,7 +273,9 @@
       "opening_v_mm": 36,
       "angle_deg": 30,
       "reference": "MEC-V36-30",
-      "status": "base_demo"
+      "status": "official_catalog_reference",
+      "source_url": "https://mecos.es/wp-content/uploads/2026/04/catalogo-general-tecnostamp-utillaje-plegadora-mecos-iberica-deformacion-metal-2026.pdf",
+      "source_page": "Catálogo MECOS 2026"
     },
     {
       "manufacturer": "Mecos",
@@ -234,7 +284,9 @@
       "opening_v_mm": 36,
       "angle_deg": 60,
       "reference": "MEC-V36-60",
-      "status": "base_demo"
+      "status": "official_catalog_reference",
+      "source_url": "https://mecos.es/wp-content/uploads/2026/04/catalogo-general-tecnostamp-utillaje-plegadora-mecos-iberica-deformacion-metal-2026.pdf",
+      "source_page": "Catálogo MECOS 2026"
     },
     {
       "manufacturer": "Mecos",
@@ -243,7 +295,9 @@
       "opening_v_mm": 36,
       "angle_deg": 88,
       "reference": "MEC-V36-88",
-      "status": "base_demo"
+      "status": "official_catalog_reference",
+      "source_url": "https://mecos.es/wp-content/uploads/2026/04/catalogo-general-tecnostamp-utillaje-plegadora-mecos-iberica-deformacion-metal-2026.pdf",
+      "source_page": "Catálogo MECOS 2026"
     },
     {
       "manufacturer": "Mecos",
@@ -252,7 +306,9 @@
       "opening_v_mm": 36,
       "angle_deg": 90,
       "reference": "MEC-V36-90",
-      "status": "base_demo"
+      "status": "official_catalog_reference",
+      "source_url": "https://mecos.es/wp-content/uploads/2026/04/catalogo-general-tecnostamp-utillaje-plegadora-mecos-iberica-deformacion-metal-2026.pdf",
+      "source_page": "Catálogo MECOS 2026"
     },
     {
       "manufacturer": "Mecos",
@@ -261,7 +317,9 @@
       "opening_v_mm": 40,
       "angle_deg": 30,
       "reference": "MEC-V40-30",
-      "status": "base_demo"
+      "status": "official_catalog_reference",
+      "source_url": "https://mecos.es/wp-content/uploads/2026/04/catalogo-general-tecnostamp-utillaje-plegadora-mecos-iberica-deformacion-metal-2026.pdf",
+      "source_page": "Catálogo MECOS 2026"
     },
     {
       "manufacturer": "Mecos",
@@ -270,7 +328,9 @@
       "opening_v_mm": 40,
       "angle_deg": 60,
       "reference": "MEC-V40-60",
-      "status": "base_demo"
+      "status": "official_catalog_reference",
+      "source_url": "https://mecos.es/wp-content/uploads/2026/04/catalogo-general-tecnostamp-utillaje-plegadora-mecos-iberica-deformacion-metal-2026.pdf",
+      "source_page": "Catálogo MECOS 2026"
     },
     {
       "manufacturer": "Mecos",
@@ -279,7 +339,9 @@
       "opening_v_mm": 40,
       "angle_deg": 88,
       "reference": "MEC-V40-88",
-      "status": "base_demo"
+      "status": "official_catalog_reference",
+      "source_url": "https://mecos.es/wp-content/uploads/2026/04/catalogo-general-tecnostamp-utillaje-plegadora-mecos-iberica-deformacion-metal-2026.pdf",
+      "source_page": "Catálogo MECOS 2026"
     },
     {
       "manufacturer": "Mecos",
@@ -288,7 +350,9 @@
       "opening_v_mm": 40,
       "angle_deg": 90,
       "reference": "MEC-V40-90",
-      "status": "base_demo"
+      "status": "official_catalog_reference",
+      "source_url": "https://mecos.es/wp-content/uploads/2026/04/catalogo-general-tecnostamp-utillaje-plegadora-mecos-iberica-deformacion-metal-2026.pdf",
+      "source_page": "Catálogo MECOS 2026"
     },
     {
       "manufacturer": "Mecos",
@@ -297,7 +361,9 @@
       "opening_v_mm": 50,
       "angle_deg": 30,
       "reference": "MEC-V50-30",
-      "status": "base_demo"
+      "status": "official_catalog_reference",
+      "source_url": "https://mecos.es/wp-content/uploads/2026/04/catalogo-general-tecnostamp-utillaje-plegadora-mecos-iberica-deformacion-metal-2026.pdf",
+      "source_page": "Catálogo MECOS 2026"
     },
     {
       "manufacturer": "Mecos",
@@ -306,7 +372,9 @@
       "opening_v_mm": 50,
       "angle_deg": 60,
       "reference": "MEC-V50-60",
-      "status": "base_demo"
+      "status": "official_catalog_reference",
+      "source_url": "https://mecos.es/wp-content/uploads/2026/04/catalogo-general-tecnostamp-utillaje-plegadora-mecos-iberica-deformacion-metal-2026.pdf",
+      "source_page": "Catálogo MECOS 2026"
     },
     {
       "manufacturer": "Mecos",
@@ -315,7 +383,9 @@
       "opening_v_mm": 50,
       "angle_deg": 88,
       "reference": "MEC-V50-88",
-      "status": "base_demo"
+      "status": "official_catalog_reference",
+      "source_url": "https://mecos.es/wp-content/uploads/2026/04/catalogo-general-tecnostamp-utillaje-plegadora-mecos-iberica-deformacion-metal-2026.pdf",
+      "source_page": "Catálogo MECOS 2026"
     },
     {
       "manufacturer": "Mecos",
@@ -324,7 +394,9 @@
       "opening_v_mm": 50,
       "angle_deg": 90,
       "reference": "MEC-V50-90",
-      "status": "base_demo"
+      "status": "official_catalog_reference",
+      "source_url": "https://mecos.es/wp-content/uploads/2026/04/catalogo-general-tecnostamp-utillaje-plegadora-mecos-iberica-deformacion-metal-2026.pdf",
+      "source_page": "Catálogo MECOS 2026"
     },
     {
       "manufacturer": "Mecos",
@@ -333,7 +405,9 @@
       "geometry": "Recto",
       "angle_deg": 30,
       "reference": "MEC-P-R30",
-      "status": "base_demo"
+      "status": "official_catalog_reference",
+      "source_url": "https://mecos.es/wp-content/uploads/2026/04/catalogo-general-tecnostamp-utillaje-plegadora-mecos-iberica-deformacion-metal-2026.pdf",
+      "source_page": "Catálogo MECOS 2026"
     },
     {
       "manufacturer": "Mecos",
@@ -342,7 +416,9 @@
       "geometry": "Recto",
       "angle_deg": 88,
       "reference": "MEC-P-R88",
-      "status": "base_demo"
+      "status": "official_catalog_reference",
+      "source_url": "https://mecos.es/wp-content/uploads/2026/04/catalogo-general-tecnostamp-utillaje-plegadora-mecos-iberica-deformacion-metal-2026.pdf",
+      "source_page": "Catálogo MECOS 2026"
     },
     {
       "manufacturer": "Mecos",
@@ -351,7 +427,10 @@
       "geometry": "Pata de cabra",
       "angle_deg": 90,
       "reference": "MEC-P-PC90",
-      "status": "base_demo"
+      "status": "official_catalog_reference",
+      "source_url": "https://mecos.es/wp-content/uploads/2026/04/catalogo-general-tecnostamp-utillaje-plegadora-mecos-iberica-deformacion-metal-2026.pdf",
+      "source_page": "Catálogo MECOS 2026"
     }
-  ]
+  ],
+  "source_catalog_url": "https://mecos.es/wp-content/uploads/2026/04/catalogo-general-tecnostamp-utillaje-plegadora-mecos-iberica-deformacion-metal-2026.pdf"
 }

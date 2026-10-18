@@ -234,3 +234,71 @@ input,select,textarea{background:rgba(4,13,24,.9)!important;border:1px solid rgb
 @media(max-width:980px){.settings-pro-layout{grid-template-columns:1fr}.settings-index{position:static;display:flex;overflow:auto;max-height:none}.settings-index>input{min-width:210px}.settings-index button{min-width:220px}.settings-section-grid{grid-template-columns:1fr}}
 @media(max-width:760px){.pp-global-forward span,.pp-global-home span,.pp-global-back span{display:none}.settings-index{margin:0 -2px}.settings-section-grid>label{padding:11px}}
 .collision-pro-page{display:flex;flex-direction:column;gap:16px}.collision-toolbar{display:flex;align-items:center;gap:12px;justify-content:space-between;padding:14px 18px;background:#0b1b25;border:1px solid #254657;border-radius:14px}.collision-toolbar>div{display:flex;flex-direction:column;gap:4px}.collision-toolbar span{color:#8caab8;font-size:.82rem}.collision-toolbar button{border:1px solid #2e657a;background:#102b38;color:#d8eef7;border-radius:9px;padding:9px 14px;cursor:pointer}.collision-layout{display:grid;grid-template-columns:minmax(0,1fr) 330px;gap:16px}.collision-visual-panel{padding:12px}.collision-cad-viewport{position:relative;min-height:430px;border-radius:12px;overflow:hidden;background:#08131c}.collision-cad-viewport svg{width:100%;height:100%;display:block}.collision-cad-viewport.collision-hit{box-shadow:inset 0 0 0 2px #ff5368,0 0 25px #ff536833}.collision-legend{display:flex;gap:18px;align-items:center;padding:12px 4px 2px;color:#89a8b7;font-size:.8rem}.collision-legend b{margin-left:auto}.collision-legend .danger{color:#ff6d7c}.collision-legend .safe{color:#38dfa2}.collision-step-panel{padding:18px;display:flex;flex-direction:column;gap:10px}.collision-step-panel h3{margin:0 0 5px}.collision-step-panel>button{display:grid;grid-template-columns:42px 1fr;gap:2px;text-align:left;padding:10px;border:1px solid #244554;background:#0b1a23;color:#c8dce5;border-radius:9px;cursor:pointer}.collision-step-panel>button.active{border-color:#35cfff;background:#0d2935;box-shadow:0 0 0 1px #35cfff33}.collision-step-panel>button span,.collision-step-panel>button small{grid-column:2;color:#86a8b7}.collision-status-card{padding:13px;border-radius:10px;display:flex;flex-direction:column;gap:5px;border:1px solid}.collision-status-card.safe{border-color:#2fe3a0;background:#0c2823}.collision-status-card.danger{border-color:#ff5368;background:#2b151b}.collision-status-card span{font-size:.78rem;color:#a8c1cb}.collision-step-panel dl{margin:0}.collision-step-panel dl div{display:flex;justify-content:space-between;gap:12px;padding:7px 0;border-bottom:1px solid #1f3440}.collision-step-panel dt{color:#7696a4}.collision-step-panel dd{margin:0;text-align:right}.collision-kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}.collision-kpis>div{display:flex;flex-direction:column;padding:14px 16px;border:1px solid #284858;border-radius:12px;background:#0b1a23}.collision-kpis .ok{border-color:#2fe3a0}.collision-kpis .bad{border-color:#ff5368}.collision-kpis span{color:#86a8ba;font-size:.8rem}@media(max-width:900px){.collision-layout{grid-template-columns:1fr}.collision-kpis{grid-template-columns:repeat(2,1fr)}}
+
+/* Perfiles de utillaje: geometría paramétrica y relieve CAD */
+.technical-tool .tool-front-face{fill:url(#steel-current);fill:#9aadb7;stroke:#eafaff;stroke-width:3;stroke-linejoin:round}
+.technical-tool.mode-3d .tool-front-face{fill:#8197a2;stroke:#d9f7ff;stroke-width:2.5}
+.technical-tool .tool-side-face{fill:#263d49;stroke:#597887;stroke-width:1.2;stroke-linejoin:round}
+.technical-tool .tool-back-face{fill:#354e5b;stroke:#76939f;stroke-width:1.5;stroke-linejoin:round}
+.technical-tool .tool-nose-highlight{fill:#d9f7ff;stroke:#1bdcff;stroke-width:2;filter:drop-shadow(0 0 5px #2deaff)}
+.technical-tool .tool-contact-highlight{fill:none;stroke:#30dcff;stroke-width:3;filter:drop-shadow(0 0 5px #22cfff)}
+.technical-tool .cad-depth-label{fill:#43dcff;font-size:14px;font-weight:700}
+.tooling-toolbar{position:relative}
+.catalog-refresh-button{border:1px solid #1689a8;background:linear-gradient(135deg,#0b3142,#102334);color:#8ceaff;border-radius:8px;padding:9px 13px;cursor:pointer;white-space:nowrap}
+.catalog-refresh-button:hover{border-color:#30dfff;box-shadow:0 0 15px #18d5ff33}
+.catalog-source-popover{position:absolute;right:10px;top:calc(100% + 8px);z-index:30;width:min(440px,calc(100vw - 32px));padding:16px;border:1px solid #1c6680;border-radius:12px;background:linear-gradient(145deg,#0b1925,#07111a);box-shadow:0 18px 45px #000b;display:grid;gap:10px}
+.catalog-source-popover strong{color:#eafaff}
+.catalog-source-popover p{margin:0;color:#9bb3c2;font-size:12px;line-height:1.5}
+.catalog-source-popover a{color:#6bdfff;text-decoration:none;border:1px solid #1d3b4e;border-radius:7px;padding:9px;font-size:12px}
+.catalog-source-popover a:hover{background:#102a39;border-color:#24bfe4}
+
+.tool-data a{color:#54dbff;text-decoration:none}.tool-data a:hover{text-decoration:underline}
+
+/* CAD finish: stronger perspective, metallic relief and restrained viewport lighting */
+.tool-cad-stage{position:relative;perspective:1100px;transform-style:preserve-3d;background-image:linear-gradient(#73dfff0a 1px,transparent 1px),linear-gradient(90deg,#73dfff0a 1px,transparent 1px),radial-gradient(ellipse at 50% 34%,#174b6a 0,#071827 48%,#02070c 84%);background-size:32px 32px,32px 32px,auto}
+.tool-cad-object{transform-style:preserve-3d;transform-origin:50% 48%;transition:transform .24s cubic-bezier(.2,.7,.2,1);will-change:transform}
+.technical-tool.mode-3d{overflow:visible;filter:drop-shadow(0 28px 24px #000b) drop-shadow(0 0 18px #38caff18)}
+.technical-tool.mode-3d .tool-front-face{stroke:#f0fbff;stroke-width:1.7;stroke-linejoin:round;paint-order:stroke fill}
+.technical-tool .tool-side-face{fill:#203846;stroke:#8ca8b5;stroke-width:1.35;stroke-linejoin:round}
+.technical-tool .tool-back-face{fill:#314c59;stroke:#b2c9d2;stroke-width:1.4;stroke-linejoin:round}
+.technical-tool.mode-3d .tool-nose-highlight{filter:drop-shadow(0 0 8px #22dfff) drop-shadow(0 2px 3px #fff)}
+.technical-tool.mode-3d .cad-dims{filter:drop-shadow(0 0 3px #1ccfff66)}
+.tool-cad-stage:after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(115deg,transparent 28%,#9eefff0a 44%,#42dfff12 50%,transparent 63%);background-size:220% 100%;animation:cad-light-sweep 12s ease-in-out infinite}
+@keyframes cad-light-sweep{0%,100%{background-position:120% 0}50%{background-position:-20% 0}}
+@media(prefers-reduced-motion:reduce){.tool-cad-object,.tool-cad-stage:after{transition:none;animation:none}}
+
+/* Simulation rendering: synchronized motion cues and clearer tool/workpiece separation */
+.sim-ref-stage{perspective:1250px;isolation:isolate}
+.sim3d-reference{transform-origin:center center;filter:drop-shadow(0 22px 35px #0009);transition:transform .28s ease}
+.sim3d-machine-svg{overflow:visible;filter:drop-shadow(0 10px 20px #0008)}
+.sim3d-moving-ram{transform-box:fill-box;transform-origin:50% 0;transition:transform .48s cubic-bezier(.2,.75,.25,1);filter:drop-shadow(0 4px 5px #0007)}
+.sim3d-workpiece{filter:drop-shadow(0 0 5px #c7f4ff88);stroke-linecap:round;stroke-linejoin:round;transition:d .45s cubic-bezier(.2,.75,.25,1)}
+.sim2d-reference{background:radial-gradient(ellipse at 50% 30%,#8daeb0 0,#567d83 65%,#35565f 100%);box-shadow:inset 0 0 42px #06151b88,0 18px 36px #0007}
+.sim2d-drawing{filter:drop-shadow(0 8px 16px #0006)}
+.sim2d-tool-shape{filter:drop-shadow(0 5px 5px #17222a77);stroke-linejoin:round;transition:all .25s ease}
+.sim2d-workpiece{filter:drop-shadow(0 0 4px #effcff66);stroke-linecap:round;stroke-linejoin:round;transition:d .45s cubic-bezier(.2,.75,.25,1)}
+.sim2d-angle{font-weight:800;paint-order:stroke fill;stroke:#31545a;stroke-width:4px;stroke-linejoin:round}
+.sim-ref-progress i{transition:width .42s cubic-bezier(.2,.7,.2,1)}
+@media(prefers-reduced-motion:reduce){.sim3d-reference,.sim3d-moving-ram,.sim3d-workpiece,.sim2d-tool-shape,.sim2d-workpiece,.sim-ref-progress i{transition:none}}
+
+/* v0.25.0 reference-matched startup */
+.startup-splash{position:fixed;inset:0;z-index:9999;display:grid;place-items:center;overflow:hidden;padding:0;background:#02070c;color:#d9f8ff;text-align:left}
+.startup-canvas{position:relative;width:min(100vw,176.76vh);aspect-ratio:1004/568;max-height:100vh;overflow:hidden;border:1px solid rgba(120,150,166,.36);border-radius:11px;box-shadow:0 16px 70px #000b}
+.startup-splash .startup-art{position:absolute;inset:0;display:block;width:100%;height:100%;object-fit:fill;filter:none;animation:none}
+.startup-logo-scan{position:absolute;z-index:2;top:8%;left:31%;width:2.7%;height:43%;pointer-events:none;opacity:0;background:linear-gradient(90deg,transparent,rgba(56,237,255,.92),rgba(230,255,255,.72),transparent);filter:blur(4px);mix-blend-mode:screen;transform:skewX(-19deg);animation:startupLogoSweep 3.4s ease-in-out infinite}
+.startup-progress-cover,.startup-status-cover{position:absolute;z-index:2;pointer-events:none;background:rgba(2,10,17,.96)}
+.startup-progress-cover{left:21.3%;top:76.7%;width:55.5%;height:7.1%;background:linear-gradient(90deg,rgba(2,10,17,.45),rgba(2,10,17,.98) 9%,rgba(2,10,17,.98) 92%,rgba(2,10,17,.55))}
+.startup-status-cover{left:19%;top:83.2%;width:62%;height:10.7%;background:linear-gradient(90deg,rgba(2,10,17,.58),rgba(2,10,17,.97) 14%,rgba(2,10,17,.97) 86%,rgba(2,10,17,.58))}
+.startup-live-progress{position:absolute;z-index:3;left:23.2%;top:78.35%;width:51.3%;height:3.25%;display:flex;align-items:center;gap:1.2%;font-size:clamp(9px,1.55vw,16px);line-height:1;letter-spacing:.02em}
+.startup-live-track{position:relative;flex:0 0 90.8%;height:100%;overflow:hidden;border:1px solid #11dfff;border-radius:999px;padding:2px;background:rgba(0,8,14,.88);box-shadow:0 0 10px #09caff55,inset 0 0 7px #05bde833}
+.startup-live-track i{display:block;height:100%;border-radius:999px;background:linear-gradient(90deg,#0099d7 0%,#00bde8 70%,#4af7ff 100%);box-shadow:0 0 12px #04dcff;transition:width .12s linear}
+.startup-live-value{flex:1;min-width:0;color:#eafaff;text-shadow:0 1px 5px #000}
+.startup-live-status{position:absolute;z-index:3;left:19%;top:84.2%;width:62%;display:grid;justify-items:center;gap:clamp(4px,.8vw,9px);text-align:center;text-shadow:0 1px 5px #00101a}
+.startup-live-status strong{color:#27e7ff;font-size:clamp(8px,1.4vw,14px);font-weight:600;letter-spacing:.15em}
+.startup-live-status small{color:#9bb3c4;font-size:clamp(7px,1.3vw,13px);letter-spacing:.015em}
+@keyframes startupLogoSweep{0%{transform:translateX(-20px) skewX(-19deg);opacity:0}18%{opacity:.88}72%{opacity:.7}100%{transform:translateX(250px) skewX(-19deg);opacity:0}}
+@media(prefers-reduced-motion:reduce){.startup-logo-scan{animation:none;opacity:.18}.startup-live-track i{transition:none}}
+
+.startup-logo-halo{position:absolute;z-index:2;top:8%;left:30%;width:31%;height:46%;pointer-events:none;background:radial-gradient(ellipse at 54% 54%,rgba(18,206,255,.34) 0%,rgba(18,206,255,.14) 35%,transparent 72%);filter:blur(8px);mix-blend-mode:screen;animation:startupLogoHalo 2.8s ease-in-out infinite}
+@keyframes startupLogoHalo{0%,100%{opacity:.38;transform:scale(.96)}50%{opacity:.95;transform:scale(1.04)}}
+@media(prefers-reduced-motion:reduce){.startup-logo-halo{animation:none;opacity:.52;transform:none}}

@@ -141,10 +141,14 @@ try {
     }
   }
 
-  const mobile = await browser.newPage({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true });
+  // Usa una ventana real de 390 CSS px. La emulación isMobile puede cambiar el
+  // ancho de diseño de Chromium en CI y dar una falsa alarma de desbordamiento.
+  const mobile = await browser.newPage({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 1 });
+  await mobile.setViewportSize({ width: 390, height: 844 });
   mobile.on('pageerror', (error) => errors.push(error.stack || error.message));
   await mobile.goto(baseUrl, { waitUntil: 'domcontentloaded', timeout: 60000 });
   await mobile.waitForTimeout(6000);
+  await mobile.setViewportSize({ width: 390, height: 844 });
   const mobileShell = await mobile.locator('.app-shell').count();
   if (!mobileShell) throw new Error('La interfaz no ha montado en móvil. Texto: ' + (await mobile.locator('#root').innerText().catch(()=>'#root no encontrado')));
   const dimensions = await mobile.evaluate(() => {

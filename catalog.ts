@@ -1,4 +1,4 @@
-import type {Machine,Tool} from '../types/domain';
+import type {Machine,Tool} from './domain';
 export const machines:Machine[]=[
 {id:'truma-v85',manufacturer:'TRUMPF',name:'TrumaBend V85',forceT:85,lengthMm:2550,strokeMm:215,daylightMm:385,throatMm:410,axes:['Y1','Y2','X','R','Z1','Z2'],clamp:'TRUMPF',source:'reconstructed',verified:false},
 {id:'by-100-2006',manufacturer:'Bystronic',name:'100 T (2006) · modelo por confirmar',forceT:100,year:2006,lengthMm:3100,strokeMm:200,daylightMm:410,throatMm:400,axes:['Y1','Y2','X','R'],clamp:'European',source:'reconstructed',verified:false},

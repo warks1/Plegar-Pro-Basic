@@ -1,4 +1,4 @@
-name: Static site checks
+name: Static site and source checks
 
 on:
   pull_request:
@@ -11,11 +11,16 @@ permissions:
 jobs:
   static-site:
     runs-on: ubuntu-latest
-    timeout-minutes: 3
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: 22
+          cache: npm
+      - name: Install locked dependencies
+        run: npm ci
+      - name: Type-check React source and recovered module routes
+        run: npm run typecheck
       - name: Verify published site and smoke-test server
         run: npm run build

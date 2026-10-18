@@ -302,17 +302,3 @@ input,select,textarea{background:rgba(4,13,24,.9)!important;border:1px solid rgb
 .startup-logo-halo{position:absolute;z-index:2;top:8%;left:30%;width:31%;height:46%;pointer-events:none;background:radial-gradient(ellipse at 54% 54%,rgba(18,206,255,.34) 0%,rgba(18,206,255,.14) 35%,transparent 72%);filter:blur(8px);mix-blend-mode:screen;animation:startupLogoHalo 2.8s ease-in-out infinite}
 @keyframes startupLogoHalo{0%,100%{opacity:.38;transform:scale(.96)}50%{opacity:.95;transform:scale(1.04)}}
 @media(prefers-reduced-motion:reduce){.startup-logo-halo{animation:none;opacity:.52;transform:none}}
-
-
-/* Explicit recovery state for routes whose original source modules are absent. */
-.module-recovery-panel{max-width:980px;margin:24px auto;padding:clamp(20px,4vw,36px);border:1px solid #d6dce2;border-radius:16px;background:#fff;color:#263442;box-shadow:0 8px 28px rgba(20,35,50,.07)}
-.module-recovery-icon{display:flex;align-items:center;justify-content:center;width:54px;height:54px;border-radius:14px;background:#fff2d8;color:#805500}
-.module-recovery-panel h2{margin:18px 0 10px;font-size:1.35rem;color:#253647}
-.module-recovery-panel p{line-height:1.65;max-width:78ch}
-.module-recovery-panel code{overflow-wrap:anywhere;background:#f0f3f6;padding:2px 5px;border-radius:4px}
-.module-recovery-note{display:flex;align-items:flex-start;gap:10px;margin:20px 0;padding:14px;border:1px solid #efd9a5;border-radius:10px;background:#fff9e9;color:#624900;line-height:1.5}
-.module-recovery-note svg{flex:none;margin-top:2px}
-.module-recovery-links{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px}
-.module-recovery-links a{display:inline-flex;align-items:center;gap:8px;padding:10px 13px;border:1px solid #d6dce2;border-radius:9px;color:#263442;background:#f8fafb;text-decoration:none}
-.module-recovery-links a:hover{background:#edf3f6;border-color:#9eacb7}
-@media(max-width:600px){.module-recovery-panel{margin:12px 0;padding:18px}.module-recovery-links{display:grid;grid-template-columns:1fr}.module-recovery-links a{justify-content:space-between}}

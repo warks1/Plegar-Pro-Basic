@@ -1,7 +1,7 @@
 import {useEffect,useState} from 'react';
-import {Page} from '../../components/Page';
-import {useActiveProject,useAppStore} from '../../store/useAppStore';
-import {machines,tools} from '../../data/catalog';
+import {Page} from './Page';
+import {useActiveProject,useAppStore} from './useAppStore';
+import {machines,tools} from './catalog';
 
 function CollisionViewport({project,punch,die,angle,collision}:{project:ReturnType<typeof useActiveProject>;punch:(typeof tools)[number];die:(typeof tools)[number];angle:number;collision:boolean}){
  const cx=380,top=105,bendRad=(180-angle)*Math.PI/360,arm=150,lx=cx-Math.cos(bendRad)*arm,ly=top+Math.sin(bendRad)*arm,rx=cx+Math.cos(bendRad)*arm,ry=top+Math.sin(bendRad)*arm;

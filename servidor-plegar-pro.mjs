@@ -38,7 +38,7 @@ const server = http.createServer((req, res) => {
     if (!fs.existsSync(filePath) || fs.statSync(filePath).isDirectory()) {
       // A missing asset must not return index.html with HTTP 200: that masks broken
       // imports and makes the browser report confusing MIME/syntax errors.
-      if (relativePath.startsWith('assets' + path.sep) || path.extname(relativePath)) {
+      if (relativePath.split(/[\\/]/)[0] === 'assets' || path.extname(relativePath)) {
         res.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8', 'Cache-Control': 'no-store' });
         res.end('Not found');
         return;

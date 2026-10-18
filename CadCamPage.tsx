@@ -1,8 +1,8 @@
 import {useMemo,useRef,useState} from 'react';
 import type {PointerEvent as ReactPointerEvent,WheelEvent as ReactWheelEvent} from 'react';
 import {Download,FileJson,Plus,RotateCcw,Save,Trash2} from 'lucide-react';
-import {Page} from '../../components/Page';
-import {useActiveProject,useAppStore} from '../../store/useAppStore';
+import {Page} from './Page';
+import {useActiveProject,useAppStore} from './useAppStore';
 
 type Workspace='sketch'|'model'|'cam';
 type Profile='sheet'|'tray'|'u';

@@ -1,4 +1,4 @@
-import type {Project} from '../types/domain';
+import type {Project} from './domain';
 
 export function ProjectThumbnail({project,className=''}:{project:Project;className?:string}){
   const bends=[...project.bends].sort((a,b)=>a.order-b.order);

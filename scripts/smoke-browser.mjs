@@ -147,12 +147,32 @@ try {
   await mobile.waitForTimeout(6000);
   const mobileShell = await mobile.locator('.app-shell').count();
   if (!mobileShell) throw new Error('La interfaz no ha montado en móvil. Texto: ' + (await mobile.locator('#root').innerText().catch(()=>'#root no encontrado')));
-  const dimensions = await mobile.evaluate(() => ({
-    width: window.innerWidth,
-    documentWidth: document.documentElement.scrollWidth,
-    bodyWidth: document.body.scrollWidth,
-  }));
-  if (dimensions.documentWidth > dimensions.width + 3) {
+  const dimensions = await mobile.evaluate(() => {
+    const overflowing = [...document.querySelectorAll('body *')].map((element) => {
+      const rect = element.getBoundingClientRect();
+      const style = getComputedStyle(element);
+      return {
+        tag: element.tagName, className: typeof element.className === 'string' ? element.className : '',
+        right: Math.round(rect.right), left: Math.round(rect.left),
+        width: Math.round(rect.width), display: style.display, minWidth: style.minWidth,
+      };
+    }).filter((element) => element.right > document.documentElement.clientWidth + 3 && element.width > 0)
+      .sort((a, b) => b.right - a.right).slice(0, 12);
+    return {
+      width: window.innerWidth,
+      documentClientWidth: document.documentElement.clientWidth,
+      documentWidth: document.documentElement.scrollWidth,
+      bodyWidth: document.body.scrollWidth,
+      screenWidth: screen.width,
+      visualViewportWidth: window.visualViewport?.width ?? null,
+      devicePixelRatio: window.devicePixelRatio,
+      viewportMeta: document.querySelector('meta[name="viewport"]')?.getAttribute('content') ?? null,
+      matchesMobile: window.matchMedia('(max-width: 700px)').matches,
+      overflowing,
+    };
+  });
+  console.log('DIAGNÓSTICO MÓVIL: ' + JSON.stringify(dimensions));
+  if (dimensions.documentWidth > (dimensions.documentClientWidth || dimensions.width) + 3) {
     throw new Error(`Desbordamiento horizontal en móvil: ${JSON.stringify(dimensions)}`);
   }
 

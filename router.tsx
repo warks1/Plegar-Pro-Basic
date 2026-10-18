@@ -3,54 +3,86 @@ import {createBrowserRouter} from 'react-router-dom';
 import {AppShell} from './AppShell';
 import {AppErrorPage} from './AppErrorPage';
 
-const modulePage=(title:string,route:string)=>lazy(()=>import('./ModulePage').then(m=>({default:()=> <m.ModulePage title={title} route={route}/> })));
-
 const pages={
   Dashboard:lazy(()=>import('./DashboardPage').then(m=>({default:m.DashboardPage}))),
-  Projects:modulePage("Proyectos","/proyectos"),
-  Development:modulePage("Desarrollo","/desarrollo"),
-  DevelopmentCalculator:modulePage("Calculadora de desarrollo","/calculadora-desarrollo"),
-  PartProgrammer:modulePage("Programador de pieza","/programador-pieza"),
-  Programming2D:modulePage("Programación 2D","/programacion-2d"),
-  Programming3D:modulePage("Programación 3D","/programacion-3d"),
-  Simulation2D:modulePage("Simulación 2D","/simulacion-2d"),
-  Simulation3D:modulePage("Simulación 3D","/simulacion-3d"),
-  Tooling:modulePage("Utillaje","/utillaje"),
-  Libraries:modulePage("Bibliotecas","/bibliotecas"),
-  Orders:modulePage("Órdenes","/ordenes"),
-  Settings:modulePage("Ajustes","/ajustes"),
+  // @ts-expect-error -- restore the existing compiled page module; its original TSX source is absent.
+  Projects:lazy(()=>import('./ProjectsPage-BaluQiUy.js').then(m=>({default:m.ProjectsPage}))),
+  // @ts-expect-error -- restore the existing compiled page module; its original TSX source is absent.
+  Development:lazy(()=>import('./DevelopmentPage-B_Jw04OJ.js').then(m=>({default:m.DevelopmentPage}))),
+  // @ts-expect-error -- restore the existing compiled page module; its original TSX source is absent.
+  DevelopmentCalculator:lazy(()=>import('./DevelopmentCalculatorPage-CS_-p8RR.js').then(m=>({default:m.DevelopmentCalculatorPage}))),
+  // @ts-expect-error -- restore the existing compiled page module; its original TSX source is absent.
+  PartProgrammer:lazy(()=>import('./PartProgrammerPage-CQgWPfWM.js').then(m=>({default:m.PartProgrammerPage}))),
+  // @ts-expect-error -- restore the existing compiled page module; its original TSX source is absent.
+  Programming2D:lazy(()=>import('./Programming2DPage-DZQa639B.js').then(m=>({default:m.Programming2DPage}))),
+  // @ts-expect-error -- restore the existing compiled page module; its original TSX source is absent.
+  Programming3D:lazy(()=>import('./Programming3DPage-B-9iLBwM.js').then(m=>({default:m.Programming3DPage}))),
+  // @ts-expect-error -- restore the existing compiled page module; its original TSX source is absent.
+  Simulation2D:lazy(()=>import('./SimulationPage-c1WPp7AU.js').then(m=>({default:m.Simulation2DPage}))),
+  // @ts-expect-error -- restore the existing compiled page module; its original TSX source is absent.
+  Simulation3D:lazy(()=>import('./SimulationPage-c1WPp7AU.js').then(m=>({default:m.Simulation3DPage}))),
+  // @ts-expect-error -- restore the existing compiled page module; its original TSX source is absent.
+  Tooling:lazy(()=>import('./ToolingPage-DGUS0WyL.js').then(m=>({default:m.ToolingPage}))),
+  // @ts-expect-error -- restore the existing compiled page module; its original TSX source is absent.
+  Libraries:lazy(()=>import('./LibrariesPage-BtwSwUwE.js').then(m=>({default:m.LibrariesPage}))),
+  // @ts-expect-error -- restore the existing compiled page module; its original TSX source is absent.
+  Orders:lazy(()=>import('./OrdersPage-D0p7cXnX.js').then(m=>({default:m.OrdersPage}))),
+  // @ts-expect-error -- restore the existing compiled page module; its original TSX source is absent.
+  Settings:lazy(()=>import('./SettingsPage-DgLP2AIk.js').then(m=>({default:m.SettingsPage}))),
   Ai:lazy(()=>import('./AiPage').then(m=>({default:m.AiPage}))),
   Communications:lazy(()=>import('./CommunicationsPage').then(m=>({default:m.CommunicationsPage}))),
-  Validation:modulePage("Validación","/validacion"),
+  // @ts-expect-error -- restore the existing compiled page module; its original TSX source is absent.
+  Validation:lazy(()=>import('./ValidationPage-B2PeLmUv.js').then(m=>({default:m.ValidationPage}))),
   Agenda:lazy(()=>import('./AgendaPage').then(m=>({default:m.AgendaPage}))),
   Customers:lazy(()=>import('./CustomersPage').then(m=>({default:m.CustomersPage}))),
-  Suppliers:modulePage("Proveedores","/proveedores"),
-  Production:modulePage("Producción","/produccion"),
-  Quality:modulePage("Calidad","/calidad"),
-  Maintenance:modulePage("Mantenimiento","/mantenimiento"),
-  Materials:modulePage("Materiales","/materiales"),
-  Requirements:modulePage("Requisitos","/requisitos"),
+  // @ts-expect-error -- restore the existing compiled page module; its original TSX source is absent.
+  Suppliers:lazy(()=>import('./SuppliersPage-13Adfwu4.js').then(m=>({default:m.SuppliersPage}))),
+  // @ts-expect-error -- restore the existing compiled page module; its original TSX source is absent.
+  Production:lazy(()=>import('./ProductionPage-aHrzLsDf.js').then(m=>({default:m.ProductionPage}))),
+  // @ts-expect-error -- restore the existing compiled page module; its original TSX source is absent.
+  Quality:lazy(()=>import('./QualityPage-CYzDckfu.js').then(m=>({default:m.QualityPage}))),
+  // @ts-expect-error -- restore the existing compiled page module; its original TSX source is absent.
+  Maintenance:lazy(()=>import('./MaintenancePage-BoHPAvYG.js').then(m=>({default:m.MaintenancePage}))),
+  // @ts-expect-error -- restore the existing compiled page module; its original TSX source is absent.
+  Materials:lazy(()=>import('./MaterialsPage-BKpHKhP8.js').then(m=>({default:m.MaterialsPage}))),
+  // @ts-expect-error -- restore the existing compiled page module; its original TSX source is absent.
+  Requirements:lazy(()=>import('./RequirementsPage-1gRMFWE6.js').then(m=>({default:m.RequirementsPage}))),
   Curve:lazy(()=>import('./CurvePerfectPage').then(m=>({default:m.CurvePerfectPage}))),
-  VCompare:modulePage("Comparador V","/comparador-v"),
-  Welding:modulePage("Soldadura","/soldadura"),
-  Import:modulePage("Importación CAD/IA","/importacion"),
+  // @ts-expect-error -- restore the existing compiled page module; its original TSX source is absent.
+  VCompare:lazy(()=>import('./VComparePage-B8Kaviti.js').then(m=>({default:m.VComparePage}))),
+  // @ts-expect-error -- restore the existing compiled page module; its original TSX source is absent.
+  Welding:lazy(()=>import('./WeldingPage-DDiMzKKi.js').then(m=>({default:m.WeldingPage}))),
+  // @ts-expect-error -- restore the existing compiled page module; its original TSX source is absent.
+  Import:lazy(()=>import('./ImportPage-SQakPGm3.js').then(m=>({default:m.ImportPage}))),
   About:lazy(()=>import('./AboutPage').then(m=>({default:m.AboutPage}))),
-  Warehouse:modulePage("Almacén","/almacen"),
-  Quotes:modulePage("Presupuestos","/presupuestos"),
-  Routes:modulePage("Rutas de fabricación","/rutas"),
-  Notifications:modulePage("Notificaciones","/notificaciones"),
-  ProcessTree:modulePage("Árbol de fabricación","/arbol-fabricacion"),
+  // @ts-expect-error -- restore the existing compiled page module; its original TSX source is absent.
+  Warehouse:lazy(()=>import('./WarehousePage-B-VENc5b.js').then(m=>({default:m.WarehousePage}))),
+  // @ts-expect-error -- restore the existing compiled page module; its original TSX source is absent.
+  Quotes:lazy(()=>import('./QuotesPage-BOvts-U6.js').then(m=>({default:m.QuotesPage}))),
+  // @ts-expect-error -- restore the existing compiled page module; its original TSX source is absent.
+  Routes:lazy(()=>import('./RoutesPage-mife8W_R.js').then(m=>({default:m.RoutesPage}))),
+  // @ts-expect-error -- restore the existing compiled page module; its original TSX source is absent.
+  Notifications:lazy(()=>import('./NotificationsPage-h-llBQFk.js').then(m=>({default:m.NotificationsPage}))),
+  // @ts-expect-error -- restore the existing compiled page module; its original TSX source is absent.
+  ProcessTree:lazy(()=>import('./ProcessTreePage-CCJU9iO0.js').then(m=>({default:m.ProcessTreePage}))),
   Collisions:lazy(()=>import('./CollisionsPage').then(m=>({default:m.CollisionsPage}))),
-  Documents:modulePage("Documentos","/documentos"),
-  Revisions:modulePage("Revisiones","/revisiones"),
-  Release:modulePage("Liberación","/liberacion"),
-  QualityGate:modulePage("Puerta de calidad","/puerta-calidad"),
-  OfficialSources:modulePage("Fuentes oficiales","/fuentes-oficiales"),
-  Integrity:modulePage("Integridad funcional","/integridad"),
+  // @ts-expect-error -- restore the existing compiled page module; its original TSX source is absent.
+  Documents:lazy(()=>import('./DocumentsPage-CGV2KSPx.js').then(m=>({default:m.DocumentsPage}))),
+  // @ts-expect-error -- restore the existing compiled page module; its original TSX source is absent.
+  Revisions:lazy(()=>import('./RevisionsPage-Dt-mU57u.js').then(m=>({default:m.RevisionsPage}))),
+  // @ts-expect-error -- restore the existing compiled page module; its original TSX source is absent.
+  Release:lazy(()=>import('./ReleasePage-BcIL5ZtI.js').then(m=>({default:m.ReleasePage}))),
+  // @ts-expect-error -- restore the existing compiled page module; its original TSX source is absent.
+  QualityGate:lazy(()=>import('./QualityGatePage-CH_-w0H-.js').then(m=>({default:m.QualityGatePage}))),
+  // @ts-expect-error -- restore the existing compiled page module; its original TSX source is absent.
+  OfficialSources:lazy(()=>import('./OfficialSourcesPage-D-avNxea.js').then(m=>({default:m.OfficialSourcesPage}))),
+  // @ts-expect-error -- restore the existing compiled page module; its original TSX source is absent.
+  Integrity:lazy(()=>import('./IntegrityPage-DF7GeeBR.js').then(m=>({default:m.IntegrityPage}))),
   CadAssets:lazy(()=>import('./CadAssetsPage').then(m=>({default:m.CadAssetsPage}))),
   CatalogManager:lazy(()=>import('./CatalogManagerPage').then(m=>({default:m.CatalogManagerPage}))),
   CadCam:lazy(()=>import('./CadCamPage').then(m=>({default:m.CadCamPage}))),
-  Updates:modulePage("Actualizaciones","/actualizaciones"),
+  // @ts-expect-error -- restore the existing compiled page module; its original TSX source is absent.
+  Updates:lazy(()=>import('./UpdatesPage-D05cBLa7.js').then(m=>({default:m.UpdatesPage}))),
 };
 const wrap=(Component:React.LazyExoticComponent<React.ComponentType>)=><Suspense fallback={<div className="module-loader">Cargando módulo…</div>}><Component/></Suspense>;
 export const router=createBrowserRouter([{path:'/',element:<AppShell/>,errorElement:<AppErrorPage/>,children:[

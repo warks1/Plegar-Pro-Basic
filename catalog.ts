@@ -8,7 +8,7 @@ const catalogMachines:Machine[]=[
 ,{id:'truma-5230',manufacturer:'TRUMPF',name:'TruBend 5230 configurable',forceT:230,lengthMm:3230,strokeMm:445,daylightMm:615,throatMm:420,axes:['Y1','Y2','X','R','Z1','Z2'],clamp:'TRUMPF',source:'reconstructed',verified:false}
 ,{id:'amada-hg1303',manufacturer:'AMADA',name:'HG 1303 configurable',forceT:130,lengthMm:3110,strokeMm:250,daylightMm:520,throatMm:420,axes:['Y1','Y2','X','R','Z1','Z2'],clamp:'European',source:'reconstructed',verified:false}
 ,{id:'lvd-toolcell',manufacturer:'LVD',name:'ToolCell configurable',forceT:135,lengthMm:3050,strokeMm:250,daylightMm:570,throatMm:400,axes:['Y1','Y2','X','R','Z1','Z2'],clamp:'Wila',source:'reconstructed',verified:false}
-,{id:'saf-darley-e-brake',manufacturer:'SafanDarley',name:'E-Brake configurable',forceT:100,lengthMm:3100,strokeMm:300,daylightMm:590,throatMm:300,axes:['Y1','Y2','X','R','Z1','Z2'],clamp:'European',source:'reconstructed',verified:false};
+,{id:'saf-darley-e-brake',manufacturer:'SafanDarley',name:'E-Brake configurable',forceT:100,lengthMm:3100,strokeMm:300,daylightMm:590,throatMm:300,axes:['Y1','Y2','X','R','Z1','Z2'],clamp:'European',source:'reconstructed',verified:false}];
 export const machines:Machine[]=catalogMachines;
 
 export const tools:Tool[]=[

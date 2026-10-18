@@ -669,3 +669,7 @@ main.startup-splash{position:fixed!important;inset:0!important;z-index:9999!impo
 .startup-live-status small{color:#9bb3c4;font-size:clamp(7px,1.3vw,13px);letter-spacing:.015em}
 @keyframes startupLogoSweep{0%{transform:translateX(-20px) skewX(-19deg);opacity:0}18%{opacity:.88}72%{opacity:.7}100%{transform:translateX(250px) skewX(-19deg);opacity:0}}
 @media(prefers-reduced-motion:reduce){.startup-logo-scan{animation:none;opacity:.18}.startup-live-track i{transition:none}}
+
+.startup-logo-halo{position:absolute;z-index:2;top:8%;left:30%;width:31%;height:46%;pointer-events:none;background:radial-gradient(ellipse at 54% 54%,rgba(18,206,255,.34) 0%,rgba(18,206,255,.14) 35%,transparent 72%);filter:blur(8px);mix-blend-mode:screen;animation:startupLogoHalo 2.8s ease-in-out infinite}
+@keyframes startupLogoHalo{0%,100%{opacity:.38;transform:scale(.96)}50%{opacity:.95;transform:scale(1.04)}}
+@media(prefers-reduced-motion:reduce){.startup-logo-halo{animation:none;opacity:.52;transform:none}}

@@ -66,6 +66,7 @@ const conceptCss = read('assets/concept-two-v024.css');
 if (!navigation.includes("window.matchMedia('(max-width: 700px)')")) failures.push('La navegación móvil debe detectar el ancho de pantalla pequeño.');
 if (!navigation.includes("event.target.closest('.approved-nav a,.sidebar a')")) failures.push('El menú móvil debe cerrarse al seleccionar un enlace lateral.');
 if (!navigation.includes("button.getAttribute('aria-label')==='Contraer menú'")) failures.push('El cierre del menú móvil debe usar el control de navegación existente.');
+if (!navigation.includes('window.setTimeout(()=>{if(button&&button.getAttribute(\'aria-label\')===\'Contraer menú\')button.click()},0)')) failures.push('El cierre del menú móvil debe esperar a que React confirme el cambio de ruta para evitar un doble clic.');
 if (!conceptCss.includes('.app-shell:not(.sidebar-collapsed) .approved-sidebar')) failures.push('El panel lateral aprobado debe mostrarse como menú superpuesto en móvil.');
 if (!conceptCss.includes('.app-shell.sidebar-collapsed .approved-sidebar{display:none!important}')) failures.push('El panel lateral debe ocultarse cuando el menú está contraído en móvil.');
 if (!conceptCss.includes('.app-shell.sidebar-collapsed:has(.pp-workbench) .approved-sidebar{display:none!important}')) failures.push('El menú lateral contraído debe seguir oculto en módulos de banco de trabajo.');

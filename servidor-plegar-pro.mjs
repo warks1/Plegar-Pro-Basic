@@ -36,6 +36,13 @@ const server = http.createServer((req, res) => {
       res.writeHead(403); res.end('Forbidden'); return;
     }
     if (!fs.existsSync(filePath) || fs.statSync(filePath).isDirectory()) {
+      // A missing asset must not return index.html with HTTP 200: that masks broken
+      // imports and makes the browser report confusing MIME/syntax errors.
+      if (relativePath.startsWith('assets' + path.sep) || path.extname(relativePath)) {
+        res.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8', 'Cache-Control': 'no-store' });
+        res.end('Not found');
+        return;
+      }
       filePath = path.join(distDir, 'index.html');
     }
     const ext = path.extname(filePath).toLowerCase();

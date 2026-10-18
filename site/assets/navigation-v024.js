@@ -43,7 +43,8 @@ document.addEventListener('click',event=>{
     const link=event.target.closest('.approved-nav a,.sidebar a');
     if(link){
       const button=document.querySelector('.menu-button');
-      if(button&&button.getAttribute('aria-label')==='Contraer menú')button.click();
+      /* Deja que React confirme la navegación antes de consultar el estado del botón; evita un doble clic durante el mismo evento. */
+      window.setTimeout(()=>{if(button&&button.getAttribute('aria-label')==='Contraer menú')button.click()},0);
     }
   }
 });

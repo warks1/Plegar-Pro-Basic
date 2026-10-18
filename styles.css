@@ -266,3 +266,17 @@ input,select,textarea{background:rgba(4,13,24,.9)!important;border:1px solid rgb
 .tool-cad-stage:after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(115deg,transparent 28%,#9eefff0a 44%,#42dfff12 50%,transparent 63%);background-size:220% 100%;animation:cad-light-sweep 12s ease-in-out infinite}
 @keyframes cad-light-sweep{0%,100%{background-position:120% 0}50%{background-position:-20% 0}}
 @media(prefers-reduced-motion:reduce){.tool-cad-object,.tool-cad-stage:after{transition:none;animation:none}}
+
+/* Simulation rendering: synchronized motion cues and clearer tool/workpiece separation */
+.sim-ref-stage{perspective:1250px;isolation:isolate}
+.sim3d-reference{transform-origin:center center;filter:drop-shadow(0 22px 35px #0009);transition:transform .28s ease}
+.sim3d-machine-svg{overflow:visible;filter:drop-shadow(0 10px 20px #0008)}
+.sim3d-moving-ram{transform-box:fill-box;transform-origin:50% 0;transition:transform .48s cubic-bezier(.2,.75,.25,1);filter:drop-shadow(0 4px 5px #0007)}
+.sim3d-workpiece{filter:drop-shadow(0 0 5px #c7f4ff88);stroke-linecap:round;stroke-linejoin:round;transition:d .45s cubic-bezier(.2,.75,.25,1)}
+.sim2d-reference{background:radial-gradient(ellipse at 50% 30%,#8daeb0 0,#567d83 65%,#35565f 100%);box-shadow:inset 0 0 42px #06151b88,0 18px 36px #0007}
+.sim2d-drawing{filter:drop-shadow(0 8px 16px #0006)}
+.sim2d-tool-shape{filter:drop-shadow(0 5px 5px #17222a77);stroke-linejoin:round;transition:all .25s ease}
+.sim2d-workpiece{filter:drop-shadow(0 0 4px #effcff66);stroke-linecap:round;stroke-linejoin:round;transition:d .45s cubic-bezier(.2,.75,.25,1)}
+.sim2d-angle{font-weight:800;paint-order:stroke fill;stroke:#31545a;stroke-width:4px;stroke-linejoin:round}
+.sim-ref-progress i{transition:width .42s cubic-bezier(.2,.7,.2,1)}
+@media(prefers-reduced-motion:reduce){.sim3d-reference,.sim3d-moving-ram,.sim3d-workpiece,.sim2d-tool-shape,.sim2d-workpiece,.sim-ref-progress i{transition:none}}

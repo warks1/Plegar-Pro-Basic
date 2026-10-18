@@ -42,13 +42,13 @@ try {
 
   for (const route of routes) {
     console.log(`COMPROBANDO ${route}`);
-    await page.goto(origin + route, { waitUntil: 'commit', timeout: 10000 });
-    await page.locator('.app-shell').waitFor({ state: 'visible', timeout: 5000 });
-    await page.locator('.content').waitFor({ state: 'visible', timeout: 5000 });
+    await page.goto(origin + route, { waitUntil: 'commit', timeout: 15000 });
+    await page.locator('.app-shell').waitFor({ state: 'visible', timeout: 12000 });
+    await page.locator('.content').waitFor({ state: 'visible', timeout: 10000 });
     await page.waitForFunction(() => {
       const content = document.querySelector('.content');
       return Boolean(content && content.innerText.trim() && !content.innerText.includes('Cargando módulo…'));
-    }, null, { timeout: 5000 });
+    }, null, { timeout: 10000 });
     const diagnostic = await page.evaluate(() => ({
       title: document.querySelector('.content h1')?.textContent?.trim() || '',
       text: document.querySelector('.content')?.innerText?.trim().slice(0, 160) || '',

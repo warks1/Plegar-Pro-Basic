@@ -1,4 +1,4 @@
-import {AlertTriangle,CalendarDays,ClipboardList,FolderKanban,Settings,TrendingUp} from 'lucide-react';
+import {AlertTriangle,CalendarDays,FolderKanban,Settings,TrendingUp} from 'lucide-react';
 import {useNavigate} from 'react-router-dom';
 import {useState} from 'react';
 import {useActiveProject,useAppStore} from '../../store/useAppStore';

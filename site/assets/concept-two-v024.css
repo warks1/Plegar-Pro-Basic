@@ -675,13 +675,9 @@ main.startup-splash{position:fixed!important;inset:0!important;z-index:9999!impo
 @media(prefers-reduced-motion:reduce){.startup-logo-halo{animation:none;opacity:.52;transform:none}}
 
 
-/* Mantiene el menú lateral utilizable cuando la suma de opciones supera la altura disponible. */
-.approved-sidebar{display:flex!important;flex-direction:column!important;min-height:0!important}
-.approved-nav{display:block!important;flex:1 1 auto!important;min-height:0!important;overflow-y:auto!important;overscroll-behavior:contain}
-.approved-nav a{display:flex!important;flex:0 0 auto!important;visibility:visible!important}
-
-
-/* Evita que el menú quede sin área de desplazamiento en pantallas altas o con muchos módulos. */
-.approved-sidebar{display:flex!important;flex-direction:column!important;height:100vh!important;min-height:0!important;overflow:hidden!important}
-.approved-nav{display:block!important;flex:0 0 auto!important;height:calc(100vh - 180px)!important;max-height:none!important;min-height:180px!important;overflow-y:auto!important;overflow-x:hidden!important;overscroll-behavior:contain}
-.approved-nav a{display:flex!important;flex:0 0 39px!important;min-height:39px!important;visibility:visible!important}
+/* Menú lateral: columna real con altura limitada y opciones desplazables. */
+.approved-sidebar{display:flex!important;flex-direction:column!important;height:100vh!important;max-height:100vh!important;min-height:0!important;overflow:hidden!important}
+.approved-brand{flex:0 0 102px!important}
+.approved-nav{display:flex!important;flex:1 1 auto!important;flex-direction:column!important;width:100%!important;height:auto!important;max-height:none!important;min-height:0!important;overflow-y:auto!important;overflow-x:hidden!important;overscroll-behavior:contain;scroll-behavior:auto!important}
+.approved-nav a{display:flex!important;flex:0 0 auto!important;width:100%!important;min-height:39px!important;height:auto!important;visibility:visible!important;opacity:1!important;pointer-events:auto!important}
+.approved-sidebar footer{flex:0 0 auto!important}

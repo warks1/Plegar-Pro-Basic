@@ -75,7 +75,11 @@ function Reference2DCanvas({d}) {
  const sheetLeftY=100+(143-100)*(1-d.blend*.12);
  const sheetTipY=50+(143-50)*(1-d.blend);
  const sheetRightY=143+(d.bend.direction==="negative"?-Math.min(activeAngle,90)*.18:0);
- const toolHue=(d.bend.order||1)%2===0?"#927e9a":"#9b879f";
+ const punchAngle=d.punch?.angle||d.bend.angle||88;
+ const punchHalf=clamp(3+Math.tan(punchAngle*Math.PI/360)*5,3,9.5);
+ const dieSpan=clamp(12+(d.die?.v||12)*.42,14,26);
+ const dieDepth=clamp(8+(d.die?.v||12)*.34,10,20);
+ const toolHue="#9b879f";
  return h("div",{className:"ref2d-shell"},
   h("div",{className:"ref2d-top"},
    h("div",{className:"ref2d-tabs"},...[1,2,3].map(n=>h("button",{key:n,className:"ref2d-tab "+((n===Math.min(3,d.bend.order||1))?"on":""),onClick:()=>d.timeline[1]({progress:clamp(n-1,0,Math.max(0,d.count-1)),playing:false}),title:`Seleccionar paso P${n}`},n))),
@@ -102,10 +106,10 @@ function Reference2DCanvas({d}) {
      h("g",{className:"ref2d-ram",style:{transform:`translateY(${ramOffset}px)`}},
       h("rect",{x:146,y:17,width:47,height:55,rx:2,fill:"url(#refPunch)",stroke:"#697a7b","stroke-width":"1.3"}),
       h("rect",{x:159,y:71,width:20,height:65,fill:"#526f51"}),
-      h("path",{d:"M159 132H179L174 144H164Z",fill:"#3d5d45"})),
+      h("path",{d:`M159 126 L${166+punchHalf} 126 L166 143 L${166-punchHalf} 126 L173 126Z`,fill:"url(#refPunch)",stroke:"#647477","stroke-width":"1"})),
      h("g",{className:"ref2d-die"},
-      h("path",{d:"M150 145H158L166 157L174 145H182V178H150Z",fill:"#647d60",stroke:"#516b53","stroke-width":"1"}),
-      h("path",{d:"M158 145L166 157L174 145",fill:"none",stroke:"#a2b5a0","stroke-width":"2"}),
+      h("path",{d:`M${166-dieSpan} 145 H${166-dieSpan*.62} L166 ${145+dieDepth} L${166+dieSpan*.62} 145 H${166+dieSpan} V178 H${166-dieSpan}Z`,fill:"#647d60",stroke:"#516b53","stroke-width":"1"}),
+      h("path",{d:`M${166-dieSpan*.62} 145 L166 ${145+dieDepth} L${166+dieSpan*.62} 145`,fill:"none",stroke:"#a2b5a0","stroke-width":"2"}),
       h("rect",{x:151,y:179,width:30,height:15,rx:1,fill:"url(#refPunch)",stroke:"#647477","stroke-width":"1"})),
      h("path",{d:`M122 ${sheetLeftY} L166 143 L263 ${sheetTipY}`,fill:"none",stroke:"#ddf5eb","stroke-width":"1.5","stroke-linejoin":"round",filter:"url(#refGlow)"}),
      h("path",{d:`M263 ${sheetTipY} l20 19`,fill:"none",stroke:"#8bd897","stroke-width":"2"}),

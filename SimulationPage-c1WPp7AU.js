@@ -11,7 +11,7 @@ const styles={workspace:{display:"grid",gridTemplateColumns:"minmax(0,1fr) 310px
 function polygon(points,fill,stroke="#526974",extra={}){return h("polygon",{points:points.map(p=>p.join(",")).join(" "),fill,stroke,strokeWidth:2,...extra})}
 function PressBrakeScene({bend,angleFactor,ramDrop,view="isometric",compact=false}){const sign=bend?.direction==="negative"?-1:1,theta=(180-clamp(bend?.angle??90,1,179))/2*Math.PI/180*clamp(angleFactor,0,1),cx=620,base=compact?140:370,arm=compact?86:190,left=[cx-arm*Math.cos(theta),base-sign*arm*Math.sin(theta)],mid=[cx,base],right=[cx+arm*Math.cos(theta),base-sign*arm*Math.sin(theta)],profile=[left,mid,right],dx=compact?30:78,dy=compact?-15:-38,extruded=[...profile,...profile.slice().reverse().map(([x,y])=>[x+dx,y+dy])],p=(arr)=>arr.map(v=>v.join(",")).join(" "),toolY=compact?82:278+ramDrop,dieTop=compact?153:432;
 const parts=[];
-parts.push(h("defs",{key:"defs"},h("linearGradient",{id:compact?"steelMini":"steelMain",x1:"0",x2:"1",y1:"0",y2:"1"},h("stop",{offset:"0",stopColor:"#e2e7e7"}),h("stop",{offset:".52",stopColor:"#8f9c9f"}),h("stop",{offset:"1",stopColor:"#59676d"})),h("linearGradient",{id:compact?"orangeMini":"orangeMain",x1:"0",x2:"0",y1:"0",y2:"1"},h("stop",{offset:"0",stopColor:"#ffd147"}),h("stop",{offset:"1",stopColor:"#dd7900"})),h("pattern",{id:compact?"gridMini":"gridMain",width:32,height:32,patternUnits:"userSpaceOnUse"},h("path",{d:"M 32 0 L 0 0 0 32",fill:"none",stroke:"#0d3647",strokeOpacity:.12,strokeWidth:1}))));
+parts.push(h("defs",{key:"defs"},h("linearGradient",{id:compact?"steelMini":"steelMain",x1:"0",x2:"1",y1:"0",y2:"1"},h("stop",{offset:"0",stopColor:"#dce6eb"}),h("stop",{offset:".52",stopColor:"#8b9eaa"}),h("stop",{offset:"1",stopColor:"#455b6b"})),h("linearGradient",{id:"machineBlue",x1:"0",x2:"1",y1:"0",y2:"1"},h("stop",{offset:"0",stopColor:"#607d91"}),h("stop",{offset:".32",stopColor:"#344f67"}),h("stop",{offset:"1",stopColor:"#172b3b"})),h("linearGradient",{id:compact?"orangeMini":"orangeMain",x1:"0",x2:"0",y1:"0",y2:"1"},h("stop",{offset:"0",stopColor:"#ffd147"}),h("stop",{offset:"1",stopColor:"#dd7900"})),h("pattern",{id:compact?"gridMini":"gridMain",width:32,height:32,patternUnits:"userSpaceOnUse"},h("path",{d:"M 32 0 L 0 0 0 32",fill:"none",stroke:"#0d3647",strokeOpacity:.12,strokeWidth:1}))));
 parts.push(h("rect",{key:"bg",width:1200,height:compact?220:650,fill:compact?"#4f7e86":"#e4e7e4"}),h("rect",{key:"grid",width:1200,height:compact?220:650,fill:`url(#${compact?"gridMini":"gridMain"})`}));
 if(!compact){parts.push(h("ellipse",{key:"shadow",cx:620,cy:548,rx:470,ry:40,fill:"#354047",opacity:.22}));
 // Bed, side frames, beam and guide rails of the press brake.
@@ -20,18 +20,36 @@ parts.push(polygon([[145,148],[230,148],[260,465],[178,465]],"url(#steelMain)"),
 parts.push(polygon([[172,118],[953,118],[1037,166],[256,166]],"#879296"),polygon([[256,166],[1037,166],[1037,256],[256,256]],"url(#steelMain)"),polygon([[172,118],[256,166],[256,256],[172,208]],"#778589"));
 parts.push(h("path",{key:"beamline",d:"M256 248 H1037",stroke:"#303b40",strokeWidth:12}),h("path",{key:"beamlight",d:"M270 241 H1024",stroke:"#d2dcdd",strokeWidth:3}));
 for(let x=282;x<1020;x+=42)parts.push(h("rect",{key:`seg${x}`,x,y:254,width:30,height:28,rx:3,fill:"#59666b",stroke:"#b4c0c3",strokeWidth:2}));
+
+// TruBend V85 bodywork: blue-grey cabinet panels, joints and right-side CNC control.
+parts.push(polygon([[105,145],[178,145],[208,420],[130,420]],"url(#machineBlue)","#172b3b"),
+ polygon([[178,145],[222,162],[252,420],[208,420]],"#24435a","#182e40"),
+ polygon([[876,162],[924,145],[964,420],[890,420]],"#233e54","#172b3b"),
+ polygon([[924,145],[1002,145],[970,420],[964,420]],"url(#machineBlue)","#172b3b"));
+parts.push(h("path",{key:"cabinetSeams",d:"M134 172L160 390 M180 168L211 395 M942 168L923 395 M975 170L951 392",stroke:"#8ba4b5",strokeWidth:2,opacity:.55}),
+ h("path",{key:"cabinetDark",d:"M118 394H220 M899 394H979",stroke:"#122435",strokeWidth:8}),
+ h("rect",{key:"controlStand",x:1020,y:287,width:102,height:158,rx:4,fill:"#172936",stroke:"#526a78",strokeWidth:3}),
+ polygon([[1028,296],[1107,296],[1107,358],[1028,358]],"#10202b","#536d7a"),
+ h("rect",{key:"controlScreen",x:1035,y:303,width:65,height:45,rx:2,fill:"#397b91",stroke:"#9bb5c0",strokeWidth:2}),
+ h("path",{key:"controlUI",d:"M1040 311H1092 M1040 319H1080 M1040 327H1088 M1040 335H1068",stroke:"#bcecf2",strokeWidth:2}),
+ h("circle",{key:"controlKnob",cx:1041,cy:375,r:5,fill:"#e7b34f"}),
+ h("circle",{key:"controlKnob2",cx:1060,cy:375,r:5,fill:"#5ec99a"}),
+ h("path",{key:"controlBase",d:"M1028 445H1120L1108 467H1040Z",fill:"#263a46",stroke:"#526a78",strokeWidth:2}));
+parts.push(h("rect",{key:"blueLogo",x:300,y:179,width:50,height:25,rx:2,fill:"#0c2840",stroke:"#7898aa",strokeWidth:1}),
+ h("text",{key:"blueLogoText",x:325,y:196,textAnchor:"middle",fill:"#d8e8ed",fontSize:10,fontWeight:800},"TRUMPF"),
+ h("path",{key:"vent",d:"M330 212H390 M330 218H390 M330 224H390",stroke:"#445967",strokeWidth:2,opacity:.8}));
 // Workpiece surface and its extruded 3D edge.
 parts.push(polygon(extruded,"#22c8d0", "#135c65",{opacity:.92}),h("polyline",{key:"profile",points:p(profile),fill:"none",stroke:"#19f0ed",strokeWidth:8,strokeLinejoin:"round",strokeLinecap:"round",filter:"drop-shadow(0 0 5px #00eaff)"}),h("polyline",{key:"backprofile",points:p(profile.map(([x,y])=>[x+dx,y+dy])),fill:"none",stroke:"#31aeb6",strokeWidth:3}));
 // Reference holes and the active bend station.
 const holeX=(left[0]+mid[0])/2;parts.push(h("ellipse",{key:"hole",cx:holeX+24,cy:(left[1]+base)/2-18,rx:22,ry:10,fill:"#e0e4df",stroke:"#2a939a",strokeWidth:4,transform:`rotate(-8 ${holeX+24} ${(left[1]+base)/2-18})`}),h("circle",{key:"hole2",cx:right[0]-34,cy:(right[1]+base)/2-16,r:8,fill:"#e3e7e5",stroke:"#278b91",strokeWidth:3}));
 // Lower V die with orange relief.
-parts.push(polygon([[500,dieTop],[570,dieTop],[620,dieTop+54],[670,dieTop],[740,dieTop],[740,dieTop+70],[500,dieTop+70]],"url(#orangeMain)","#8b4c08"),h("path",{key:"vline",d:`M570 ${dieTop} L620 ${dieTop+54} L670 ${dieTop}`,fill:"none",stroke:"#ffe68c",strokeWidth:4}));
+parts.push(polygon([[500,dieTop],[570,dieTop],[620,dieTop+54],[670,dieTop],[740,dieTop],[740,dieTop+70],[500,dieTop+70]],"url(#steelMain)","#8b4c08"),h("path",{key:"vline",d:`M570 ${dieTop} L620 ${dieTop+54} L670 ${dieTop}`,fill:"none",stroke:"#ffe68c",strokeWidth:4}));
 // Moving ram and orange upper punch follow the press cycle.
-parts.push(h("g",{key:"ram",transform:`translate(0 ${ramDrop})`},polygon([[505,toolY],[735,toolY],[777,toolY+22],[547,toolY+22]],"#ffbd26","#8f5205"),polygon([[547,toolY+22],[777,toolY+22],[777,toolY+76],[547,toolY+76]],"url(#orangeMain)","#8f5205"),polygon([[505,toolY],[547,toolY+22],[547,toolY+76],[505,toolY+54]],"#dc8508","#8f5205"),polygon([[547,toolY+76],[777,toolY+76],[700,toolY+112],[620,toolY+112]],"#e9930a","#8f5205"),h("path",{d:`M620 ${toolY+112} L700 ${toolY+112}`,stroke:"#ffe48a",strokeWidth:3}))); 
+parts.push(h("g",{key:"ram",transform:`translate(0 ${ramDrop})`},polygon([[505,toolY],[735,toolY],[777,toolY+22],[547,toolY+22]],"#ffbd26","#172f42"),polygon([[547,toolY+22],[777,toolY+22],[777,toolY+76],[547,toolY+76]],"url(#orangeMain)","#8f5205"),polygon([[505,toolY],[547,toolY+22],[547,toolY+76],[505,toolY+54]],"#dc8508","#8f5205"),polygon([[547,toolY+76],[777,toolY+76],[700,toolY+112],[620,toolY+112]],"#e9930a","#8f5205"),h("path",{d:`M620 ${toolY+112} L700 ${toolY+112}`,stroke:"#d6e3ea",strokeWidth:3}))); 
 // Linear guides, bolts and coordinate labels make the CAD view legible.
 for(let x=220;x<1060;x+=56){parts.push(h("circle",{key:`bolt${x}`,cx:x,cy:500,r:5,fill:"#d5dcdb",stroke:"#546269",strokeWidth:2}))}
 parts.push(h("path",{key:"gauge",d:"M290 390 L885 390 M330 382 V402 M420 382 V402 M510 382 V402 M600 382 V402 M690 382 V402 M780 382 V402",stroke:"#4c626b",strokeWidth:2,opacity:.75}));
-parts.push(h("text",{key:"model",x:610,y:206,textAnchor:"middle",fill:"#edf4f4",fontSize:18,fontWeight:800,letterSpacing:2},"PLEGADORA CNC · SIMULACIÓN DINÁMICA"),h("text",{key:"pmark",x:cx,y:compact?40:325,textAnchor:"middle",fill:compact?"#b5f8ff":"#155065",fontSize:compact?13:18,fontWeight:800},`P${bend?.order??1} · ${Math.round((bend?.angle??90)*clamp(angleFactor,0,1))}°`));
+parts.push(h("text",{key:"model",x:610,y:206,textAnchor:"middle",fill:"#edf4f4",fontSize:18,fontWeight:800,letterSpacing:2},"TRUMPF TRUMABEND V85"),h("text",{key:"pmark",x:cx,y:compact?40:325,textAnchor:"middle",fill:compact?"#b5f8ff":"#155065",fontSize:compact?13:18,fontWeight:800},`P${bend?.order??1} · ${Math.round((bend?.angle??90)*clamp(angleFactor,0,1))}°`));
 }else{
 // Synchronized 2D section: the punch, V die and sheet use the same bend angle.
 const midX=620, baseY=dieTop, a=Math.max(0,theta), reach=compact?82:180, yL=baseY-sign*reach*Math.sin(a), xL=midX-reach*Math.cos(a), yR=baseY-sign*reach*Math.sin(a), xR=midX+reach*Math.cos(a);

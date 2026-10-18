@@ -280,3 +280,21 @@ input,select,textarea{background:rgba(4,13,24,.9)!important;border:1px solid rgb
 .sim2d-angle{font-weight:800;paint-order:stroke fill;stroke:#31545a;stroke-width:4px;stroke-linejoin:round}
 .sim-ref-progress i{transition:width .42s cubic-bezier(.2,.7,.2,1)}
 @media(prefers-reduced-motion:reduce){.sim3d-reference,.sim3d-moving-ram,.sim3d-workpiece,.sim2d-tool-shape,.sim2d-workpiece,.sim-ref-progress i{transition:none}}
+
+/* v0.25.0 reference-matched startup */
+.startup-splash{position:fixed;inset:0;z-index:9999;display:grid;place-items:center;overflow:hidden;padding:0;background:#02070c;color:#d9f8ff;text-align:left}
+.startup-canvas{position:relative;width:min(100vw,176.76vh);aspect-ratio:1004/568;max-height:100vh;overflow:hidden;border:1px solid rgba(120,150,166,.36);border-radius:11px;box-shadow:0 16px 70px #000b}
+.startup-splash .startup-art{position:absolute;inset:0;display:block;width:100%;height:100%;object-fit:fill;filter:none;animation:none}
+.startup-logo-scan{position:absolute;z-index:2;top:8%;left:31%;width:2.7%;height:43%;pointer-events:none;opacity:0;background:linear-gradient(90deg,transparent,rgba(56,237,255,.92),rgba(230,255,255,.72),transparent);filter:blur(4px);mix-blend-mode:screen;transform:skewX(-19deg);animation:startupLogoSweep 3.4s ease-in-out infinite}
+.startup-progress-cover,.startup-status-cover{position:absolute;z-index:2;pointer-events:none;background:rgba(2,10,17,.96)}
+.startup-progress-cover{left:21.3%;top:76.7%;width:55.5%;height:7.1%;background:linear-gradient(90deg,rgba(2,10,17,.45),rgba(2,10,17,.98) 9%,rgba(2,10,17,.98) 92%,rgba(2,10,17,.55))}
+.startup-status-cover{left:19%;top:83.2%;width:62%;height:10.7%;background:linear-gradient(90deg,rgba(2,10,17,.58),rgba(2,10,17,.97) 14%,rgba(2,10,17,.97) 86%,rgba(2,10,17,.58))}
+.startup-live-progress{position:absolute;z-index:3;left:23.2%;top:78.35%;width:51.3%;height:3.25%;display:flex;align-items:center;gap:1.2%;font-size:clamp(9px,1.55vw,16px);line-height:1;letter-spacing:.02em}
+.startup-live-track{position:relative;flex:0 0 90.8%;height:100%;overflow:hidden;border:1px solid #11dfff;border-radius:999px;padding:2px;background:rgba(0,8,14,.88);box-shadow:0 0 10px #09caff55,inset 0 0 7px #05bde833}
+.startup-live-track i{display:block;height:100%;border-radius:999px;background:linear-gradient(90deg,#0099d7 0%,#00bde8 70%,#4af7ff 100%);box-shadow:0 0 12px #04dcff;transition:width .12s linear}
+.startup-live-value{flex:1;min-width:0;color:#eafaff;text-shadow:0 1px 5px #000}
+.startup-live-status{position:absolute;z-index:3;left:19%;top:84.2%;width:62%;display:grid;justify-items:center;gap:clamp(4px,.8vw,9px);text-align:center;text-shadow:0 1px 5px #00101a}
+.startup-live-status strong{color:#27e7ff;font-size:clamp(8px,1.4vw,14px);font-weight:600;letter-spacing:.15em}
+.startup-live-status small{color:#9bb3c4;font-size:clamp(7px,1.3vw,13px);letter-spacing:.015em}
+@keyframes startupLogoSweep{0%{transform:translateX(-20px) skewX(-19deg);opacity:0}18%{opacity:.88}72%{opacity:.7}100%{transform:translateX(250px) skewX(-19deg);opacity:0}}
+@media(prefers-reduced-motion:reduce){.startup-logo-scan{animation:none;opacity:.18}.startup-live-track i{transition:none}}

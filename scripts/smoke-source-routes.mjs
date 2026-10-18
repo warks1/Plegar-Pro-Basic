@@ -14,9 +14,7 @@ const routes = [
   '/registro-cad','/catalogos-tecnicos','/cad-cam-3d','/acerca-de'
 ];
 
-const server = spawn(process.execPath, [
-  'node_modules/vite/bin/vite.js','--host','127.0.0.1','--port','4186','--strictPort'
-], { stdio: 'ignore', env: process.env });
+const server = spawn(process.execPath, ['servidor-plegar-pro.mjs'], { stdio: 'ignore', env: process.env });
 let browser;
 
 try {
@@ -62,7 +60,7 @@ try {
 
   if (pageErrors.length) throw new Error('Errores JavaScript:\\n' + pageErrors.join('\\n---\\n'));
   if (failedResponses.length) throw new Error('Recursos fallidos:\\n' + failedResponses.join('\\n'));
-  console.log(`Prueba de rutas fuente: OK · ${routes.length} rutas renderizadas sin errores de página ni recursos fallidos.`);
+  console.log(`Prueba de rutas del sitio publicado: OK · ${routes.length} rutas renderizadas sin errores de página ni recursos fallidos.`);
 } finally {
   if (browser) await browser.close();
   server.kill('SIGTERM');

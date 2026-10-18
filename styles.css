@@ -302,3 +302,41 @@ input,select,textarea{background:rgba(4,13,24,.9)!important;border:1px solid rgb
 .startup-logo-halo{position:absolute;z-index:2;top:8%;left:30%;width:31%;height:46%;pointer-events:none;background:radial-gradient(ellipse at 54% 54%,rgba(18,206,255,.34) 0%,rgba(18,206,255,.14) 35%,transparent 72%);filter:blur(8px);mix-blend-mode:screen;animation:startupLogoHalo 2.8s ease-in-out infinite}
 @keyframes startupLogoHalo{0%,100%{opacity:.38;transform:scale(.96)}50%{opacity:.95;transform:scale(1.04)}}
 @media(prefers-reduced-motion:reduce){.startup-logo-halo{animation:none;opacity:.52;transform:none}}
+
+/* Tablet: keep the top bar's fixed controls from widening the document. */
+@media (min-width: 721px) and (max-width: 1050px) {
+  .topbar,
+  .approved-topbar {
+    min-width: 0;
+    max-width: 100%;
+    padding-inline: 12px;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .history {
+    flex: 0 0 auto;
+    min-width: 0;
+    gap: 5px;
+  }
+  .history button {
+    min-width: 40px !important;
+    padding-inline: 8px !important;
+  }
+  .history button span {
+    display: none !important;
+  }
+  .search-wrap {
+    flex: 1 1 220px;
+    min-width: 0;
+    max-width: none !important;
+  }
+  .search,
+  .search input {
+    min-width: 0;
+  }
+  .top-actions {
+    flex: 0 0 auto;
+    min-width: 0;
+    gap: 5px;
+  }
+}

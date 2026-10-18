@@ -16,7 +16,7 @@ export function AppShell(){
   const [historyMessage,setHistoryMessage]=useState('');
   const [query,setQuery]=useState('');
   const [canForward,setCanForward]=useState(false);
-  const [collapsed,setCollapsed]=useState(()=>readLocal('pp-sidebar-collapsed')==='1');
+  const [collapsed,setCollapsed]=useState(()=>readLocal('pp-sidebar-collapsed')==='1'||(typeof window!=='undefined'&&window.matchMedia('(max-width: 700px)').matches));
   const [lastSync,setLastSync]=useState(()=>readLocal('pp-last-sync','Sin sincronizar'));const [syncing,setSyncing]=useState(false);
   const results=useMemo(()=>query.trim()?searchItems.filter(([label])=>label.toLowerCase().includes(query.toLowerCase())):[],[query]);
   const unread=notifications.filter(x=>!x.read).length;

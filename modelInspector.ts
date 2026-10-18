@@ -37,12 +37,12 @@ export function inspectObj(text:string):CadInspection{
   return {format:'obj',vertexCount:points.length,triangleCount:faces,bounds:bounds(points),previewPoints:points.slice(0,2500),warnings:points.length?[]:['No se detectaron vértices OBJ válidos.']};
 }
 export function inspectAsciiStl(text:string):CadInspection{
-  const points:[number,number,number][]=[];let triangles=0;
+  const points:[number,number,number][]=[];
   for(const match of text.matchAll(/vertex\s+([-+\d.eE]+)\s+([-+\d.eE]+)\s+([-+\d.eE]+)/g)){
     const p=[Number(match[1]),Number(match[2]),Number(match[3])] as [number,number,number];
     if(p.every(Number.isFinite)) points.push(p);
   }
-  triangles=Math.floor(points.length/3);
+  const triangles=Math.floor(points.length/3);
   return {format:'stl-ascii',vertexCount:points.length,triangleCount:triangles,bounds:bounds(points),previewPoints:points.slice(0,2500),warnings:triangles?[]:['No se detectaron triángulos STL válidos.']};
 }
 export function inspectBinaryStl(bytes:Uint8Array):CadInspection{

@@ -1,8 +1,8 @@
 import {useMemo,useState} from 'react';
-import {Page} from '../../components/Page';
-import {createEmptyCatalogPackage,downloadCatalogPackage,validateCatalogPackage,type TechnicalCatalogPackage} from '../../core/cad/catalogPackage';
-import {machines,tools} from '../../data/catalog';
-import {compareCatalogPackages,createSyncState,type CatalogDiff,type CatalogSyncState} from '../../core/cad/catalogSync';
+import {Page} from './Page';
+import {createEmptyCatalogPackage,downloadCatalogPackage,validateCatalogPackage,type TechnicalCatalogPackage} from './catalogPackage';
+import {machines,tools} from './catalog';
+import {compareCatalogPackages,createSyncState,type CatalogDiff,type CatalogSyncState} from './catalogSync';
 
 const builtInCatalog:TechnicalCatalogPackage={schema:'plegar-pro.catalog.v1',packageId:'plegar-pro-built-in-v1',title:'Catálogo paramétrico inicial Plegar Pro',publisher:'Plegar Pro',generatedAt:new Date().toISOString(),items:[
   ...machines.map(m=>({id:`machine-${m.id}`,kind:'machine' as const,manufacturer:m.manufacturer,reference:m.id,name:m.name,source:m.source,verification:m.verified?'validated' as const:'parametric' as const,dimensions:{lengthMm:m.lengthMm,strokeMm:m.strokeMm,daylightMm:m.daylightMm},metadata:{forceT:m.forceT,throatMm:m.throatMm,clamp:m.clamp}})),

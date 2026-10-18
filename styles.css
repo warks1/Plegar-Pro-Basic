@@ -302,3 +302,241 @@ input,select,textarea{background:rgba(4,13,24,.9)!important;border:1px solid rgb
 .startup-logo-halo{position:absolute;z-index:2;top:8%;left:30%;width:31%;height:46%;pointer-events:none;background:radial-gradient(ellipse at 54% 54%,rgba(18,206,255,.34) 0%,rgba(18,206,255,.14) 35%,transparent 72%);filter:blur(8px);mix-blend-mode:screen;animation:startupLogoHalo 2.8s ease-in-out infinite}
 @keyframes startupLogoHalo{0%,100%{opacity:.38;transform:scale(.96)}50%{opacity:.95;transform:scale(1.04)}}
 @media(prefers-reduced-motion:reduce){.startup-logo-halo{animation:none;opacity:.52;transform:none}}
+
+/* Tablet: keep the top bar's fixed controls from widening the document. */
+@media (min-width: 721px) and (max-width: 1050px) {
+  .topbar,
+  .approved-topbar {
+    min-width: 0;
+    max-width: 100%;
+    padding-inline: 12px;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .history {
+    flex: 0 0 auto;
+    min-width: 0;
+    gap: 5px;
+  }
+  .history button {
+    min-width: 40px !important;
+    padding-inline: 8px !important;
+  }
+  .history button span {
+    display: none !important;
+  }
+  .search-wrap {
+    flex: 1 1 220px;
+    min-width: 0;
+    max-width: none !important;
+  }
+  .search,
+  .search input {
+    min-width: 0;
+  }
+  .top-actions {
+    flex: 0 0 auto;
+    min-width: 0;
+    gap: 5px;
+  }
+}
+
+
+/* Responsive dashboard KPI grid: prevent its five desktop cards from forcing tablet overflow. */
+@media (min-width: 521px) and (max-width: 1050px) {
+  .approved-dashboard,
+  .approved-dashboard .approved-kpis,
+  .approved-dashboard .approved-kpis article {
+    min-width: 0;
+    max-width: 100%;
+  }
+  .approved-dashboard .approved-kpis {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+  .approved-dashboard .approved-kpis article {
+    overflow-wrap: anywhere;
+  }
+}
+
+
+/* Tablet dashboard: collapse fixed/min-content columns before they can widen the document. */
+@media (min-width: 721px) and (max-width: 1050px) {
+  .approved-shell > main,
+  .approved-shell .content,
+  .approved-dashboard,
+  .approved-dashboard > section,
+  .approved-main-grid,
+  .approved-lower-grid,
+  .approved-right-column,
+  .recent-projects,
+  .preview-card {
+    min-width: 0;
+    max-width: 100%;
+  }
+  .approved-main-grid,
+  .approved-lower-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .approved-right-column {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .approved-kpis {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+  .project-cards {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .approved-dashboard img {
+    max-width: 100%;
+  }
+  .hero-live {
+    min-width: 0;
+    max-width: calc(100% - 24px);
+  }
+}
+
+@media (max-width: 720px) {
+  .approved-dashboard,
+  .approved-dashboard > section,
+  .approved-main-grid,
+  .approved-lower-grid,
+  .approved-right-column,
+  .recent-projects,
+  .preview-card {
+    min-width: 0;
+    max-width: 100%;
+  }
+  .approved-main-grid,
+  .approved-lower-grid,
+  .approved-right-column {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .approved-kpis {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+  .project-cards {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .hero-live {
+    left: 12px;
+    right: 12px;
+    bottom: 12px;
+    min-width: 0;
+    max-width: none;
+  }
+}
+
+
+/* Final containment for intrinsic-width descendants in tablet and phone layouts. */
+@media (max-width: 1050px) {
+  html,
+  body {
+    max-width: 100%;
+    overflow-x: clip !important;
+  }
+  .approved-shell {
+    width: 100%;
+    max-width: 100vw;
+    min-width: 0;
+    overflow-x: clip;
+    grid-template-columns: minmax(0, 264px) minmax(0, 1fr);
+  }
+  .approved-shell.sidebar-collapsed {
+    grid-template-columns: 82px minmax(0, 1fr);
+  }
+  .approved-shell > main {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    overflow-x: clip;
+  }
+  .approved-shell .content {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    overflow-x: clip;
+  }
+  .approved-shell .approved-dashboard * {
+    min-width: 0;
+    max-width: 100%;
+  }
+  .approved-shell .approved-dashboard img,
+  .approved-shell .approved-dashboard svg,
+  .approved-shell .approved-dashboard canvas {
+    max-width: 100%;
+  }
+}
+
+
+/* Tablet top-bar is the remaining likely intrinsic-width contributor: wrap every control inside its grid cell. */
+@media (min-width: 721px) and (max-width: 1050px) {
+  .approved-shell .approved-topbar,
+  .approved-shell .topbar {
+    display: flex;
+    flex-wrap: wrap !important;
+    align-content: center;
+    width: 100%;
+    min-width: 0 !important;
+    max-width: 100%;
+    overflow-x: clip;
+    box-sizing: border-box;
+  }
+  .approved-shell .approved-topbar > *,
+  .approved-shell .topbar > * {
+    min-width: 0 !important;
+    max-width: 100%;
+  }
+  .approved-shell .approved-topbar .search-wrap,
+  .approved-shell .topbar .search-wrap {
+    flex: 1 1 150px !important;
+    min-width: 0 !important;
+  }
+  .approved-shell .approved-topbar .top-actions,
+  .approved-shell .topbar .top-actions {
+    flex: 0 1 auto;
+    margin-left: auto;
+  }
+}
+
+
+/* Tablet overflow guard: the application shell is a three-class shared root. Constrain the real grid root and its direct grid items. */
+@media (min-width: 721px) and (max-width: 1050px) {
+  html, body {
+    width: 100%;
+    max-width: 100vw;
+    overflow-x: clip !important;
+  }
+  .app-shell,
+  .approved-shell,
+  .concept-two-shell {
+    width: 100% !important;
+    max-width: 100vw !important;
+    min-width: 0 !important;
+    overflow-x: clip !important;
+    grid-template-columns: 82px minmax(0, 1fr) !important;
+  }
+  .app-shell > .sidebar,
+  .app-shell > .approved-sidebar,
+  .approved-shell > .sidebar,
+  .approved-shell > .approved-sidebar {
+    width: 82px !important;
+    min-width: 0 !important;
+    max-width: 82px !important;
+  }
+  .app-shell > main,
+  .approved-shell > main,
+  .concept-two-shell > main {
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    overflow-x: clip !important;
+  }
+  .app-shell .topbar,
+  .app-shell .approved-topbar,
+  .app-shell .content,
+  .app-shell .approved-dashboard,
+  .app-shell .approved-dashboard > section {
+    min-width: 0 !important;
+    max-width: 100% !important;
+  }
+}

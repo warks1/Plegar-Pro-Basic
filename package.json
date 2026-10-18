@@ -5,8 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite --host 127.0.0.1 --port 4186 --strictPort",
-    "build": "node scripts/verify-static-site.mjs",
-    "preview": "vite preview --host 127.0.0.1 --port 4186 --strictPort",
+    "build": "npm run verify && npm run test:smoke",
+    "preview": "npm run serve",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:e2e": "playwright test",
@@ -17,8 +17,12 @@
     "test:unit": "vitest run --reporter=verbose",
     "typecheck": "tsc -p tsconfig.app.json --noEmit",
     "typecheck:test": "tsc -p tsconfig.test.json --noEmit",
-    "build:strict": "npm run typecheck && vite build",
-    "repair:utf8": "node scripts/repair-utf8.mjs"
+    "build:strict": "npm run audit:imports && npm run typecheck && vite build",
+    "repair:utf8": "node repair-utf8.mjs",
+    "start": "npm run serve",
+    "serve": "node servidor-plegar-pro.mjs",
+    "test:smoke": "node scripts/smoke-static-server.mjs",
+    "audit:imports": "node scripts/audit-router-imports.mjs"
   },
   "dependencies": {
     "@vitejs/plugin-react": "latest",

@@ -1,7 +1,7 @@
 import {useState} from 'react';
-import {Page} from '../../components/Page';
-import {useActiveProject,useAppStore} from '../../store/useAppStore';
-import {answerMetalQuestion} from '../../core/ai/metalAssistant';
+import {Page} from './Page';
+import {useActiveProject,useAppStore} from './useAppStore';
+import {answerMetalQuestion} from './metalAssistant';
 
 interface ChatMessage {role:'user'|'assistant';text:string;title?:string;checks?:string[];assumptions?:string[];confidence?:string}
 export function AiPage(){

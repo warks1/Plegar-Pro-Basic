@@ -1,6 +1,6 @@
-import type {Project} from '../../types/domain';
-import {machines,tools} from '../../data/catalog';
-import {calculateProject} from '../bending/calculations';
+import type {Project} from './domain';
+import {machines,tools} from './catalog';
+import {calculateProject} from './calculations';
 
 export interface MetalAssistantAnswer {title:string;summary:string;checks:string[];assumptions:string[];confidence:'alta'|'media'|'baja';}
 

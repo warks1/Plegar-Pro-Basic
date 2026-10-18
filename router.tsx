@@ -1,10 +1,10 @@
 import {lazy,Suspense} from 'react';
 import {createBrowserRouter} from 'react-router-dom';
-import {AppShell} from '../components/AppShell';
-import {AppErrorPage} from '../components/AppErrorPage';
+import {AppShell} from './AppShell';
+import {AppErrorPage} from './AppErrorPage';
 
 const pages={
-  Dashboard:lazy(()=>import('../features/dashboard/DashboardPage').then(m=>({default:m.DashboardPage}))),
+  Dashboard:lazy(()=>import('./DashboardPage').then(m=>({default:m.DashboardPage}))),
   Projects:lazy(()=>import('../features/projects/ProjectsPage').then(m=>({default:m.ProjectsPage}))),
   Development:lazy(()=>import('../features/development/DevelopmentPage').then(m=>({default:m.DevelopmentPage}))),
   DevelopmentCalculator:lazy(()=>import('../features/development-calculator/DevelopmentCalculatorPage').then(m=>({default:m.DevelopmentCalculatorPage}))),
@@ -17,37 +17,37 @@ const pages={
   Libraries:lazy(()=>import('../features/libraries/LibrariesPage').then(m=>({default:m.LibrariesPage}))),
   Orders:lazy(()=>import('../features/orders/OrdersPage').then(m=>({default:m.OrdersPage}))),
   Settings:lazy(()=>import('../features/settings/SettingsPage').then(m=>({default:m.SettingsPage}))),
-  Ai:lazy(()=>import('../features/ai/AiPage').then(m=>({default:m.AiPage}))),
-  Communications:lazy(()=>import('../features/communications/CommunicationsPage').then(m=>({default:m.CommunicationsPage}))),
+  Ai:lazy(()=>import('./AiPage').then(m=>({default:m.AiPage}))),
+  Communications:lazy(()=>import('./CommunicationsPage').then(m=>({default:m.CommunicationsPage}))),
   Validation:lazy(()=>import('../features/validation/ValidationPage').then(m=>({default:m.ValidationPage}))),
-  Agenda:lazy(()=>import('../features/agenda/AgendaPage').then(m=>({default:m.AgendaPage}))),
-  Customers:lazy(()=>import('../features/customers/CustomersPage').then(m=>({default:m.CustomersPage}))),
+  Agenda:lazy(()=>import('./AgendaPage').then(m=>({default:m.AgendaPage}))),
+  Customers:lazy(()=>import('./CustomersPage').then(m=>({default:m.CustomersPage}))),
   Suppliers:lazy(()=>import('../features/suppliers/SuppliersPage').then(m=>({default:m.SuppliersPage}))),
   Production:lazy(()=>import('../features/production/ProductionPage').then(m=>({default:m.ProductionPage}))),
   Quality:lazy(()=>import('../features/quality/QualityPage').then(m=>({default:m.QualityPage}))),
   Maintenance:lazy(()=>import('../features/maintenance/MaintenancePage').then(m=>({default:m.MaintenancePage}))),
   Materials:lazy(()=>import('../features/materials/MaterialsPage').then(m=>({default:m.MaterialsPage}))),
   Requirements:lazy(()=>import('../features/requirements/RequirementsPage').then(m=>({default:m.RequirementsPage}))),
-  Curve:lazy(()=>import('../features/curve/CurvePerfectPage').then(m=>({default:m.CurvePerfectPage}))),
+  Curve:lazy(()=>import('./CurvePerfectPage').then(m=>({default:m.CurvePerfectPage}))),
   VCompare:lazy(()=>import('../features/vcompare/VComparePage').then(m=>({default:m.VComparePage}))),
   Welding:lazy(()=>import('../features/welding/WeldingPage').then(m=>({default:m.WeldingPage}))),
   Import:lazy(()=>import('../features/importer/ImportPage').then(m=>({default:m.ImportPage}))),
-  About:lazy(()=>import('../features/about/AboutPage').then(m=>({default:m.AboutPage}))),
+  About:lazy(()=>import('./AboutPage').then(m=>({default:m.AboutPage}))),
   Warehouse:lazy(()=>import('../features/warehouse/WarehousePage').then(m=>({default:m.WarehousePage}))),
   Quotes:lazy(()=>import('../features/quotes/QuotesPage').then(m=>({default:m.QuotesPage}))),
   Routes:lazy(()=>import('../features/routes/RoutesPage').then(m=>({default:m.RoutesPage}))),
   Notifications:lazy(()=>import('../features/notifications/NotificationsPage').then(m=>({default:m.NotificationsPage}))),
   ProcessTree:lazy(()=>import('../features/process-tree/ProcessTreePage').then(m=>({default:m.ProcessTreePage}))),
-  Collisions:lazy(()=>import('../features/collisions/CollisionsPage').then(m=>({default:m.CollisionsPage}))),
+  Collisions:lazy(()=>import('./CollisionsPage').then(m=>({default:m.CollisionsPage}))),
   Documents:lazy(()=>import('../features/documents/DocumentsPage').then(m=>({default:m.DocumentsPage}))),
   Revisions:lazy(()=>import('../features/revisions/RevisionsPage').then(m=>({default:m.RevisionsPage}))),
   Release:lazy(()=>import('../features/release/ReleasePage').then(m=>({default:m.ReleasePage}))),
   QualityGate:lazy(()=>import('../features/quality-gate/QualityGatePage').then(m=>({default:m.QualityGatePage}))),
   OfficialSources:lazy(()=>import('../features/official-sources/OfficialSourcesPage').then(m=>({default:m.OfficialSourcesPage}))),
   Integrity:lazy(()=>import('../features/integrity/IntegrityPage').then(m=>({default:m.IntegrityPage}))),
-  CadAssets:lazy(()=>import('../features/cad-assets/CadAssetsPage').then(m=>({default:m.CadAssetsPage}))),
-  CatalogManager:lazy(()=>import('../features/catalog-manager/CatalogManagerPage').then(m=>({default:m.CatalogManagerPage}))),
-  CadCam:lazy(()=>import('../features/cad-cam/CadCamPage').then(m=>({default:m.CadCamPage}))),
+  CadAssets:lazy(()=>import('./CadAssetsPage').then(m=>({default:m.CadAssetsPage}))),
+  CatalogManager:lazy(()=>import('./CatalogManagerPage').then(m=>({default:m.CatalogManagerPage}))),
+  CadCam:lazy(()=>import('./CadCamPage').then(m=>({default:m.CadCamPage}))),
   Updates:lazy(()=>import('../features/updates/UpdatesPage').then(m=>({default:m.UpdatesPage}))),
 };
 const wrap=(Component:React.LazyExoticComponent<React.ComponentType>)=><Suspense fallback={<div className="module-loader">Cargando módulo…</div>}><Component/></Suspense>;

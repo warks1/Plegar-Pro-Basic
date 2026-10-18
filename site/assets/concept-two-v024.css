@@ -679,3 +679,9 @@ main.startup-splash{position:fixed!important;inset:0!important;z-index:9999!impo
 .approved-sidebar{display:flex!important;flex-direction:column!important;min-height:0!important}
 .approved-nav{display:block!important;flex:1 1 auto!important;min-height:0!important;overflow-y:auto!important;overscroll-behavior:contain}
 .approved-nav a{display:flex!important;flex:0 0 auto!important;visibility:visible!important}
+
+
+/* Evita que el menú quede sin área de desplazamiento en pantallas altas o con muchos módulos. */
+.approved-sidebar{display:flex!important;flex-direction:column!important;height:100vh!important;min-height:0!important;overflow:hidden!important}
+.approved-nav{display:block!important;flex:0 0 auto!important;height:calc(100vh - 180px)!important;max-height:none!important;min-height:180px!important;overflow-y:auto!important;overflow-x:hidden!important;overscroll-behavior:contain}
+.approved-nav a{display:flex!important;flex:0 0 39px!important;min-height:39px!important;visibility:visible!important}

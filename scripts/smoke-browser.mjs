@@ -180,6 +180,25 @@ try {
     throw new Error(`Desbordamiento horizontal en móvil: ${JSON.stringify(dimensions)}`);
   }
 
+  // Comprueba la interacción real del menú superpuesto en una pantalla móvil.
+  const mobileMenuButton = mobile.locator('.menu-button').first();
+  const mobileSidebar = mobile.locator('.approved-sidebar, .sidebar').first();
+  await mobileMenuButton.waitFor({ state: 'visible', timeout: 10000 });
+  await mobileMenuButton.click();
+  await mobile.waitForTimeout(200);
+  const menuOpened = await mobileSidebar.evaluate((el) => {
+    const style = getComputedStyle(el);
+    return style.display !== 'none' && style.visibility !== 'hidden' && el.getBoundingClientRect().width > 0;
+  });
+  if (!menuOpened) throw new Error('El menú lateral no se abre en móvil al pulsar el botón.');
+  const mobileRouteLink = mobile.locator('.approved-nav a').filter({ hasText: /Programación 2D/ }).first();
+  await mobileRouteLink.waitFor({ state: 'attached', timeout: 10000 });
+  await mobileRouteLink.click();
+  await mobile.waitForURL((url) => url.pathname.endsWith('/programacion-2d'), { timeout: 15000 });
+  await mobile.waitForTimeout(250);
+  const menuClosed = await mobileSidebar.evaluate((el) => getComputedStyle(el).display === 'none');
+  if (!menuClosed) throw new Error('El menú lateral no se cierra después de seleccionar una sección en móvil.');
+
   if (errors.length) throw new Error('Errores JavaScript del navegador:\\n' + errors.join('\\n---\\n'));
   if (consoleMessages.length) throw new Error('Errores de consola del navegador:\\n' + consoleMessages.join('\\n---\\n'));
   if (failedResources.length) throw new Error('Recursos con error HTTP o de red:\\n' + failedResources.join('\\n'));

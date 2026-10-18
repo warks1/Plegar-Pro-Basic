@@ -4,7 +4,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const appDir = path.dirname(fileURLToPath(import.meta.url));
-const distDir = path.join(appDir, 'dist');
+const distDir = path.join(appDir, 'site');
 const port = Number(process.argv[2] || 4186);
 
 const mime = {
@@ -23,15 +23,16 @@ const mime = {
 };
 
 if (!fs.existsSync(path.join(distDir, 'index.html'))) {
-  console.error('No existe dist/index.html. Reinstale Plegar Pro.');
+  console.error('No existe site/index.html. Compruebe que el repositorio contiene la carpeta publicada site/.');
   process.exit(2);
 }
 
 const server = http.createServer((req, res) => {
   try {
     const requestPath = decodeURIComponent((req.url || '/').split('?')[0]);
-    let filePath = path.join(distDir, requestPath === '/' ? 'index.html' : requestPath);
-    if (!filePath.startsWith(distDir)) {
+    const relativePath = requestPath === '/' ? 'index.html' : requestPath.replace(/^\/+/, '');
+    let filePath = path.resolve(distDir, relativePath);
+    if (filePath !== distDir && !filePath.startsWith(distDir + path.sep)) {
       res.writeHead(403); res.end('Forbidden'); return;
     }
     if (!fs.existsSync(filePath) || fs.statSync(filePath).isDirectory()) {

@@ -26,7 +26,7 @@ const index = read('index.html');
 const fallback = read('404.html');
 if (!index.includes('id="root"')) failures.push('index.html no contiene #root.');
 if (!index.includes('location.hostname.endsWith(\'.github.io\')')) failures.push('index.html no calcula la base de GitHub Pages.');
-for (const cacheBuster of ['assets/boot-guard.js?v=20261017-startup-2','assets/navigation-v024.js?v=20261018-version-sync','assets/concept-two-v024.css?v=20261018-workbench-nav-restore']) {
+for (const cacheBuster of ['assets/boot-guard.js?v=20261017-startup-2','assets/navigation-v024.js?v=20261018-version-sync','assets/concept-two-v024.css?v=20261018-mobile-workbench-overflow-fix']) {
   if (!index.includes(cacheBuster)) failures.push(`Falta actualizar la versión de caché de ${cacheBuster}.`);
 }
 if (!index.includes('src="./assets/index-BejcmiWV.js"')) failures.push('El bundle principal debe cargarse con la misma URL que usan los módulos internos.');
@@ -62,6 +62,10 @@ const bundleText = read('assets/index-BejcmiWV.js');
 if (!bundleText.includes('[`/colisiones`,`Colisiones`')) failures.push('El módulo de colisiones no está accesible desde el menú publicado.');
 if (!bundleText.includes('[`Colisiones`,`/colisiones`]')) failures.push('La búsqueda global no ofrece el módulo de colisiones.');
 const navigation = read('assets/navigation-v024.js');
+const conceptCss = read('assets/concept-two-v024.css');
+for (const fragment of ['Restaurar el marco principal', 'limitar las cuadrículas al ancho real del móvil', '.app-shell:has(.pp-workbench){display:grid!important']) {
+  if (!conceptCss.includes(fragment)) failures.push(`Falta la corrección de navegación/responsive del workbench: ${fragment}.`);
+}
 if (!navigation.includes('version&&version.textContent!==versionLabel')) {
   failures.push('El observador de navegación debe evitar volver a escribir el texto de versión.');
 }

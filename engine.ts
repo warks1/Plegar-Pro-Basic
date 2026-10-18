@@ -1,4 +1,4 @@
-import type {Bend,Project} from '../../types/domain';
+import type {Bend,Project} from './domain';
 
 export interface SimulationFrame {
   index:number;

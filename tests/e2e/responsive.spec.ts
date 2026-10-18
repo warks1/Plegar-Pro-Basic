@@ -10,8 +10,8 @@ test('la aplicación monta su interfaz principal', async ({ page }) => {
   expect(pageErrors).toEqual([]);
 });
 
-test('el menú móvil abre, navega y vuelve a cerrarse', async ({ page, isMobile }) => {
-  test.skip(!isMobile, 'Prueba específica de móvil');
+test('el menú móvil abre, navega y vuelve a cerrarse', async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== 'mobile-chromium', 'Prueba específica de móvil');
 
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/');

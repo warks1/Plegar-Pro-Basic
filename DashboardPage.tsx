@@ -1,8 +1,8 @@
 import {AlertTriangle,CalendarDays,FolderKanban,Settings,TrendingUp} from 'lucide-react';
 import {useNavigate} from 'react-router-dom';
 import {useState} from 'react';
-import {useActiveProject,useAppStore} from '../../store/useAppStore';
-import {ProjectThumbnail} from '../../components/ProjectThumbnail';
+import {useActiveProject,useAppStore} from './useAppStore';
+import {ProjectThumbnail} from './ProjectThumbnail';
 
 
 export function DashboardPage(){const p=useActiveProject();const savedProjects=useAppStore(s=>s.projects);const setActiveProject=useAppStore(s=>s.setActiveProject);const navigate=useNavigate();const [previewRotation,setPreviewRotation]=useState(0);const [previewZoom,setPreviewZoom]=useState(1);return <div className="approved-dashboard">

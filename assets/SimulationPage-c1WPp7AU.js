@@ -67,6 +67,9 @@ function SimulationPage({mode}){
   const dieWidth=Math.max(70,Math.min(170,(die?.width||56)*1.65));
   const dieBaseWidth=Math.max(40,Math.min(170,(die?.baseWidth||die?.width||56)*1.65));
   const dieV=Math.max(35,Math.min(130,(die?.v||16)*3.1));
+  const diePocketDepth=Math.max(20,Math.min(70,(Number(die?.depthMm)||16)*2.7));
+  const diePocketDepth3d=Math.max(10,Math.min(36,(Number(die?.depthMm)||12)*2.35));
+  const dieInsertPx=Math.max(12,Math.min(dieV,(Number(die?.dieInsertWidth)||0)*2.1));
   const foldDepth=Math.max(20,Math.min(92,38+(90-Math.abs(angle))*1.8));
   const ramTravel=Math.min(32,Math.max(0,(90-Math.abs(angle))*.7));
   const machineName=machine?.name||"TrumaBend V85";
@@ -109,10 +112,10 @@ function SimulationPage({mode}){
           ]}),
           jsx("path",{d:"M238 343L668 332L699 345L267 360Z",fill:"#8f9da4",stroke:"#dce4e7",strokeWidth:"2"}),
           jsx("path",{d:"M267 360L699 345L699 359L267 375Z",fill:"#3b4b54",stroke:"#73828a",strokeWidth:"2"}),
-          jsx("path",{d:"M"+(450-dieWidth/2)+" 350L"+(450-dieV/2)+" 350L450 372L"+(450+dieV/2)+" 350L"+(450+dieWidth/2)+" 350L"+(450+dieBaseWidth/2)+" 363L"+(450-dieBaseWidth/2)+" 363Z",fill:"#75848b",stroke:"#d7e0e3",strokeWidth:"2"}),
+          jsx("path",{d:"M"+(450-dieWidth/2)+" 350L"+(450-dieV/2)+" 350L450 "+(350+diePocketDepth3d)+"L"+(450+dieV/2)+" 350L"+(450+dieWidth/2)+" 350L"+(450+dieBaseWidth/2)+" 363L"+(450-dieBaseWidth/2)+" 363Z",fill:"#75848b",stroke:"#d7e0e3",strokeWidth:"2"}),
           jsx("path",{d:"M306 339L450 "+(339+foldDepth*.42)+"L594 339",fill:"none",stroke:"#c8e8f4",strokeWidth:"5","stroke-linecap":"round","stroke-linejoin":"round",className:"sim3d-workpiece",key:"3d-part-"+step+"-"+angle,children:jsx("animate",{attributeName:"d",from:"M306 339L450 339L594 339",to:"M306 339L450 "+(339+foldDepth*.42)+"L594 339",dur:"450ms",fill:"freeze"})}),
           jsx("path",{d:"M"+(450-punchWidth/2)+" 303H"+(450+punchWidth/2)+"L"+(450+punchTipWidth/2)+" 340H"+(450-punchTipWidth/2)+"Z",fill:"url(#machine-metal)",stroke:"#edf2f4",strokeWidth:"2"}),
-          jsx("path",{d:"M"+(450-dieV/2)+" 373H"+(450+dieV/2),stroke:"#44c5ee",strokeWidth:"2"}),
+          jsx("path",{d:"M"+(450-dieInsertPx/2)+" "+(363+diePocketDepth3d*.35)+"H"+(450+dieInsertPx/2),stroke:"#44c5ee",strokeWidth:"2",opacity:".9"}),
           jsx("path",{d:"M120 108L150 107L150 386L120 392Z",fill:"#193247",stroke:"#6f8795",strokeWidth:"2"}),
           jsx("path",{d:"M132 128L143 128L143 153L132 154Z",fill:"#8fc8ec"}),
           jsx("path",{d:"M" +(machineBrand==="TRUMPF"?184:181)+" 137h60v25h-60z",fill:"#1b3c59"}),
@@ -153,7 +156,7 @@ function SimulationPage({mode}){
           jsx("path",{d:"M502 352H855",stroke:"#b8d9dd",strokeWidth:"1",strokeDasharray:"5 8",opacity:".35"}),
           jsx("path",{d:"M450 110V445",stroke:"#c2dfe0",strokeWidth:"1",strokeDasharray:"5 7",opacity:".45"}),
           jsx("path",{d:"M450 "+(351+foldDepth)+"L450 440",stroke:"#eaf5f4",strokeWidth:"1.5",strokeDasharray:"4 5",opacity:".6"}),
-          jsx("path",{d:"M"+(450-dieWidth/2)+" 375H"+(450-dieV/2)+"L450 426L"+(450+dieV/2)+" 375H"+(450+dieWidth/2)+"L"+(450+dieBaseWidth/2)+" 468H"+(450-dieBaseWidth/2)+"Z",fill:"url(#sim2d-die-metal)",stroke:"#81778a",strokeWidth:"2"}),
+          jsx("path",{d:"M"+(450-dieWidth/2)+" 375H"+(450-dieV/2)+"L450 "+(375+diePocketDepth)+"L"+(450+dieV/2)+" 375H"+(450+dieWidth/2)+"L"+(450+dieBaseWidth/2)+" 468H"+(450-dieBaseWidth/2)+"Z",fill:"url(#sim2d-die-metal)",stroke:"#81778a",strokeWidth:"2"}),
           jsx("path",{d:"M"+(450-dieWidth/2-12)+" 375H"+(450-dieWidth/2)+"V468H"+(450-dieWidth/2-12)+"Z",fill:"#526e60"}),
           jsx("path",{d:"M"+(450+dieWidth/2)+" 375H"+(450+dieWidth/2+12)+"V468H"+(450+dieWidth/2)+"Z",fill:"#526e60"}),
           jsx("path",{d:"M"+(450-punchWidth/2)+" "+punchShoulder+"H"+(450+punchWidth/2)+"V"+(punchShoulder+48)+"L"+(450+punchTipWidth/2)+" "+(punchShoulder+48+punchTipDepth)+"H"+(450-punchTipWidth/2)+"L"+(450-punchWidth/2)+" "+(punchShoulder+48)+"Z",fill:"url(#sim2d-punch-metal)",stroke:"#e4d7e5",strokeWidth:"2",className:"sim2d-tool-shape"}),
@@ -161,7 +164,7 @@ function SimulationPage({mode}){
           jsx("path",{d:"M450 130V"+(punchShoulder-4),stroke:"#263e3f",strokeWidth:"10",opacity:".9"}),
           jsx("path",{key:"sheet-"+step+"-"+angle,d:"M75 351H400L450 "+(351+foldDepth)+"L500 351H825",fill:"none",stroke:"#e5eff0",strokeWidth:"4",strokeLinecap:"round",strokeLinejoin:"round",className:"sim2d-workpiece",children:jsx("animate",{attributeName:"d",from:"M75 351H400L450 351L500 351H825",to:"M75 351H400L450 "+(351+foldDepth)+"L500 351H825",dur:"450ms",fill:"freeze"})}),
           jsx("circle",{cx:"450",cy:String(351+foldDepth),r:"5",fill:"#e6f5f1",stroke:"#425e5e",strokeWidth:"2"}),
-          jsx("path",{d:"M"+(450-dieV/2)+" 441H"+(450+dieV/2),stroke:"#a9e7e0",strokeWidth:"2"}),
+          jsx("path",{d:"M"+(450-dieInsertPx/2)+" 447H"+(450+dieInsertPx/2),stroke:"#a9e7e0",strokeWidth:"2"}),
           jsx("text",{x:"450",y:"500",textAnchor:"middle",className:"sim2d-die-label",children:"MATRIZ V"+(die?.v||"—")+" · "+(die?.angle||"—")+"°"}),
           jsx("text",{x:"450",y:"80",textAnchor:"middle",className:"sim2d-punch-label",children:(punch?.name||"Punzón")+" · "+(punch?.angle||"—")+"°"}),
           jsx("text",{x:"535",y:String(343+foldDepth/2),className:"sim2d-angle",children:angle+"°"}),

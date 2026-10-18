@@ -78,14 +78,16 @@ try {
         return Boolean(content && content.innerText.trim() && !content.innerText.includes('Cargando módulo…'));
       }, null, { timeout: 10000 });
       await page.waitForTimeout(80);
-      const layout = await page.evaluate(() => ({
-        viewport: window.innerWidth,
-        document: document.documentElement.scrollWidth,
-        body: document.body.scrollWidth,
-        path: location.pathname,
-      }));
+      const layout = await page.evaluate(() => {
+        const wide = [...document.querySelectorAll('body *')].map(el => {
+          const r = el.getBoundingClientRect();
+          const s = getComputedStyle(el);
+          return { tag: el.tagName.toLowerCase(), className: typeof el.className === 'string' ? el.className : '', id: el.id, left: Math.round(r.left), right: Math.round(r.right), width: Math.round(r.width), position: s.position, minWidth: s.minWidth, overflowX: s.overflowX };
+        }).filter(el => el.width > window.innerWidth + 2 || el.right > window.innerWidth + 2 || el.left < -2).sort((a,b) => b.right-a.right).slice(0,12);
+        return { viewport: window.innerWidth, document: document.documentElement.scrollWidth, body: document.body.scrollWidth, path: location.pathname, wide };
+      });
       if (layout.document > layout.viewport + 2 || layout.body > layout.viewport + 2) {
-        throw new Error(`Desbordamiento horizontal en ${viewport.name} (${viewport.width}px), ruta ${route}: viewport=${layout.viewport}, document=${layout.document}, body=${layout.body}`);
+        throw new Error(`Desbordamiento horizontal en ${viewport.name} (${viewport.width}px), ruta ${route}: viewport=${layout.viewport}, document=${layout.document}, body=${layout.body}; elementos=${JSON.stringify(layout.wide)}`);
       }
       console.log(`RESPONSIVE OK ${viewport.name} ${viewport.width}px · ${route}`);
     }

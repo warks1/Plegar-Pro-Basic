@@ -51,8 +51,8 @@ export const tools:Tool[]=[
 ,{id:'mec-mec-p-r30',kind:'punch',manufacturer:'MECOS',family:'Recto',name:'MEC-P-R30 · Recto',angle:30,radius:0,height:0,width:0,clamp:'Wila',lengths:[],source:'official',verified:true,catalogCode:'P-R30',sourcePage:'Catálogo MECOS 2026',sourceUrl:'https://mecos.es/wp-content/uploads/2026/04/catalogo-general-tecnostamp-utillaje-plegadora-mecos-iberica-deformacion-metal-2026.pdf'}
 ,{id:'mec-mec-p-r88',kind:'punch',manufacturer:'MECOS',family:'Recto',name:'MEC-P-R88 · Recto',angle:88,radius:0,height:0,width:0,clamp:'Wila',lengths:[],source:'official',verified:true,catalogCode:'P-R88',sourcePage:'Catálogo MECOS 2026',sourceUrl:'https://mecos.es/wp-content/uploads/2026/04/catalogo-general-tecnostamp-utillaje-plegadora-mecos-iberica-deformacion-metal-2026.pdf'}
 ,{id:'mec-mec-p-pc90',kind:'punch',manufacturer:'MECOS',family:'Pata de cabra',name:'MEC-P-PC90 · Pata de cabra',angle:90,radius:0,height:0,width:0,clamp:'Wila',lengths:[],source:'official',verified:true,catalogCode:'P-PC90',sourcePage:'Catálogo MECOS 2026',sourceUrl:'https://mecos.es/wp-content/uploads/2026/04/catalogo-general-tecnostamp-utillaje-plegadora-mecos-iberica-deformacion-metal-2026.pdf'}
-];
-export const tools:Tool[]=[
+,
+
 {id:'p-tr-88-r1',kind:'punch',manufacturer:'TRUMPF',family:'Recto',name:'Punzón 88° R1',angle:88,radius:1,height:120,width:30,loadKnM:1000,clamp:'Trumpf',lengths:[25,50,100,200,500,835],source:'reconstructed',verified:false},
 {id:'p-tr-goose',kind:'punch',manufacturer:'TRUMPF',family:'Cuello de cisne',name:'Cuello de cisne 86° R1.5',angle:86,radius:1.5,height:165,width:45,loadKnM:800,clamp:'Trumpf',lengths:[25,50,100,200,500],source:'reconstructed',verified:false},
 {id:'p-am-30-r2',kind:'punch',manufacturer:'AMADA',family:'Agudo',name:'Punzón agudo 30° R2',angle:30,radius:2,height:145,width:32,loadKnM:700,clamp:'European',lengths:[10,15,20,40,50,100,200,415,835],source:'reconstructed',verified:false},

@@ -59,6 +59,38 @@ try {
     console.log(`OK ${route} · ${diagnostic.title || diagnostic.text.split('\\n')[0]}`);
   }
 
+  const responsiveRoutes = ['/', '/programacion-2d', '/simulacion-3d', '/colisiones', '/utillaje'];
+  const viewports = [
+    { name: 'móvil pequeño', width: 320, height: 740 },
+    { name: 'móvil', width: 390, height: 844 },
+    { name: 'tableta', width: 768, height: 1024 },
+    { name: 'PC', width: 1365, height: 900 },
+  ];
+  for (const viewport of viewports) {
+    await page.setViewportSize({ width: viewport.width, height: viewport.height });
+    for (const route of responsiveRoutes) {
+      await page.evaluate(path => {
+        history.pushState({}, '', path);
+        window.dispatchEvent(new PopStateEvent('popstate'));
+      }, route);
+      await page.waitForFunction(() => {
+        const content = document.querySelector('.content');
+        return Boolean(content && content.innerText.trim() && !content.innerText.includes('Cargando módulo…'));
+      }, null, { timeout: 10000 });
+      await page.waitForTimeout(80);
+      const layout = await page.evaluate(() => ({
+        viewport: window.innerWidth,
+        document: document.documentElement.scrollWidth,
+        body: document.body.scrollWidth,
+        path: location.pathname,
+      }));
+      if (layout.document > layout.viewport + 2 || layout.body > layout.viewport + 2) {
+        throw new Error(`Desbordamiento horizontal en ${viewport.name} (${viewport.width}px), ruta ${route}: viewport=${layout.viewport}, document=${layout.document}, body=${layout.body}`);
+      }
+      console.log(`RESPONSIVE OK ${viewport.name} ${viewport.width}px · ${route}`);
+    }
+  }
+
   if (pageErrors.length) throw new Error('Errores JavaScript:\\n' + pageErrors.join('\\n---\\n'));
   if (failedResponses.length) throw new Error('Recursos fallidos:\\n' + failedResponses.join('\\n'));
   console.log(`Prueba de rutas del sitio publicado: OK · ${routes.length} rutas renderizadas sin errores de página ni recursos fallidos.`);

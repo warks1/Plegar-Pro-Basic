@@ -340,3 +340,20 @@ input,select,textarea{background:rgba(4,13,24,.9)!important;border:1px solid rgb
     gap: 5px;
   }
 }
+
+
+/* Responsive dashboard KPI grid: prevent its five desktop cards from forcing tablet overflow. */
+@media (min-width: 521px) and (max-width: 1050px) {
+  .approved-dashboard,
+  .approved-dashboard .approved-kpis,
+  .approved-dashboard .approved-kpis article {
+    min-width: 0;
+    max-width: 100%;
+  }
+  .approved-dashboard .approved-kpis {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+  .approved-dashboard .approved-kpis article {
+    overflow-wrap: anywhere;
+  }
+}

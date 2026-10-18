@@ -47,9 +47,9 @@ for (const file of files) {
 }
 
 if (unresolved.length) {
-  console.error(\`Auditoría de imports: \${unresolved.length} importaciones locales sin destino entre \${files.length} archivos fuente:\`);
-  for (const item of unresolved) console.error(\` - \${item.file}: \${item.specifier}\`);
+  console.error('Auditoría de imports: ' + unresolved.length + ' importaciones locales sin destino entre ' + files.length + ' archivos fuente:');
+  for (const item of unresolved) console.error(' - ' + item.file + ': ' + item.specifier);
   process.exitCode = 1;
 } else {
-  console.log(\`Auditoría de imports: OK · \${importCount} importaciones locales comprobadas en \${files.length} archivos fuente.\`);
+  console.log('Auditoría de imports: OK · ' + importCount + ' importaciones locales comprobadas en ' + files.length + ' archivos fuente.');
 }

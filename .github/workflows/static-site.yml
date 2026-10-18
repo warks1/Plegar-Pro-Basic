@@ -20,7 +20,7 @@ jobs:
           cache: npm
       - name: Install locked dependencies
         run: npm ci
-      - name: Type-check React source and recovered module routes
-        run: npm run typecheck
+      - name: Build React source and recovered module routes
+        run: npm run build:strict
       - name: Verify published site and smoke-test server
         run: npm run build

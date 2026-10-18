@@ -29,8 +29,8 @@ if (!index.includes('location.hostname.endsWith(\'.github.io\')')) failures.push
 for (const cacheBuster of ['assets/boot-guard.js?v=20261017-startup-2','assets/navigation-v024.js?v=20261017-observer-fix']) {
   if (!index.includes(cacheBuster)) failures.push(`Falta actualizar la versión de caché de ${cacheBuster}.`);
 }
-if (!/src=["']\.\/assets\/index-BejcmiWV\.js\?v=[^"']+["']/.test(index)) failures.push('El bundle principal debe cargarse desde una URL versionada para renovar la caché de forma controlada.');
-// El parámetro v= de la entrada invalida la caché; las importaciones relativas conservan sus nombres de archivo.
+if (!index.includes('src="./assets/index-BejcmiWV.js"')) failures.push('El bundle principal debe cargarse con la misma URL que usan los módulos internos.');
+if (index.includes('index-BejcmiWV.js?')) failures.push('El bundle principal no debe usar un parámetro de caché distinto al de sus importaciones internas.');
 if (fallback !== index) failures.push('404.html no coincide con index.html; las rutas directas pueden fallar.');
 const htmlResources = [...index.matchAll(/(?:src|href)=["']([^"']+)["']/g)]
   .map((match) => match[1])

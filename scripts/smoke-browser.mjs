@@ -105,6 +105,8 @@ try {
       console.warn(`Enlace de menú no visible para ${route.suffix}; comprobando la ruta publicada directamente.`);
       await page.goto(directRouteUrl, { waitUntil: 'domcontentloaded', timeout: 60000 });
       await page.waitForURL((url) => url.pathname.endsWith(route.suffix), { timeout: 15000 });
+      await page.locator('.app-shell').waitFor({ state: 'visible', timeout: 30000 });
+      await page.locator('.content').waitFor({ state: 'visible', timeout: 15000 });
     }
     const path = new URL(page.url()).pathname;
     if (expectedBase && !path.startsWith(expectedBase + '/')) {

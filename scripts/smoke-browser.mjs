@@ -199,17 +199,19 @@ try {
   const menuClosed = await mobileSidebar.evaluate((el) => getComputedStyle(el).display === 'none');
   if (!menuClosed) throw new Error('El menú lateral no se cierra después de seleccionar una sección en móvil.');
 
-  // Reutiliza la misma aplicación para revisar un ancho típico de tableta.
-  await mobile.setViewportSize({ width: 768, height: 1024 });
-  await mobile.waitForTimeout(250);
-  const tabletDimensions = await mobile.evaluate(() => ({
-    viewport: document.documentElement.clientWidth,
-    document: document.documentElement.scrollWidth,
-    body: document.body.scrollWidth,
-  }));
-  console.log('DIAGNÓSTICO TABLETA: ' + JSON.stringify(tabletDimensions));
-  if (tabletDimensions.document > tabletDimensions.viewport + 3 || tabletDimensions.body > tabletDimensions.viewport + 3) {
-    throw new Error(`Desbordamiento horizontal en tableta: ${JSON.stringify(tabletDimensions)}`);
+  // Reutiliza la misma aplicación para comprobar tableta y escritorio intermedio.
+  for (const viewport of [{ width: 768, height: 1024, label: 'TABLETA' }, { width: 1024, height: 768, label: 'PORTÁTIL' }, { width: 1365, height: 900, label: 'ESCRITORIO' }]) {
+    await mobile.setViewportSize({ width: viewport.width, height: viewport.height });
+    await mobile.waitForTimeout(150);
+    const dimensions = await mobile.evaluate(() => ({
+      viewport: document.documentElement.clientWidth,
+      document: document.documentElement.scrollWidth,
+      body: document.body.scrollWidth,
+    }));
+    console.log('DIAGNÓSTICO ' + viewport.label + ': ' + JSON.stringify(dimensions));
+    if (dimensions.document > dimensions.viewport + 3 || dimensions.body > dimensions.viewport + 3) {
+      throw new Error(`Desbordamiento horizontal en ${viewport.label.toLowerCase()}: ${JSON.stringify(dimensions)}`);
+    }
   }
 
   if (errors.length) throw new Error('Errores JavaScript del navegador:\\n' + errors.join('\\n---\\n'));

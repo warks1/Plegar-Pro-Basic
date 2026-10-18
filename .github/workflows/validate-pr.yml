@@ -29,6 +29,9 @@ jobs:
       - name: Install locked dependencies
         run: npm ci --ignore-scripts
 
+      - name: Install Chromium for browser tests
+        run: npx playwright install --with-deps chromium
+
       - name: Verify published site and referenced assets
         run: npm run verify
 
@@ -42,3 +45,7 @@ jobs:
       - name: Check lint
         if: always()
         run: npm run lint
+
+      - name: Run browser smoke tests
+        if: always()
+        run: npm run test:e2e

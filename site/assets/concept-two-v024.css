@@ -792,3 +792,24 @@ button{touch-action:manipulation}
     min-width:0!important;max-width:100%!important
   }
 }
+
+
+/* Tablet workbench: let the bottom command bar wrap instead of pushing the page wider than the viewport. */
+@media (min-width:701px) and (max-width:1050px){
+  .pp-workbench .pp-bottom-bar{
+    display:flex!important;flex-wrap:wrap!important;align-items:center;
+    width:100%;max-width:100%;min-width:0;height:auto;min-height:58px;
+    overflow-x:clip!important;gap:4px;padding:5px 7px
+  }
+  .pp-workbench .pp-bottom-bar>button{
+    flex:1 1 38px;min-width:0!important;max-width:100%;padding:4px 5px
+  }
+  .pp-workbench .pp-bottom-status{
+    flex:1 1 100%;width:100%;min-width:0!important;max-width:100%;
+    margin-left:0;justify-content:space-between;gap:6px;padding:5px 8px;
+    box-sizing:border-box
+  }
+  .pp-workbench .pp-bottom-status span,
+  .pp-workbench .pp-bottom-status b,
+  .pp-workbench .pp-bottom-status small{min-width:0;overflow-wrap:anywhere}
+}

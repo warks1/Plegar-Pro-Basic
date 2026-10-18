@@ -771,3 +771,5 @@ button{touch-action:manipulation}
  .app-shell .menu-button{position:relative;z-index:1002!important;flex:0 0 auto}
  .app-shell .topbar,.app-shell .approved-topbar{position:sticky;top:0;z-index:1001}
 }
+
+@media(max-width:700px){.app-shell.sidebar-collapsed:has(.pp-workbench) .sidebar,.app-shell.sidebar-collapsed:has(.pp-workbench) .approved-sidebar{display:none!important}}

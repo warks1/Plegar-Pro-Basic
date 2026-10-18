@@ -37,3 +37,25 @@ try{sessionStorage.setItem('pp.currentRoute',last)}catch{}
 const observer=new MutationObserver(()=>{const current=window.location.pathname;if(current!==last){try{sessionStorage.setItem('pp.previousRoute',last);sessionStorage.setItem('pp.currentRoute',current)}catch{}last=current;}install()});
 observer.observe(document.documentElement,{subtree:true,childList:true});
 window.addEventListener('popstate',install);document.addEventListener('DOMContentLoaded',install);install();
+
+
+/* Mobile menu overlay: open on menu tap and close after selecting a destination. */
+(function(){
+  if(window.__ppMobileMenuBound)return;
+  window.__ppMobileMenuBound=true;
+  document.addEventListener('click',function(event){
+    if(!window.matchMedia('(max-width: 700px)').matches)return;
+    const menu=event.target.closest('.menu-button');
+    const link=event.target.closest('.approved-nav a');
+    if(menu){
+      window.setTimeout(function(){document.documentElement.classList.toggle('pp-mobile-nav-open');},0);
+      return;
+    }
+    if(link){
+      document.documentElement.classList.remove('pp-mobile-nav-open');
+    }
+  },true);
+  document.addEventListener('keydown',function(event){
+    if(event.key==='Escape')document.documentElement.classList.remove('pp-mobile-nav-open');
+  });
+})();

@@ -497,3 +497,46 @@ input,select,textarea{background:rgba(4,13,24,.9)!important;border:1px solid rgb
     margin-left: auto;
   }
 }
+
+
+/* Tablet overflow guard: the application shell is a three-class shared root. Constrain the real grid root and its direct grid items. */
+@media (min-width: 721px) and (max-width: 1050px) {
+  html, body {
+    width: 100%;
+    max-width: 100vw;
+    overflow-x: clip !important;
+  }
+  .app-shell,
+  .approved-shell,
+  .concept-two-shell {
+    width: 100% !important;
+    max-width: 100vw !important;
+    min-width: 0 !important;
+    overflow-x: clip !important;
+    grid-template-columns: 82px minmax(0, 1fr) !important;
+  }
+  .app-shell > .sidebar,
+  .app-shell > .approved-sidebar,
+  .approved-shell > .sidebar,
+  .approved-shell > .approved-sidebar {
+    width: 82px !important;
+    min-width: 0 !important;
+    max-width: 82px !important;
+  }
+  .app-shell > main,
+  .approved-shell > main,
+  .concept-two-shell > main {
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    overflow-x: clip !important;
+  }
+  .app-shell .topbar,
+  .app-shell .approved-topbar,
+  .app-shell .content,
+  .app-shell .approved-dashboard,
+  .app-shell .approved-dashboard > section {
+    min-width: 0 !important;
+    max-width: 100% !important;
+  }
+}

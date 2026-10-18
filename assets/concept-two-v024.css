@@ -935,3 +935,59 @@ body { overflow-x:clip; }
   .pp-workbench table { table-layout:fixed; }
   .pp-workbench th, .pp-workbench td { overflow:hidden; text-overflow:ellipsis; }
 }
+
+
+/* Mobile navigation: explicit overlay state, closed after choosing a destination. */
+@media (max-width:700px) {
+  .app-shell, .approved-shell, .concept-two-shell {
+    grid-template-columns:minmax(0,1fr)!important;
+  }
+  .sidebar, .approved-sidebar {
+    display:none!important;
+  }
+  html.pp-mobile-nav-open .app-shell .approved-sidebar,
+  html.pp-mobile-nav-open .approved-shell .approved-sidebar,
+  html.pp-mobile-nav-open .concept-two-shell .approved-sidebar {
+    display:flex!important;
+    position:fixed!important;
+    z-index:10020!important;
+    inset:0 auto 0 0!important;
+    width:min(84vw,300px)!important;
+    min-width:0!important;
+    max-width:min(84vw,300px)!important;
+    height:100dvh!important;
+    padding:8px 10px 12px!important;
+    overflow:hidden!important;
+    box-shadow:16px 0 42px #0009!important;
+    background:#0b1a2a!important;
+  }
+  html.pp-mobile-nav-open .approved-sidebar .approved-brand {
+    height:70px!important;
+    margin:0 -10px 8px!important;
+    padding:10px 14px!important;
+  }
+  html.pp-mobile-nav-open .approved-sidebar .approved-brand img {
+    width:auto!important; max-width:100%!important; max-height:54px!important; transform:none!important;
+  }
+  html.pp-mobile-nav-open .approved-sidebar .approved-nav {
+    display:flex!important; flex:1 1 auto!important; min-height:0!important;
+    flex-direction:column!important; overflow-y:auto!important; overflow-x:hidden!important;
+  }
+  html.pp-mobile-nav-open .approved-sidebar .approved-nav a {
+    justify-content:flex-start!important; gap:9px!important; padding:8px 9px!important;
+    min-height:40px!important;
+  }
+  html.pp-mobile-nav-open .approved-sidebar .approved-nav a span:last-child,
+  html.pp-mobile-nav-open .approved-sidebar footer {
+    display:block!important;
+  }
+  html.pp-mobile-nav-open .approved-sidebar .approved-nav a span:last-child {
+    font-size:12px!important; white-space:normal!important; overflow-wrap:anywhere!important;
+  }
+  html.pp-mobile-nav-open body:after {
+    content:""; position:fixed; inset:0; z-index:10010;
+    background:#02070db3; backdrop-filter:blur(2px);
+  }
+  .pp-workbench { min-width:0!important; width:100%!important; max-width:100%!important; }
+  .pp-bottom-bar { max-width:100%!important; }
+}

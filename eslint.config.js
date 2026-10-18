@@ -13,6 +13,7 @@ export default tseslint.config(
       'assets/**',
       'site/assets/**',
       '**/*Page-*.js',
+      'ProjectThumbnail-*.js',
       '**/index-*.js',
       '**/main-*.js',
       '**/router-*.js',

@@ -19,6 +19,7 @@ function goBack(){
   const segment=destination.startsWith('/')?destination.slice(1):destination;
   window.location.assign(base+segment);
 }
+let mobileMenuInitialized=false;
 function install(){
   const topbar=document.querySelector('.topbar');
   if(topbar&&!topbar.querySelector('.pp-global-back')){
@@ -26,6 +27,11 @@ function install(){
     button.type='button';button.className='pp-global-back';button.setAttribute('aria-label','Volver a la pantalla anterior');
     button.innerHTML=icon()+'<span>Volver</span>';button.addEventListener('click',goBack);
     const menu=topbar.querySelector('.menu-button');menu?.after(button);
+  }
+  const mobileMenuButton=document.querySelector('.menu-button');
+  if(!mobileMenuInitialized&&window.matchMedia('(max-width: 700px)').matches&&document.querySelector('.app-shell')&&mobileMenuButton){
+    mobileMenuInitialized=true;
+    if(mobileMenuButton.getAttribute('aria-label')==='Contraer menú')mobileMenuButton.click();
   }
   const version=document.querySelector('.build-version');
   const versionLabel='v0.24.4 · ESTABILIDAD, AJUSTES Y NAVEGACIÓN PRO';

@@ -3,7 +3,7 @@ import {Outlet,useLocation,useNavigate} from 'react-router-dom';
 import {ArrowLeft,ArrowRight,Bell,Home as HomeIcon,Mail,Menu,Search,Undo2,Redo2} from 'lucide-react';
 import {Sidebar} from './Sidebar';
 import {ModuleBoundary} from './ModuleBoundary';
-import {useActiveProject,useAppStore} from '../store/useAppStore';
+import {useActiveProject,useAppStore} from './useAppStore';
 
 const readLocal=(key:string,fallback='')=>{try{return window.localStorage.getItem(key)??fallback}catch{return fallback}};
 const writeLocal=(key:string,value:string)=>{try{window.localStorage.setItem(key,value)}catch{/* storage can be unavailable */}};

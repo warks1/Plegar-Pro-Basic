@@ -87,6 +87,30 @@ try {
     // contenedor desplazable y los enlaces pueden estar fuera de la zona visible.
     const routeLink = page.locator('.approved-nav a').filter({ hasText: route.label }).first();
     await routeLink.waitFor({ state: 'attached', timeout: 10000 });
+    const navigationDebug = await routeLink.evaluate((el) => {
+      const inspect = (node) => {
+        if (!node) return null;
+        const style = getComputedStyle(node);
+        const rect = node.getBoundingClientRect();
+        return {
+          tag: node.tagName, className: node.className,
+          display: style.display, visibility: style.visibility, opacity: style.opacity,
+          position: style.position, overflowY: style.overflowY,
+          width: Math.round(rect.width), height: Math.round(rect.height),
+          x: Math.round(rect.x), y: Math.round(rect.y),
+          clientRects: node.getClientRects().length,
+          scrollHeight: node.scrollHeight, clientHeight: node.clientHeight,
+        };
+      };
+      return {
+        link: inspect(el), nav: inspect(el.closest('.approved-nav')),
+        sidebar: inspect(el.closest('.approved-sidebar')),
+        shell: inspect(el.closest('.app-shell')),
+        viewport: { width: innerWidth, height: innerHeight },
+        href: el.getAttribute('href'), text: el.innerText,
+      };
+    });
+    console.log('DIAGNÓSTICO MENÚ ' + route.suffix + ': ' + JSON.stringify(navigationDebug));
     await routeLink.scrollIntoViewIfNeeded({ timeout: 10000 });
     await routeLink.click({ timeout: 10000 });
     await page.waitForURL((url) => url.pathname.endsWith(route.suffix), { timeout: 15000 });

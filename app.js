@@ -23,7 +23,7 @@ const descriptions = {
  'Proyectos':'Proyectos de chapa, archivos asociados y revisiones. Vista inicial de demostración.',
  'Programación 2D':'Editor de perfil 2D: tramos, ángulos, secuencia y estimación geométrica de desarrollo (no validada para fabricación).',
  'Programación 3D':'Geometría tridimensional de la pieza. Todavía sin núcleo CAD interactivo.',
- 'Simulación 2D':'Vista de perfil del punzón, matriz y chapa. La representación actual es ilustrativa.',
+ 'Simulación 2D':'Vista cinemática local de perfil sincronizada con Programación 2D, sin física ni colisiones verificadas.',
  'Simulación 3D':'Vista industrial de la máquina y controles de secuencia. La imagen no calcula deformación física.',
  'Utillaje':'Biblioteca visual de punzones, matrices y adaptadores. Las fichas deberán verificarse con datos de fabricante.',
  'Materiales':'Materiales de muestra. Propiedades mecánicas y espesores pendientes de validación.',
@@ -84,6 +84,7 @@ function showNotice(title,message){showDialog(title,`<p>${escapeHtml(message)}</
 function closeMenu(){ $('#sidebar').classList.remove('open');$('#sidebar-curtain').classList.remove('open');}
 function toggleMenu(){const opened=$('#sidebar').classList.toggle('open');$('#sidebar-curtain').classList.toggle('open',opened);}
 function switchScreen(name){
+ window.PlegarForming2D?.destroy();
  stopPlayer();activeScreen=name;buildNav();closeMenu();
  $$('.mobile-bottom [data-screen]').forEach(b=>b.classList.toggle('active',b.dataset.screen===name));
  $('#summary-cards').hidden=name!=='Inicio';$('#module-view').hidden=name==='Inicio';
@@ -98,6 +99,11 @@ function renderModule(name){
    $('#module-sample').innerHTML='';
    window.PlegarEditor2D.mount();
    return;
+ }else if(name==='Simulación 2D'){
+   $('#module-sample').classList.remove('module-editor');
+   $('#module-sample').classList.add('module-forming');
+   window.PlegarForming2D.mount($('#module-sample'),window.PlegarEditor2D.getData,window.PlegarEditor2D.getSelection,window.PlegarEditor2D.selectBend);
+   return;
  }else if(name==='Proyectos'){
  content=projects.map((p,i)=>`<div class="module-tile"><img src="assets/pieza-mini.webp" alt="Soporte de chapa"/><strong>${escapeHtml(p.name)}</strong><p>${escapeHtml(p.detail)}<br>Registro local de ejemplo</p><button type="button" data-project="${i}">Seleccionar proyecto</button></div>`).join('')+`<div class="module-tile"><strong>Nuevo proyecto</strong><p>Crea un proyecto de muestra almacenado en este navegador.</p><button type="button" id="new-project">Crear proyecto</button></div>`;
  }else if(name==='Materiales'){
@@ -111,7 +117,7 @@ function renderModule(name){
  }else{
  content=`<div class="module-tile"><strong>Diseño del módulo preparado</strong><p>Este módulo está identificado en el mapa maestro. Su implementación funcional corresponde a una fase posterior.</p></div>`;
  }
- $('#module-sample').classList.remove('module-editor');
+ $('#module-sample').classList.remove('module-editor','module-forming');
  $('#module-sample').innerHTML=content;
 }
 

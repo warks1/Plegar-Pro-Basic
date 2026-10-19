@@ -1,4 +1,4 @@
-# Plegar Pro Plus · Prototipo v0.3
+# Plegar Pro Plus · Prototipo v0.4
 
 Repositorio: `warks1/Plegar-Pro-Basic`.
 
@@ -40,3 +40,13 @@ Servir desde HTTP: `python -m http.server 8000`, después abrir `http://localhos
 - `python tests/browser_check.py` (requiere Playwright y Chromium compatibles)
 
 Para GitHub Pages: es necesario habilitar explícitamente la publicación en *Settings → Pages*, si no está configurada. No basta con subir los archivos al repositorio.
+
+## v0.4 · Vista cinemática 2D (no validada para fabricación)
+
+En **Programación 2D** y **Simulación 2D** hay una vista de perfil con punzón arriba, matriz V abajo, tope posterior fijo y chapa. Utiliza el mismo perfil local, orden de plegado, ángulos firmados, punzón genérico, matriz y espesor.
+
+Control de reproducción, pausa, avance manual, pasos, selección de pliegue y zoom. Se dibuja solo el par de tramos adyacentes al pliegue activo. La carrera es una geometría cinemática ilustrativa: `profundidad = (V/2) * tan((|ángulo|*avance)/2)`; NO es una carrera real de máquina. El punzón y la matriz son símbolos genéricos y el tope no sigue la chapa.
+
+**No representa:** radios reales, deformación plástica, contacto, fuerzas, recuperación elástica, interferencias con alas previamente plegadas, reorientación de pieza para pliegues negativos ni seguridad. Alertas por geometría idealizada NO son una detección de colisiones verificada.
+
+Archivos: `forming2d.js`, `forming2d-view.js`, `forming2d.css` y `tests/forming2d.test.cjs`. La portada aprobada permanece sin cambios.

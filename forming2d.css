@@ -1,0 +1,27 @@
+/* Plegar Pro Plus v0.4 — vista de perfil, aislada de la portada aprobada. */
+.f2-view{min-width:0;border:1px solid #315b7a;border-radius:10px;overflow:hidden;color:#eaf4ff;background:#081e30}
+.f2-title{padding:12px 14px;display:flex;gap:12px;align-items:center;justify-content:space-between;background:#0d2b43;flex-wrap:wrap;border-bottom:1px solid #305777}
+.f2-title>div{display:flex;flex-direction:column;gap:5px;min-width:0}
+.f2-title strong{font-size:12px;letter-spacing:.5px;color:#e7f6ff}
+.f2-title small{color:#9bc4dd;font-size:11px}
+.f2-title>span{font-size:10px;letter-spacing:.5px;color:#ffcc78}
+.f2-stage{background:#061727;max-width:100%;overflow:hidden}
+.f2d-svg{display:block;width:100%;height:auto;aspect-ratio:900/480}
+.f2-toolbar{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:9px;padding:12px 14px;border-top:1px solid #244963}
+.f2-toolbar>strong{font-size:12px;color:#b7daf2}
+.f2-controls{display:flex;flex-wrap:wrap;gap:6px}
+.f2-view button{min-height:37px;border-radius:6px;padding:7px 11px;font-size:11px;color:#e4f2ff;background:#0c3f68;border:1px solid #3984ae;cursor:pointer}
+.f2-view button:disabled{opacity:.4;cursor:not-allowed}
+.f2-view button:focus-visible,.f2-range:focus-visible{outline:2px solid #80daff;outline-offset:2px}
+.f2-view button:hover:not(:disabled){background:#08629c}
+.f2-slider{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:12px;padding:8px 14px;font-size:12px;color:#b8d2e4}
+.f2-slider label{font-weight:600}
+.f2-range{width:100%;accent-color:#19aaf7;cursor:pointer;min-width:0}
+.f2-progress{font-variant-numeric:tabular-nums;min-width:42px;text-align:right;color:#83daff}
+.f2-steps{display:flex;gap:6px;overflow-x:auto;max-width:100%;padding:10px 14px 14px;scrollbar-color:#386d8c #071a28}
+.f2-steps .f2-step{white-space:nowrap;flex:0 0 auto;background:#102b40}
+.f2-steps .f2-step.selected{background:#005f9c;border-color:#67ceff}
+.f2-notes{padding:12px 14px 12px 32px;margin:0;background:#292617;border-top:1px solid #705b2d;color:#f2d6a9;font-size:11px;line-height:1.6}
+.f2-inline{margin:14px 0;max-width:100%;min-width:0}
+.module-sample.module-forming{display:block;min-width:0;max-width:100%;margin-top:20px}
+@media(max-width:700px){.f2-toolbar,.f2-title{padding:10px}.f2-controls{width:100%}.f2-controls button{flex:1 1 auto}.f2-slider{grid-template-columns:1fr auto;gap:7px;padding:9px 10px}.f2-slider label{grid-column:1}.f2-slider .f2-range{grid-column:1/3;grid-row:2}.f2-slider output{grid-column:2;grid-row:1}.f2-title>span{font-size:9px}.f2d-svg{min-height:180px}}

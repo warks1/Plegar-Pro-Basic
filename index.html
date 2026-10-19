@@ -5,11 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#061321">
   <meta name="description" content="Plegar Pro — prototipo navegable basado en el boceto aprobado.">
-  <title>Plegar Pro · Prototipo de interfaz</title>
+  <title>Plegar Pro Plus · Prototipo de interfaz</title>
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
   <link rel="stylesheet" href="styles.css">
   <link rel="stylesheet" href="editor2d.css">
+  <link rel="stylesheet" href="forming2d.css">
 </head>
 <body>
   <svg aria-hidden="true" class="svg-icons" xmlns="http://www.w3.org/2000/svg">
@@ -108,7 +109,10 @@
   <dialog class="dialog" id="dialog"><div class="dialog-header"><h2 id="dialog-title">Información</h2><button id="dialog-close" aria-label="Cerrar">×</button></div><div class="dialog-body" id="dialog-body"></div></dialog>
   <div class="toast" role="status" aria-live="polite" id="toast"></div>
   <script src="geometry2d.js" defer></script>
+  <script src="bendcalc.js" defer></script>
   <script src="editor2d.js" defer></script>
+  <script src="forming2d.js" defer></script>
+  <script src="forming2d-view.js" defer></script>
   <script src="app.js" defer></script>
 </body>
 </html>

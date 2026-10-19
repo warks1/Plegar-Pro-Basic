@@ -1,16 +1,5 @@
-# Plegar Pro Plus v0.11 · Continuación de proyecto
+# Plegar Pro Plus v0.12
 
-Diseño de Inicio aprobado conservado, disponible en `assets/referencia-aprobada.webp`. La versión 0.11 añade un **cribado nominal 3D** entre tramos completados de chapa, punzón, matriz y tope como prismas extruidos; sus resultados NO son verificación CAD ni de seguridad.
+Prototipo de interfaz basado en el boceto aprobado, publicado en GitHub Pages tras el despliegue de la rama main.
 
-## Uso
-
-Abrir `index.html` desde un servidor HTTP local, por ejemplo: `python -m http.server 8000`. La aplicación es un prototipo responsive con demostraciones y almacenaje local; no genera programas CNC válidos para producción.
-
-## Pruebas
-
-- `node --test tests/*.test.cjs`
-- `python tests/browser_check.py` (requiere Playwright y Chromium)
-
-**Repositorio:** https://github.com/warks1/Plegar-Pro-Basic
-
-**Continuación:** v0.12, catálogos de geometría con procedencia y revisión; ampliar criterios de colisiones reales sólo tras importar CAD dimensional verificado.
+Novedad: fichas de utillaje genérico SIN VERIFICAR en Programación 2D. No son catálogos oficiales de MECOS/AMADA/Trumpf. Pruebas: node --test tests/*.test.cjs; python tests/browser_check.py. Revisa ESTADO_PROYECTO.md.

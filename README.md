@@ -1,4 +1,4 @@
-# Plegar Pro Plus · Prototipo v0.11
+# Plegar Pro Plus · Prototipo v0.12
 
 Repositorio: `warks1/Plegar-Pro-Basic`.
 
@@ -135,3 +135,14 @@ Los resultados de este cribado 3D se muestran en un **panel propio** y se mantie
 Se amplían las pruebas con casos de contacto, separación XY y Z, intervalos inválidos, correspondencia de prismas visibles, tramo no evaluable y cribado de pliegues anteriores. Comprobar con `node --test tests/*.test.cjs` y `python tests/browser_check.py` (Chromium/Playwright).
 
 **Pendiente v0.12:** sección de catálogos dimensionales con trazabilidad de fuentes; geometría de montaje/adaptadores; modelos de máquina y ejes verificables; motor CAD de sólidos y barrido de trayectorias para colisiones industriales; publicación GitHub Pages y validación en dispositivos físicos.
+
+## v0.12 — Biblioteca de utillaje paramétrico SIN VERIFICAR
+
+- `tool-library.js` define 8 punzones y 21 matrices de demostración, sin atribuirlos a fabricantes; todos tienen ID, fuente, revisión y `verified: false`.
+- Series genéricas 30°/88°, V6–V50 y alturas nominales H100/H120/H150 para punzones seleccionados. **No** representan perfiles CAD certificados ni cotas oficiales.
+- Se conservan los IDs anteriores para recuperar proyectos JSON previos; el editor, el cálculo, el seguimiento 2D y la vista 3D comparten los mismos datos.
+- Fichas de la herramienta seleccionada en Programación 2D; avisos claros «SIN VERIFICAR». El 3D utiliza alturas nominales cuando existen.
+- Pruebas: `node --test tests/*.test.cjs` y `python tests/browser_check.py` (1440, 820, 390, 320 px).
+- **No usar para fabricar** ni garantizar fuerzas, amarres, tolerancias, secuencia CNC o colisiones.
+
+Próxima fase: fichas oficiales con fabricante, referencia, versión, URL, fecha, medidas, amarre y tolerancias comprobables.

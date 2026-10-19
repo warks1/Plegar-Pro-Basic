@@ -8,16 +8,9 @@
  else root.PlegarBendCalc=api;
 })(typeof globalThis!=='undefined'?globalThis:this,function(){
  'use strict';
- const PUNCHES=Object.freeze([
-  {id:'p88-r1',name:'Punzón genérico 88° · punta R1',angle:88,nose:1},
-  {id:'p88-r2',name:'Punzón genérico 88° · punta R2',angle:88,nose:2},
-  {id:'p30-r1',name:'Punzón genérico 30° · punta R1',angle:30,nose:1},
-  {id:'p30-r2',name:'Punzón genérico 30° · punta R2',angle:30,nose:2}
- ]);
- const DIES=Object.freeze([6,8,10,12,16,22,24,32,35,40,50].map(v=>({id:`v${v}-88`,name:`Matriz genérica V${v} · 88°`,opening:v,angle:88})).concat([
-  {id:'v10-30',name:'Matriz genérica V10 · 30°',opening:10,angle:30},
-  {id:'v16-30',name:'Matriz genérica V16 · 30°',opening:16,angle:30}
- ]));
+ const LIB=typeof module==='object'&&module.exports?require('./tool-library.js'):window.PlegarToolLibrary;
+ if(!LIB)throw new Error('Biblioteca de herramientas no cargada.');
+ const {PUNCHES,DIES}=LIB;
  const DEFAULT_SETUP=Object.freeze({radius:2,kFactor:0.33,punch:'p88-r1',die:'v16-88',backgaugeX:120});
  function lookup(list,id){return list.find(item=>item.id===id);}
  function validateSetup(source){

@@ -9,9 +9,9 @@
  'use strict';
  const rad=n=>n*Math.PI/180;
  const pt=(x,y)=>({x,y});
- function punch({punchAngle,punchNose,punchTipY,dieOpening}){
+ function punch({punchAngle,punchNose,punchTipY,dieOpening,punchHeight}){
   const alpha=rad(punchAngle/2),r=punchNose;
-  const topHeight=Math.max(22,dieOpening*1.7);
+  const topHeight=Math.max(22,dieOpening*1.7,punchHeight||0);
   const centerY=punchTipY-r;
   const tx=r*Math.cos(alpha),ty=centerY+r*Math.sin(alpha);
   const topY=punchTipY-topHeight,topX=tx+(ty-topY)*Math.tan(alpha);
@@ -22,9 +22,9 @@
   }
   return {outline:points,tipY:punchTipY,nose:r,angle:punchAngle};
  }
- function die({dieOpening,dieDepth}){
+ function die({dieOpening,dieDepth,dieHeight}){
   const h=dieOpening/2,outer=h+Math.max(14,Math.min(40,dieOpening));
-  const bottom=Math.max(dieDepth+22,32);
+  const bottom=Math.max(dieDepth+22,32,dieHeight||0);
   return {outline:[pt(-outer,0),pt(-h,0),pt(0,dieDepth),pt(h,0),pt(outer,0),pt(outer,bottom),pt(-outer,bottom)],opening:dieOpening,depth:dieDepth};
  }
  function profiles(model){return {punch:punch(model),die:die(model)};}

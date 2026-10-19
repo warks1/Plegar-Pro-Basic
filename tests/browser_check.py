@@ -18,7 +18,7 @@ with sync_playwright() as p:
   page.set_content(html,wait_until='domcontentloaded')
   page.add_style_tag(content=css)
   page.evaluate("""() => {window.__testStorage=window.__testStorage||new Map();Object.defineProperty(window,'localStorage',{configurable:true,value:{getItem:k=>window.__testStorage.get(k)??null,setItem:(k,v)=>window.__testStorage.set(k,String(v)),removeItem:k=>window.__testStorage.delete(k)}})}""")
-  for script in ('geometry2d.js','bendcalc.js','clearance2d.js','toolprofiles2d.js','previousbends2d.js','interference2d.js','assembly2d.js','forming2d.js','forming2d-view.js','piece3d.js','tooling3d.js','scene3d-audit.js','proximity3d.js','piece3d-view.js','editor2d.js','app.js'):
+  for script in ('geometry2d.js','tool-library.js','bendcalc.js','clearance2d.js','toolprofiles2d.js','previousbends2d.js','interference2d.js','assembly2d.js','forming2d.js','forming2d-view.js','piece3d.js','tooling3d.js','scene3d-audit.js','proximity3d.js','piece3d-view.js','editor2d.js','app.js'):
    page.evaluate((root/script).read_text())
   assert page.locator('#project-name').inner_text()=='Soporte motor S235'
   print('navigating',tag,flush=True)
@@ -29,6 +29,8 @@ with sync_playwright() as p:
   assert page.locator('#ed-flat').inner_text().endswith('mm')
   assert page.locator('#ed-bend-table tr').count()==4
   assert page.locator('#ed-vratio').inner_text().startswith('8')
+  assert 'SIN VERIFICAR' in page.locator('#ed-tool-punch').inner_text()
+  assert 'SIN VERIFICAR' in page.locator('#ed-tool-die').inner_text()
   assert page.locator('.ed-bend-point').count()==4
   assert page.locator('#ed-forming .f2d-svg').count()==1
   assert page.locator('.f2-prior-summary').count()==1
@@ -67,12 +69,16 @@ with sync_playwright() as p:
   assert page.locator('#ed-backgauge').input_value()=='30'
   assert 'Tope X 30' in page.locator('#ed-forming .f2-nominal').inner_text()
   assert 'Tope:' in page.locator('#ed-forming .f2-notes').inner_text()
+  page.locator('#ed-punch').select_option('p30-r1-h120')
+  assert 'H120 mm' in page.locator('#ed-tool-punch').inner_text()
   page.locator('#ed-die').select_option('v6-88')
   assert 'V/e' in page.locator('#ed-calc-warnings').inner_text()
   page.locator('#ed-undo').click()
   assert page.locator('#ed-die').input_value()=='v16-88'
   page.locator('#ed-redo').click()
   assert page.locator('#ed-die').input_value()=='v6-88'
+  assert page.locator('#ed-punch').input_value()=='p30-r1-h120'
+  assert 'SIN VERIFICAR' in page.locator('#ed-tool-punch').inner_text()
   print('steps',tag,flush=True)
   page.locator('#ed-add').click()
   assert page.locator('[data-ed-segment]').count()==6

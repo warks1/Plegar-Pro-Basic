@@ -30,3 +30,13 @@
 
 /* v0.11: separate prismatic 3D screening output (not a safety verdict). */
 .p3-proximity3d{padding:12px 14px;border-top:1px solid #315d72;background:#10283a;color:#b1e4f4;font-size:12px;line-height:1.6;overflow-wrap:anywhere}
+
+/* v0.25: cinemática 3D independiente del diseño de portada. */
+.p3-kinematics{padding:12px 14px;border-top:1px solid #315b70;background:#10354b;color:#c5ecff;font-size:12px;line-height:1.55;overflow-wrap:anywhere}
+.p3-motion-controls{padding:12px 14px;display:flex;align-items:center;flex-wrap:wrap;gap:9px;border-top:1px solid #2f6381;background:#0b2940}
+.p3-motion-controls button{padding:10px 14px;border-radius:7px;border:1px solid #4b95c0;background:#124f76;color:#edf8ff;min-height:42px;cursor:pointer;font-size:12px}
+.p3-motion-controls button[aria-pressed="true"]{background:#1f789b;border-color:#85d0ea}
+.p3-motion-controls label{display:flex;align-items:center;gap:10px;color:#bfdef1;font-size:12px}
+.p3-speed{border-radius:5px;background:#122c44;color:#ecf6ff;border:1px solid #548aaa;padding:9px;min-height:42px}
+.p3-cycle-progress{font-weight:700;color:#fff}
+@media(max-width:700px){.p3-motion-controls button{flex:1 1 140px}.p3-motion-controls label{width:100%;justify-content:space-between}}

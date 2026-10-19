@@ -41,12 +41,19 @@
   faces.push({ids:[0,2,3,1],kind:'edge'},{ids:[vertices.length-4,vertices.length-3,vertices.length-1,vertices.length-2],kind:'edge'});
   return {vertices,faces,segmentStatuses,stations:points.length,width,thickness:t,source:'Hipótesis geométrica con ancho de demostración: no representa el programa CNC.'};
  }
- function project(mesh,yaw=38,elevation=24,zoom=1){
+ function bounds(mesh,yaw=38,elevation=24){
+  if(!mesh?.vertices?.length||![yaw,elevation].every(Number.isFinite))throw new Error('Límites 3D inválidos.');
+  const a=rad(yaw),e=rad(elevation),ca=Math.cos(a),sa=Math.sin(a),ce=Math.cos(e),se=Math.sin(e);
+  const points=mesh.vertices.map(p=>{const x=p.x*ca+p.z*sa,d=-p.x*sa+p.z*ca;return {x,y:p.y*ce-d*se};});
+  return {minX:Math.min(...points.map(p=>p.x)),maxX:Math.max(...points.map(p=>p.x)),minY:Math.min(...points.map(p=>p.y)),maxY:Math.max(...points.map(p=>p.y))};
+ }
+ function project(mesh,yaw=38,elevation=24,zoom=1,fixedBounds=null){
   if(![yaw,elevation,zoom].every(Number.isFinite)||zoom<=0||zoom>3)throw new Error('Vista 3D inválida.');
   const a=rad(yaw),e=rad(elevation),ca=Math.cos(a),sa=Math.sin(a),ce=Math.cos(e),se=Math.sin(e);
   const raw=mesh.vertices.map(p=>{const xx=p.x*ca+p.z*sa,deep=-p.x*sa+p.z*ca;return {x:xx,y:p.y*ce-deep*se,depth:deep*ce+p.y*se};});
-  const minX=Math.min(...raw.map(p=>p.x)),maxX=Math.max(...raw.map(p=>p.x));
-  const minY=Math.min(...raw.map(p=>p.y)),maxY=Math.max(...raw.map(p=>p.y));
+  const view=fixedBounds||bounds(mesh,yaw,elevation);
+  const {minX,maxX,minY,maxY}=view;
+  if(![minX,maxX,minY,maxY].every(Number.isFinite)||maxX<minX||maxY<minY)throw new Error('Límites de cámara inválidos.');
   const fit=Math.min(720/Math.max(1,maxX-minX),360/Math.max(1,maxY-minY),7)*zoom;
   const midX=(minX+maxX)/2,midY=(minY+maxY)/2;
   const vertices=raw.map(p=>({x:450+(p.x-midX)*fit,y:238+(p.y-midY)*fit,depth:p.depth}));
@@ -54,5 +61,5 @@
   faces.sort((a,b)=>b.depth-a.depth);
   return {vertices,faces,fit};
  }
- return {build,project};
+ return {build,project,bounds};
 });

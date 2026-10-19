@@ -1,4 +1,4 @@
-# Plegar Pro Plus · Prototipo v0.24
+# Plegar Pro Plus · Prototipo v0.25
 
 Repositorio: `warks1/Plegar-Pro-Basic`.
 
@@ -252,3 +252,14 @@ El módulo `cad-tangency.js` inspecciona las direcciones tangentes nominales en 
 **Límites:** los extremos fuente son analíticos **para arcos circulares en el plano XY**, no para splines, DXF 3D o entidades fuera del formato permitido. La auditoría no comprueba continuidad G2, curvaturas de herramienta real, radios físicos ni colisiones exactas curva–curva. No reconecta tramos ni crea cuerpos. **NO HABILITA CNC, SIMULACIÓN INDUSTRIAL NI VALIDACIÓN DE SEGURIDAD.**
 
 Pruebas v0.24: `node --test tests/*.test.cjs` y `python tests/browser_check.py` en Chromium con 1440, 820, 390 y 320 px. `assets/referencia-aprobada.webp`, `styles.css` y el diseño de Inicio permanecen intactos.
+
+
+## v0.25 — Cinemática ilustrativa reproducible en Simulación 3D
+
+El módulo **Simulación 3D** incorpora una línea de tiempo de ciclo en tres fases: **aproximación**, **plegado** y **retirada**. Un nuevo motor independiente `fold-kinematics.js` calcula el movimiento vertical **nominal** del punzón y el progreso de la curvatura de la chapa a partir de las cotas y ángulos de Programación 2D. El perfil de la matriz y el bloque del tope permanecen fijos. Para evitar la falsa impresión de que la máquina se desplaza, la cámara queda fija durante el ciclo.
+
+Controles disponibles: reproducir/pausar paso, reproducir secuencia de pliegues programada, reiniciar el paso, ajustar el progreso manual, velocidad 0,5×/1×/2×, cambiar paso, giro y zoom de cámara, cambiar ancho de muestra y activar/desactivar visibilidad de punzón, matriz y tope. Al cambiar de pantalla, se cancela la reproducción; los pasos usan la secuencia que figura en Programación 2D.
+
+**Límites explícitos:** NO es una cinemática exacta de eje Y de Cybelec/Trumpf/Bystronic. La chapa sigue una geometría de arco supuesto, no una simulación elastoplástica de contacto; no hay velocidad ni aceleración real, fuerza, sincronización de ejes CNC, amarre, seguimiento activo del tope, retorno elástico ni despeje volumétrico barrido. Los pliegues negativos, secuencias y recolocaciones no se resuelven físicamente. La reproducción NO es apta para fabricar ni verificar colisiones o seguridad.
+
+Nuevos `fold-kinematics.js`, `tests/fold-kinematics.test.cjs`; cambios en `piece3d-view.js`, `piece3d.js`, `piece3d.css`, `app.js`, `index.html`, `sw.js` y las pruebas de navegador. Ejecutar: `node --test tests/*.test.cjs` y `python tests/browser_check.py`.

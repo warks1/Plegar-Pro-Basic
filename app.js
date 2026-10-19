@@ -24,7 +24,7 @@ const descriptions = {
  'Programación 2D':'Editor de perfil 2D: tramos, ángulos, secuencia y estimación geométrica de desarrollo (no validada para fabricación).',
  'Programación 3D':'Previsualización 3D geométrica derivada del editor 2D, sin edición CAD en volumen.',
  'Simulación 2D':'Vista cinemática local de perfil sincronizada con Programación 2D, sin física ni colisiones verificadas.',
- 'Simulación 3D':'Vista 3D geométrica de la pieza del editor 2D, no una simulación de máquina o de colisiones.',
+ 'Simulación 3D':'Cinemática ilustrativa 3D de descenso del punzón y plegado de chapa; no simula fuerzas ni seguridad de máquina.',
  'Utillaje':'Biblioteca visual de punzones, matrices y adaptadores. Las fichas deberán verificarse con datos de fabricante.',
  'Materiales':'Materiales de muestra. Propiedades mecánicas y espesores pendientes de validación.',
  'Máquinas':'Catálogo de plegadoras, ejes y configuraciones. Aún sin gemelos digitales calibrados.',

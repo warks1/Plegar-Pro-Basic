@@ -1,4 +1,4 @@
-# Plegar Pro Plus — Entrega v0.24
+# Plegar Pro Plus — Entrega v0.25
 
 **Ver en web (GitHub Pages):** https://warks1.github.io/Plegar-Pro-Basic/  
 **Repositorio:** https://github.com/warks1/Plegar-Pro-Basic
@@ -23,3 +23,13 @@ Pruebas: `node --test tests/*.test.cjs` y `python tests/browser_check.py` (Pytho
 En **Programación 2D**, importa `EJEMPLO_TANGENCIAS_DXF.dxf` y baja hasta **Tangencias de arcos DXF**. Ajusta la tolerancia angular 0–10 grados y revisa el análisis independiente del módulo de cruces. El botón **Exportar informe de tangencias JSON** guarda los resultados de inspección con el bloqueo `NO CNC`.
 
 Para los arcos circulares se calculan también las cotas X/Y extremas desde el centro y radio originales; la previsualización sigue aproximada por puntos. Ninguna tangencia constituye un amarre verificado ni puede activar geometría real en una máquina.
+
+
+## NUEVO: Simulación 3D (v0.25)
+
+1. Abre **Simulación 3D**. Pulsa **Reproducir paso** para ver cómo baja el punzón, se pliega la chapa y se retira.
+2. Usa **Reproducir secuencia** para ejecutar de forma visual los pliegues en el orden programado.
+3. Puedes pausar, ajustar velocidad o arrastrar la barra de ciclo. El control no mueve una máquina real.
+4. El motor sigue una trayectoria supuesta; NO permite certificar colisiones ni enviar datos CNC.
+
+Pruebas v0.25: 183 automáticas y navegación Playwright 1440, 820, 390, 320 px.

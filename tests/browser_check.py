@@ -19,7 +19,7 @@ with sync_playwright() as p:
   page.set_content(html,wait_until='domcontentloaded')
   page.add_style_tag(content=css)
   page.evaluate("""() => {window.__testStorage=window.__testStorage||new Map();Object.defineProperty(window,'localStorage',{configurable:true,value:{getItem:k=>window.__testStorage.get(k)??null,setItem:(k,v)=>window.__testStorage.set(k,String(v)),removeItem:k=>window.__testStorage.delete(k)}})}""")
-  for script in ('geometry2d.js','tool-library.js','manufacturer-references.js','cad-profile.js','cad-orientation.js','cad-trace.js','cad-profile-view.js','cad-mounting-audit.js','cad-mounting-view.js','cad-trace-view.js','cad-topology.js','cad-topology-view.js','cad-chain.js','cad-chain-view.js','cad-crossings.js','cad-crossings-view.js','cad-tangency.js','cad-tangency-view.js','bendcalc.js','clearance2d.js','toolprofiles2d.js','previousbends2d.js','interference2d.js','assembly2d.js','forming2d.js','forming2d-view.js','piece3d.js','tooling3d.js','scene3d-audit.js','proximity3d.js','piece3d-view.js','editor2d.js','app.js'):
+  for script in ('geometry2d.js','tool-library.js','manufacturer-references.js','cad-profile.js','cad-orientation.js','cad-trace.js','cad-profile-view.js','cad-mounting-audit.js','cad-mounting-view.js','cad-trace-view.js','cad-topology.js','cad-topology-view.js','cad-chain.js','cad-chain-view.js','cad-crossings.js','cad-crossings-view.js','cad-tangency.js','cad-tangency-view.js','bendcalc.js','clearance2d.js','toolprofiles2d.js','previousbends2d.js','interference2d.js','assembly2d.js','forming2d.js','forming2d-view.js','piece3d.js','fold-kinematics.js','tooling3d.js','scene3d-audit.js','proximity3d.js','piece3d-view.js','editor2d.js','app.js'):
    page.evaluate((root/script).read_text())
   assert page.locator('#project-name').inner_text()=='Soporte motor S235'
   print('navigating',tag,flush=True)
@@ -294,7 +294,7 @@ with sync_playwright() as p:
   page.set_content(html,wait_until='domcontentloaded')
   page.add_style_tag(content=css)
   page.evaluate("""() => {window.__testStorage=window.__testStorage||new Map();Object.defineProperty(window,'localStorage',{configurable:true,value:{getItem:k=>window.__testStorage.get(k)??null,setItem:(k,v)=>window.__testStorage.set(k,String(v)),removeItem:k=>window.__testStorage.delete(k)}})}""")
-  for script in ('geometry2d.js','tool-library.js','manufacturer-references.js','cad-profile.js','cad-orientation.js','cad-trace.js','cad-profile-view.js','cad-mounting-audit.js','cad-mounting-view.js','cad-trace-view.js','cad-topology.js','cad-topology-view.js','cad-chain.js','cad-chain-view.js','cad-crossings.js','cad-crossings-view.js','cad-tangency.js','cad-tangency-view.js','bendcalc.js','clearance2d.js','toolprofiles2d.js','previousbends2d.js','interference2d.js','assembly2d.js','forming2d.js','forming2d-view.js','piece3d.js','tooling3d.js','scene3d-audit.js','proximity3d.js','piece3d-view.js','editor2d.js','app.js'):
+  for script in ('geometry2d.js','tool-library.js','manufacturer-references.js','cad-profile.js','cad-orientation.js','cad-trace.js','cad-profile-view.js','cad-mounting-audit.js','cad-mounting-view.js','cad-trace-view.js','cad-topology.js','cad-topology-view.js','cad-chain.js','cad-chain-view.js','cad-crossings.js','cad-crossings-view.js','cad-tangency.js','cad-tangency-view.js','bendcalc.js','clearance2d.js','toolprofiles2d.js','previousbends2d.js','interference2d.js','assembly2d.js','forming2d.js','forming2d-view.js','piece3d.js','fold-kinematics.js','tooling3d.js','scene3d-audit.js','proximity3d.js','piece3d-view.js','editor2d.js','app.js'):
    page.evaluate((root/script).read_text())
   if w<=1120:page.locator('#open-menu').click()
   page.locator('button.nav-item[data-screen="Programación 2D"]').click()
@@ -327,6 +327,37 @@ with sync_playwright() as p:
   if w<=1120:page.locator('#open-menu').click()
   page.locator('button.nav-item[data-screen="Simulación 3D"]').click()
   assert page.locator('.p3-view .p3-svg').count()==1
+  assert 'CINEMÁTICA 3D' in page.locator('.p3-heading').inner_text()
+  assert 'FASE: APROXIMACIÓN' in page.locator('.p3-kinematics').inner_text()
+  assert page.locator('[data-p3="play"]').is_enabled()
+  assert page.locator('[data-p3="all"]').is_enabled()
+  def stage_group(group):
+   return page.locator(f'.p3-svg polygon[data-group="{group}"]').first.get_attribute('points')
+  start_punch=stage_group('punch'); start_sheet=stage_group('sheet')
+  start_die=stage_group('die'); start_gauge=stage_group('gauge')
+  page.locator('.p3-progress').fill('50')
+  assert 'FASE: PLEGADO' in page.locator('.p3-kinematics').inner_text()
+  assert stage_group('punch')!=start_punch
+  assert stage_group('sheet')!=start_sheet
+  assert stage_group('die')==start_die
+  assert stage_group('gauge')==start_gauge
+  middle_sheet=stage_group('sheet')
+  page.locator('.p3-progress').fill('100')
+  assert 'FASE: RETIRADA' in page.locator('.p3-kinematics').inner_text()
+  assert stage_group('sheet')!=middle_sheet
+  page.locator('[data-p3="rewind"]').click()
+  assert page.locator('.p3-progress').input_value()=='0'
+  page.locator('.p3-speed').select_option('2')
+  page.locator('[data-p3="play"]').click()
+  assert page.locator('[data-p3="play"]').get_attribute('aria-pressed')=='true'
+  page.wait_for_timeout(170)
+  assert float(page.locator('.p3-progress').input_value())>0
+  page.locator('[data-p3="play"]').click()
+  assert page.locator('[data-p3="play"]').get_attribute('aria-pressed')=='false'
+  page.locator('[data-p3="all"]').click()
+  assert page.locator('[data-p3="all"]').get_attribute('aria-pressed')=='true'
+  assert 'Paso 1' in page.locator('.p3-step').inner_text()
+  page.locator('[data-p3="all"]').click()
   assert 'caras ilustrativas' in page.locator('.p3-state').inner_text()
   assert page.locator('.p3-svg polygon[data-group="punch"]').count()>0
   assert page.locator('.p3-svg polygon[data-group="die"]').count()>0

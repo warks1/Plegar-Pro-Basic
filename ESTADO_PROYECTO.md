@@ -1,4 +1,4 @@
-# Plegar Pro Plus — Punto de continuidad v0.24
+# Plegar Pro Plus — Punto de continuidad v0.25
 
 **Fecha:** 2026-10-19  
 **Repositorio:** https://github.com/warks1/Plegar-Pro-Basic  
@@ -38,3 +38,13 @@ Instrucción al recibir «Seguir»: recuperar el último commit de GitHub, compr
 - Ejemplo `EJEMPLO_TANGENCIAS_DXF.dxf` y pruebas `tests/cad-tangency.test.cjs`; pruebas del navegador en PC, tablet y dos móviles.
 - NO se validan continuidad G2, solapes curva–curva de manera exacta, sólidos, amarres ni colisiones físicas. Se mantiene la interfaz original aprobada.
 - Siguiente objetivo: evaluar geometricamente contacto y holgura curva–curva de manera controlada y preparar verificaciones CAD por fabricante con tolerancias documentadas; nunca validar fabricación solo por coincidencia de perfiles 2D.
+
+
+## v0.25 — simulación de movimiento 3D (esquema)
+
+- Motor `fold-kinematics.js`: ciclo reproducible aproximación (0–22 %), conformado (22–78 %) y retirada (78–100 %), con descenso del punzón acoplado a una deformación geométrica nominal de la chapa. La matriz y el tope quedan estáticos; la cámara 3D se mantiene fija en el ciclo.
+- `piece3d-view.js`: Play/Pausa, secuencia completa, reinicio, velocidad, barra de avance, selector de pasos y controles 3D anteriores. Control limpio de `requestAnimationFrame` al abandonar la pantalla.
+- Pruebas: 183 Node (incluidas 9 de cinemática), Playwright en PC, tablet y móviles 390 y 320 px, comprobando desplazamiento del punzón, deformación de la chapa y estabilidad de matriz y tope.
+- Importante: no se han incorporado modelos CAD certificados, leyes constitutivas, contacto sólido, ejes físicos, fuerzas o evaluación de seguridad. **NO CNC / NO FABRICACIÓN**.
+- Se mantiene la imagen aprobada en `assets/referencia-aprobada.webp` y `styles.css` sin cambios.
+- Próximo paso recomendado: sincronizar cinemática 3D con un modelo mecánico contrastado (planos de montaje, alturas reales, topes, cinemática de máquina), y realizar barrido de colisiones fiable antes de evaluar uso industrial.

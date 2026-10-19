@@ -37,12 +37,10 @@ Pruebas v0.25: 183 automáticas y navegación Playwright 1440, 820, 390, 320 px.
 
 **v0.26:** La simulación 3D tiene un nuevo panel de muestreo de proximidades durante el ciclo. Revisa alas anteriores, punzón, matriz y tope nominales en 25 posiciones y permite exportar JSON. No comprueba movimiento continuo ni colisión física; no usar para fabricación. Pruebas: 189 Node y cuatro resoluciones de navegador.
 
-## v0.27 — módulo Planos por cliente
+**v0.27 Planos:** abre Planos desde el menú. Crea una carpeta, importa una foto o un fichero; encontrarás PDF y miniatura donde el formato permite dibujarla. Conserva copias ZIP por cliente porque el almacenamiento es local del dispositivo y puede perderse al borrar datos del navegador. Para STEP/DWG/SolidWorks se crea ficha PDF, no sólido convertido.
 
-Nuevo módulo Planos sin rediseñar Inicio: carpetas de cliente, importación desde almacenamiento o cámara, búsqueda, cambio de cliente y borrado. IndexedDB local conserva fichero original, miniatura cuando es posible y una copia PDF.
-Fotos JPG/PNG/WebP: PDF con imagen real y miniatura. DXF 2D ASCII admitido: vista de inspección rasterizada en PDF y miniatura, SIN escala certificada. PDFs originales: conservados. Otros archivos (STEP, DWG, SolidWorks, etc.): PDF de ficha de archivo, NO conversión de sólidos ni CAM; original disponible siempre.
-Exportaciones: PDF, original, copia ZIP por carpeta o global con índice JSON. Compartir PDF mediante Web Share cuando el dispositivo lo permite; de lo contrario descargar PDF y preparar correo con adjunto manual. Formatos aconsejados DXF/DWG, STEP/IGES, SLDPRT/SLDDRW/SLDASM, STL/3MF, SVG y NC/G-code, sin producir conversiones falsas.
-Miniatura geométrica real para fotografía y DXF compatible; para otros tipos (PDF importado y sólidos no interpretables) se muestra identificación de formato, NO siluetas inventadas. El almacenamiento no se sincroniza y puede perderse al borrar datos del navegador: hacer copias ZIP. Límites 22 MB/archivo y 150 documentos. No integración CNC ni certificación industrial.
-Pruebas locales: 193 Node; verificaciones del navegador general y del módulo Planos a 1440/820/390/320 px. La prueba aislada de Planos emula IndexedDB porque el navegador de ensayo bloquea URLs locales.
+**v0.28:** Nuevo botón **Importar carpeta ZIP** en Planos para instalar carpetas privadas de PDFs y miniaturas. Los 10 documentos de Trenirtrade se entregan en un ZIP aparte: no se publican en GitHub.
 
-**v0.28:** En Planos, el botón Importar carpeta ZIP admite lotes privados de PDFs y miniaturas. Los planos de clientes no están incluidos en el repositorio público.
+
+### Planos Trenirtrade
+En **Planos → Trenirtrade** se ven los diez PDFs del repositorio, sus miniaturas y la opción **Abrir en Programación**. Al abrir un plano aparece junto al editor 2D; introduce los dos primeros tramos, el ángulo y el espesor, pulsa **Crear perfil 2D** y completa todos los pliegues reales en el editor antes de pulsar **Simular 2D/3D**. El resultado es una representación del perfil que programes, no una interpretación CAD automática del PDF. Los PDFs son públicos en el repositorio; las copias privadas importadas al navegador no se publican.

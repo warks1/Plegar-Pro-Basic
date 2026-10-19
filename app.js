@@ -85,6 +85,7 @@ function showNotice(title,message){showDialog(title,`<p>${escapeHtml(message)}</
 function closeMenu(){ $('#sidebar').classList.remove('open');$('#sidebar-curtain').classList.remove('open');}
 function toggleMenu(){const opened=$('#sidebar').classList.toggle('open');$('#sidebar-curtain').classList.toggle('open',opened);}
 function switchScreen(name){
+ if(['Simulación 2D','Simulación 3D','Programación 3D'].includes(name)&&window.PlegarEditor2D?.getPlanReference()&&!window.PlegarEditor2D.isPlanConfigured()){name='Programación 2D';toast('Define primero las medidas del perfil del plano seleccionado para habilitar su simulación.');}
  window.PlegarPlans?.destroy();
  window.PlegarForming2D?.destroy();
  window.PlegarPiece3DView?.destroy();
@@ -199,3 +200,5 @@ $('#dialog-close').addEventListener('click',()=>$('#dialog').close());
 $('#dialog').addEventListener('click',event=>{if(event.target===$('#dialog'))$('#dialog').close();});
 buildNav();renderProjects();renderMaterials();renderSteps();switchScreen('Inicio');
 if('serviceWorker' in navigator&&location.protocol.startsWith('http'))navigator.serviceWorker.register('sw.js').catch(()=>{});
+
+window.PlegarApp={switchScreen};

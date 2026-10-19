@@ -58,13 +58,24 @@ Instrucción al recibir «Seguir»: recuperar el último commit de GitHub, compr
 - 189 pruebas Node superadas y navegación Playwright en 1440/820/390/320 px. El boceto Inicio y `styles.css` no cambian.
 - Siguiente fase sugerida: verificaciones geométricas de contacto activo, enclavamientos de utillaje y topes basados en datos dimensionales fiables, nunca certificación de seguridad por aproximación.
 
+
 ## v0.27 — módulo Planos por cliente
 
-Nuevo módulo Planos sin rediseñar Inicio: carpetas de cliente, importación desde almacenamiento o cámara, búsqueda, cambio de cliente y borrado. IndexedDB local conserva fichero original, miniatura cuando es posible y una copia PDF.
-Fotos JPG/PNG/WebP: PDF con imagen real y miniatura. DXF 2D ASCII admitido: vista de inspección rasterizada en PDF y miniatura, SIN escala certificada. PDFs originales: conservados. Otros archivos (STEP, DWG, SolidWorks, etc.): PDF de ficha de archivo, NO conversión de sólidos ni CAM; original disponible siempre.
-Exportaciones: PDF, original, copia ZIP por carpeta o global con índice JSON. Compartir PDF mediante Web Share cuando el dispositivo lo permite; de lo contrario descargar PDF y preparar correo con adjunto manual. Formatos aconsejados DXF/DWG, STEP/IGES, SLDPRT/SLDDRW/SLDASM, STL/3MF, SVG y NC/G-code, sin producir conversiones falsas.
-Miniatura geométrica real para fotografía y DXF compatible; para otros tipos (PDF importado y sólidos no interpretables) se muestra identificación de formato, NO siluetas inventadas. El almacenamiento no se sincroniza y puede perderse al borrar datos del navegador: hacer copias ZIP. Límites 22 MB/archivo y 150 documentos. No integración CNC ni certificación industrial.
-Pruebas locales: 193 Node; verificaciones del navegador general y del módulo Planos a 1440/820/390/320 px. La prueba aislada de Planos emula IndexedDB porque el navegador de ensayo bloquea URLs locales.
+- Nuevo botón **Planos** en el menú lateral, sin alterar Inicio ni sus imágenes/estilos. Biblioteca local en IndexedDB, carpetas por cliente, búsqueda, cambio de carpeta, eliminación, importación de archivos y captura desde cámara móvil (`capture=environment`).
+- Al importar fotos JPG/PNG/WebP compatibles, genera PDF con la fotografía real y miniatura de la pieza. Para DXF ASCII 2D admitidos por el lector v0.24, genera una vista rasterizada de geometría y PDF de inspección **sin escala certificada**. Un PDF original permanece sin cambios. STEP, DWG, SolidWorks y demás formatos CAD no interpretables generan un **PDF de ficha documental**, no una conversión de sólidos, y conservan los bytes originales.
+- Lista muestra miniatura de fotos y DXF admitidos; otros archivos se identifican por formato, **sin inventar una silueta**. Descarga de PDF o archivo original; compartir PDF con Web Share API cuando existe, o descarga + correo `mailto:` con necesidad de adjuntar manualmente.
+- Exportación ZIP por cliente o de todos los planos, con PDFs, originales e índice JSON. Recomendaciones de formatos: PDF, DXF/DWG, STEP/IGES, SolidWorks (SLDPRT/SLDDRW/SLDASM), STL/3MF, SVG y NC/G-code específico de máquina; **no se crean conversiones CAD/CAM falsas**.
+- Almacenamiento local del navegador (no sincronizado entre dispositivos ni cuentas). Borrar los datos del navegador elimina los planos si no se exportó una copia ZIP. Límite de importación por archivo 22 MB y máximo de 150 registros.
+- Seguridad: ningún documento se activa como geometría del simulador ni se usa para CNC. No se ha incorporado visor de sólidos CAD ni interpretación completa de PDFs nativos.
+- Pruebas: `node --test tests/*.test.cjs`, `python tests/browser_check.py` y `python tests/plans-browser-check.py` (esta última utiliza un simulador de IndexedDB porque el navegador de prueba no permite direcciones HTTP locales); verificar integración en GitHub Pages real tras el commit.
 
 ## v0.28 - Lotes privados de planos
-Importador de carpeta ZIP guardado en Planos. El usuario importa el ZIP entregado por separado para instalarlo en su almacenamiento local IndexedDB. Nunca subir archivos de clientes al repositorio público.
+Nuevo importador de carpeta ZIP almacenado en Planos. Se debe descargar `Trenirtrade_10_planos_PDF_importar.zip` y seleccionar con el botón Importar carpeta ZIP. No subir fotografías ni PDFs reales al repositorio público.
+
+
+## Continuidad v0.29 (19 oct 2026)
+- Carpeta GitHub pública `planos/trenirtrade` con diez PDF fotográficos y diez miniaturas.
+- Catálogo `repo-plans.js` muestra la carpeta en Planos sin importar ZIP manual.
+- `Planos → Abrir en Programación` carga el nombre y vista previa, NO geometría CAD automática.
+- Para simular: introducir medidas y generar perfil editable; simulación de cinemática genérica, NO CNC.
+- Diseño de Inicio intacto. Mantener separación de simulación nominal vs verificada.

@@ -1,4 +1,4 @@
-# Plegar Pro Plus · Prototipo v0.28
+# Plegar Pro Plus · Prototipo v0.29
 
 Repositorio: `warks1/Plegar-Pro-Basic`.
 
@@ -273,17 +273,29 @@ El módulo **Simulación 3D** ahora calcula un **muestreo discreto** de 25 posic
 
 Se añadieron `sweep3d.js` y `tests/sweep3d.test.cjs`; se cambiaron `piece3d-view.js`, `piece3d.css`, `index.html`, `sw.js`, `tests/browser_check.py` y documentos. Pruebas locales: **189 automáticas** más Playwright en **1440, 820, 390 y 320 px**. Identidad visual aprobada (Inicio) no modificada.
 
-## v0.27 — módulo Planos por cliente
 
-Nuevo módulo Planos sin rediseñar Inicio: carpetas de cliente, importación desde almacenamiento o cámara, búsqueda, cambio de cliente y borrado. IndexedDB local conserva fichero original, miniatura cuando es posible y una copia PDF.
-Fotos JPG/PNG/WebP: PDF con imagen real y miniatura. DXF 2D ASCII admitido: vista de inspección rasterizada en PDF y miniatura, SIN escala certificada. PDFs originales: conservados. Otros archivos (STEP, DWG, SolidWorks, etc.): PDF de ficha de archivo, NO conversión de sólidos ni CAM; original disponible siempre.
-Exportaciones: PDF, original, copia ZIP por carpeta o global con índice JSON. Compartir PDF mediante Web Share cuando el dispositivo lo permite; de lo contrario descargar PDF y preparar correo con adjunto manual. Formatos aconsejados DXF/DWG, STEP/IGES, SLDPRT/SLDDRW/SLDASM, STL/3MF, SVG y NC/G-code, sin producir conversiones falsas.
-Miniatura geométrica real para fotografía y DXF compatible; para otros tipos (PDF importado y sólidos no interpretables) se muestra identificación de formato, NO siluetas inventadas. El almacenamiento no se sincroniza y puede perderse al borrar datos del navegador: hacer copias ZIP. Límites 22 MB/archivo y 150 documentos. No integración CNC ni certificación industrial.
-Pruebas locales: 193 Node; verificaciones del navegador general y del módulo Planos a 1440/820/390/320 px. La prueba aislada de Planos emula IndexedDB porque el navegador de ensayo bloquea URLs locales.
+## v0.27 — Planos: biblioteca documental por cliente
+
+**Menú → Planos.** Crear carpetas por cliente, importar desde cámara o dispositivo, buscar, mover y borrar planos. Los originales se conservan localmente en IndexedDB junto a una copia PDF. PDF de fotografía contiene la imagen; DXF 2D ASCII compatible crea una vista de inspección rasterizada; los formatos de sólidos CAD (STEP, DWG, SLDPRT, etc.) generan un **PDF de ficha documental**, no una conversión de geometría. El PDF importado se conserva sin modificaciones.
+
+Cada plano incluye miniatura real para imágenes y DXF compatibles. No se promete miniatura geométrica de PDFs sin un motor de renderizado PDF ni de sólidos 3D sin un lector CAD. Se puede descargar PDF, descargar original, usar la función Compartir del dispositivo para el PDF o descargarlo y preparar un correo (adjuntar manualmente cuando no haya función de compartir archivos). Exporta ZIP con originales, PDFs e índice para copia de seguridad.
+
+La lista explica formatos recomendados: PDF consulta; DXF/DWG CAD 2D; STEP/IGES intercambio 3D; SLDPRT/SLDDRW/SLDASM SolidWorks; STL/3MF mallas; SVG vector; NC/G-code solo tras posprocesado para la máquina. Solo se permite descargar el original correspondiente: no se fabrican conversiones automáticas a estos formatos.
+
+**Atención al almacenamiento:** IndexedDB pertenece al navegador/dispositivo y al origen web; no es una nube ni se sincroniza. Exportar copias ZIP a menudo, ya que borrar datos del navegador puede borrar planos. Archivos hasta 22 MB y límite 150 registros para proteger dispositivos móviles. No hay integración CNC ni validación CAD industrial.
 
 
 ## v0.28 — importar carpetas privadas con PDFs y miniaturas
 
-En Planos → Importar carpeta ZIP se puede seleccionar un paquete ZIP sin compresión, con índice de carpeta, PDFs, fotografías originales y miniaturas. La carpeta del cliente se crea si no existe y sus documentos se guardan en IndexedDB local. Se evitan duplicados al volver a importar el mismo paquete. Los documentos privados no se publican en el repositorio, que solo contiene código.
+En **Planos → Importar carpeta ZIP**, seleccionar un paquete ZIP sin compresión con `indice-planos.json` y PDFs + fotografías + miniaturas. La carpeta se crea si no existe (por ejemplo, **Trenirtrade**), se importan los documentos a IndexedDB local, se evita repetir entradas del mismo paquete y se conservan PDF y foto original. Es compatible con el paquete de 10 planos facilitado aparte al propietario. **Los planos privados NO se suben al repositorio público ni a GitHub Pages.**
 
-Se valida estructura ZIP, CRC32, cabeceras PDF/JPEG, tamaños y rutas. No se interpretan CAD ni se certifican cotas o fabricación. El paquete ZIP privado debe importarse por separado en cada dispositivo.
+La entrada ZIP se valida (CRC32, estructura, cabeceras de PDF/JPEG, tamaño y nombres); ZIP comprimido, cifrado o arbitrario no se acepta. No se convierten cotas a CAD ni se realizan verificaciones de fabricación. Para verlos en otro dispositivo hay que importar el paquete allí también.
+
+
+## v0.29 — Planos Trenirtrade guardados en GitHub y enlace a Programación 2D/Simulación
+
+Los diez PDF fotográficos aportados por el usuario y sus diez miniaturas se encuentran en `planos/trenirtrade/`. `repo-plans.js` configura la carpeta **Trenirtrade** (solo lectura), visible automáticamente desde Planos en todos los equipos conectados. Los documentos se publican en este repositorio de carácter **público**; no se han incluido las fotografías JPEG originales, pero los PDFs sí contienen las imágenes y anotaciones visibles.
+
+El botón **Abrir en Programación** vincula el plano seleccionado con Programación 2D: miniatura, nombre, fuente y enlace al PDF. Las fotografías no tienen geometría CAD analítica. El usuario debe introducir al menos dos tramos y un ángulo de plegado, además del espesor, para crear un primer perfil editable; podrá añadir los demás tramos y definir el orden de plegado en el editor. Solo entonces se habilita la navegación a Simulación 2D o 3D para ese perfil. No existe reconstrucción automática, extracción fiable de cotas, agujeros o espesor, ni simulación certificada de la pieza fotografiada.
+
+Los PDFs públicos se pueden descargar o compartir. Los documentos privados añadidos por el usuario siguen guardándose únicamente en IndexedDB de su dispositivo. No se modifican las imágenes de Inicio ni la hoja de estilos principal. Pruebas: `node --test tests/*.test.cjs`, `python tests/browser_check.py`, `python tests/plans-browser-check.py`, `python tests/plans-programming.test.py`.

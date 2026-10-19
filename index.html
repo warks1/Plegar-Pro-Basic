@@ -9,6 +9,7 @@
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
   <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="splash.css">
   <link rel="stylesheet" href="editor2d.css">
   <link rel="stylesheet" href="forming2d.css">
   <link rel="stylesheet" href="piece3d.css">
@@ -21,6 +22,25 @@
   <link rel="stylesheet" href="cad-tangency.css">
 </head>
 <body>
+  <div class="pp-splash" id="startup-splash" role="status" aria-live="polite" aria-label="Plegar Pro Plus, inicializando módulos">
+    <div class="pp-splash-background" aria-hidden="true"></div>
+    <div class="pp-splash-art" aria-hidden="true">
+      <div class="pp-splash-emblem pp-splash-emblem-a"></div>
+      <div class="pp-splash-emblem pp-splash-emblem-b"></div>
+      <div class="pp-splash-energy"></div>
+    </div>
+    <div class="pp-splash-bottom">
+      <p class="pp-splash-version">PLEGAR PRO PLUS · INICIANDO</p>
+      <div class="pp-splash-progress-row">
+        <div class="pp-splash-meter" role="progressbar" aria-label="Progreso estimado de inicio" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="startup-meter"><div class="pp-splash-fill" id="startup-fill"></div></div>
+        <span id="startup-value" class="pp-splash-value" aria-hidden="true">0%</span>
+      </div>
+      <p class="pp-splash-status" id="startup-status">INICIALIZANDO MÓDULOS...</p>
+      <p class="pp-splash-modules">Motor de geometría · Bibliotecas · Simulación 3D · IA · Interfaz</p>
+      <button class="pp-splash-skip" id="startup-skip" type="button">Omitir presentación</button>
+    </div>
+  </div>
+  <noscript><style>.pp-splash{display:none!important}</style></noscript>
   <svg aria-hidden="true" class="svg-icons" xmlns="http://www.w3.org/2000/svg">
     <symbol id="i-home" viewBox="0 0 24 24"><path d="m3 10 9-7 9 7v10H3zM9 20v-7h6v7"/></symbol>
     <symbol id="i-folder" viewBox="0 0 24 24"><path d="M3 6h7l2 3h9v11H3z"/></symbol>
@@ -116,6 +136,7 @@
   <footer class="statusbar"><div><i class="online-dot"></i> Modo demostración</div><div><svg><use href="#i-cloud"/></svg> Datos locales del navegador</div><div class="status-spacer"></div><div>Prototipo UI · sin validación de fabricación</div><div>© 2026 AMS Engineering</div></footer>
   <dialog class="dialog" id="dialog"><div class="dialog-header"><h2 id="dialog-title">Información</h2><button id="dialog-close" aria-label="Cerrar">×</button></div><div class="dialog-body" id="dialog-body"></div></dialog>
   <div class="toast" role="status" aria-live="polite" id="toast"></div>
+  <script src="splash.js" defer></script>
   <script src="geometry2d.js" defer></script>
   <script src="tool-library.js" defer></script>
   <script src="manufacturer-references.js" defer></script>

@@ -95,7 +95,7 @@
 /* v0.16: exportación accesible del informe DXF. */
 .cad-export-actions{display:flex;flex-wrap:wrap;gap:8px}.cad-export-actions button{border:1px solid #4c86a6;background:#174564;color:#e6f6ff;border-radius:6px;padding:9px 12px;min-height:40px;font:inherit;cursor:pointer}.cad-export-actions button:disabled{opacity:.45;cursor:not-allowed}.cad-export-actions button:focus-visible{outline:2px solid #6bd5ff;outline-offset:2px}
 
-/* v0.17 · orientación nominal del DXF, independiente de Inicio */
+/* v0.17: vista de orientación nominal DXF, sin modificar Inicio */
 .cad-orient-panel{border:1px solid #345e7e;background:#0a2437;border-radius:9px;padding:12px;display:grid;gap:10px;min-width:0}
 .cad-orient-panel>strong{font-size:12px;color:#8fddff}
 .cad-orient-controls{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;align-items:end}
@@ -103,15 +103,5 @@
 .cad-orient-controls input[type=checkbox]{width:18px;height:18px;accent-color:#229df2}
 #cad-oriented-preview{width:100%;height:min(230px,37vw);min-height:165px;display:block;border:1px solid #2b4d65;border-radius:6px;background:#061727}
 #cad-orientation-metrics{white-space:normal;overflow-wrap:anywhere}
+.cad-orient-warning{margin:4px 0;padding:8px;border:1px solid #8d7337;background:#30291d;color:#f5d9ac;border-radius:6px;font-size:11px;line-height:1.5}
 @media(max-width:650px){.cad-orient-controls{grid-template-columns:minmax(0,1fr)}#cad-oriented-preview{height:200px}}
-
-/* Planos → Programación: la foto sirve únicamente de referencia */
-.ed-plan-reference:not([hidden]){display:block;margin:12px 0;border:1px solid #247aa6;border-radius:12px;padding:14px;background:#f0f8fc;color:#19364a}
-.ed-plan-header{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;border-bottom:1px solid #b9d3e3;padding-bottom:8px}
-.ed-plan-body{display:flex;gap:18px;align-items:flex-start;margin-top:14px;flex-wrap:wrap}
-.ed-plan-body>img{width:210px;max-width:100%;height:170px;object-fit:contain;background:#fff;border:1px solid #abc}
-.ed-plan-body>div{flex:1;min-width:220px}.ed-plan-inputs{display:grid;grid-template-columns:repeat(2,minmax(90px,1fr));gap:8px}
-.ed-plan-inputs label{display:flex;flex-direction:column;gap:3px;font-size:13px}
-.ed-plan-inputs input{width:100%;min-width:0;box-sizing:border-box;padding:7px;border:1px solid #9ab2c2;border-radius:5px}
-.ed-plan-reference button{padding:8px 10px}.ed-plan-reference button:disabled{opacity:.45;cursor:not-allowed}
-@media(max-width:440px){.ed-plan-inputs{grid-template-columns:1fr 1fr}.ed-plan-body>img{width:100%;height:160px}}

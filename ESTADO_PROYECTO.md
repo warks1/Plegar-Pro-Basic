@@ -1,4 +1,4 @@
-# Plegar Pro Plus — Punto de continuidad v0.27
+# Plegar Pro Plus — Punto de continuidad v0.30
 
 **Fecha:** 2026-10-19  
 **Repositorio:** https://github.com/warks1/Plegar-Pro-Basic  
@@ -79,3 +79,10 @@ Nuevo importador de carpeta ZIP almacenado en Planos. Se debe descargar `Trenirt
 - `Planos → Abrir en Programación` carga el nombre y vista previa, NO geometría CAD automática.
 - Para simular: introducir medidas y generar perfil editable; simulación de cinemática genérica, NO CNC.
 - Diseño de Inicio intacto. Mantener separación de simulación nominal vs verificada.
+
+## v0.29 · 2026-10-19
+Planos Trenirtrade: 10 PDF fotográficos públicos, 10 miniaturas y enlaces desde biblioteca a Programación. Para simular una pieza se requieren tramos, ángulos y espesor introducidos por el usuario: NO hay extracción CAD automática. No modificar Inicio aprobado.
+
+## v0.30 — Pantalla de carga (2026-10-19)
+
+Imagen de carga autorizada `assets/splash-plegar-pro.webp`, con dos P animadas mediante brillo y pulso independientes y efecto de estela luminosa; barra de progreso **visual estimado** de 0 a 100, mínimo 4,4 segundos, esperar `load` completo y permitir omisión. Respeta movimiento reducido, PC/tablet/móvil. No modifica dashboard Inicio aprobado. Scripts nuevos: `splash.js`, `splash.css`. Verificar GitHub Pages tras publicar.

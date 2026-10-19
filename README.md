@@ -299,3 +299,18 @@ Los diez PDF fotográficos aportados por el usuario y sus diez miniaturas se enc
 El botón **Abrir en Programación** vincula el plano seleccionado con Programación 2D: miniatura, nombre, fuente y enlace al PDF. Las fotografías no tienen geometría CAD analítica. El usuario debe introducir al menos dos tramos y un ángulo de plegado, además del espesor, para crear un primer perfil editable; podrá añadir los demás tramos y definir el orden de plegado en el editor. Solo entonces se habilita la navegación a Simulación 2D o 3D para ese perfil. No existe reconstrucción automática, extracción fiable de cotas, agujeros o espesor, ni simulación certificada de la pieza fotografiada.
 
 Los PDFs públicos se pueden descargar o compartir. Los documentos privados añadidos por el usuario siguen guardándose únicamente en IndexedDB de su dispositivo. No se modifican las imágenes de Inicio ni la hoja de estilos principal. Pruebas: `node --test tests/*.test.cjs`, `python tests/browser_check.py`, `python tests/plans-browser-check.py`, `python tests/plans-programming.test.py`.
+
+
+## v0.29 — Planos públicos Trenirtrade y paso a Programación
+
+- Se incorporan las **10 copias PDF fotográficas** suministradas por el usuario en `planos/trenirtrade/`, con miniaturas en `planos/trenirtrade/miniaturas/` y catálogo `repo-plans.js`. Este repositorio es **público**: los ficheros y las anotaciones presentes en las fotografías también quedan accesibles públicamente.
+- **Planos** muestra la carpeta `Trenirtrade`, los documentos y un botón «Abrir en Programación» junto a cada nombre. Las entradas del repositorio son de solo lectura; los planos personales de IndexedDB siguen en el dispositivo.
+- **Programación 2D** muestra la fotografía como **referencia** y ofrece campos manuales para dos tramos, un ángulo firmado y espesor. Solo tras introducir y validar esos datos genera el primer perfil editable y habilita los botones de simulación 2D y 3D. Otros pliegues deben completarse manualmente.
+- **No hay conversión automática foto→DXF/STEP/CAM, reconstrucción 3D fiable, reconocimiento de cotas ni configuración CNC**. La cinemática 3D representa el perfil introducido, **no la geometría deducida de la fotografía**. El usuario debe revisar medidas, material, radios, herramientas y secuencias antes de cualquier aplicación real.
+- Importante: solo se incorporan a GitHub los **PDF y miniaturas**: las fotografías originales a resolución completa siguen en el paquete ZIP privado que se entregó al usuario.
+- Pruebas: `node --test tests/*.test.cjs`, `python tests/plans-programming.test.py` y `python tests/plans-browser-check.py` cuando esté disponible el entorno de Playwright.
+
+
+## v0.30: pantalla de carga Plegar Pro Plus
+
+Pantalla completa a partir del boceto visual aprobado (`assets/splash-plegar-pro.webp`), con pulsos de luz independientes sobre las dos P, barrido energético y barra de progreso animada. El progreso mostrado es una presentación estimada y no medición física ni progreso de validación de módulos. La pantalla espera a la carga real de la página, muestra al menos 4,4 segundos (0,5 s cuando se solicita movimiento reducido), ofrece botón de omitir y nunca oculta la interfaz en caso de carga lenta. Responsive PC/tablet/móvil. Inicio original sin cambios.

@@ -1,0 +1,27 @@
+/* Pantalla de carga Plegar Pro Plus v0.30. Independiente de la interfaz aprobada. */
+.pp-splash{position:fixed;inset:0;z-index:3000;isolation:isolate;background:#020b15;color:#d5f5ff;overflow:hidden;display:grid;place-items:center;opacity:1;visibility:visible;transition:opacity .45s ease,visibility .45s ease}
+.pp-splash.pp-splash-done{opacity:0;visibility:hidden;pointer-events:none}
+.pp-splash-background{position:absolute;inset:-3%;background:linear-gradient(180deg,rgba(0,5,15,.06) 58%,#020a15 100%),url('assets/splash-plegar-pro.webp') center center/cover no-repeat;filter:brightness(.85);animation:pp-background 5.8s ease-in-out infinite alternate;transform-origin:50% 37%}
+.pp-splash-art{position:absolute;inset:0;overflow:hidden;pointer-events:none}
+/* Superposiciones del fotograma original: las dos P tienen pulsos y destellos independientes. */
+.pp-splash-emblem{position:absolute;inset:0;background:url('assets/splash-plegar-pro.webp') center center/cover no-repeat;mix-blend-mode:screen;opacity:.18;filter:brightness(1.8) saturate(1.7) drop-shadow(0 0 20px #00bcff)}
+.pp-splash-emblem-a{clip-path:polygon(37% 7%,72% 8%,65% 47%,34% 46%);animation:pp-engrave-a 2.7s ease-in-out infinite alternate}
+.pp-splash-emblem-b{clip-path:polygon(47% 22%,76% 24%,74% 56%,42% 52%);animation:pp-engrave-b 2.15s ease-in-out infinite alternate}
+.pp-splash-energy{position:absolute;inset:0;opacity:.85;background:linear-gradient(107deg,transparent 31%,rgba(0,213,255,.02) 39%,rgba(113,240,255,.31) 47%,rgba(0,212,255,.03) 54%,transparent 62%);mix-blend-mode:screen;transform:translateX(-120%);animation:pp-light-trail 3.6s ease-in-out infinite}
+.pp-splash-bottom{position:absolute;bottom:0;left:0;width:100%;height:32%;min-height:205px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px max(20px,env(safe-area-inset-right)) max(20px,env(safe-area-inset-bottom));box-sizing:border-box;background:linear-gradient(180deg,rgba(2,10,23,.04),rgba(2,10,23,.94) 22%,rgba(2,10,23,.98));gap:clamp(7px,1.4vh,14px);text-align:center}
+.pp-splash-version{font-size:clamp(11px,1.4vw,19px);letter-spacing:.27em;color:#1ddcff;margin:0;font-weight:700;text-shadow:0 0 13px rgba(0,207,255,.6)}
+.pp-splash-progress-row{width:min(820px,87vw);display:flex;align-items:center;gap:13px}
+.pp-splash-meter{height:clamp(13px,1.8vw,22px);flex:1;box-sizing:border-box;border:2px solid #1f9cde;border-radius:15px;background:rgba(0,9,22,.95);box-shadow:0 0 17px #00aaff77,inset 0 0 10px #008cda55;padding:3px;overflow:hidden}
+.pp-splash-fill{height:100%;width:0;border-radius:9px;background:repeating-linear-gradient(120deg,transparent 0 17px,rgba(255,255,255,.25) 17px 22px,transparent 22px 27px),linear-gradient(90deg,#0854d6,#00d7ff,#6ffcff);box-shadow:0 0 22px #00daff;transition:width .09s linear;position:relative}
+.pp-splash-fill::after{content:"";position:absolute;right:0;top:-8px;bottom:-8px;width:7px;background:#efffff;filter:blur(5px)}
+.pp-splash-value{min-width:3ch;color:#e5faff;font-size:clamp(15px,2vw,24px);font-variant-numeric:tabular-nums}
+.pp-splash-status{color:#23d6f8;font-size:clamp(11px,1.35vw,17px);letter-spacing:.19em;margin:0}
+.pp-splash-modules{color:#bfd1df;font-size:clamp(9px,1.2vw,15px);margin:0;max-width:90vw}
+.pp-splash-skip{font:inherit;font-size:12px;background:rgba(3,38,62,.7);color:#d0ecfc;border:1px solid #2e6f90;border-radius:7px;padding:6px 14px;cursor:pointer}
+.pp-splash-skip:focus-visible{outline:3px solid #70e5ff;outline-offset:2px}
+@keyframes pp-background{from{transform:scale(1);filter:brightness(.83)}to{transform:scale(1.027);filter:brightness(.95)}}
+@keyframes pp-engrave-a{from{opacity:.13;transform:translateY(3px) scale(.999);filter:brightness(1.5)}to{opacity:.43;transform:translateY(-4px) scale(1.005);filter:brightness(2.1)}}
+@keyframes pp-engrave-b{from{opacity:.34;transform:translateX(-2px) scale(.997);filter:brightness(1.8)}to{opacity:.08;transform:translateX(4px) scale(1.006);filter:brightness(1.25)}}
+@keyframes pp-light-trail{0%,20%{transform:translateX(-110%);opacity:0}45%{opacity:.85}80%,100%{transform:translateX(110%);opacity:0}}
+@media(max-width:700px){.pp-splash-background,.pp-splash-emblem{background-position:center 42%}.pp-splash-bottom{height:35%;min-height:225px;padding-inline:15px;gap:12px}.pp-splash-version{letter-spacing:.12em}.pp-splash-status{letter-spacing:.09em}.pp-splash-modules{line-height:1.5}.pp-splash-progress-row{width:93vw}}
+@media(prefers-reduced-motion:reduce){.pp-splash-background,.pp-splash-emblem,.pp-splash-energy{animation:none!important}.pp-splash{transition:none}}

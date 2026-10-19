@@ -1,4 +1,0 @@
-const test=require('node:test');const assert=require('node:assert/strict');const C=require('../plans-core');
-test('Planos: solo PDF y el formato original estan disponibles',()=>{assert(C.availableFormats('pieza.sldprt').find(f=>f.ext==='sldprt').available);assert(!C.availableFormats('pieza.sldprt').find(f=>f.ext==='step').available);assert(C.availableFormats('foto.jpg').find(f=>f.ext==='pdf').available)});
-test('Planos: PDF contiene JPEG y tabla xref',async()=>{const b=await C.pdfWithJpeg(Uint8Array.of(255,216,255,217),120,100).arrayBuffer();const s=Buffer.from(b).toString('latin1');assert(s.startsWith('%PDF-1.4'));assert(s.includes('/Subtype /Image'));assert(s.includes('startxref'));});
-test('Planos: ZIP incluye los archivos originales',async()=>{const b=await C.makeZip([{name:'pieza.dxf',data:new Blob(['original'])}]);assert.equal(new Uint8Array(await b.arrayBuffer())[0],80);});

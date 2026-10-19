@@ -1,4 +1,4 @@
-# Plegar Pro Plus — Punto de continuidad v0.23
+# Plegar Pro Plus — Punto de continuidad v0.24
 
 **Fecha:** 2026-10-19  
 **Repositorio:** https://github.com/warks1/Plegar-Pro-Basic  
@@ -17,18 +17,24 @@
 
 - **v0.21:** `cad-chain.js` detecta conectividad nominal entre extremos: cadenas, ciclos, bifurcaciones y agrupaciones transitivas ambiguas, y presenta requisitos para un futuro sólido 3D sin habilitar el simulador. Exportación JSON con el estado NO HABILITADO.
 
+- **v0.23:** detección de retrocesos solapados entre segmentos consecutivos y coordenadas nominales de incidencias DXF; 5 ejemplos visibles, 80 en JSON. Mantiene bloqueo de CNC y sólidos.
+
 ## Restricciones de seguridad y alcance
 
 Ninguna comparación dimensional o topológica valida el montaje físico, la identidad del útil, su estabilidad, las colisiones de CAD sólido ni la seguridad de una plegadora. Los contornos no se unen, los anillos internos no se interpretan como huecos de corte y no se generan programas de fabricación.
 
 ## Pruebas y continuación
 
-- 147 pruebas automáticas Node y Playwright en 1440, 820, 390, 320 px sin errores ni desbordamientos detectados en entorno de pruebas.
+- 174 pruebas automáticas Node y Playwright en 1440, 820, 390, 320 px sin errores ni desbordamientos detectados en entorno de pruebas.
 - **GitHub Pages:** verificar el workflow para este nuevo commit después de publicarlo; no asumir despliegue terminado.
-- Siguiente objetivo v0.23: validación geométrica de la continuidad exacta y análisis de contornos cruzados más complejos; incorporar documentación dimensional oficial de amarre cuando esté disponible y contrastada. Mantener DXF de inspección aislados.
+- Siguiente objetivo v0.25: inspección de distancias y cruces entre curvas circulares con precisión documentada; validar datos de amarre antes de integración 3D.
 
 Instrucción al recibir «Seguir»: recuperar el último commit de GitHub, comprobar el código, ejecutar pruebas, guardar los cambios con commit verificado y preservar la interfaz aprobada.
 
-- **v0.22:** cruces, uniones T, solapes y proximidades del DXF con presupuesto y bloqueo CNC (`cad-crossings.js`). 164 pruebas Node y cuatro anchos Playwright locales correctos.
+## Versión v0.24 — precisión de curva circular, tangencias
 
-- **v0.23:** los tramos DXF adyacentes que se retroceden y solapan ya no se omiten; el reporte incluye coordenadas X/Y nominales por incidencia. 164 pruebas automáticas Node y cuatro anchos de navegador correctos; SIN VERIFICAR / NO CNC.
+- Se conserva la geometría fuente analítica (segmento/centro/radio/ángulo/barrido) de LINE, ARC, CIRCLE y LWPOLYLINE bulge sin sustituir los puntos de dibujo. Las envolventes X/Y se calculan con extremos cardinales analíticos para arcos circulares; longitud desde arco exacto ya disponible.
+- `cad-tangency.js`, `cad-tangency-view.js`, `cad-tangency.css`: inspección G1 nominal de tangencias internas y posibles tangencias de entidades independientes. Filtro de capas, tolerancias lineales y angulares, informe JSON con fuente SHA-256 y bloqueo CNC/simulación. Límites de presupuesto indicados como PARCIAL.
+- Ejemplo `EJEMPLO_TANGENCIAS_DXF.dxf` y pruebas `tests/cad-tangency.test.cjs`; pruebas del navegador en PC, tablet y dos móviles.
+- NO se validan continuidad G2, solapes curva–curva de manera exacta, sólidos, amarres ni colisiones físicas. Se mantiene la interfaz original aprobada.
+- Siguiente objetivo: evaluar geometricamente contacto y holgura curva–curva de manera controlada y preparar verificaciones CAD por fabricante con tolerancias documentadas; nunca validar fabricación solo por coincidencia de perfiles 2D.

@@ -1,0 +1,7 @@
+.cad-tangency-panel{border:1px solid rgba(30,169,195,.4);border-radius:12px;padding:14px;margin-top:14px;display:grid;gap:8px;background:rgba(14,39,60,.7);color:#e8f5fb}
+.cad-tangency-panel strong{color:#86ecff}
+.cad-tangency-panel label{font-size:.88rem}
+.cad-tangency-panel input{width:110px;max-width:100%;background:#f2fafc;color:#12283d;padding:7px 9px;border-radius:7px;border:1px solid #8ab6c6}
+.cad-tangency-panel button{width:max-content;max-width:100%;min-height:40px}
+.cad-tangency-panel .cad-tangency-examples{padding-left:22px;margin:2px 0;font-size:.85rem;overflow-wrap:anywhere}
+.cad-tangency-panel p{margin:0;overflow-wrap:anywhere}

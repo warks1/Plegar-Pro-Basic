@@ -4,7 +4,7 @@ import json,sys,re,tempfile
 root=Path(__file__).resolve().parents[1]
 html=re.sub(r'<script src="[^"]+" defer></script>', '', (root/'index.html').read_text())
 html=re.sub(r'<link rel="stylesheet"[^>]+>', '', html)
-css='\n'.join((root/x).read_text() for x in ('styles.css','editor2d.css','forming2d.css','piece3d.css','cad-mounting.css','cad-trace.css','cad-topology.css','cad-chain.css','cad-crossings.css'))
+css='\n'.join((root/x).read_text() for x in ('styles.css','editor2d.css','forming2d.css','piece3d.css','cad-mounting.css','cad-trace.css','cad-topology.css','cad-chain.css','cad-crossings.css','cad-tangency.css'))
 issues=[]
 artifacts=Path(tempfile.mkdtemp(prefix="plegar-v21-browser-"))
 with sync_playwright() as p:
@@ -19,7 +19,7 @@ with sync_playwright() as p:
   page.set_content(html,wait_until='domcontentloaded')
   page.add_style_tag(content=css)
   page.evaluate("""() => {window.__testStorage=window.__testStorage||new Map();Object.defineProperty(window,'localStorage',{configurable:true,value:{getItem:k=>window.__testStorage.get(k)??null,setItem:(k,v)=>window.__testStorage.set(k,String(v)),removeItem:k=>window.__testStorage.delete(k)}})}""")
-  for script in ('geometry2d.js','tool-library.js','manufacturer-references.js','cad-profile.js','cad-orientation.js','cad-trace.js','cad-profile-view.js','cad-mounting-audit.js','cad-mounting-view.js','cad-trace-view.js','cad-topology.js','cad-topology-view.js','cad-chain.js','cad-chain-view.js','cad-crossings.js','cad-crossings-view.js','bendcalc.js','clearance2d.js','toolprofiles2d.js','previousbends2d.js','interference2d.js','assembly2d.js','forming2d.js','forming2d-view.js','piece3d.js','tooling3d.js','scene3d-audit.js','proximity3d.js','piece3d-view.js','editor2d.js','app.js'):
+  for script in ('geometry2d.js','tool-library.js','manufacturer-references.js','cad-profile.js','cad-orientation.js','cad-trace.js','cad-profile-view.js','cad-mounting-audit.js','cad-mounting-view.js','cad-trace-view.js','cad-topology.js','cad-topology-view.js','cad-chain.js','cad-chain-view.js','cad-crossings.js','cad-crossings-view.js','cad-tangency.js','cad-tangency-view.js','bendcalc.js','clearance2d.js','toolprofiles2d.js','previousbends2d.js','interference2d.js','assembly2d.js','forming2d.js','forming2d-view.js','piece3d.js','tooling3d.js','scene3d-audit.js','proximity3d.js','piece3d-view.js','editor2d.js','app.js'):
    page.evaluate((root/script).read_text())
   assert page.locator('#project-name').inner_text()=='Soporte motor S235'
   print('navigating',tag,flush=True)
@@ -37,7 +37,9 @@ with sync_playwright() as p:
   assert page.locator('#cad-topo-summary').count()==1
   assert page.locator('#cad-chain-summary').count()==1
   assert page.locator('#cad-crossings-summary').count()==1
+  assert page.locator('#cad-tangent-summary').count()==1
   assert page.locator('#cad-crossings-export').is_disabled()
+  assert page.locator('#cad-tangent-export').is_disabled()
   assert page.locator('#cad-chain-export').is_disabled()
   assert page.locator('#cad-crossings-export').is_disabled()
   assert page.locator('#cad-mount-export').is_disabled()
@@ -65,6 +67,7 @@ with sync_playwright() as p:
   assert '0 entidades abiertas' in page.locator('#cad-chain-summary').inner_text()
   assert '0 cruces' in page.locator('#cad-crossings-summary').inner_text()
   assert page.locator('#cad-crossings-export').is_enabled()
+  assert page.locator('#cad-tangent-export').is_enabled()
   assert 'NO HABILITADO' in page.locator('#cad-chain-summary').inner_text()
   assert page.locator('#cad-chain-export').is_enabled()
   assert page.locator('#cad-crossings-export').is_enabled()
@@ -75,6 +78,7 @@ with sync_playwright() as p:
   assert page.locator('#cad-topo-export').is_disabled()
   assert page.locator('#cad-chain-export').is_disabled()
   assert page.locator('#cad-crossings-export').is_disabled()
+  assert page.locator('#cad-tangent-export').is_disabled()
   page.locator('#cad-topo-tolerance').fill('0.05')
   page.locator('#cad-topo-tolerance').press('Tab')
   assert page.locator('#cad-topo-export').is_enabled()
@@ -142,7 +146,7 @@ with sync_playwright() as p:
   page.locator('#cad-layer').select_option('*')
   page.locator('#cad-contour').select_option('0')
   assert page.locator('#cad-preview polyline').count()==2
-  # v0.22: dos LINE cruzadas; NO se declaran aptas para fabricación.
+  # v0.22: dos LINE que se cruzan no se confunden con una cadena cerrada.
   crossing_dxf='0\nSECTION\n2\nHEADER\n9\n$INSUNITS\n70\n4\n0\nENDSEC\n0\nSECTION\n2\nENTITIES\n'+('0\nLINE\n8\nTEST\n10\n0\n20\n0\n11\n10\n21\n10\n')+('0\nLINE\n8\nTEST\n10\n0\n20\n10\n11\n10\n21\n0\n')+'0\nENDSEC\n0\nEOF\n'
   page.locator('#cad-file-input').set_input_files({'name':'cruces.dxf','mimeType':'application/dxf','buffer':crossing_dxf.encode()})
   page.wait_for_function("document.querySelector('#cad-status').textContent.includes('2 elementos')")
@@ -150,6 +154,25 @@ with sync_playwright() as p:
   assert page.locator('#cad-crossings-cases li').count()==1
   assert 'X 5 mm, Y 5 mm' in page.locator('#cad-crossings-cases').inner_text()
   assert 'NO CNC' in page.locator('#cad-crossings-summary').inner_text()
+  # v0.24: tangencia de curvas analíticas DXF frente a línea en otra entidad.
+  tangent_dxf='0\nSECTION\n2\nHEADER\n9\n$INSUNITS\n70\n4\n0\nENDSEC\n0\nSECTION\n2\nENTITIES\n0\nARC\n8\nCURVA\n10\n0\n20\n0\n40\n10\n50\n0\n51\n90\n0\nLINE\n8\nCURVA\n10\n10\n20\n0\n11\n10\n21\n-5\n0\nENDSEC\n0\nEOF\n'
+  page.locator('#cad-file-input').set_input_files({'name':'tangente.dxf','mimeType':'application/dxf','buffer':tangent_dxf.encode()})
+  page.wait_for_function("document.querySelector('#cad-status').textContent.includes('2 elementos')")
+  assert '1 posibles tangencias' in page.locator('#cad-tangent-summary').inner_text()
+  assert 'SIN VERIFICAR' in page.locator('#cad-tangent-summary').inner_text()
+  page.locator('#cad-tangent-angle').fill('11')
+  assert 'Auditoría no disponible' in page.locator('#cad-tangent-summary').inner_text()
+  assert page.locator('#cad-tangent-export').is_disabled()
+  page.locator('#cad-tangent-angle').fill('1')
+  assert page.locator('#cad-tangent-export').is_enabled()
+  if tag=='pc':
+   with page.expect_download() as tangent_dl: page.locator('#cad-tangent-export').click()
+   tangent_path=artifacts/'v24_tangency_report.json'
+   tangent_dl.value.save_as(tangent_path)
+   tangent=json.loads(tangent_path.read_text())
+   assert tangent['version']=='0.24'
+   assert tangent['approvedForCNC'] is False
+   assert tangent['summary']['externalTangentCandidates']==1
   # v0.16: curvas ARC y CIRCLE; informe local sin alterar utillaje activo.
   arcdxf=(root/'EJEMPLO_ARCOS_CAPAS.dxf').read_bytes()
   page.locator('#cad-file-input').set_input_files({'name':'arcos.dxf','mimeType':'application/dxf','buffer':arcdxf})
@@ -271,7 +294,7 @@ with sync_playwright() as p:
   page.set_content(html,wait_until='domcontentloaded')
   page.add_style_tag(content=css)
   page.evaluate("""() => {window.__testStorage=window.__testStorage||new Map();Object.defineProperty(window,'localStorage',{configurable:true,value:{getItem:k=>window.__testStorage.get(k)??null,setItem:(k,v)=>window.__testStorage.set(k,String(v)),removeItem:k=>window.__testStorage.delete(k)}})}""")
-  for script in ('geometry2d.js','tool-library.js','manufacturer-references.js','cad-profile.js','cad-orientation.js','cad-trace.js','cad-profile-view.js','cad-mounting-audit.js','cad-mounting-view.js','cad-trace-view.js','cad-topology.js','cad-topology-view.js','cad-chain.js','cad-chain-view.js','cad-crossings.js','cad-crossings-view.js','bendcalc.js','clearance2d.js','toolprofiles2d.js','previousbends2d.js','interference2d.js','assembly2d.js','forming2d.js','forming2d-view.js','piece3d.js','tooling3d.js','scene3d-audit.js','proximity3d.js','piece3d-view.js','editor2d.js','app.js'):
+  for script in ('geometry2d.js','tool-library.js','manufacturer-references.js','cad-profile.js','cad-orientation.js','cad-trace.js','cad-profile-view.js','cad-mounting-audit.js','cad-mounting-view.js','cad-trace-view.js','cad-topology.js','cad-topology-view.js','cad-chain.js','cad-chain-view.js','cad-crossings.js','cad-crossings-view.js','cad-tangency.js','cad-tangency-view.js','bendcalc.js','clearance2d.js','toolprofiles2d.js','previousbends2d.js','interference2d.js','assembly2d.js','forming2d.js','forming2d-view.js','piece3d.js','tooling3d.js','scene3d-audit.js','proximity3d.js','piece3d-view.js','editor2d.js','app.js'):
    page.evaluate((root/script).read_text())
   if w<=1120:page.locator('#open-menu').click()
   page.locator('button.nav-item[data-screen="Programación 2D"]').click()

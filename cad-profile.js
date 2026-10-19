@@ -65,7 +65,7 @@ function bulgeArc(a,z,bulge){
  const pts=sampleArc(cx,cy,r,Math.atan2(a.y-cy,a.x-cx),sweep);
  // Los extremos DXF son los exactos; evita desfases acumulados tras muestreo.
  pts[0]={x:a.x,y:a.y};pts[pts.length-1]={x:z.x,y:z.y};
- return {points:pts,length:Math.abs(sweep)*r};
+ return {points:pts,length:Math.abs(sweep)*r,center:{x:cx,y:cy},radius:r,startAngle:Math.atan2(a.y-cy,a.x-cx),sweep};
 }
 function checkPlane(entity,label){
  for(const g of entity){
@@ -101,19 +101,20 @@ function readLW(entity,factor){
   vertices.pop();
  }
  if(!closed&&Math.abs(vertices.at(-1).bulge)>1e-9)err('Bulge en último vértice de un contorno abierto: no hay segmento siguiente.');
- const points=[],count=closed?vertices.length:vertices.length-1;let length=0,arcCount=0;
+ const points=[],primitives=[],count=closed?vertices.length:vertices.length-1;let length=0,arcCount=0;
  for(let i=0;i<count;i++){
   const a=vertices[i],z=vertices[(i+1)%vertices.length],bulge=a.bulge;
   if(Math.hypot(z.x-a.x,z.y-a.y)<1e-5)err('Contorno con segmentos de longitud cero.');
   if(!points.length)points.push({x:a.x,y:a.y});
   if(Math.abs(bulge)>1e-9){
    const arc=bulgeArc(a,z,bulge);length+=arc.length;arcCount++;
+   primitives.push({kind:'ARC',start:{x:a.x,y:a.y},end:{x:z.x,y:z.y},center:arc.center,radius:arc.radius,startAngle:arc.startAngle,sweep:arc.sweep});
    points.push(...arc.points.slice(1));
-  }else{points.push({x:z.x,y:z.y});length+=Math.hypot(z.x-a.x,z.y-a.y);}
+  }else{primitives.push({kind:'LINE',start:{x:a.x,y:a.y},end:{x:z.x,y:z.y}});points.push({x:z.x,y:z.y});length+=Math.hypot(z.x-a.x,z.y-a.y);}
   if(points.length>MAX_VERTICES+1)err('Arcos con demasiados puntos: límite de 1500 por archivo.');
  }
  if(closed)points.pop(); // último punto coincide con primero
- return {points,closed,exactLength:length,arcCount,sourceVertices:vertices.length};
+ return {points,primitives,closed,exactLength:length,arcCount,sourceVertices:vertices.length};
 }
 function readCircleOrArc(entity,factor,kind){
  const one=code=>entity.find(g=>g.code===code)?.value;
@@ -127,18 +128,39 @@ function readCircleOrArc(entity,factor,kind){
  if(!closed&&sweep<1e-8)err('ARC de barrido nulo o completo no admitido: usa CIRCLE.');
  const points=sampleArc(cx,cy,r,start,sweep);
  if(closed)points.pop();
- return {points,closed,exactLength:r*sweep,arcCount:1,sourceVertices:closed?1:2};
+ return {points,primitives:[{kind:closed?'CIRCLE':'ARC',start:{x:cx+r*Math.cos(start),y:cy+r*Math.sin(start)},end:{x:cx+r*Math.cos(start+sweep),y:cy+r*Math.sin(start+sweep)},center:{x:cx,y:cy},radius:r,startAngle:start,sweep}],closed,exactLength:r*sweep,arcCount:1,sourceVertices:closed?1:2};
 }
 function readLine(entity,factor){
  const one=code=>entity.find(g=>g.code===code)?.value;
  if(entity.some(g=>(g.code===30||g.code===31||g.code===39||g.code===38)&&Math.abs(number(g.value,'elevación/espesor'))>1e-9))err('LINE con elevación o espesor: se admite únicamente geometría 2D.');
  if(entity.some(g=>g.code===210&&Math.abs(number(g.value,'normal X'))>1e-9||g.code===220&&Math.abs(number(g.value,'normal Y'))>1e-9||g.code===230&&Math.abs(number(g.value,'normal Z')-1)>1e-9))err('LINE en plano de extrusión no compatible.');
- return {points:[{x:number(one(10),'inicio X')*factor,y:number(one(20),'inicio Y')*factor},{x:number(one(11),'fin X')*factor,y:number(one(21),'fin Y')*factor}],closed:false};
+ const points=[{x:number(one(10),'inicio X')*factor,y:number(one(20),'inicio Y')*factor},{x:number(one(11),'fin X')*factor,y:number(one(21),'fin Y')*factor}];
+ return {points,primitives:[{kind:'LINE',start:points[0],end:points[1]}],closed:false};
 }
 function layerOf(entity){
  const raw=entity.find(g=>g.code===8)?.value||'0';
  if(raw.length>120||/[\x00-\x1f]/.test(raw))err('Nombre de capa DXF inválido.');
  return raw;
+}
+// Bounding box analítica de segmentos rectos y arcos circulares del DXF.
+// El muestreo sigue siendo para la vista previa y no valida sólidos CAD.
+function analyticBounds(primitives){
+ const values=[];const TAU=2*Math.PI;
+ const inSweep=(angle,start,sweep)=>{
+  if(Math.abs(sweep)>=TAU-1e-10)return true;
+  const positive=x=>((x%TAU)+TAU)%TAU;
+  return sweep>=0?positive(angle-start)<=sweep+1e-10:positive(start-angle)<=-sweep+1e-10;
+ };
+ for(const part of primitives){
+  values.push(part.start,part.end);
+  if(part.kind==='ARC'||part.kind==='CIRCLE'){
+   for(const a of [0,Math.PI/2,Math.PI,3*Math.PI/2])if(inSweep(a,part.startAngle,part.sweep)){
+    values.push({x:part.center.x+part.radius*Math.cos(a),y:part.center.y+part.radius*Math.sin(a)});
+   }
+  }
+ }
+ const xs=values.map(p=>p.x),ys=values.map(p=>p.y);
+ return {minX:Math.min(...xs),maxX:Math.max(...xs),minY:Math.min(...ys),maxY:Math.max(...ys)};
 }
 function parseDocument(text,{unitsOverride=null}={}){
  const pairs=pairsOf(text);let section=null,unitCode=null,readUnits=false,hasEntities=false;
@@ -177,6 +199,10 @@ function parseDocument(text,{unitsOverride=null}={}){
   count+=s.points.length;if(count>MAX_VERTICES)err('Demasiados vértices en total: máximo 1500.');
   const bounds=validatePoints(s.points,s.closed),layer=layerOf(g.entity);
   if(s.exactLength!==undefined)bounds.length=s.exactLength;
+  if(s.primitives?.some(p=>p.kind!=='LINE')){
+   const exact=analyticBounds(s.primitives);
+   Object.assign(bounds,exact,{width:exact.maxX-exact.minX,height:exact.maxY-exact.minY});
+  }
   contours.push(Object.freeze({...s,bounds,layer,kind:g.kind,index:i,id:`contorno-${i+1}`,verified:false,activeInSimulation:false}));
  }
  const minX=Math.min(...contours.map(s=>s.bounds.minX)),maxX=Math.max(...contours.map(s=>s.bounds.maxX));

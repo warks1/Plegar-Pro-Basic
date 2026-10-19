@@ -1,4 +1,4 @@
-# Plegar Pro Plus · Prototipo v0.23
+# Plegar Pro Plus · Prototipo v0.24
 
 Repositorio: `warks1/Plegar-Pro-Basic`.
 
@@ -235,14 +235,6 @@ El usuario controla el mismo filtro por capa y tolerancia de 0–1 mm del módul
 
 Tests: `tests/cad-chain.test.cjs` y ampliación de `tests/browser_check.py`; 147 pruebas Node y comprobación Playwright en 1440, 820, 390 y 320 px. No son ensayos de seguridad de máquina.
 
-## v0.22 — Cribado de cruces y continuidad nominal DXF (SOLO INSPECCIÓN)
-
-Se incorporan `cad-crossings.js`, `cad-crossings-view.js` y `cad-crossings.css`. En **Programación 2D** el panel informa de **cruces de segmentos**, **uniones T**, **solapes colineales** y **proximidades** bajo la tolerancia de 0–1 mm, respetando las capas por defecto. Exportación JSON con los bloqueos explícitos `approvedForCNC=false`, `approvedForSimulation=false`, `canGenerateSolid=false`. No une ni corrige segmentos ni modifica el DXF.
-
-**Limitaciones:** arcos `ARC`, `CIRCLE` y curvas `bulge` se evalúan sobre cuerdas discretizadas. Se limitan a 1600 segmentos y 60000 pares; cuando se alcanza el presupuesto, el informe indica **ANÁLISIS PARCIAL**. No se certifican tolerancias físicas, amarres, colisiones ni seguridad. Los extremos coincidentes siguen bajo el módulo de cadenas v0.21.
-
-Pruebas locales: 159 casos Node, Playwright Chromium a 1440, 820, 390 y 320 px; no equivale a certificación CAD ni CNC.
-
 ## v0.23 — Incidencias geométricas localizadas y retrocesos adyacentes (solo inspección)
 
 Se refuerza `cad-crossings.js` para no omitir solapes de tramos consecutivos de un mismo contorno: cuando el trazado retrocede, se informa del solape, aunque los dos segmentos compartan un extremo. Las esquinas válidas y las uniones exactas ordinarias siguen sin contarse como cruces. Las incidencias incluyen un punto nominal X/Y en milímetros; para las proximidades se calcula el punto medio entre los dos puntos más cercanos, y para los solapes se indica el punto medio de la zona compartida.
@@ -250,3 +242,13 @@ Se refuerza `cad-crossings.js` para no omitir solapes de tramos consecutivos de 
 `cad-crossings-view.js` muestra hasta cinco incidencias con ubicación textual accesible y el informe JSON permite recuperar hasta 80 ejemplos. Los cambios no alteran la geometría DXF, ni su verificación industrial, ni el estado del utillaje. Los arcos continúan discretizados; la ubicación de las incidencias puede ser aproximada. **NO CNC / SIN VERIFICAR / NO SIMULACIÓN INDUSTRIAL.**
 
 Pruebas: 164 Node y navegador en 1440/820/390/320 píxeles, sin errores detectados en ese entorno.
+
+## v0.24 — Envolventes analíticas y tangencias nominales de curvas DXF
+
+**Programación 2D → Importar DXF → Tangencias de arcos DXF**: el importador ahora conserva primitivas fuente (`LINE`, `ARC`, `CIRCLE` y segmentos `LWPOLYLINE` con `bulge`) además de los puntos muestreados, calculando las **cotas extremas exactas en direcciones X/Y para arcos circulares** a partir de radios, centros y ángulos. La vista previa sigue usando polilíneas discretizadas para que los módulos previos no pierdan compatibilidad.
+
+El módulo `cad-tangency.js` inspecciona las direcciones tangentes nominales en encuentros de línea–arco y arco–arco dentro de una misma polilínea; entre entidades diferentes, sólo marca **posibles tangencias**, porque no consta el orden/recorrido real. El usuario puede variar tolerancia lineal de 0 a 1 mm (compartida con topología) y tolerancia angular de 0 a 10°. Informa las primeras incidencias, genera JSON y etiqueta un análisis **PARCIAL** si alcanza el presupuesto de comparaciones. Se añade `EJEMPLO_TANGENCIAS_DXF.dxf`.
+
+**Límites:** los extremos fuente son analíticos **para arcos circulares en el plano XY**, no para splines, DXF 3D o entidades fuera del formato permitido. La auditoría no comprueba continuidad G2, curvaturas de herramienta real, radios físicos ni colisiones exactas curva–curva. No reconecta tramos ni crea cuerpos. **NO HABILITA CNC, SIMULACIÓN INDUSTRIAL NI VALIDACIÓN DE SEGURIDAD.**
+
+Pruebas v0.24: `node --test tests/*.test.cjs` y `python tests/browser_check.py` en Chromium con 1440, 820, 390 y 320 px. `assets/referencia-aprobada.webp`, `styles.css` y el diseño de Inicio permanecen intactos.

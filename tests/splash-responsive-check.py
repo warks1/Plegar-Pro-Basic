@@ -1,6 +1,6 @@
 """Prueba visual aislada del splash: imágenes reales como data URLs, sin acceso HTTP local."""
 from pathlib import Path
-import re, base64
+import re, base64, tempfile
 from playwright.sync_api import sync_playwright
 ROOT=Path(__file__).resolve().parents[1]
 def url(p): return 'data:image/webp;base64,'+base64.b64encode((ROOT/p).read_bytes()).decode('ascii')
@@ -35,7 +35,7 @@ with sync_playwright() as pw:
         print('Sizes',width,vw)
         assert vw['splash']<=vw['splashClient']+1,f'Desbordamiento en splash {width} {vw}'
         assert page.locator('.pp-splash-emblem').count()==2
-        if width in (390,320,844,1440): page.screenshot(path=f'/mnt/data/v31_splash_{width}.png')
+        if width in (390,320,844,1440): page.screenshot(path=str(Path(tempfile.gettempdir()) / f'plegar-v31-splash-{width}.png'))
         page.wait_for_timeout(600)
         assert int(page.locator('#startup-meter').get_attribute('aria-valuenow'))>=5,f'Barra no progresa {width}'
         page.locator('#startup-skip').click(timeout=2000)

@@ -102,7 +102,7 @@ with sync_playwright() as p:
    crossing=json.loads(crossing_path.read_text())
    assert crossing['approvedForCNC'] is False
    assert crossing['readiness']['canGenerateSolid'] is False
-   assert crossing['version']=='0.22'
+   assert crossing['version']=='0.23'
   # v0.19: SHA-256 de bytes originales y registro voluntario SOLO METADATOS.
   assert page.locator('#cad-trace-save').is_enabled()
   assert 'SIN VERIFICAR' in page.locator('.cad-trace-panel').inner_text()
@@ -147,6 +147,8 @@ with sync_playwright() as p:
   page.locator('#cad-file-input').set_input_files({'name':'cruces.dxf','mimeType':'application/dxf','buffer':crossing_dxf.encode()})
   page.wait_for_function("document.querySelector('#cad-status').textContent.includes('2 elementos')")
   assert '1 cruces' in page.locator('#cad-crossings-summary').inner_text()
+  assert page.locator('#cad-crossings-cases li').count()==1
+  assert 'X 5 mm, Y 5 mm' in page.locator('#cad-crossings-cases').inner_text()
   assert 'NO CNC' in page.locator('#cad-crossings-summary').inner_text()
   # v0.16: curvas ARC y CIRCLE; informe local sin alterar utillaje activo.
   arcdxf=(root/'EJEMPLO_ARCOS_CAPAS.dxf').read_bytes()

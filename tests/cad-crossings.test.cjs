@@ -17,3 +17,30 @@ test('rechaza tolerancias no numéricas o fuera de rango',()=>{const d=parse(lin
 test('rechaza cambio de filtro no booleano o entrada activada',()=>{const d=parse(line('A',[0,0],[3,0]));assert.throws(()=>Core.inspect(d,{sameLayer:0}),/capas/);assert.throws(()=>Core.inspect({...d,activeInSimulation:true}),/inspección/);});
 test('presupuesto agotado informa de parcial sin declarar seguro',()=>{const points=Array.from({length:390},(_,i)=>({x:i,y:i%2}));const d={verified:false,activeInSimulation:false,contours:[{index:0,layer:'X',verified:false,activeInSimulation:false,closed:false,points}]};const r=Core.inspect(d,{joinTolerance:0});assert.equal(r.summary.limited,true);assert.equal(r.complete,false);assert.equal(r.readiness.canUseCNC,false);});
 test('geometría degenerada y valores infinitos se rechazan',()=>{const d={verified:false,activeInSimulation:false,contours:[{index:0,layer:'A',verified:false,activeInSimulation:false,closed:false,points:[{x:0,y:0},{x:0,y:0}]}]};assert.throws(()=>Core.inspect(d),/degenerado/);d.contours[0].points[1]={x:Infinity,y:0};assert.throws(()=>Core.inspect(d),/Coordenadas/);});
+
+test('v0.23: dos tramos adyacentes que retroceden por la misma recta se consideran solape',()=>{
+ const doc={verified:false,activeInSimulation:false,contours:[{verified:false,activeInSimulation:false,index:0,layer:'M',closed:false,points:[{x:0,y:0},{x:10,y:0},{x:5,y:0}]}]};
+ const original=JSON.stringify(doc),r=Core.inspect(doc);
+ assert.equal(r.summary.overlaps,1);assert.equal(r.examples[0].type,'solape');
+ assert.deepEqual(r.examples[0].point_mm,{x:7.5,y:0});
+ assert.equal(r.approvedForCNC,false);assert.equal(JSON.stringify(doc),original);
+});
+test('v0.23: un codo o contorno cerrado correcto no genera falsos solapes',()=>{
+ const doc={verified:false,activeInSimulation:false,contours:[{verified:false,activeInSimulation:false,index:0,layer:'M',closed:true,points:[{x:0,y:0},{x:10,y:0},{x:10,y:10},{x:0,y:10},{x:0,y:0}]}]};
+ const r=Core.inspect(doc);assert.equal(r.summary.overlaps,0);assert.equal(r.summary.crossings,0);assert.equal(r.summary.nearGaps,0);
+});
+test('v0.23: localiza coordenadas de un cruce entre dos líneas y deja informe bloqueado',()=>{
+ const r=check(line('A',[0,0],[10,10])+line('A',[0,10],[10,0]));
+ assert.equal(r.version,'0.23');assert.deepEqual(r.examples[0].point_mm,{x:5,y:5});
+ assert.equal(r.readiness.canGenerateSolid,false);
+});
+test('v0.23: calcula un punto aproximado de la distancia mínima sin confundir proximidad y contacto',()=>{
+ const r=check(line('A',[0,0],[10,0])+line('A',[5,0.04],[5,3]),{joinTolerance:0.1});
+ assert.equal(r.summary.nearGaps,1);
+ assert.equal(r.examples[0].gap_mm,0.04);
+ assert.deepEqual(r.examples[0].point_mm,{x:5,y:0.02});
+});
+test('v0.23: la unión en T registra la ubicación del contacto',()=>{
+ const r=check(line('A',[0,0],[10,0])+line('A',[4,-3],[4,0]));
+ assert.equal(r.summary.tJunctions,1);assert.deepEqual(r.examples[0].point_mm,{x:4,y:0});
+});

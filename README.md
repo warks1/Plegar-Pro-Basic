@@ -1,4 +1,4 @@
-# Plegar Pro Plus · Prototipo v0.22
+# Plegar Pro Plus · Prototipo v0.23
 
 Repositorio: `warks1/Plegar-Pro-Basic`.
 
@@ -242,3 +242,11 @@ Se incorporan `cad-crossings.js`, `cad-crossings-view.js` y `cad-crossings.css`.
 **Limitaciones:** arcos `ARC`, `CIRCLE` y curvas `bulge` se evalúan sobre cuerdas discretizadas. Se limitan a 1600 segmentos y 60000 pares; cuando se alcanza el presupuesto, el informe indica **ANÁLISIS PARCIAL**. No se certifican tolerancias físicas, amarres, colisiones ni seguridad. Los extremos coincidentes siguen bajo el módulo de cadenas v0.21.
 
 Pruebas locales: 159 casos Node, Playwright Chromium a 1440, 820, 390 y 320 px; no equivale a certificación CAD ni CNC.
+
+## v0.23 — Incidencias geométricas localizadas y retrocesos adyacentes (solo inspección)
+
+Se refuerza `cad-crossings.js` para no omitir solapes de tramos consecutivos de un mismo contorno: cuando el trazado retrocede, se informa del solape, aunque los dos segmentos compartan un extremo. Las esquinas válidas y las uniones exactas ordinarias siguen sin contarse como cruces. Las incidencias incluyen un punto nominal X/Y en milímetros; para las proximidades se calcula el punto medio entre los dos puntos más cercanos, y para los solapes se indica el punto medio de la zona compartida.
+
+`cad-crossings-view.js` muestra hasta cinco incidencias con ubicación textual accesible y el informe JSON permite recuperar hasta 80 ejemplos. Los cambios no alteran la geometría DXF, ni su verificación industrial, ni el estado del utillaje. Los arcos continúan discretizados; la ubicación de las incidencias puede ser aproximada. **NO CNC / SIN VERIFICAR / NO SIMULACIÓN INDUSTRIAL.**
+
+Pruebas: 164 Node y navegador en 1440/820/390/320 píxeles, sin errores detectados en ese entorno.

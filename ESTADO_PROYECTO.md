@@ -1,4 +1,4 @@
-# Plegar Pro Plus — Punto de continuidad v0.22
+# Plegar Pro Plus — Punto de continuidad v0.23
 
 **Fecha:** 2026-10-19  
 **Repositorio:** https://github.com/warks1/Plegar-Pro-Basic  
@@ -29,4 +29,6 @@ Ninguna comparación dimensional o topológica valida el montaje físico, la ide
 
 Instrucción al recibir «Seguir»: recuperar el último commit de GitHub, comprobar el código, ejecutar pruebas, guardar los cambios con commit verificado y preservar la interfaz aprobada.
 
-- **v0.22:** cruces, uniones T, solapes y proximidades del DXF con presupuesto y bloqueo CNC (`cad-crossings.js`). 159 pruebas Node y cuatro anchos Playwright locales correctos.
+- **v0.22:** cruces, uniones T, solapes y proximidades del DXF con presupuesto y bloqueo CNC (`cad-crossings.js`). 164 pruebas Node y cuatro anchos Playwright locales correctos.
+
+- **v0.23:** los tramos DXF adyacentes que se retroceden y solapan ya no se omiten; el reporte incluye coordenadas X/Y nominales por incidencia. 164 pruebas automáticas Node y cuatro anchos de navegador correctos; SIN VERIFICAR / NO CNC.

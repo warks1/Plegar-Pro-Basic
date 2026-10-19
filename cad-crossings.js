@@ -1,4 +1,4 @@
-/* Plegar Pro Plus v0.22 — cribado topológico de cruces DXF (SOLO INSPECCIÓN).
+/* Plegar Pro Plus v0.23 — cribado topológico de cruces DXF (SOLO INSPECCIÓN).
  * Segmentos ARC/CIRCLE/bulge son cuerdas discretizadas por el importador: los resultados
  * son aproximados. No modifica el documento ni certifica sólidos, colisiones o CNC.
  */
@@ -12,7 +12,16 @@ function dot(a,b){return a.x*b.x+a.y*b.y;}
 function length(a){return Math.hypot(a.x,a.y);}
 function clamp(x){return Math.max(0,Math.min(1,x));}
 function pointGap(p,a,b){const v=sub(b,a),len2=dot(v,v),t=len2?clamp(dot(sub(p,a),v)/len2):0;return {gap:Math.hypot(p.x-a.x-t*v.x,p.y-a.y-t*v.y),t};}
-function minGap(a,b,c,d){return Math.min(pointGap(a,c,d).gap,pointGap(b,c,d).gap,pointGap(c,a,b).gap,pointGap(d,a,b).gap);}
+function closestGap(a,b,c,d){
+ const picks=[];
+ for(const [p,u,v] of [[a,c,d],[b,c,d],[c,a,b],[d,a,b]]){
+  const z=pointGap(p,u,v),near={x:u.x+(v.x-u.x)*z.t,y:u.y+(v.y-u.y)*z.t};
+  picks.push({gap:z.gap,point:{x:(p.x+near.x)/2,y:(p.y+near.y)/2}});
+ }
+ return picks.reduce((best,x)=>x.gap<best.gap?x:best);
+}
+function minGap(a,b,c,d){return closestGap(a,b,c,d).gap;}
+function mmPoint(p){return {x:Number(p.x.toFixed(6)),y:Number(p.y.toFixed(6))};}
 function segmentsFrom(document){const items=[];for(const c of document.contours){
  check(c&&c.verified===false&&c.activeInSimulation===false&&Number.isInteger(c.index)&&Array.isArray(c.points)&&c.points.length>=2,'Contorno DXF no verificado inválido.');
  check(c.points.length<=1600&&c.points.every(p=>p&&Number.isFinite(p.x)&&Number.isFinite(p.y)),'Coordenadas DXF inválidas.');
@@ -33,20 +42,20 @@ function intersection(a,b,tol){const A=a.a,B=a.b,C=b.a,D=b.b,r=sub(B,A),s=sub(D,
  const parallel=Math.abs(den)<=EPS*l1*l2;
  if(parallel){const collinear=Math.abs(cross(w,r))/l1<=EPS&&Math.abs(cross(w,s))/l2<=EPS;
   if(collinear){const u=dot(w,r)/(l1*l1),v=dot(sub(D,A),r)/(l1*l1),overlap=Math.min(1,Math.max(u,v))-Math.max(0,Math.min(u,v));
-   if(overlap*l1>EPS)return {kind:'solape',gap_mm:0};
+   if(overlap*l1>EPS)return {kind:'solape',gap_mm:0,point:mmPoint({x:A.x+r.x*(Math.max(0,Math.min(u,v))+Math.min(1,Math.max(u,v)))/2,y:A.y+r.y*(Math.max(0,Math.min(u,v))+Math.min(1,Math.max(u,v)))/2})};
    if(minGap(A,B,C,D)<=EPS)return null; // Coincidencia exacta de extremos: pertenece al grafo de cadenas.
   }
  }else{
   const t=cross(w,s)/den,u=cross(w,r)/den;
   if(t>=-EPS&&t<=1+EPS&&u>=-EPS&&u<=1+EPS){
    const insideA=t>EPS&&t<1-EPS,insideB=u>EPS&&u<1-EPS;
-   if(insideA&&insideB)return {kind:'cruce',gap_mm:0};
-   if(insideA||insideB)return {kind:'unión T',gap_mm:0};
+   if(insideA&&insideB)return {kind:'cruce',gap_mm:0,point:mmPoint({x:A.x+t*r.x,y:A.y+t*r.y})};
+   if(insideA||insideB)return {kind:'unión T',gap_mm:0,point:mmPoint({x:A.x+t*r.x,y:A.y+t*r.y})};
    return null; // Extremos coincidentes: competencia del grafo de v0.21.
   }
  }
- const gap=minGap(A,B,C,D);
- if(tol>0&&gap<=tol)return {kind:'proximidad',gap_mm:gap};
+ const candidate=closestGap(A,B,C,D);
+ if(tol>0&&candidate.gap<=tol)return {kind:'proximidad',gap_mm:candidate.gap,point:mmPoint(candidate.point)};
  return null;
 }
 function inspect(document,{joinTolerance=0.05,sameLayer=true}={}){
@@ -57,12 +66,16 @@ function inspect(document,{joinTolerance=0.05,sameLayer=true}={}){
  const segments=segmentsFrom(document),counts={cruce:0,'unión T':0,solape:0,proximidad:0},cases=[];
  let pairs=0,limited=false;
  outer:for(let i=0;i<segments.length;i++)for(let j=i+1;j<segments.length;j++){
-  const a=segments[i],b=segments[j];if(sameLayer&&a.layer!==b.layer||adjacent(a,b))continue;
+  const a=segments[i],b=segments[j];if(sameLayer&&a.layer!==b.layer)continue;
+  // Un par adyacente puede SOLAPARSE al retroceder; no debe omitirse en bloque.
+  if(adjacent(a,b)){const overlap=intersection(a,b,0);
+   if(overlap?.kind==='solape'){counts.solape++;if(cases.length<MAX_EXAMPLES)cases.push({type:'solape',a:{contour:a.contour,segment:a.segment,layer:a.layer},b:{contour:b.contour,segment:b.segment,layer:b.layer},gap_mm:0,point_mm:overlap.point});}
+   continue;}
   if(++pairs>MAX_PAIRS){limited=true;break outer;}
   if(a.maxX+joinTolerance<b.minX||b.maxX+joinTolerance<a.minX||a.maxY+joinTolerance<b.minY||b.maxY+joinTolerance<a.minY)continue;
   const info=intersection(a,b,joinTolerance);if(!info)continue;
   counts[info.kind]++;
-  if(cases.length<MAX_EXAMPLES)cases.push({type:info.kind,a:{contour:a.contour,segment:a.segment,layer:a.layer},b:{contour:b.contour,segment:b.segment,layer:b.layer},gap_mm:Number(info.gap_mm.toFixed(8))});
+  if(cases.length<MAX_EXAMPLES)cases.push({type:info.kind,a:{contour:a.contour,segment:a.segment,layer:a.layer},b:{contour:b.contour,segment:b.segment,layer:b.layer},gap_mm:Number(info.gap_mm.toFixed(8)),point_mm:info.point});
  }
  const intersections=counts.cruce+counts['unión T']+counts.solape;
  const issues=[];
@@ -72,7 +85,7 @@ function inspect(document,{joinTolerance=0.05,sameLayer=true}={}){
  const warnings=['Los arcos y círculos se evalúan mediante segmentos muestreados: NO son intersecciones CAD exactas.',
  'La detección de cruces no cierra cadenas ni valida agujeros, útiles, amarres o cuerpos sólidos.',
  'SIN VERIFICAR / NO CNC / NO SIMULACIÓN INDUSTRIAL.',...issues];
- return {version:'0.22',type:'AUDITORÍA DE CRUCES Y CONTINUIDAD (APROXIMADA)',verified:false,approvedForCNC:false,approvedForSimulation:false,
+ return {version:'0.23',type:'AUDITORÍA DE CRUCES Y CONTINUIDAD (APROXIMADA)',verified:false,approvedForCNC:false,approvedForSimulation:false,
   geometryModified:false,complete:!limited,joinTolerance_mm:joinTolerance,sameLayer,
   summary:{contours:document.contours.length,segments:segments.length,checkedPairs:Math.min(pairs,MAX_PAIRS),crossings:counts.cruce,tJunctions:counts['unión T'],overlaps:counts.solape,nearGaps:counts.proximidad,limited},
   examples:cases,openIssues:issues,readiness:{status:'NO HABILITADO',canUseCNC:false,canUseSimulation:false,canGenerateSolid:false},warnings};

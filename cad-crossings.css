@@ -5,3 +5,5 @@
 .cad-crossings-panel button{padding:10px 12px;border-radius:8px;max-width:100%;white-space:normal}
 .cad-crossings-panel .cad-danger{margin-top:12px}
 @media(max-width:580px){.cad-crossings-panel{padding:12px}}
+
+.cad-crossings-cases{padding-left:1.4rem;margin:.6rem 0;color:var(--text,#c9dde8);font-size:.86rem;line-height:1.5}.cad-crossings-cases li{overflow-wrap:anywhere;margin:.25rem 0}

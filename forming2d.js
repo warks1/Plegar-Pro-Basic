@@ -1,4 +1,4 @@
-/* Plegar Pro Plus v0.5 — rounded centreline profile for a SINGLE isolated bend.
+/* Plegar Pro Plus v0.7 — rounded centreline profile for a SINGLE isolated bend.
  * This is a geometric visualization, not an elastic/plastic/contact solver.
  * Coordinates: x horizontal, y DOWN, mm. The nominal V shoulders are y=0.
  * Negative bends require repositioning, which is not calculated. */
@@ -11,6 +11,8 @@
  const G=typeof require==='function'?require('./geometry2d.js'):window.PlegarGeometry2D;
  const C=typeof require==='function'?require('./bendcalc.js'):window.PlegarBendCalc;
  const I=typeof require==='function'?require('./interference2d.js'):window.PlegarInterference2D;
+ const T=typeof require==='function'?require('./toolprofiles2d.js'):window.PlegarToolProfiles2D;
+ const P=typeof require==='function'?require('./previousbends2d.js'):window.PlegarPreviousBends2D;
  const rad=d=>d*Math.PI/180;
  const round=n=>Math.round(n*1000000)/1000000;
 
@@ -86,8 +88,11 @@
    // 'depth' is nominal centreline descent from its START position, not CNC Y.
    depth:round(cy+t/2),punchTipY:round(cy-t/2),shoulderY,
    stop:{x:setup.backgaugeX,y:round(-t/2),width:Math.max(2,t),top:round(-t/2-12),bottom:round(-t/2+4)},warnings,
-   note:'Arco tangente de radio interior supuesto y espesor nominal. Tope X estático configurado manualmente: NO representa un eje controlado. Cribado 2D genérico NO certifica colisiones, fuerzas, posicionamiento CNC ni plegados previamente ejecutados.'
+   note:'Arco tangente de radio interior supuesto y espesor nominal. Tope X estático configurado manualmente: NO representa un eje controlado. Cribado 2D de alas anteriores únicamente con bisagras agudas, en el mismo plano y sin recolocación; NO certifica colisiones, fuerzas ni posicionamiento CNC.'
   };
+  output.toolProfiles=T.profiles(output);
+  output.previous=P.calculate(piece,output);
+  if(output.previous.completed.some(id=>piece.angles[id-1]<0))output.warnings.push('Hay pliegues anteriores negativos: la orientación y la recolocación necesarias NO se han resuelto.');
   output.interferences=I.inspect(output);
   return output;
  }

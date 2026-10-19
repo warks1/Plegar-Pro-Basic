@@ -1,4 +1,4 @@
-# Plegar Pro Plus · Prototipo v0.5
+# Plegar Pro Plus · Prototipo v0.7
 
 Repositorio: `warks1/Plegar-Pro-Basic`.
 
@@ -79,3 +79,15 @@ La vista de **Seguimiento de plegado · Perfil** permite comprobar cómo cambia,
 **Limitaciones críticas:** no se calcula la posición vertical real del tope, el contacto físico, desplazamiento del material, el eje Y, las holguras reales de útiles, el punzón frente a las alas, el giro y orientación para pliegues negativos, las paredes de piezas anteriores ni colisiones 3D. Un resultado «sin alertas geométricas» no significa que el proceso esté libre de colisiones o sea seguro. No utilizar los avisos como validación para plegado o preparación CNC. Para ello son necesarios modelos dimensionales certificados, verificación de interferencias de sólidos y contraste con la máquina real.
 
 Archivos nuevos: `interference2d.js` y `tests/interference2d.test.cjs`. Se mantienen intactos los estilos e imágenes de la pantalla Inicio aprobada.
+
+## v0.7 — Contornos genéricos de herramientas y alas anteriormente plegadas (cribado plano)
+
+Se incorporan perfiles **paramétricos orientativos** de punzón con punta circular tangente a las caras nominales de 30°/88°, y matriz V triangular genérica. El gráfico usa los mismos contornos que se examinan numéricamente para las alertas, pero NO son perfiles de fabricante ni sólidos CAD; faltan sus cotas reales, segmentos de montaje, adaptadores, radios de hombro y geometría de máquina.
+
+Para los pliegues anteriores en la secuencia del usuario, el modelo intenta trazar **únicamente las alas contiguas** al pliegue activo, como trazos naranjas discontinuos. Los giros ya realizados se tratan como **bisagras agudas en un mismo plano**, con signos tomados del perfil, sin corregir posición de mordazas, topes ni apoyo, y sin modelar el radio en los pliegues anteriores. Las alas no contiguas que requieran pasar por un pliegue aún no ejecutado no se reconstruyen.
+
+Se calcula la distancia nominal 2D entre segmentos auxiliares y los contornos simplificados del punzón, matriz y tope. Al restar medio espesor se identifican **posibles interferencias planas**, que se presentan únicamente como advertencias. Sin alerta NO significa ausencia de colisión real. No se examinan movimientos barridos ni cambios de orientación, contacto físico, recuperación elástica, piezas 3D, alturas verificadas ni cinemática CNC. Las secuencias con pliegues negativos necesitan recolocación física no implementada.
+
+Nuevos archivos: `toolprofiles2d.js`, `previousbends2d.js`, `clearance2d.js`, `tests/priorflanges.test.cjs`. Se incrementa la caché PWA a `v7` y se mantienen sin cambios los recursos de la portada aprobada (`assets/*`, `styles.css`, `app.js`).
+
+**Advertencia industrial:** esta es una maqueta de investigación geométrica que NO se debe usar para certificar ausencia de colisiones, definir parámetros de máquina o realizar trabajos de fabricación.

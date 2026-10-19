@@ -42,3 +42,19 @@
 @media (max-width:360px){.ed-fieldgrid{grid-template-columns:1fr}}
 /* Evita que los iconos de cuenta desborden la cabecera en tablet. */
 @media (min-width:701px) and (max-width:1120px){.topbar .brand{min-width:210px}.topbar .top-search{min-width:0}.topbar .top-actions{gap:8px}}
+/* v0.3 — cuadro de cálculo orientativo, sin modificar estilos de Inicio */
+.ed-calculation{gap:12px;background:linear-gradient(150deg,#0a2336,#0c1f30)}
+.ed-results{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.ed-results>div{border:1px solid #285575;background:#0e3049;padding:12px 10px;border-radius:8px;display:flex;flex-direction:column;gap:5px;min-width:0}
+.ed-results small{color:#b8d2e8;font-size:11px}
+.ed-results strong{color:#85d8ff;font-size:clamp(14px,1.4vw,19px);font-weight:700;overflow-wrap:anywhere}
+.ed-results [data-calculable="false"]{border-color:#bc8056}
+.ed-table-wrap{max-width:100%;overflow:auto}
+.ed-bend-table{width:100%;border-collapse:collapse;font-size:11px;white-space:nowrap;text-align:right}
+.ed-bend-table th,.ed-bend-table td{border-bottom:1px solid #31526a;padding:8px 9px}
+.ed-bend-table th:first-child{text-align:left}
+.ed-bend-table thead{color:#a3c7e2;background:#0f3149}
+.ed-calc-warnings{list-style:disc;padding:9px 10px 9px 27px;border:1px solid #65543c;color:#f4daa9;background:#30291d;border-radius:7px;font-size:11px;line-height:1.55;margin:0}
+.ed-calc-warnings li+li{margin-top:4px}
+.ed-equation,.ed-mini{font-size:11px;color:#9fc2dc;line-height:1.55;margin:0;overflow-wrap:anywhere}
+@media(max-width:700px){.ed-results{grid-template-columns:repeat(2,minmax(0,1fr))}.ed-results strong{font-size:15px}}

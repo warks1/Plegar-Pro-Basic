@@ -21,7 +21,7 @@ const materials = [
 ];
 const descriptions = {
  'Proyectos':'Proyectos de chapa, archivos asociados y revisiones. Vista inicial de demostración.',
- 'Programación 2D':'Editor de perfil nominal 2D: tramos, ángulos y secuencia. Sin desarrollo de corte ni simulación de fabricación validados.',
+ 'Programación 2D':'Editor de perfil 2D: tramos, ángulos, secuencia y estimación geométrica de desarrollo (no validada para fabricación).',
  'Programación 3D':'Geometría tridimensional de la pieza. Todavía sin núcleo CAD interactivo.',
  'Simulación 2D':'Vista de perfil del punzón, matriz y chapa. La representación actual es ilustrativa.',
  'Simulación 3D':'Vista industrial de la máquina y controles de secuencia. La imagen no calcula deformación física.',

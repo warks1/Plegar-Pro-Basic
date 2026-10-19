@@ -62,5 +62,54 @@ async function makeZip(files){
  const indexSize=central.reduce((sum,a)=>sum+a.length,0);
  return new Blob([...local,...central,join([le32(0x06054b50),le16(0),le16(0),le16(entries.length),le16(entries.length),le32(indexSize),le32(cursor),le16(0)])],{type:'application/zip'});
 }
-return {pdfWithJpeg,makeZip,safeName,availableFormats,extension,formats,crc32};
+
+/* ZIP privado sin compresión; importación local: no se publica contenido de clientes. */
+const u16=(b,i)=>b[i]|b[i+1]<<8;
+const u32=(b,i)=>(b[i]|b[i+1]<<8|b[i+2]<<16|b[i+3]<<24)>>>0;
+function safeArchivePath(p){return typeof p==='string'&&p.length<=240&&!/[\\\x00-\x1f:]/.test(p)&&p.split('/').every(t=>t&&t!=='.'&&t!=='..')&&!p.startsWith('/');}
+function readStoredZip(input){
+ const b=input instanceof Uint8Array?input:new Uint8Array(input);
+ if(b.length>100*1024*1024)throw Error('Límite de paquete ZIP: 100 MB');
+ const decoder=new TextDecoder('utf-8',{fatal:true}),files=new Map();let pos=0,bytes=0;
+ while(pos+4<=b.length&&u32(b,pos)===0x04034b50){
+  if(pos+30>b.length)throw Error('Cabecera ZIP incompleta');
+  const flag=u16(b,pos+6),method=u16(b,pos+8),crc=u32(b,pos+14),packed=u32(b,pos+18),unpacked=u32(b,pos+22),nameLen=u16(b,pos+26),extraLen=u16(b,pos+28);
+  if((flag&9)!==0||method!==0)throw Error('El ZIP debe estar sin comprimir, sin cifrar y sin descriptores de datos');
+  if(packed!==unpacked||packed>22*1024*1024)throw Error('Tamaño no permitido en el ZIP');
+  const begin=pos+30+nameLen+extraLen,end=begin+packed;
+  if(end>b.length)throw Error('Entrada ZIP incompleta');
+  const name=decoder.decode(b.subarray(pos+30,pos+30+nameLen));
+  if(!safeArchivePath(name)||files.has(name))throw Error('Nombre duplicado o ruta no válida en ZIP');
+  const data=b.subarray(begin,end);
+  if(crc32(data)!==crc)throw Error('Fallo de integridad CRC en ZIP: '+name);
+  files.set(name,data);bytes+=packed;
+  if(files.size>160||bytes>100*1024*1024)throw Error('Demasiados archivos para importar');
+  pos=end;
+ }
+ if(!files.size||pos+4>b.length||u32(b,pos)!==0x02014b50)throw Error('ZIP incompleto o formato no admitido');
+ const eocd=b.length-22;
+ if(eocd<pos||u32(b,eocd)!==0x06054b50||u16(b,eocd+10)!==files.size)throw Error('Directorio ZIP no válido');
+ return files;
+}
+function readPlanBundle(input){
+ const files=readStoredZip(input),indexes=[...files.keys()].filter(n=>n.endsWith('/indice-planos.json'));
+ if(indexes.length!==1)throw Error('El ZIP necesita exactamente un índice de carpeta');
+ const indexPath=indexes[0],prefix=indexPath.slice(0,-'indice-planos.json'.length);
+ let manifest;try{manifest=JSON.parse(new TextDecoder().decode(files.get(indexPath)));}catch{throw Error('Índice JSON ilegible');}
+ const folder=manifest?.folder;
+ if(manifest?.type!=='plans-import-v1'||manifest.version!==1||!folder||folder.length>60||folder.trim()!==folder||prefix!==folder+'/'||!Array.isArray(manifest.documents)||manifest.documents.length<1||manifest.documents.length>50)throw Error('Índice de planos inválido');
+ const seen=new Set(),documents=[];
+ for(const doc of manifest.documents){
+  const pdfPath=prefix+doc.pdf,originalPath=prefix+doc.original,thumbPath=prefix+doc.thumbnail;
+  if(![doc.name,doc.pdf,doc.original,doc.thumbnail,doc.originalName].every(x=>typeof x==='string'&&x.length<=240)||!safeArchivePath(pdfPath)||!safeArchivePath(originalPath)||!safeArchivePath(thumbPath)||seen.has(doc.pdf))throw Error('Documento duplicado o rutas incorrectas');
+  seen.add(doc.pdf);
+  const pdf=files.get(pdfPath),original=files.get(originalPath),thumbnail=files.get(thumbPath);
+  if(!pdf||!original||!thumbnail||pdf.length<5||String.fromCharCode(...pdf.subarray(0,5))!=='%PDF-'||original.length<4||original[0]!==255||original[1]!==216||thumbnail.length<4||thumbnail[0]!==255||thumbnail[1]!==216)throw Error('Faltan PDF, foto original o miniatura válidos: '+doc.pdf);
+  if(!doc.name.toLowerCase().endsWith('.pdf')||!doc.pdf.toLowerCase().endsWith('.pdf')||(!doc.original.toLowerCase().endsWith('.jpeg')&&!doc.original.toLowerCase().endsWith('.jpg'))||!doc.thumbnail.toLowerCase().endsWith('.jpg'))throw Error('Formato inesperado en el paquete');
+  documents.push({name:safeName(doc.name),sourceId:doc.pdf,originalName:safeName(doc.originalName),pdf,original,thumbnail,note:String(doc.note||'Plano fotográfico importado con su PDF original').slice(0,300)});
+ }
+ return {folder,documents};
+}
+
+return {pdfWithJpeg,makeZip,safeName,availableFormats,extension,formats,crc32,readPlanBundle};
 });

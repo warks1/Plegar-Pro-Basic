@@ -44,3 +44,5 @@ Fotos JPG/PNG/WebP: PDF con imagen real y miniatura. DXF 2D ASCII admitido: vist
 Exportaciones: PDF, original, copia ZIP por carpeta o global con índice JSON. Compartir PDF mediante Web Share cuando el dispositivo lo permite; de lo contrario descargar PDF y preparar correo con adjunto manual. Formatos aconsejados DXF/DWG, STEP/IGES, SLDPRT/SLDDRW/SLDASM, STL/3MF, SVG y NC/G-code, sin producir conversiones falsas.
 Miniatura geométrica real para fotografía y DXF compatible; para otros tipos (PDF importado y sólidos no interpretables) se muestra identificación de formato, NO siluetas inventadas. El almacenamiento no se sincroniza y puede perderse al borrar datos del navegador: hacer copias ZIP. Límites 22 MB/archivo y 150 documentos. No integración CNC ni certificación industrial.
 Pruebas locales: 193 Node; verificaciones del navegador general y del módulo Planos a 1440/820/390/320 px. La prueba aislada de Planos emula IndexedDB porque el navegador de ensayo bloquea URLs locales.
+
+**v0.28:** En Planos, el botón Importar carpeta ZIP admite lotes privados de PDFs y miniaturas. Los planos de clientes no están incluidos en el repositorio público.

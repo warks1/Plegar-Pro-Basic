@@ -1,4 +1,4 @@
-/* Plegar Pro Plus v0.27 - Planos. Biblioteca local en IndexedDB. */
+/* Plegar Pro Plus v0.28 - Planos: importación privada de carpetas ZIP PDF. */
 (function(root,factory){const api=factory(root);if(typeof module==='object'&&module.exports)module.exports=api;else root.PlegarPlans=api;})(typeof globalThis!=='undefined'?globalThis:this,function(root){
 'use strict';
 const C=()=>root.PlegarPlansCore;
@@ -57,11 +57,11 @@ async function refresh(){folderCache=(await all('folders')).sort((a,b)=>a.name.l
 function folderName(id){return folderCache.find(f=>f.id===id)?.name||'Sin cliente';}
 function tile(p){return `<article class="pl-item" data-id="${escape(p.id)}"><div class="pl-thumb">${p.thumbnail?`<img src="${p.thumbnail}" alt="Miniatura del plano"/>`:`<span class="pl-no-preview">${escape((C().extension(p.name)||'PDF').toUpperCase())}<small>Sin vista de geometría</small></span>`}</div><div class="pl-item-copy"><strong>${escape(p.name)}</strong><span>${escape(folderName(p.folderId))} · ${escape(new Date(p.created).toLocaleDateString('es-ES'))}</span><small>${escape(p.note)}</small></div><div class="pl-item-actions"><button type="button" data-action="preview" data-id="${escape(p.id)}">Ver</button><button type="button" data-action="pdf" data-id="${escape(p.id)}">PDF</button><button type="button" data-action="share" data-id="${escape(p.id)}">Enviar</button><button type="button" data-action="more" data-id="${escape(p.id)}">Formatos</button></div></article>`;}
 function render(){if(!host)return;const filtered=plansCache.filter(p=>(selectedFolder==='all'||p.folderId===selectedFolder)&&(!search||`${p.name} ${folderName(p.folderId)}`.toLowerCase().includes(search.toLowerCase())));
- host.innerHTML=`<section class="pl-layout"><div class="pl-toolbar"><div><h2>Biblioteca de planos</h2><p>Documentos y PDFs guardados <strong>solo en este dispositivo</strong>. Las miniaturas reproducen fotos y DXF compatibles.</p></div><div class="pl-tools"><button data-action="open-files">＋ Importar archivos</button><button data-action="open-camera">📷 Hacer foto</button><button data-action="backup">↓ Copia ZIP</button></div></div>
+ host.innerHTML=`<section class="pl-layout"><div class="pl-toolbar"><div><h2>Biblioteca de planos</h2><p>Documentos y PDFs guardados <strong>solo en este dispositivo</strong>. Las miniaturas reproducen fotos y DXF compatibles.</p></div><div class="pl-tools"><button data-action="open-files">＋ Importar archivos</button><button data-action="open-camera">📷 Hacer foto</button><button data-action="open-bundle">📁 Importar carpeta ZIP</button><button data-action="backup">↓ Copia ZIP</button></div></div>
  <div class="pl-area"><aside class="pl-folders"><h3>Clientes / carpetas</h3><button data-action="folder" data-folder="all" class="${selectedFolder==='all'?'active':''}">▣ Todos los planos <span>${plansCache.length}</span></button>${folderCache.map(f=>`<button data-action="folder" data-folder="${escape(f.id)}" class="${selectedFolder===f.id?'active':''}">▸ ${escape(f.name)} <span>${plansCache.filter(p=>p.folderId===f.id).length}</span></button>`).join('')}<form id="pl-folder-form"><label for="pl-folder-name">Nueva carpeta de cliente</label><input id="pl-folder-name" maxlength="60" required placeholder="Nombre del cliente" autocomplete="off"/><button type="submit">Crear carpeta</button></form></aside>
  <div class="pl-content"><div class="pl-filter"><label>Buscar<input id="pl-search" value="${escape(search)}" placeholder="Buscar por plano o cliente"/></label><label>Guardar importaciones en<select id="pl-target">${folderCache.map(f=>`<option value="${escape(f.id)}" ${selectedFolder===f.id?'selected':''}>${escape(f.name)}</option>`).join('')}</select></label></div><p class="pl-summary">${filtered.length} plano${filtered.length===1?'':'s'} · PDFs disponibles para descarga y compartición</p><div id="pl-message" role="status" aria-live="polite"></div><div class="pl-items">${filtered.length?filtered.map(tile).join(''):'<p class="pl-empty">Aquí aparecerán los planos importados y una miniatura de cada pieza cuando pueda obtenerse.</p>'}</div></div></div>
  <div class="pl-policy"><strong>Formatos recomendados:</strong> PDF para consulta, DXF/DWG para planos CAD 2D, STEP/IGES para sólidos, SLDPRT/SLDDRW para SolidWorks, STL/3MF para mallas y NC/G-code solo con posprocesador específico. <strong>No se generan estos formatos a partir de fotos o PDFs:</strong> solo se descargan cuando el original importado coincide con ellos.</div>
- <input id="pl-files" type="file" hidden multiple accept="image/*,.pdf,.dxf,.dwg,.step,.stp,.iges,.igs,.sldprt,.sldasm,.slddrw,.stl,.3mf,.svg,.nc,.gcode,.tap,.heic,.heif"/><input id="pl-camera" type="file" hidden accept="image/*" capture="environment"/></section><div class="pl-modal" id="pl-modal" hidden></div>`;
+ <input id="pl-files" type="file" hidden multiple accept="image/*,.pdf,.dxf,.dwg,.step,.stp,.iges,.igs,.sldprt,.sldasm,.slddrw,.stl,.3mf,.svg,.nc,.gcode,.tap,.heic,.heif"/><input id="pl-camera" type="file" hidden accept="image/*" capture="environment"/><input id="pl-bundle" type="file" hidden accept=".zip,application/zip"/></section><div class="pl-modal" id="pl-modal" hidden></div>`;
 }
 async function importFiles(fileList){if(busy)return;const files=[...fileList];if(!files.length)return;if(!folderCache.length){tell('Primero crea una carpeta de cliente para guardar los planos.',true);return;}
  const target=host.querySelector('#pl-target').value;if(!folderCache.some(f=>f.id===target)){tell('Selecciona una carpeta de cliente válida.',true);return;}
@@ -70,6 +70,31 @@ async function importFiles(fileList){if(busy)return;const files=[...fileList];if
  const converted=await convertFile(file);const row={id:identity(),folderId:target,name:C().safeName(file.name),created:new Date().toISOString(),original:file,pdf:converted.pdf,thumbnail:converted.thumbnail,pdfKind:converted.type,note:converted.note,bytes:file.size,mime:file.type};await change('plans','put',row);ok++;
  }catch(e){failed.push(`${file.name}: ${e.message||e}`);}}
  busy=false;await refresh();tell(`${ok} plano(s) importado(s)${failed.length?'. Errores: '+failed.join(' · '):' y guardados en PDF.'}`,!!failed.length);
+}
+
+function dataURL(bytes){let result='';for(let i=0;i<bytes.length;i+=0x8000)result+=String.fromCharCode(...bytes.subarray(i,i+0x8000));return 'data:image/jpeg;base64,'+btoa(result);}
+async function importFolderZip(file){
+ if(busy)throw Error('Ya hay una importación en curso');
+ if(!file||!file.size||file.size>100*1024*1024)throw Error('ZIP vacío o superior a 100 MB');
+ busy=true;
+ try{
+  const bundle=C().readPlanBundle(await file.arrayBuffer());
+  const existing=await all('folders');let folder=existing.find(f=>f.name.toLocaleLowerCase('es')===bundle.folder.toLocaleLowerCase('es'));
+  const saved=await all('plans');
+  const incoming=bundle.documents.filter(d=>!saved.some(p=>p.sourceId===d.sourceId&&p.folderId===folder?.id&&p.importFolder===bundle.folder));
+  if(saved.length+incoming.length>MAX_COUNT)throw Error('No caben más planos en esta biblioteca (máximo 150)');
+  if(!folder){folder={id:identity(),name:bundle.folder};await change('folders','put',folder);}
+  let added=0;
+  for(const d of incoming){
+   await change('plans','put',{
+    id:identity(),folderId:folder.id,name:d.name,sourceId:d.sourceId,importFolder:bundle.folder,created:new Date().toISOString(),
+    original:new Blob([d.original],{type:'image/jpeg'}),pdf:new Blob([d.pdf],{type:'application/pdf'}),
+    thumbnail:dataURL(d.thumbnail),pdfKind:'image',note:d.note,bytes:d.original.length,mime:'image/jpeg'
+   });added++;
+  }
+  selectedFolder=folder.id;await refresh();
+  tell(bundle.folder+': '+added+' plano(s) PDF guardados con miniatura y foto original.'+(bundle.documents.length-added?' Omitidos duplicados: '+(bundle.documents.length-added)+'.':''));
+ }finally{busy=false;}
 }
 async function makeBackup(){let list=plansCache.filter(p=>selectedFolder==='all'||p.folderId===selectedFolder);if(!list.length){tell('La carpeta seleccionada está vacía.',true);return;}
  const objects=[],manifest={app:'Plegar Pro Plus',module:'Planos',date:new Date().toISOString(),warning:'Los CAD se conservan en formato original; el PDF de cobertura no implica conversión geométrica.',plans:[]};
@@ -86,7 +111,7 @@ function showDetails(p){revokePreview();const modal=host.querySelector('#pl-moda
  modal.innerHTML=`<div class="pl-dialog" role="dialog" aria-modal="true" aria-label="Detalle del plano"><div class="pl-dialog-head"><strong>${escape(p.name)}</strong><button data-action="close" aria-label="Cerrar ventana">✕</button></div><div class="pl-document">${p.thumbnail?`<img src="${p.thumbnail}" alt="Vista previa de la pieza"/>`:`<div class="pl-no-detail-preview">${escape(C().extension(p.name).toUpperCase())} · Geometría no previsualizable con este lector</div>`}</div><p>${escape(p.note)}</p><div class="pl-dialog-actions"><button data-action="pdf" data-id="${escape(p.id)}">↓ PDF</button><button data-action="original" data-id="${escape(p.id)}">↓ Original</button><button data-action="share" data-id="${escape(p.id)}">Enviar por correo / compartir</button></div><h3>Formatos de exportación aconsejados</h3><p>Los formatos CAD/CAM solo son descargables si se importó el archivo en ese formato. No existen conversiones automáticas entre formatos.</p><div class="pl-formats">${format.map(f=>`<div><span>${escape(f.label)}</span><small>${f.available?'Disponible': 'Requiere CAD/CAM externo'}</small></div>`).join('')}</div><div class="pl-edit"><label>Cambiar cliente<select id="pl-move">${selected}</select></label><button data-action="move" data-id="${escape(p.id)}">Mover</button><button data-action="delete" data-id="${escape(p.id)}">Eliminar plano</button></div></div>`;
 }
 function closeDetails(){if(!host)return;revokePreview();const modal=host.querySelector('#pl-modal');if(modal){modal.hidden=true;modal.replaceChildren();}}
-async function onAction(action,id,button){if(action==='close'){closeDetails();return;}if(action==='open-files'){host.querySelector('#pl-files').click();return;}if(action==='open-camera'){host.querySelector('#pl-camera').click();return;}if(action==='folder'){selectedFolder=button.dataset.folder;render();return;}if(action==='backup'){await makeBackup();return;}
+async function onAction(action,id,button){if(action==='close'){closeDetails();return;}if(action==='open-files'){host.querySelector('#pl-files').click();return;}if(action==='open-camera'){host.querySelector('#pl-camera').click();return;}if(action==='open-bundle'){host.querySelector('#pl-bundle').click();return;}if(action==='folder'){selectedFolder=button.dataset.folder;render();return;}if(action==='backup'){await makeBackup();return;}
  const p=plansCache.find(x=>x.id===id);if(!p)return;
  if(action==='preview'||action==='more'){selectedPlan=id;showDetails(p);return;}
  if(action==='pdf'){download(p.pdf,p.name.replace(/\.[^/.]+$/,'')+'.pdf');return;}
@@ -98,9 +123,9 @@ async function onAction(action,id,button){if(action==='close'){closeDetails();re
 async function mount(container){destroy();host=container;listenerController=new AbortController();const signal=listenerController.signal;container.classList.add('pl-host');selectedFolder='all';try{await openDb();folderCache=await all('folders');plansCache=await all('plans');if(!folderCache.length){await change('folders','put',{id:'default',name:'Sin cliente'});}await refresh();}catch(e){host.innerHTML=`<p class="pl-error">No se puede abrir la biblioteca local: ${escape(e.message)}. Comprueba los permisos de almacenamiento del navegador.</p>`;return;}
  container.addEventListener('click',async e=>{const button=e.target.closest('[data-action]');if(!button||!container.contains(button))return;try{await onAction(button.dataset.action,button.dataset.id,button);}catch(err){tell(err.message||String(err),true);}},{signal});
  container.addEventListener('submit',async e=>{if(e.target.id!=='pl-folder-form')return;e.preventDefault();const name=container.querySelector('#pl-folder-name').value.trim();if(!name||name.length>60){tell('Nombre de cliente no válido.',true);return;}if(folderCache.some(f=>f.name.toLocaleLowerCase('es')===name.toLocaleLowerCase('es'))){tell('Esta carpeta ya existe.',true);return;}try{const id=identity();await change('folders','put',{id,name});selectedFolder=id;await refresh();tell('Carpeta creada. Ya puedes importar documentos.');}catch(err){tell(err.message,true);}},{signal});
- container.addEventListener('change',async e=>{if(!['pl-files','pl-camera'].includes(e.target.id))return;const picked=[...e.target.files];e.target.value='';await importFiles(picked);},{signal});
+ container.addEventListener('change',async e=>{if(!['pl-files','pl-camera','pl-bundle'].includes(e.target.id))return;const type=e.target.id;const picked=[...e.target.files];e.target.value='';try{if(type==='pl-bundle'){if(picked.length)await importFolderZip(picked[0]);}else await importFiles(picked);}catch(err){tell(err.message||String(err),true);}},{signal});
  container.addEventListener('input',e=>{if(e.target.id!=='pl-search')return;search=e.target.value;const position=e.target.selectionStart;render();const fld=host.querySelector('#pl-search');fld.focus();fld.setSelectionRange(position,position);},{signal});
 }
 function destroy(){listenerController?.abort();listenerController=null;revokePreview();host=null;selectedPlan=null;}
-return {mount,destroy,openDb,convertFile,dbName:DB};
+return {mount,destroy,openDb,convertFile,importFolderZip,dbName:DB};
 });

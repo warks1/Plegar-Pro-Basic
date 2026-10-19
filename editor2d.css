@@ -59,9 +59,22 @@
 .ed-equation,.ed-mini{font-size:11px;color:#9fc2dc;line-height:1.55;margin:0;overflow-wrap:anywhere}
 @media(max-width:700px){.ed-results{grid-template-columns:repeat(2,minmax(0,1fr))}.ed-results strong{font-size:15px}}
 
-/* v0.12: trazabilidad del utillaje, solamente en el editor */
+/* v0.12 · panel de trazabilidad del utillaje; solo dentro del editor */
 .ed-tool-card{background:#0a2b43;border:1px solid #39769a;border-radius:8px;padding:12px;min-width:0;overflow-wrap:anywhere;font-size:11px;line-height:1.5}
 .ed-tool-card strong{display:block;font-size:12px;color:#a5e1ff}
 .ed-tool-card p{margin:7px 0 0;color:#bddbed}
 .ed-tool-card b{color:#e5f2ff}
 .ed-tool-card .ed-tool-warning{border-left:3px solid #f3b65e;color:#f5d9ac;padding:7px;background:#322a1d;border-radius:3px}
+
+/* v0.13 — fichas de fabricante de solo lectura; no se modifica Inicio */
+.ed-reference-library{display:flex;flex-direction:column;gap:10px;min-width:0;padding:12px;border:1px solid #326e94;border-radius:9px;background:linear-gradient(145deg,#0b2b42,#091d31);font-size:11px;line-height:1.5}
+.ed-reference-library>strong{font-size:13px;color:#9bdcff}
+.ed-reference-library p{margin:0;overflow-wrap:anywhere}
+.ed-ref-note{color:#cee2f1}
+.ed-ref-details{min-width:0;display:flex;flex-direction:column;gap:7px;padding:11px;border-radius:7px;border:1px solid #274e67;background:#0a2031}
+.ed-ref-details b{color:#c0edff;font-size:12px}
+.ed-ref-details p{color:#c9dceb}
+.ed-ref-details a,.ed-ref-catalogs a{color:#80d6ff;text-decoration:underline;text-underline-offset:3px;overflow-wrap:anywhere}
+.ed-ref-details a:focus-visible,.ed-ref-catalogs a:focus-visible{outline:2px solid #80d6ff;outline-offset:3px}
+.ed-ref-catalogs{display:flex;flex-direction:column;gap:7px;padding:4px 0}
+.ed-ref-warning{border-left:3px solid #e9a34d;background:#392917;color:#ffe2b6;padding:8px 10px;border-radius:4px}

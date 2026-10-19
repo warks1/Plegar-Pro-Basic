@@ -1,4 +1,4 @@
-# Plegar Pro Plus · Prototipo v0.12
+# Plegar Pro Plus · Prototipo v0.13
 
 Repositorio: `warks1/Plegar-Pro-Basic`.
 
@@ -136,13 +136,28 @@ Se amplían las pruebas con casos de contacto, separación XY y Z, intervalos in
 
 **Pendiente v0.12:** sección de catálogos dimensionales con trazabilidad de fuentes; geometría de montaje/adaptadores; modelos de máquina y ejes verificables; motor CAD de sólidos y barrido de trayectorias para colisiones industriales; publicación GitHub Pages y validación en dispositivos físicos.
 
-## v0.12 — Biblioteca de utillaje paramétrico SIN VERIFICAR
 
-- `tool-library.js` define 8 punzones y 21 matrices de demostración, sin atribuirlos a fabricantes; todos tienen ID, fuente, revisión y `verified: false`.
-- Series genéricas 30°/88°, V6–V50 y alturas nominales H100/H120/H150 para punzones seleccionados. **No** representan perfiles CAD certificados ni cotas oficiales.
-- Se conservan los IDs anteriores para recuperar proyectos JSON previos; el editor, el cálculo, el seguimiento 2D y la vista 3D comparten los mismos datos.
-- Fichas de la herramienta seleccionada en Programación 2D; avisos claros «SIN VERIFICAR». El 3D utiliza alturas nominales cuando existen.
-- Pruebas: `node --test tests/*.test.cjs` y `python tests/browser_check.py` (1440, 820, 390, 320 px).
-- **No usar para fabricar** ni garantizar fuerzas, amarres, tolerancias, secuencia CNC o colisiones.
+## v0.12 · Fichas de utillaje paramétrico SIN VERIFICAR
 
-Próxima fase: fichas oficiales con fabricante, referencia, versión, URL, fecha, medidas, amarre y tolerancias comprobables.
+- Archivo fuente: `tool-library.js`, con 8 punzones y 21 matrices de DEMOSTRACIÓN. Todas las entradas tienen identificador único, revisión, procedencia interna y `verified: false`; las referencias no corresponden a productos oficiales ni permiten garantizar compatibilidad con marcas o amarras.
+- Punzones genéricos 30° / 88°, radios R1 / R2; tres alternativas ilustrativas H100/H120/H150 para punta R1 a 30°. Matrices nominales 30° / 88° y V6–V50 según la tabla incluida. El modelo no tiene tolerancias de fabricación ni cotas certificadas.
+- Las opciones anteriores se conservan para abrir JSON de versiones previas. Las selecciones, cálculos y simulaciones 2D/3D comparten el mismo identificador de herramienta.
+- Las fichas aparecen bajo los selectores de Programación 2D y señalan `SIN VERIFICAR`, la fuente y las dimensiones disponibles. Si no hay altura documentada, se indica claramente.
+- Los perfiles 2D y 3D de demostración reflejan las alturas especificadas; no existe geometría CAD sólida de fabricante ni comprobación de trayectorias barridas.
+- No utilizar los resultados para aprobar fabricación, fuerza, amarre, interferencias reales o seguridad de la máquina.
+- Pruebas: `node --test tests/*.test.cjs` (72 pruebas) y `python tests/browser_check.py` en 1440 / 820 / 390 / 320 px.
+
+**Próximo paso:** introducir perfiles oficiales de fabricantes únicamente tras obtener documentación dimensional contrastable (DXF, STEP o planos acotados), conservar fabricante, referencia exacta, URL, versión, fecha, sistema de amarre y tolerancias, sin sobrescribir los modelos genéricos actuales.
+
+
+## v0.13 — Referencias dimensionales de fabricante (consulta separada)
+
+Se crea `manufacturer-references.js` con **cinco referencias concretas AMADA**, documentadas mediante fichas o catálogos publicados por el propio fabricante: **tres punzones y dos matrices**. Cada registro identifica fabricante, serie, modelo, referencia comercial de la variante, cotas publicadas, origen URL, fecha de consulta, revisión cuando se identifica y límites del dato. La ficha puede filtrarse por punzón/matriz y abrir su fuente original en Programación 2D. Se incluyen **cuatro entradas de catálogo**, entre ellas TRUMPF, aún sin datos de herramienta individual importados.
+
+- La nueva biblioteca es **solo de consulta**. No se añade ningún útil de fabricante a los desplegables de selección del motor geométrico ni se usa una ficha parcial para generar un sólido de colisión.
+- El motor continúa con los 8 punzones y 21 matrices genéricos de v0.12, marcados SIN VERIFICAR; la portada aprobada y sus recursos no se han modificado.
+- No hay referencias MECOS importadas, pues todavía no se ha comprobado una fuente dimensional suficiente.
+- Ver [FUENTES_UTILLAJE.md](FUENTES_UTILLAJE.md) para referencias, dimensiones, fechas y advertencias.
+- Pruebas: `node --test tests/*.test.cjs` y `python3 tests/browser_check.py`.
+
+**Advertencia:** cota publicada ≠ geometría CAD verificada ≠ aptitud para producción. La geometría del amarre y la compatibilidad de máquina permanecen sin contrastar.

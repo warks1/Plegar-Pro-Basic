@@ -18,7 +18,7 @@ with sync_playwright() as p:
   page.set_content(html,wait_until='domcontentloaded')
   page.add_style_tag(content=css)
   page.evaluate("""() => {window.__testStorage=window.__testStorage||new Map();Object.defineProperty(window,'localStorage',{configurable:true,value:{getItem:k=>window.__testStorage.get(k)??null,setItem:(k,v)=>window.__testStorage.set(k,String(v)),removeItem:k=>window.__testStorage.delete(k)}})}""")
-  for script in ('geometry2d.js','tool-library.js','bendcalc.js','clearance2d.js','toolprofiles2d.js','previousbends2d.js','interference2d.js','assembly2d.js','forming2d.js','forming2d-view.js','piece3d.js','tooling3d.js','scene3d-audit.js','proximity3d.js','piece3d-view.js','editor2d.js','app.js'):
+  for script in ('geometry2d.js','tool-library.js','manufacturer-references.js','bendcalc.js','clearance2d.js','toolprofiles2d.js','previousbends2d.js','interference2d.js','assembly2d.js','forming2d.js','forming2d-view.js','piece3d.js','tooling3d.js','scene3d-audit.js','proximity3d.js','piece3d-view.js','editor2d.js','app.js'):
    page.evaluate((root/script).read_text())
   assert page.locator('#project-name').inner_text()=='Soporte motor S235'
   print('navigating',tag,flush=True)
@@ -31,6 +31,20 @@ with sync_playwright() as p:
   assert page.locator('#ed-vratio').inner_text().startswith('8')
   assert 'SIN VERIFICAR' in page.locator('#ed-tool-punch').inner_text()
   assert 'SIN VERIFICAR' in page.locator('#ed-tool-die').inner_text()
+  assert page.locator('#ed-ref-item option').count()==5
+  assert '50838E' in page.locator('#ed-ref-item').inner_text()
+  assert 'CAD' in page.locator('.ed-ref-warning').inner_text()
+  page.locator('#ed-ref-filter').select_option('punch')
+  assert page.locator('#ed-ref-item option').count()==3
+  page.locator('#ed-ref-item').select_option('amada-a13-p30-r06-835')
+  assert '120 mm' in page.locator('#ed-ref-dimensions').inner_text()
+  assert 'AGA13061' in page.locator('#ed-ref-family').inner_text()
+  assert page.locator('#ed-ref-link').get_attribute('href').startswith('https://www.amada.de/')
+  assert page.locator('#ed-punch').input_value()=='p88-r1'
+  page.locator('#ed-ref-filter').select_option('die')
+  assert page.locator('#ed-ref-item option').count()==2
+  assert 'AMADA' in page.locator('#ed-ref-family').inner_text()
+
   assert page.locator('.ed-bend-point').count()==4
   assert page.locator('#ed-forming .f2d-svg').count()==1
   assert page.locator('.f2-prior-summary').count()==1
@@ -86,7 +100,7 @@ with sync_playwright() as p:
   page.set_content(html,wait_until='domcontentloaded')
   page.add_style_tag(content=css)
   page.evaluate("""() => {window.__testStorage=window.__testStorage||new Map();Object.defineProperty(window,'localStorage',{configurable:true,value:{getItem:k=>window.__testStorage.get(k)??null,setItem:(k,v)=>window.__testStorage.set(k,String(v)),removeItem:k=>window.__testStorage.delete(k)}})}""")
-  for script in ('geometry2d.js','bendcalc.js','clearance2d.js','toolprofiles2d.js','previousbends2d.js','interference2d.js','assembly2d.js','forming2d.js','forming2d-view.js','piece3d.js','tooling3d.js','scene3d-audit.js','proximity3d.js','piece3d-view.js','editor2d.js','app.js'):
+  for script in ('geometry2d.js','tool-library.js','manufacturer-references.js','bendcalc.js','clearance2d.js','toolprofiles2d.js','previousbends2d.js','interference2d.js','assembly2d.js','forming2d.js','forming2d-view.js','piece3d.js','tooling3d.js','scene3d-audit.js','proximity3d.js','piece3d-view.js','editor2d.js','app.js'):
    page.evaluate((root/script).read_text())
   if w<=1120:page.locator('#open-menu').click()
   page.locator('button.nav-item[data-screen="Programación 2D"]').click()
@@ -94,6 +108,8 @@ with sync_playwright() as p:
   assert page.locator('#ed-total').inner_text().startswith('476 mm')
   assert page.locator('#ed-radius').input_value()=='3'
   assert page.locator('#ed-die').input_value()=='v6-88'
+  assert page.locator('#ed-punch').input_value()=='p30-r1-h120'
+  assert 'SIN VERIFICAR' in page.locator('#ed-tool-punch').inner_text()
   assert page.locator('#ed-backgauge').input_value()=='30'
   assert page.locator('.f2-step').count()==5
   overflow=page.evaluate('document.documentElement.scrollWidth > innerWidth+2')

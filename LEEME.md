@@ -1,5 +1,9 @@
-# Plegar Pro Plus v0.12
+# Plegar Pro Plus v0.13
 
-Prototipo de interfaz basado en el boceto aprobado, publicado en GitHub Pages tras el despliegue de la rama main.
+Abre `index.html` en un servidor local o visita la URL publicada de GitHub Pages cuando el despliegue del último commit termine.
 
-Novedad: fichas de utillaje genérico SIN VERIFICAR en Programación 2D. No son catálogos oficiales de MECOS/AMADA/Trumpf. Pruebas: node --test tests/*.test.cjs; python tests/browser_check.py. Revisa ESTADO_PROYECTO.md.
+Esta versión incorpora fichas de utillaje paramétrico SIN VERIFICAR en Programación 2D. Ninguna de las cotas es una ficha oficial de fabricante. El resto del visor y de Inicio mantiene el diseño aprobado.
+
+Pruebas: `node --test tests/*.test.cjs` y `python tests/browser_check.py`. Revisa `ESTADO_PROYECTO.md` para continuar.
+
+Fichas AMADA de solo consulta: `manufacturer-references.js` y `FUENTES_UTILLAJE.md`. No reemplazan los perfiles genéricos ni la simulación CAD.

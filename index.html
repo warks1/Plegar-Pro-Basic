@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#061321">
+  <meta name="description" content="Plegar Pro — prototipo navegable basado en el boceto aprobado.">
+  <title>Plegar Pro · Prototipo de interfaz</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <svg aria-hidden="true" class="svg-icons" xmlns="http://www.w3.org/2000/svg">
+    <symbol id="i-home" viewBox="0 0 24 24"><path d="m3 10 9-7 9 7v10H3zM9 20v-7h6v7"/></symbol>
+    <symbol id="i-folder" viewBox="0 0 24 24"><path d="M3 6h7l2 3h9v11H3z"/></symbol>
+    <symbol id="i-wrench" viewBox="0 0 24 24"><path d="M14 6a6 6 0 0 0-8 8l-4 4 4 4 4-4a6 6 0 0 0 8-8l-4 4-4-4z"/></symbol>
+    <symbol id="i-box" viewBox="0 0 24 24"><path d="m12 2 9 5v10l-9 5-9-5V7zM3 7l9 5 9-5M12 12v10"/></symbol>
+    <symbol id="i-calc" viewBox="0 0 24 24"><rect x="4" y="2" width="16" height="20" rx="2"/><path d="M7 6h10v4H7zM8 14h1m6 0h1m-8 4h1m6 0h1"/></symbol>
+    <symbol id="i-calendar" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="17" rx="2"/><path d="M7 2v6m10-6v6M3 10h18"/></symbol>
+    <symbol id="i-gear" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="m10 2-.4 2.3-2.2 1-2-.9-2 3.5 1.7 1.5v2.5L3.4 14.5l2 3.5 2-.9 2.2 1L10 21h4l.4-2.9 2.2-1 2 .9 2-3.5-1.7-1.6v-2.5l1.7-1.5-2-3.5-2 .9-2.2-1L14 2z"/></symbol>
+    <symbol id="i-search" viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/></symbol>
+    <symbol id="i-bell" viewBox="0 0 24 24"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9zM10 21h4"/></symbol>
+    <symbol id="i-mail" viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="15" rx="2"/><path d="m3 7 9 7 9-7"/></symbol>
+    <symbol id="i-chevron" viewBox="0 0 24 24"><path d="m7 10 5 5 5-5"/></symbol>
+    <symbol id="i-menu" viewBox="0 0 24 24"><path d="M3 6h18M3 12h18M3 18h18"/></symbol>
+    <symbol id="i-close" viewBox="0 0 24 24"><path d="m5 5 14 14M19 5 5 19"/></symbol>
+    <symbol id="i-play" viewBox="0 0 24 24"><path d="m7 3 13 9-13 9z"/></symbol>
+    <symbol id="i-pause" viewBox="0 0 24 24"><path d="M6 3h4v18H6zM14 3h4v18h-4z"/></symbol>
+    <symbol id="i-back" viewBox="0 0 24 24"><path d="M4 4v16M19 4 7 12l12 8z"/></symbol>
+    <symbol id="i-next" viewBox="0 0 24 24"><path d="M20 4v16M5 4l12 8-12 8z"/></symbol>
+    <symbol id="i-max" viewBox="0 0 24 24"><path d="M9 3H3v6M15 3h6v6M3 15v6h6m12-6v6h-6"/></symbol>
+    <symbol id="i-min" viewBox="0 0 24 24"><path d="M3 9h6V3m6 0v6h6M3 15h6v6m6 0v-6h6"/></symbol>
+    <symbol id="i-refresh" viewBox="0 0 24 24"><path d="M20 7V3h-4M4 17v4h4M20 7a8 8 0 0 0-14-2M4 17a8 8 0 0 0 14 2"/></symbol>
+    <symbol id="i-cloud" viewBox="0 0 24 24"><path d="M6 18a4 4 0 1 1 0-8 6 6 0 0 1 12 0 4 4 0 0 1 0 8z"/></symbol>
+    <symbol id="i-sliders" viewBox="0 0 24 24"><path d="M3 6h18M3 12h18M3 18h18M7 4v4m10 2v4M9 16v4"/></symbol>
+    <symbol id="i-ruler" viewBox="0 0 24 24"><path d="m4 16 12-12 4 4L8 20zM12 8l2 2M9 11l2 2M6 14l2 2"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="m4 12 5 5L20 6"/></symbol>
+    <symbol id="i-help" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9 9a3 3 0 1 1 5 2l-2 2v2m0 3h.1"/></symbol>
+  </svg>
+
+  <header class="topbar">
+    <button class="icon-btn mobile-menu" aria-label="Abrir menú" id="open-menu"><svg><use href="#i-menu"/></svg></button>
+    <button class="brand" id="brand-home" aria-label="Ir al inicio"><img src="assets/logo.webp" alt="Plegar Pro"/><span class="brand-copy"><strong>PLEGAR <em>PRO</em></strong><small>SUITE PROFESIONAL DE PLEGADO DE CHAPA <span>v1.0.0</span></small></span></button>
+    <label class="top-search"><svg><use href="#i-search"/></svg><input type="search" placeholder="Buscar proyectos, piezas, materiales, herramientas..." id="search" aria-label="Buscar"/><kbd>Ctrl + K</kbd></label>
+    <div class="top-actions">
+      <button class="icon-btn marked" aria-label="Notificaciones" id="notifications"><svg><use href="#i-bell"/></svg><span>3</span></button>
+      <button class="icon-btn marked" aria-label="Mensajes" id="messages"><svg><use href="#i-mail"/></svg><span>7</span></button>
+      <div class="account"><strong>AMS ENGINEERING</strong><small>Administrador</small></div>
+      <button class="avatar" title="Cuenta demo">AM</button>
+      <button class="icon-btn" aria-label="Configuración" data-screen="Ajustes"><svg><use href="#i-gear"/></svg></button>
+    </div>
+  </header>
+
+  <div class="shell" id="shell">
+    <aside class="sidebar" id="sidebar" aria-label="Menú principal">
+      <nav id="menu-nav"></nav>
+      <div class="sidebar-note">DISEÑO APROBADO · DEMO UI</div>
+    </aside>
+    <div class="sidebar-curtain" id="sidebar-curtain"></div>
+    <main class="workspace" id="workspace">
+      <section class="summary-cards" id="summary-cards" aria-label="Contexto activo">
+        <article class="summary-card project active-summary"><div class="summary-head">PROYECTO ACTIVO</div><div class="summary-body"><img src="assets/pieza-mini.webp" alt="Soporte motor"/><div><strong id="project-name">Soporte motor S235</strong><small>Rev. B · 6 pliegues</small><small>Última edición: Hoy 11:24</small></div></div></article>
+        <article class="summary-card"><div class="summary-head">MÁQUINA ACTIVA</div><div class="summary-body"><img src="assets/maquina-mini.webp" alt="Plegadora Bystronic"/><div><strong>Bystronic Xpert Pro 100</strong><small class="status"><i></i> Conectada <span class="demo-tag">demo</span></small><small>1000 kN · 3100 mm</small></div></div></article>
+        <article class="summary-card"><div class="summary-head">MATERIAL</div><div class="summary-body"><img src="assets/chapa-mini.webp" alt="Chapa de acero"/><div><strong id="material-name">Acero S235JR</strong><small>Espesor: 2.00 mm</small><small>Ralímite: 360 MPa</small></div></div></article>
+        <article class="summary-card"><div class="summary-head">UTILLAJE ACTIVO</div><div class="summary-body"><img src="assets/utillaje.webp" alt="Punzones y matriz"/><div><small>Punzón: 88° R1</small><small>Matriz: V16 88°</small></div></div></article>
+      </section>
+
+      <section class="main-panels">
+        <article class="panel machine-panel" id="machine-panel">
+          <div class="panel-heading"><div><h2>SIMULACIÓN 3D</h2><p>Visualización de referencia de la máquina y secuencia de plegado</p></div><div class="heading-actions"><button class="small-button" aria-label="Vista previa" id="machine-info">▣</button><button class="small-button" aria-label="Cambiar vista" id="view-option">◉</button><button class="small-button selected" id="realistic-option">Realista ▾</button><button class="small-button" id="views">Vistas ▾</button><button class="small-button" aria-label="Ampliar simulación" id="maximize"><svg><use href="#i-max"/></svg></button></div></div>
+          <div class="machine-stage"><img src="assets/maquina.webp" alt="Referencia visual de máquina Bystronic con chapa en proceso de plegado"/><div class="stage-tools"><button title="Centrar" id="center-view">⌖</button><button title="Acercar" id="zoom-in">＋</button><button title="Alejar" id="zoom-out">－</button><button title="Reiniciar vista" id="reset-view">⛶</button></div><div class="axis-legend"><span>Z</span><span>Y</span><span>X</span></div><div class="demo-overlay">REFERENCIA VISUAL · NO SIMULACIÓN FÍSICA</div></div>
+          <div class="player"><button class="player-icon" id="step-back" aria-label="Paso anterior"><svg><use href="#i-back"/></svg></button><button class="player-icon play" id="play" aria-label="Reproducir"><svg id="play-icon"><use href="#i-play"/></svg></button><button class="player-icon" id="step-next" aria-label="Paso siguiente"><svg><use href="#i-next"/></svg></button><div class="timeline-wrap"><input type="range" min="1" max="6" value="3" id="timeline" aria-label="Paso de plegado"/><span id="step-count">Paso 3 / 6</span><small id="step-description">Plegado 2 de 6</small></div><label class="speed">Velocidad <select id="speed"><option value="2000">0.5x</option><option value="1100" selected>1.0x</option><option value="550">2.0x</option></select></label></div>
+          <div class="steps" id="steps"></div>
+        </article>
+
+        <article class="panel section-panel">
+          <div class="panel-heading"><div><h2>SIMULACIÓN 2D</h2><p>Vista de sección y parámetros de plegado</p></div><button class="small-button selected" id="section-switch" aria-label="Abrir programación 2D"><svg><use href="#i-box"/></svg></button></div>
+          <div class="section-drawing"><img src="assets/seccion-2d.webp" alt="Dibujo de punzón, chapa y matriz en sección"/><div class="demo-overlay">SECCIÓN ILUSTRATIVA</div></div>
+          <div class="specs-grid"><div>Ángulo objetivo <strong>88.00°</strong></div><div>Espesor <strong>2.00 mm</strong></div><div>Radio interior <strong>1.00 mm</strong></div><div>Fuerza estimada <strong>—</strong></div><div>Apertura de matriz <strong>16.00 mm</strong></div><div>Desarrollo <strong>Sin calcular</strong></div></div>
+        </article>
+
+        <article class="panel tooling-panel">
+          <div class="panel-heading"><div><h2>UTILLAJE</h2></div></div>
+          <div class="tabs" id="tool-tabs"><button class="tab selected" data-tab="Punzones">Punzones</button><button class="tab" data-tab="Matrices">Matrices</button><button class="tab" data-tab="Adaptadores">Adaptadores</button></div>
+          <label class="fake-select"><select id="tool-select"><option>Bystronic V16 88°</option><option>Punzón recto 88° R1</option><option>Punzón 30° R1</option><option>Matriz V24 88°</option></select></label>
+          <div class="tool-image"><img src="assets/utillaje.webp" alt="Dimensiones ilustrativas del utillaje de plegado"/><div class="demo-overlay">CATÁLOGO VISUAL</div></div>
+          <dl class="tool-specs"><div><dt>Código</dt><dd id="tool-code">M-V16-88</dd></div><div><dt>Apertura V</dt><dd>16.00 mm</dd></div><div><dt>Ángulo</dt><dd>88°</dd></div><div><dt>Altura</dt><dd>120.00 mm</dd></div><div><dt>Ancho hombro</dt><dd>60.00 mm</dd></div><div><dt>Radio</dt><dd>1.00 mm</dd></div><div><dt>Carga máx.</dt><dd>No validada</dd></div></dl>
+          <button class="wide-button" data-screen="Utillaje">Ver en biblioteca</button>
+        </article>
+      </section>
+
+      <section class="bottom-panels">
+        <article class="panel projects-panel"><div class="panel-heading compact"><h2>PROYECTOS RECIENTES</h2><button class="inline-link" data-screen="Proyectos">Ver todos</button></div><div class="project-list" id="projects"></div></article>
+        <article class="panel materials-panel"><div class="panel-heading compact"><h2>LISTA DE MATERIALES</h2><button class="inline-link" data-screen="Materiales">Ver todos</button></div><div class="material-list" id="materials"></div></article>
+        <article class="panel calculator-panel"><div class="panel-heading compact"><h2>CALCULADORA DE PLEGADO</h2><button class="icon-min" id="calc-close" aria-label="Minimizar calculadora">×</button></div><div class="tabs calc-tabs" id="calc-tabs"><button class="tab selected" data-calc="Desarrollo">Desarrollo</button><button class="tab" data-calc="Fuerza">Fuerza</button><button class="tab" data-calc="Curva perfecta">Curva perfecta</button></div><div class="calc-main"><img src="assets/calculadora.webp" alt="Ilustración de la geometría de plegado"/><div class="calc-fields"><label>Espesor (T)<input inputmode="decimal" type="number" value="2.00" min="0.1" step="0.1"/></label><label>Ángulo (θ)<input inputmode="decimal" type="number" value="88" min="1" max="179"/></label><label>Radio interior (R)<input inputmode="decimal" type="number" value="1.00" min="0" step="0.1"/></label><label>Apertura V<input inputmode="decimal" type="number" value="16.00" min="1" step="1"/></label></div></div><div class="calc-output"><span>Longitud de desarrollo</span><strong>Sin cálculo validado</strong><button id="calc-action" aria-label="Estado del cálculo"><svg><use href="#i-calc"/></svg></button></div></article>
+        <article class="panel preview-panel"><div class="panel-heading compact"><h2>VISTA PREVIA 3D</h2><button class="inline-link" id="preview-open">Ampliar</button></div><div class="preview-image"><img src="assets/pieza-3d.webp" alt="Vista previa de soporte metálico de chapa"/></div><div class="preview-actions"><button id="rotate-prev" aria-label="Rotar vista a la izquierda">↶</button><button id="rotate-next" aria-label="Rotar vista a la derecha">↷</button><button id="preview-zoom" aria-label="Acercar">⊕</button><button id="preview-reset" aria-label="Centrar">⛶</button></div></article>
+      </section>
+
+      <section class="module-view" id="module-view" hidden><div class="module-top"><button class="small-button" data-screen="Inicio">← Inicio</button><span>PLEGAR PRO · MÓDULO</span></div><div class="module-main"><h1 id="module-title"></h1><p id="module-subtitle"></p><div class="module-sample" id="module-sample"></div></div></section>
+    </main>
+  </div>
+
+  <nav class="mobile-bottom" aria-label="Navegación móvil"><button data-screen="Inicio"><svg><use href="#i-home"/></svg><span>Inicio</span></button><button data-screen="Proyectos"><svg><use href="#i-folder"/></svg><span>Proyectos</span></button><button data-screen="Programación 2D"><svg><use href="#i-ruler"/></svg><span>Prog. 2D</span></button><button data-screen="Simulación 3D"><svg><use href="#i-box"/></svg><span>Sim. 3D</span></button><button id="bottom-more"><svg><use href="#i-menu"/></svg><span>Más</span></button></nav>
+
+  <footer class="statusbar"><div><i class="online-dot"></i> Modo demostración</div><div><svg><use href="#i-cloud"/></svg> Datos locales del navegador</div><div class="status-spacer"></div><div>Prototipo UI · sin validación de fabricación</div><div>© 2026 AMS Engineering</div></footer>
+  <dialog class="dialog" id="dialog"><div class="dialog-header"><h2 id="dialog-title">Información</h2><button id="dialog-close" aria-label="Cerrar">×</button></div><div class="dialog-body" id="dialog-body"></div></dialog>
+  <div class="toast" role="status" aria-live="polite" id="toast"></div>
+  <script src="app.js" defer></script>
+</body>
+</html>

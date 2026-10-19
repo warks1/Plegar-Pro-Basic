@@ -1,4 +1,4 @@
-/* Plegar Pro Plus v0.7 — rounded centreline profile for a SINGLE isolated bend.
+/* Plegar Pro Plus v0.8 — rounded centreline profile for a SINGLE isolated bend.
  * This is a geometric visualization, not an elastic/plastic/contact solver.
  * Coordinates: x horizontal, y DOWN, mm. The nominal V shoulders are y=0.
  * Negative bends require repositioning, which is not calculated. */
@@ -13,6 +13,7 @@
  const I=typeof require==='function'?require('./interference2d.js'):window.PlegarInterference2D;
  const T=typeof require==='function'?require('./toolprofiles2d.js'):window.PlegarToolProfiles2D;
  const P=typeof require==='function'?require('./previousbends2d.js'):window.PlegarPreviousBends2D;
+ const A=typeof require==='function'?require('./assembly2d.js'):window.PlegarAssembly2D;
  const rad=d=>d*Math.PI/180;
  const round=n=>Math.round(n*1000000)/1000000;
 
@@ -92,6 +93,7 @@
   };
   output.toolProfiles=T.profiles(output);
   output.previous=P.calculate(piece,output);
+  output.assembly=A.calculate(piece,output);
   if(output.previous.completed.some(id=>piece.angles[id-1]<0))output.warnings.push('Hay pliegues anteriores negativos: la orientación y la recolocación necesarias NO se han resuelto.');
   output.interferences=I.inspect(output);
   return output;

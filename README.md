@@ -91,3 +91,13 @@ Se calcula la distancia nominal 2D entre segmentos auxiliares y los contornos si
 Nuevos archivos: `toolprofiles2d.js`, `previousbends2d.js`, `clearance2d.js`, `tests/priorflanges.test.cjs`. Se incrementa la caché PWA a `v7` y se mantienen sin cambios los recursos de la portada aprobada (`assets/*`, `styles.css`, `app.js`).
 
 **Advertencia industrial:** esta es una maqueta de investigación geométrica que NO se debe usar para certificar ausencia de colisiones, definir parámetros de máquina o realizar trabajos de fabricación.
+
+## v0.8 — Perfil completo y primera malla 3D ilustrativa
+
+**Pantalla Inicio, logotipo, recursos originales y disposición**: sin cambios. En **Programación 2D / Simulación 2D** ahora se muestran también los tramos de la pieza que siguen al pliegue activo, incluidos los pendientes (azul) y los pliegues anteriores en forma de bisagra aguda (naranja). El dibujo utiliza el mismo perfil nominal guardado. Se centra y escala dinámicamente para intentar mostrar el conjunto sin desbordar; el zoom permite inspeccionarlo. El cálculo del plegado activo sigue siendo un arco tangente supuesto con espesor nominal y **no representa fuerzas, contacto, colisiones reales, giro de la pieza ni recuperaciones elásticas**. El cribado de interferencias previo **solo** verifica las alas previas contiguas que el modelo v0.7 sabía trazar; **NO** se amplía automáticamente a todo el contorno de la v0.8.
+
+Se ha incorporado una **previsualización 3D geométrica** en los módulos «Programación 3D» y «Simulación 3D». Un motor independiente (`piece3d.js`) construye una malla de caras desde el contorno entero 2D, con el espesor nominal y un **ancho de demostración configurable (por defecto 100 mm)**, sin almacenarlo como dimensión real de la pieza. El visor SVG (`piece3d-view.js`) proyecta esa malla y ofrece rotación, zoom, selección de paso y avance del pliegue; no depende de un motor WebGL, con lo cual funciona como representación estática proyectada, no como CAD manipulable o sólida verificada.
+
+**Importante:** esta malla se genera a partir de segmentos nominales y bisagras agudas de pliegues previos; los offsets son aproximados y no tienen radios completos en cada pliegue, intersecciones CAD, validación de solidez ni colisiones 3D. Un giro negativo se representa sin recolocación física. No sirve para decidir si un plegado es seguro ni para generar CNC. La vista de máquina del dashboard Inicio sigue siendo una fotografía/ilustración original, **no** un gemelo digital animado.
+
+Archivos nuevos: `assembly2d.js`, `piece3d.js`, `piece3d-view.js`, `piece3d.css`, `tests/assembly3d.test.cjs`. Se actualizan `forming2d.js`, `forming2d-view.js`, `app.js`, `index.html`, `sw.js`, `tests/browser_check.py` y la documentación. Caché PWA `v8`.

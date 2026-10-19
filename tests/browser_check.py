@@ -4,7 +4,7 @@ import json,sys,re
 root=Path(__file__).resolve().parents[1]
 html=re.sub(r'<script src="[^"]+" defer></script>', '', (root/'index.html').read_text())
 html=re.sub(r'<link rel="stylesheet"[^>]+>', '', html)
-css='\n'.join((root/x).read_text() for x in ('styles.css','editor2d.css','forming2d.css'))
+css='\n'.join((root/x).read_text() for x in ('styles.css','editor2d.css','forming2d.css','piece3d.css'))
 issues=[]
 with sync_playwright() as p:
  browser=p.chromium.launch(executable_path='/usr/bin/chromium',headless=True,args=['--no-sandbox','--disable-dev-shm-usage'])
@@ -18,7 +18,7 @@ with sync_playwright() as p:
   page.set_content(html,wait_until='domcontentloaded')
   page.add_style_tag(content=css)
   page.evaluate("""() => {window.__testStorage=window.__testStorage||new Map();Object.defineProperty(window,'localStorage',{configurable:true,value:{getItem:k=>window.__testStorage.get(k)??null,setItem:(k,v)=>window.__testStorage.set(k,String(v)),removeItem:k=>window.__testStorage.delete(k)}})}""")
-  for script in ('geometry2d.js','bendcalc.js','clearance2d.js','toolprofiles2d.js','previousbends2d.js','interference2d.js','forming2d.js','forming2d-view.js','editor2d.js','app.js'):
+  for script in ('geometry2d.js','bendcalc.js','clearance2d.js','toolprofiles2d.js','previousbends2d.js','interference2d.js','assembly2d.js','forming2d.js','forming2d-view.js','piece3d.js','piece3d-view.js','editor2d.js','app.js'):
    page.evaluate((root/script).read_text())
   assert page.locator('#project-name').inner_text()=='Soporte motor S235'
   print('navigating',tag,flush=True)
@@ -32,6 +32,8 @@ with sync_playwright() as p:
   assert page.locator('.ed-bend-point').count()==4
   assert page.locator('#ed-forming .f2d-svg').count()==1
   assert page.locator('.f2-prior-summary').count()==1
+  assert 'Perfil completo:' in page.locator('.f2-prior-summary').inner_text()
+  assert page.locator('.f2d-svg line[stroke="#71b5ed"]').count()>=1
   # v0.5: the drawing uses a sampled circular arc, not two straight legs.
   page.locator('#f2-range').fill('100')
   arc_path=page.locator('.f2d-svg path[stroke="url(#f2d-sheet)"]').get_attribute('d')
@@ -78,7 +80,7 @@ with sync_playwright() as p:
   page.set_content(html,wait_until='domcontentloaded')
   page.add_style_tag(content=css)
   page.evaluate("""() => {window.__testStorage=window.__testStorage||new Map();Object.defineProperty(window,'localStorage',{configurable:true,value:{getItem:k=>window.__testStorage.get(k)??null,setItem:(k,v)=>window.__testStorage.set(k,String(v)),removeItem:k=>window.__testStorage.delete(k)}})}""")
-  for script in ('geometry2d.js','bendcalc.js','clearance2d.js','toolprofiles2d.js','previousbends2d.js','interference2d.js','forming2d.js','forming2d-view.js','editor2d.js','app.js'):
+  for script in ('geometry2d.js','bendcalc.js','clearance2d.js','toolprofiles2d.js','previousbends2d.js','interference2d.js','assembly2d.js','forming2d.js','forming2d-view.js','piece3d.js','piece3d-view.js','editor2d.js','app.js'):
    page.evaluate((root/script).read_text())
   if w<=1120:page.locator('#open-menu').click()
   page.locator('button.nav-item[data-screen="Programación 2D"]').click()
@@ -104,6 +106,20 @@ with sync_playwright() as p:
   assert page.locator('.f2-notes').inner_text()
   page.locator('[data-f2-action="previous"]').click()
   assert 'pliegue 4' in page.locator('.f2-step-label').inner_text()
+  assert page.evaluate('document.documentElement.scrollWidth <= innerWidth+2')
+  # The separate 3D module consumes the same editable project and is rotatable.
+  if w<=1120:page.locator('#open-menu').click()
+  page.locator('button.nav-item[data-screen="Simulación 3D"]').click()
+  assert page.locator('.p3-view .p3-svg').count()==1
+  assert 'malla' in page.locator('.p3-state').inner_text()
+  assert page.locator('.p3-disclosure').inner_text().find('sin')>=0 or page.locator('.p3-disclosure').count()==1
+  prior=page.locator('.p3-svg').inner_html()
+  page.locator('[data-p3="right"]').click()
+  assert page.locator('.p3-svg').inner_html()!=prior
+  page.locator('.p3-width').fill('140')
+  assert '140 mm ILUSTRATIVO' in page.locator('.p3-stage').inner_text()
+  page.locator('[data-p3="next"]').click()
+  assert 'Paso' in page.locator('.p3-step').inner_text()
   assert page.evaluate('document.documentElement.scrollWidth <= innerWidth+2')
   page.locator('#brand-home').click()
   assert not page.locator('#module-view').is_visible()

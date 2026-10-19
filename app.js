@@ -22,9 +22,9 @@ const materials = [
 const descriptions = {
  'Proyectos':'Proyectos de chapa, archivos asociados y revisiones. Vista inicial de demostración.',
  'Programación 2D':'Editor de perfil 2D: tramos, ángulos, secuencia y estimación geométrica de desarrollo (no validada para fabricación).',
- 'Programación 3D':'Geometría tridimensional de la pieza. Todavía sin núcleo CAD interactivo.',
+ 'Programación 3D':'Previsualización 3D geométrica derivada del editor 2D, sin edición CAD en volumen.',
  'Simulación 2D':'Vista cinemática local de perfil sincronizada con Programación 2D, sin física ni colisiones verificadas.',
- 'Simulación 3D':'Vista industrial de la máquina y controles de secuencia. La imagen no calcula deformación física.',
+ 'Simulación 3D':'Vista 3D geométrica de la pieza del editor 2D, no una simulación de máquina o de colisiones.',
  'Utillaje':'Biblioteca visual de punzones, matrices y adaptadores. Las fichas deberán verificarse con datos de fabricante.',
  'Materiales':'Materiales de muestra. Propiedades mecánicas y espesores pendientes de validación.',
  'Máquinas':'Catálogo de plegadoras, ejes y configuraciones. Aún sin gemelos digitales calibrados.',
@@ -85,6 +85,7 @@ function closeMenu(){ $('#sidebar').classList.remove('open');$('#sidebar-curtain
 function toggleMenu(){const opened=$('#sidebar').classList.toggle('open');$('#sidebar-curtain').classList.toggle('open',opened);}
 function switchScreen(name){
  window.PlegarForming2D?.destroy();
+ window.PlegarPiece3DView?.destroy();
  stopPlayer();activeScreen=name;buildNav();closeMenu();
  $$('.mobile-bottom [data-screen]').forEach(b=>b.classList.toggle('active',b.dataset.screen===name));
  $('#summary-cards').hidden=name!=='Inicio';$('#module-view').hidden=name==='Inicio';
@@ -95,6 +96,7 @@ function switchScreen(name){
 function renderModule(name){
  $('#module-title').textContent=name;$('#module-subtitle').textContent=descriptions[name]||'Módulo del nuevo Plegar Pro.';
  let content='';
+ $('#module-sample').classList.remove('module-piece3d');
  if(name==='Programación 2D'){
    $('#module-sample').innerHTML='';
    window.PlegarEditor2D.mount();
@@ -103,6 +105,12 @@ function renderModule(name){
    $('#module-sample').classList.remove('module-editor');
    $('#module-sample').classList.add('module-forming');
    window.PlegarForming2D.mount($('#module-sample'),window.PlegarEditor2D.getData,window.PlegarEditor2D.getSelection,window.PlegarEditor2D.selectBend);
+   return;
+ }else if(name==='Simulación 3D'||name==='Programación 3D'){
+   $('#module-sample').classList.remove('module-editor','module-forming');
+   $('#module-sample').classList.add('module-piece3d');
+   $('#module-sample').innerHTML='';
+   window.PlegarPiece3DView.mount($('#module-sample'),window.PlegarEditor2D.getData,window.PlegarEditor2D.getSelection,window.PlegarEditor2D.selectBend);
    return;
  }else if(name==='Proyectos'){
  content=projects.map((p,i)=>`<div class="module-tile"><img src="assets/pieza-mini.webp" alt="Soporte de chapa"/><strong>${escapeHtml(p.name)}</strong><p>${escapeHtml(p.detail)}<br>Registro local de ejemplo</p><button type="button" data-project="${i}">Seleccionar proyecto</button></div>`).join('')+`<div class="module-tile"><strong>Nuevo proyecto</strong><p>Crea un proyecto de muestra almacenado en este navegador.</p><button type="button" id="new-project">Crear proyecto</button></div>`;

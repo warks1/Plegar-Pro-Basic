@@ -177,3 +177,13 @@ En **Programación 2D → Importar perfil CAD v0.14**, se puede abrir **un DXF A
 Archivos nuevos: `cad-profile.js`, `cad-profile-view.js`, `tests/cad-profile.test.cjs`, `EJEMPLO_PERFIL_UTILLAJE.dxf`. Cambios: `editor2d.js`, `editor2d.css`, `index.html`, `sw.js`, `tests/browser_check.py`, documentación.
 
 Pruebas: `node --test tests/*.test.cjs` y `python tests/browser_check.py` (Chromium Playwright en entorno local aislado). La interfaz Inicio aprobada, imágenes, colores y disposición **no se han modificado**.
+
+## v0.15 — DXF ASCII multicapas y varios contornos (solo inspección)
+
+En **Programación 2D → Importar DXF 2D v0.15**, el usuario puede inspeccionar varias entidades `LWPOLYLINE` y `LINE` rectas, respetando la pertenencia a capas DXF y seleccionando el contorno concreto para el cotejo de cotas con las fichas de fabricante. El dibujo muestra todos los contornos en gris y el seleccionado en cian. No reconstruye cadenas de LINE, no infiere superficies cerradas ni traslada la geometría al cálculo, utillaje, simulación o CNC.
+
+Admite `$INSUNITS` en mm, cm, m o pulgadas y la selección manual de unidad para archivos no declarados. Límite por archivo: 2 MB, 100 entidades y 1500 vértices. Continúa rechazando geometrías complejas (ARC/CIRCLE/SPLINE, bulges, polilíneas 3D, INSERT, formatos binarios, DWG y STEP), además de elevaciones no nulas, puntos degenerados y autointersecciones dentro de un mismo contorno. Un perfil cerrado puede tener huecos solo visuales; **no** hay booleanas ni reconstrucción de sólidos.
+
+Nuevos archivos: `EJEMPLO_PERFIL_MULTICAPA.dxf`, `tests/cad-multilayer.test.cjs`. Cambios: `cad-profile.js`, `cad-profile-view.js`, `editor2d.css`, `sw.js`, `tests/browser_check.py`, documentos de continuidad. El método heredado `PlegarCadProfile.parse()` sigue admitiendo exactamente un contorno para mantener la compatibilidad con v0.14. Se incorpora `PlegarCadProfile.parseDocument()` para documentos multientidad.
+
+La importación y la comparación siguen siendo **orientativas y SIN VERIFICAR**. No pueden emplearse para certificar compatibilidad de utillaje o seguridad de la plegadora.

@@ -86,3 +86,8 @@
 .cad-metrics,.cad-comparison{border-radius:6px;padding:10px;background:#0f354d;color:#e1f4ff}
 .cad-status{padding:10px;background:#17384d;border-left:3px solid #2ca9ff;color:#c5e2f3}.cad-status[data-error="true"]{background:#462e27;border-color:#f6ad60;color:#ffe1c4}
 .cad-danger{background:#44301b;color:#ffdfa7;padding:10px;border-left:3px solid #f2ad45;border-radius:5px}
+/* v0.15 — selección de capa y contorno DXF (sin cambiar Inicio) */
+.cad-select-row{min-width:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.cad-select-row .ed-cell,.cad-select-row select{min-width:0;max-width:100%;width:100%}
+#cad-preview polyline{pointer-events:none}
+@media(max-width:650px){.cad-select-row{grid-template-columns:minmax(0,1fr)}}

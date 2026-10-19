@@ -1,11 +1,9 @@
-# Plegar Pro Plus — v0.14
+# Plegar Pro Plus — Entrega v0.15
 
-Continúa el prototipo original aprobado (sin rediseñar Inicio).
+Ejecutar con servidor web local o GitHub Pages. Inicio mantiene la interfaz visual aprobada. Entrar en **Programación 2D → Importar DXF 2D v0.15**.
 
-**Nueva función:** inspección de un contorno DXF ASCII 2D LWPOLYLINE con unidades, cotas, validación geométrica y comparación no certificada con fichas AMADA. Archivo de prueba incluido: `EJEMPLO_PERFIL_UTILLAJE.dxf` (ficticio).
+1. Seleccionar el archivo `EJEMPLO_PERFIL_MULTICAPA.dxf`.
+2. Dejar `$INSUNITS` automático. Comprobar la vista previa y las tres capas.
+3. Cambiar la capa y elegir otro contorno: se muestran cotas individuales y la comparación documental correspondiente.
 
-Abre `index.html` mediante servidor web local o GitHub Pages, navega a **Programación 2D → Importar perfil CAD**. El DXF no modifica las piezas ni el utillaje del simulador.
-
-Pruebas: `node --test tests/*.test.cjs` y `python tests/browser_check.py`.
-
-La simulación no está validada para producción ni para garantizar seguridad de máquina.
+Importador **solo para inspección**, sin agregar DXF a simulación ni CNC; los datos de fabricante tampoco certifican un sólido geométrico. Ejecutar `node --test tests/*.test.cjs` y `python tests/browser_check.py` (requiere Chromium y Playwright).

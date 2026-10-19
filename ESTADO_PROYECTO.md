@@ -1,30 +1,32 @@
-# Plegar Pro Plus — Punto de recuperación v0.14
+# Plegar Pro Plus — Estado guardado v0.15
 
-- Fecha: 2026-10-19.
-- Repositorio oficial: https://github.com/warks1/Plegar-Pro-Basic
-- Rama: `main`.
-- Última versión de trabajo: **v0.14** (guardar el commit final de esta versión en el historial de GitHub).
-- Boceto original aprobado, sin rediseñar Inicio: `assets/referencia-aprobada.webp`.
-- La interfaz de Inicio y estilos globales `styles.css`, `app.js` y recursos `assets/` deben permanecer intactos salvo petición expresa.
-- Misma funcionalidad prevista para PC/tablet/smartphone con interfaz adaptativa.
+- **Repositorio:** https://github.com/warks1/Plegar-Pro-Basic
+- **Rama:** `main` (consultar el último commit confirmado; no asumir que GitHub Pages ya desplegó la actualización).
+- **Identidad visual aprobada:** `assets/referencia-aprobada.webp`. Conservar la pantalla Inicio, estilos globales y recursos originales.
+- **Versión del prototipo:** v0.15, importación DXF multicontorno/multicapa solo para inspección.
 
-## Lo existente
+## Capacidades actuales (resumen)
 
-- v0.2–v0.3: programación 2D editable, secuencia, guardado/JSON y desarrollo orientativo.
-- v0.4–v0.7: seguimiento 2D de punzón/matriz/chapa/tope X, radios ilustrativos y avisos de geometría 2D.
-- v0.8–v0.11: visor SVG con geometría extruida nominal 3D, perfiles de herramientas genéricas y aproximación de proximidades.
-- v0.12: catálogo interno de 8 punzones y 21 matrices sin verificar.
-- v0.13: 5 referencias oficiales AMADA y 4 catálogos públicos, para consulta, no para selección CAD validada.
-- **v0.14:** importar una sola LWPOLYLINE DXF ASCII 2D para **inspección**, con vista previa, escala/unidades, validación de contorno, cotas y comparación indicativa con ficha de fabricante. No activa geometría en simulación ni CNC.
+- Programación 2D editable, orden de plegado, deshacer/rehacer, guardado local y JSON.
+- Desarrollo orientativo, selección de utillajes genéricos y catálogo documental AMADA; las herramientas genéricas no tienen geometría certificada.
+- Seguimiento 2D y visor 3D paramétricos ilustrativos con controles, cribado de interferencias **aproximado** y avisos; no aptos para validar una fabricación.
+- Inspección de DXF ASCII: `LWPOLYLINE` y `LINE` 2D en múltiples capas/contornos, escalado por `$INSUNITS` o selección manual, vista previa y comparación de cotas por elemento. Límite 2 MB, 100 entidades, 1500 vértices.
+- Documentación de fuentes parciales de fabricante en `FUENTES_UTILLAJE.md`.
 
-## Advertencias
+## Lo que NO hace v0.15
 
-El motor de plegado es una representación geométrica de investigación: cálculos de desarrollo y colisiones **no están validados** para fabricación, CNC o seguridad de operadores. Las referencias dimensionales publicadas no bastan para reconstruir un utillaje real con garantías.
+- **No** convierte contornos DXF a sólidos, **no** ejecuta CNC, **no** activa herramientas importadas, **no** verifica compatibilidad ni colisiones.
+- Rechaza entidades que aún no se puedan inspeccionar con garantías: ARC/CIRCLE/SPLINE, INSERT, bloques de entidades, DXF binario, DWG, STEP, perfiles con elevación no nula y anchos/bulges de polilínea.
+- LINE se representa por separado; sin construcción automática de perfiles encadenados ni inferencia de cierres.
+- No se ha publicado ni certificado una aplicación en tiendas móviles o Microsoft Store.
 
-## Próximos pasos
+## Próxima fase v0.16
 
-- v0.15: incorporar soporte seguro de más entidades DXF y varias capas, agrupación por contorno y orientación explícita; conservar trazabilidad por fuente y versiones.
-- Preparar carga opcional, revisada y contrastada de geometrías CAD de utillaje en el motor 3D, nunca por coincidencia de dimensiones solamente.
-- Verificar en GitHub Pages la ejecución real, incluido refresco de caché PWA, después de cada commit.
+Proponer inspección de segmentos con arco DXF (`ARC` / bulge) a tolerancia de discretización explícita, validación de cerrados y perfiles conexos y posibilidad de exportar la información de inspección como informe. Mantener las mismas advertencias industriales y no activar geometría sin validación.
 
-Para continuar, comprobar primero el último commit de GitHub y ejecutar las pruebas. No cambiar ni reemplazar el boceto aprobado.
+## Instrucciones para continuar
+
+1. Recuperar el último commit del repositorio y ejecutar las pruebas con Node 22.
+2. Mantener exactamente el diseño aprobado.
+3. Comprobar importador, compatibilidad v0.14, UI a 1440/820/390/320 px, y comprobar estado Pages tras cada commit.
+4. Separar claramente lo experimental de cualquier geometría verificada antes de habilitar operaciones reales.

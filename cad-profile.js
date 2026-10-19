@@ -1,10 +1,10 @@
-/* Plegar Pro Plus v0.14: importación restringida de contornos ASCII DXF 2D.
- * Sólo INSPECCIÓN, nunca activa una geometría de máquina ni marca CAD verificado.
- * No soporta splines, bulges/arcos, polilíneas 3D ni contornos múltiples.
+/* Plegar Pro Plus v0.15: inspección de entidades LINE/LWPOLYLINE ASCII DXF 2D,
+ * múltiples contornos y capas. Sólo INSPECCIÓN: jamás incorpora al simulador.
+ * No admite arcos, splines, INSERT, bloques, elevaciones ni polilíneas 3D.
  */
 (function(root,factory){const api=factory();if(typeof module==='object'&&module.exports)module.exports=api;else root.PlegarCadProfile=api;})(typeof globalThis!=='undefined'?globalThis:this,function(){
 'use strict';
-const MAX_BYTES=2*1024*1024,MAX_VERTICES=1500,MAX_GROUPS=60000;
+const MAX_BYTES=2*1024*1024,MAX_VERTICES=1500,MAX_GROUPS=60000,MAX_CONTOURS=100;
 const UNITS=Object.freeze({1:{name:'pulgadas',mm:25.4},4:{name:'milímetros',mm:1},5:{name:'centímetros',mm:10},6:{name:'metros',mm:1000}});
 const err=message=>{throw new Error(message);};
 function number(value,what){if(value===undefined||value===null||String(value).trim()==='')err(`${what} ausente.`);const n=Number(value);if(!Number.isFinite(n)||Math.abs(n)>1e9)err(`${what} no es un número válido.`);return n;}
@@ -62,12 +62,23 @@ function readLW(entity,factor){
  if(closed&&vertices.length>3&&Math.hypot(vertices[0].x-vertices.at(-1).x,vertices[0].y-vertices.at(-1).y)<1e-5)vertices.pop();
  return {points:vertices,closed};
 }
-function parse(text,{unitsOverride=null}={}){
- const pairs=pairsOf(text);let section=null,unitCode=null,readUnits=false;
+function readLine(entity,factor){
+ const one=code=>entity.find(g=>g.code===code)?.value;
+ if(entity.some(g=>(g.code===30||g.code===31||g.code===39||g.code===38)&&Math.abs(number(g.value,'elevación/espesor'))>1e-9))err('LINE con elevación o espesor: se admite únicamente geometría 2D.');
+ if(entity.some(g=>g.code===210&&Math.abs(number(g.value,'normal X'))>1e-9||g.code===220&&Math.abs(number(g.value,'normal Y'))>1e-9||g.code===230&&Math.abs(number(g.value,'normal Z')-1)>1e-9))err('LINE en plano de extrusión no compatible.');
+ return {points:[{x:number(one(10),'inicio X')*factor,y:number(one(20),'inicio Y')*factor},{x:number(one(11),'fin X')*factor,y:number(one(21),'fin Y')*factor}],closed:false};
+}
+function layerOf(entity){
+ const raw=entity.find(g=>g.code===8)?.value||'0';
+ if(raw.length>120||/[\x00-\x1f]/.test(raw))err('Nombre de capa DXF inválido.');
+ return raw;
+}
+function parseDocument(text,{unitsOverride=null}={}){
+ const pairs=pairsOf(text);let section=null,unitCode=null,readUnits=false,hasEntities=false;
  const geometries=[],unsupported=new Set();
  for(let i=0;i<pairs.length;){const p=pairs[i];
   if(p.code===0&&p.value.toUpperCase()==='SECTION'){
-   if(pairs[i+1]?.code!==2)err('Sección DXF inválida.');section=pairs[i+1].value.toUpperCase();i+=2;continue;
+   if(pairs[i+1]?.code!==2)err('Sección DXF inválida.');section=pairs[i+1].value.toUpperCase();if(section==='ENTITIES')hasEntities=true;i+=2;continue;
   }
   if(p.code===0&&(p.value.toUpperCase()==='ENDSEC'||p.value.toUpperCase()==='EOF')){section=null;i++;continue;}
   if(section==='HEADER'){
@@ -78,20 +89,43 @@ function parse(text,{unitsOverride=null}={}){
   if(section==='ENTITIES'&&p.code===0){
    const kind=p.value.toUpperCase(),entity=[];i++;
    while(i<pairs.length&&pairs[i].code!==0){entity.push(pairs[i]);i++;}
-   if(kind==='LWPOLYLINE')geometries.push({kind,entity});
-   else if(kind!=='ENDSEC'&&kind!=='EOF')unsupported.add(kind);
+   if(kind==='LWPOLYLINE'||kind==='LINE'){
+    if(geometries.length>=MAX_CONTOURS)err('Demasiadas entidades: máximo 100 contornos/líneas.');
+    if(entity.some(g=>g.code===67&&number(g.value,'espacio')!==0))err('No se admiten entidades de espacio papel.');
+    geometries.push({kind,entity});
+   }else if(kind!=='ENDSEC'&&kind!=='EOF')unsupported.add(kind);
    continue;
   }
   i++;
  }
- if(unsupported.size)err(`Entidades no admitidas: ${[...unsupported].slice(0,5).join(', ')}. Exporta una sola LWPOLYLINE 2D sin arcos.`);
- if(geometries.length!==1)err(`Se requiere exactamente una LWPOLYLINE 2D; encontradas: ${geometries.length}.`);
+ if(!hasEntities)err('No existe sección ENTITIES válida.');
+ if(unsupported.size)err(`Entidades no admitidas: ${[...unsupported].slice(0,5).join(', ')}. Exporta LINE o LWPOLYLINE 2D sin arcos, INSERT ni bloques.`);
+ if(!geometries.length)err('No se encontraron contornos LINE/LWPOLYLINE 2D.');
  if(![null,1,4,5,6].includes(unitsOverride)||unitsOverride!==null&&!UNITS[unitsOverride])err('Unidades manuales no admitidas.');
  const unit=unitsOverride??unitCode;
  if(!UNITS[unit])err('DXF sin $INSUNITS compatible. Indica manualmente las unidades antes de importar.');
- const shape=readLW(geometries[0].entity,UNITS[unit].mm);
- const bounds=validatePoints(shape.points,shape.closed);
- return Object.freeze({format:'ASCII DXF',units:UNITS[unit].name,unitCode:unit,assumedUnits:unitsOverride!==null,points:shape.points,closed:shape.closed,bounds,status:'SOLO INSPECCIÓN — SIN VALIDAR',verified:false,activeInSimulation:false,warnings:['Perfil plano formado por segmentos rectos.','No se verifican amarre, tolerancias, orientación, fabricante ni colisiones.','No se ha añadido la geometría al simulador ni al cálculo CNC.']});
+ const contours=[];let count=0;
+ for(let i=0;i<geometries.length;i++){
+  const g=geometries[i],s=g.kind==='LINE'?readLine(g.entity,UNITS[unit].mm):readLW(g.entity,UNITS[unit].mm);
+  count+=s.points.length;if(count>MAX_VERTICES)err('Demasiados vértices en total: máximo 1500.');
+  const bounds=validatePoints(s.points,s.closed),layer=layerOf(g.entity);
+  contours.push(Object.freeze({...s,bounds,layer,kind:g.kind,index:i,id:`contorno-${i+1}`,verified:false,activeInSimulation:false}));
+ }
+ const minX=Math.min(...contours.map(s=>s.bounds.minX)),maxX=Math.max(...contours.map(s=>s.bounds.maxX));
+ const minY=Math.min(...contours.map(s=>s.bounds.minY)),maxY=Math.max(...contours.map(s=>s.bounds.maxY));
+ const bounds={minX,maxX,minY,maxY,width:maxX-minX,height:maxY-minY,length:contours.reduce((n,s)=>n+s.bounds.length,0)};
+ if(Math.max(bounds.width,bounds.height)>100000)err('Extensión total mayor de 100.000 mm. Revisa escala y unidades.');
+ return Object.freeze({format:'ASCII DXF',units:UNITS[unit].name,unitCode:unit,assumedUnits:unitsOverride!==null,
+  contours,layers:[...new Set(contours.map(s=>s.layer))],bounds,points:count,verified:false,activeInSimulation:false,
+  status:'SOLO INSPECCIÓN — SIN VALIDAR',warnings:['Los contornos y capas no se convierten en sólidos CAD.','Líneas independientes no se conectan ni se cierran automáticamente.','Las coincidencias dimensionales no acreditan la identidad ni el montaje del útil.']});
+}
+function parse(text,options={}){
+ const doc=parseDocument(text,options);
+ if(doc.contours.length!==1)err(`Se requiere exactamente una LWPOLYLINE 2D para el modo legado; encontradas: ${doc.contours.length}. Utiliza parseDocument para varios contornos.`);
+ const shape=doc.contours[0];
+ return Object.freeze({format:doc.format,units:doc.units,unitCode:doc.unitCode,assumedUnits:doc.assumedUnits,
+  points:shape.points,closed:shape.closed,bounds:shape.bounds,status:doc.status,verified:false,activeInSimulation:false,
+  warnings:['Perfil plano formado por segmentos rectos.','No se verifican amarre, tolerancias, orientación, fabricante ni colisiones.','No se ha añadido la geometría al simulador ni al cálculo CNC.']});
 }
 function compareBounds(profile,reference,{tolerance=0.5}={}){
  if(!profile||!reference||!Number.isFinite(tolerance)||tolerance<0||tolerance>10)err('Datos de comparación no válidos.');
@@ -107,5 +141,5 @@ function compareBounds(profile,reference,{tolerance=0.5}={}){
  }
  return {heightDelta:main.delta,widthDelta,heightMatch:main.delta<=tolerance,widthMatch,orientation:main.orientation,tolerance,verified:false,warning:'Coincidencia dimensional ORIENTATIVA: no demuestra identidad del útil, geometría completa, montaje ni seguridad.'};
 }
-return {parse,compareBounds,validatePoints,MAX_BYTES};
+return {parse,parseDocument,compareBounds,validatePoints,MAX_BYTES,MAX_CONTOURS};
 });

@@ -52,13 +52,27 @@ with sync_playwright() as p:
   page.wait_for_function("document.querySelector('#cad-status').textContent.includes('DXF leído') || document.querySelector('#cad-status').textContent.includes('rechazada')")
   print('CAD:',page.locator('#cad-status').inner_text(),flush=True)
   assert 'DXF leído' in page.locator('#cad-status').inner_text()
-  assert '20 mm' in page.locator('#cad-metrics').inner_text()
+  assert '20 × 60 mm' in page.locator('#cad-metrics').inner_text()
   assert page.locator('#cad-preview polyline').count()==1
+  assert page.locator('#cad-layer option').count()==2
+  assert page.locator('#cad-contour option').count()==1
+  multi=sample.replace('0\nENDSEC\n0\nEOF', '0\nLWPOLYLINE\n8\nCAPA-2\n90\n3\n70\n0\n10\n40\n20\n0\n10\n60\n20\n0\n10\n60\n20\n30\n0\nENDSEC\n0\nEOF')
+  page.locator('#cad-file-input').set_input_files({'name':'capas.dxf','mimeType':'application/dxf','buffer':multi.encode()})
+  page.wait_for_function("document.querySelector('#cad-status').textContent.includes('2 elementos')")
+  assert page.locator('#cad-preview polyline').count()==2
+  assert page.locator('#cad-layer option').count()==3
+  page.locator('#cad-layer').select_option('CAPA-2')
+  assert page.locator('#cad-preview polyline').count()==1
+  assert page.locator('#cad-contour').input_value()=='1'
+  assert page.evaluate('window.PlegarCadImport.getCurrent().activeInSimulation===false')
+  page.locator('#cad-layer').select_option('*')
+  page.locator('#cad-contour').select_option('0')
+  assert page.locator('#cad-preview polyline').count()==2
   if tag=='pc':
    page.locator('.cad-import-panel').scroll_into_view_if_needed()
-   page.screenshot(path=str(root.parent/'Plegar_Pro_Plus_v014_DXF.png'),full_page=False)
+   page.screenshot(path=str(root.parent/'Plegar_Pro_Plus_v015_DXF.png'),full_page=False)
   assert page.locator('#ed-die').input_value()=='v16-88'
-  assert 'NO validada' in page.locator('#cad-comparison').inner_text() or 'Diferencia' in page.locator('#cad-comparison').inner_text()
+  assert 'NO validada' in page.locator('#cad-comparison').inner_text() or 'Dimensiones nominales diferentes' in page.locator('#cad-comparison').inner_text()
   assert page.evaluate('window.PlegarCadImport.getCurrent().activeInSimulation===false')
   page.locator('#cad-file-input').set_input_files({'name':'modelo.dxf','mimeType':'application/dxf','buffer':sample.replace('10\n20\n20\n60','42\n0.5\n10\n20\n20\n60').encode()})
   page.wait_for_function("document.querySelector('#cad-status')?.getAttribute('data-error')==='true'")

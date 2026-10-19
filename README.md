@@ -189,19 +189,32 @@ Nuevos archivos: `EJEMPLO_PERFIL_MULTICAPA.dxf`, `tests/cad-multilayer.test.cjs`
 La importación y la comparación siguen siendo **orientativas y SIN VERIFICAR**. No pueden emplearse para certificar compatibilidad de utillaje o seguridad de la plegadora.
 
 
-## v0.16 — Arcos DXF y exportación de informe dimensional (SOLO INSPECCIÓN)
+## v0.16 — Arcos en DXF ASCII e informe dimensional descargable (solo inspección)
 
-En Programación 2D, el importador admite ahora entidades LINE, LWPOLYLINE con bulge, ARC y CIRCLE de DXF ASCII 2D, en diferentes capas. Verifica el estado abierto/cerrado y detecta segmentos degenerados y autointersecciones del contorno discretizado. Límite de 2 MB, 100 entidades y 1500 puntos de vista previa. Los arcos se representan por cuerdas con tolerancia nominal de 0,04 mm; sus longitudes se calculan analíticamente. La verificación de autointersecciones usa la aproximación por segmentos y no garantiza exactitud CAD por debajo de ese límite.
+El importador de **Programación 2D** admite entidades `LINE`, `LWPOLYLINE` (incluidos bulges por vértice), `ARC` y `CIRCLE`, en distintas capas y múltiples entidades. Comprueba si la polilínea está abierta o cerrada, detecta segmentos degenerados y autointersecciones en el contorno discretizado. Se conserva el límite de 2 MB, 100 elementos y 1500 puntos totales de representación. Los arcos se discretizan con una desviación nominal máxima de **0,04 mm** para dibujar, mientras la longitud de sus barridos se calcula analíticamente. La detección de autointersecciones se efectúa sobre segmentos muestreados, **no** sobre la curva exacta y puede tener limitaciones a tolerancias inferiores.
 
-Los botones Informe JSON e Informe CSV generan un informe local con capas, entidades, ancho, alto, longitud y número de arcos. Ambos se marcan **NO VERIFICADO / NO VÁLIDO PARA FABRICACIÓN**. Los datos DXF no se envían al servidor ni pasan al simulador, al CNC o al utillaje activo.
+Los botones **Informe JSON** e **Informe CSV** permiten descargar localmente un listado por capa y entidad (ancho, alto, longitud y número de arcos). Ambos informes contienen advertencias inequívocas de **NO VERIFICADO / NO VÁLIDO PARA FABRICACIÓN**; no acreditan tolerancias, identidad del fabricante, radio de herramienta, cierre de superficies en sólidos, ni ausencia de colisiones. CSV neutraliza campos que podrían interpretarse como fórmulas de hoja de cálculo. La selección del archivo y exportación no modifican el perfil 2D activo ni envían DXF al servidor.
 
-Siguen rechazándose SPLINE, INSERT, bloques, datos 3D, DWG y STEP, elevaciones, arcos inválidos y otros datos que no se puedan representar con seguridad. Las entidades sueltas no se ensamblan automáticamente.
+**Limitaciones expresas:** se rechazan `SPLINE`, `INSERT`, `3DFACE`, bloques, DWG/STEP, elevaciones fuera de XY, bulge de último punto abierto y datos de curvas inválidos. Entidades separadas no se unen automáticamente. Para que una herramienta CAD pueda intervenir en el motor de simulación hacen falta comprobaciones topológicas y dimensionales adicionales.
 
-Archivos: cad-profile.js, cad-profile-view.js, editor2d.css, sw.js, EJEMPLO_ARCOS_CAPAS.dxf, tests/cad-arcs-report.test.cjs y actualizaciones de pruebas/documentación. Pruebas finales: 103 casos automatizados y navegador en PC (1440 px), tablet (820 px) y móviles (390 y 320 px) sin errores JavaScript ni desbordamiento horizontal detectados. Esto NO equivale a una certificación geométrica o industrial.
+Archivos: `cad-profile.js`, `cad-profile-view.js`, `editor2d.css`, `sw.js`, `tests/cad-arcs-report.test.cjs`, `tests/browser_check.py`, `EJEMPLO_ARCOS_CAPAS.dxf`, notas y documentación. Se mantienen inalterados los recursos de Inicio y los módulos de motor industrial.
 
+Pruebas: `node --test tests/*.test.cjs` y `python tests/browser_check.py`. No equivalen a validación mecánica o certificado CAD.
 
-## v0.17 — Orientación y referencia nominal de perfiles DXF
+## v0.17 — Orientación nominal y cotejo de DXF (no activa en máquina)
 
-Se añade orientación 2D para inspección: giro de 0/90/180/270°, espejo y elección de origen nominal entre las esquinas o centro de la envolvente DXF. La cruz naranja no representa amarre verificado. Vista orientada separada del DXF original, sin escala adicional ni alteración de utillajes.
+Se añade `cad-orientation.js`: rotaciones cardinales de 0°, 90°, 180° y 270°, espejo horizontal local y orígenes nominales obtenidos de las cuatro esquinas o el centro de la envolvente original. La vista previa orientada funciona independientemente del dibujo por capas de origen. No hay cambio de escala ni modificación del archivo DXF importado.
 
-Cotejo orientado contra ficha documental: altura en Y, ancho en X (si consta), tolerancia de 0 a 10 mm. Los informes JSON/CSV incluyen el origen nominal y los indicadores 'amarre_validado=false' y 'activado_en_simulacion=false'. No es una verificación mecánica ni CAD de sólidos; prohibido usar para fabricar o certificar colisiones. Se conservan intactos la imagen y los estilos de Inicio.
+El cotejo dimensional muestra diferencias respecto a la altura nominal **en Y** y el ancho **en X** después de orientar el contorno, con tolerancia ajustable de 0 a 10 mm. Cuando un fabricante no documenta el ancho, este dato aparece como no cotejado. La geometría curva discretizada mantiene su tolerancia declarada de inspección; no se importan sólidos.
+
+Los informes JSON y CSV añaden orientación, espejo, origen DXF nominal, envolvente relativa y los avisos `amarre_validado=false`, `activado_en_simulacion=false`. **No existe selección de amarre físico ni verificación de colisiones/seguridad.**
+
+Se incorpora `tests/cad-orientation.test.cjs` y se amplía `tests/browser_check.py` con controles y exportación. Las pruebas locales pasaron en Node 22 y Chromium a 1440/820/390/320 px. **La pantalla Inicio aprobada no se ha cambiado**; no se modifican los utillajes activos ni los módulos de simulación.
+
+## v0.19 — Trazabilidad voluntaria de inspecciones DXF (solo metadatos)
+
+La sección **Registro de inspecciones DXF** calcula una huella SHA-256 sobre los bytes del archivo importado. No guarda el DXF; permite registrar voluntariamente los metadatos del contorno y su orientación en `localStorage` del navegador, exportar JSON y borrar entradas. Conservar el archivo DXF original sigue siendo responsabilidad del usuario; el historial local puede perderse si se borran los datos del navegador.
+
+La coincidencia de huellas indica coincidencia de archivos, **no** verificabilidad mecánica ni autenticidad del fabricante. La importación y el registro no modifican ningún utillaje, geometría de pieza, simulación ni fichero CNC. El historial tiene un límite de 20 inspecciones. Los nuevos archivos `cad-trace.js`, `cad-trace-view.js`, `cad-trace.css` y `tests/cad-trace.test.cjs` funcionan sin un servicio externo. Documentación: `NOTAS_v0.19.md`.
+
+Pruebas locales: 129 pruebas Node y revisión del editor a 1440, 820, 390 y 320 píxeles, todas satisfactorias. Ninguna prueba equivale a validación para fabricación.

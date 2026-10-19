@@ -1,0 +1,11 @@
+.cad-trace-panel{margin-top:12px;padding:14px;border:1px solid #426681;border-radius:10px;background:#0a2133;color:#e2edf7;display:grid;gap:10px;min-width:0}
+.cad-trace-panel strong{color:#75ceff;font-size:14px}
+.cad-trace-panel p{margin:0;overflow-wrap:anywhere;font-size:12px;line-height:1.55}
+.cad-trace-current{border:1px solid #33506a;background:#132c40;border-radius:8px;padding:10px;word-break:break-word}
+.cad-trace-actions{display:flex;flex-wrap:wrap;gap:8px}
+.cad-trace-actions button,.cad-trace-entry button{min-height:42px;border:1px solid #3f8bd3;background:#143e61;border-radius:8px;color:#fff;padding:9px 12px;cursor:pointer}
+.cad-trace-actions button:disabled{opacity:.4;cursor:default}
+.cad-trace-list{display:grid;gap:5px;min-width:0}
+.cad-trace-entry{display:flex;align-items:center;justify-content:space-between;gap:10px;min-width:0;border-bottom:1px solid #314e63;padding:4px 0}
+.cad-trace-entry span{overflow-wrap:anywhere;min-width:0;font-size:12px}
+@media(max-width:680px){.cad-trace-entry{align-items:stretch;flex-direction:column}.cad-trace-actions button{width:100%}}

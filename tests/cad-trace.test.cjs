@@ -1,0 +1,17 @@
+'use strict';
+const {test}=require('node:test'),assert=require('node:assert/strict');
+const crypto=require('node:crypto');
+const T=require('../cad-trace.js'),O=require('../cad-orientation.js');
+const store=()=>{const db=new Map();return {getItem:key=>db.get(key)??null,setItem:(key,v)=>db.set(key,v),removeItem:key=>db.delete(key)};};
+const source=(s='A')=>{let b=new TextEncoder().encode(s);return {name:'muestra.dxf',bytes:b.length,sha256:T.sha256(b)};};
+const document={verified:false,activeInSimulation:false,units:'mm',assumedUnits:false};
+const shape={index:0,layer:'corte',kind:'LWPOLYLINE',closed:true,verified:false,activeInSimulation:false,points:[{x:0,y:0},{x:20,y:0},{x:20,y:50},{x:0,y:50}],bounds:{minX:0,maxX:20,minY:0,maxY:50,length:140}};
+function record(s='A',when='2026-10-19T19:00:00.000Z'){return T.makeRecord({source:source(s),document,shape,oriented:O.inspect(shape,{rotation:90}),when});}
+test('SHA-256 bytes against Node crypto incl UTF-8 and 2MB',()=>{for(const a of ['', 'abc', 'DXF ñ 123', 'X'.repeat(65536), 'Y'.repeat(2*1024*1024)]){const bytes=new TextEncoder().encode(a);assert.equal(T.sha256(bytes),crypto.createHash('sha256').update(bytes).digest('hex'));}});
+test('a trace record remains non-verified even when geometry is nominally valid',()=>{let r=record();assert.equal(r.verified,false);assert.equal(r.approvedForCNC,false);assert.equal(r.activeInSimulation,false);assert.equal(r.orientation.rotation,90);assert.equal(r.envelope.width_mm,50);});
+test('voluntary local storage retains at most 20 records and de-duplicates the same import',()=>{const s=store();T.save(s,record());T.save(s,record());assert.equal(T.list(s).length,1);for(let i=0;i<23;i++)T.save(s,record('sample '+i));assert.equal(T.list(s).length,20);assert.equal(T.list(s)[0].source.sha256,source('sample 22').sha256);});
+test('remove one and clear all records',()=>{const s=store();const a=record('A'),b=record('B');T.save(s,a);T.save(s,b);T.remove(s,a.id);assert.deepEqual(T.list(s).map(x=>x.id),[b.id]);T.clear(s);assert.equal(T.list(s).length,0);});
+test('detects exact-file SHA match and rejects changed bytes',()=>{const r=record('original');assert.equal(T.sameSource(r,source('original').sha256),true);assert.equal(T.sameSource(r,source('original ').sha256),false);});
+test('JSON export contains metadata, blocks CNC, and no source DXF bytes',()=>{const s=store();T.save(s,record('DXF CONTENT SECRET'));const out=T.exportRecords(s),d=JSON.parse(out);assert.equal(d.approvedForCNC,false);assert.equal(d.records.length,1);assert.equal(out.includes('DXF CONTENT SECRET'),false);});
+test('reject invalid hash, oversized source, active/verified CAD and invalid orientation',()=>{const oriented=O.inspect(shape);for(const change of [{sha256:'fake'},{bytes:3e6}])assert.throws(()=>T.makeRecord({source:{...source(),...change},document,shape,oriented}));assert.throws(()=>T.makeRecord({source:source(),document:{...document,verified:true},shape,oriented}));assert.throws(()=>T.makeRecord({source:source(),document,shape:{...shape,activeInSimulation:true},oriented}));assert.throws(()=>T.makeRecord({source:source(),document,shape,oriented:{...oriented,options:{rotation:33,tolerance:0.5}}}));});
+test('rejects hostile local data and excludes tampered records',()=>{const s=store();s.setItem(T.KEY,'{bad');assert.throws(()=>T.list(s));s.setItem(T.KEY,JSON.stringify([{...record(),approvedForCNC:true}]));assert.equal(T.list(s).length,0);});

@@ -8,7 +8,8 @@ Ejecutar con servidor web local o GitHub Pages. Inicio mantiene la interfaz visu
 
 Importador **solo para inspección**, sin agregar DXF a simulación ni CNC; los datos de fabricante tampoco certifican un sólido geométrico. Ejecutar `node --test tests/*.test.cjs` y `python tests/browser_check.py` (requiere Chromium y Playwright).
 
-**v0.17:** arcos DXF y bulges de LWPOLYLINE, informe CSV/JSON local; ver README y ESTADO_PROYECTO.
+**v0.16:** arcos DXF y bulges de LWPOLYLINE, informe CSV/JSON local; ver README y ESTADO_PROYECTO.
 
+**v0.17:** Tras importar, selecciona un contorno y prueba el giro, el espejo y el origen nominal. La cruz naranja es una referencia visual calculada, no un amarre real. Puedes descargar un informe con la orientación. Los datos son de inspección; la simulación/CNC no los utiliza.
 
-v0.17: después de importar, selecciona el contorno y prueba el giro, espejo y origen NOMINAL. La cruz naranja es una referencia visual, no amarre. Descarga el informe JSON/CSV con orientación; nunca se activa simulación ni CNC.
+La v0.19 añade registro de inspecciones DXF solo con metadatos locales. Consultar NOTAS_v0.19.md.

@@ -1,28 +1,30 @@
-# Plegar Pro Plus — Estado recuperable
+# Plegar Pro Plus — Punto de recuperación v0.14
 
-Fecha de actualización: 2026-10-19  
-Versión: **v0.13** (prototipo)  
-Repositorio: https://github.com/warks1/Plegar-Pro-Basic  
-Versión de referencia antes de v0.13: `9aca62115171eba3790ecfae74cfc5294e25c7e7` (v0.12).
+- Fecha: 2026-10-19.
+- Repositorio oficial: https://github.com/warks1/Plegar-Pro-Basic
+- Rama: `main`.
+- Última versión de trabajo: **v0.14** (guardar el commit final de esta versión en el historial de GitHub).
+- Boceto original aprobado, sin rediseñar Inicio: `assets/referencia-aprobada.webp`.
+- La interfaz de Inicio y estilos globales `styles.css`, `app.js` y recursos `assets/` deben permanecer intactos salvo petición expresa.
+- Misma funcionalidad prevista para PC/tablet/smartphone con interfaz adaptativa.
 
-## Diseño aprobado
+## Lo existente
 
-El boceto de Inicio **no se debe sustituir por otra interfaz**. Referencia: `assets/referencia-aprobada.webp`. La pantalla debe conservar menú, paneles, disposición, imágenes y estética industrial aprobada. Usar distribución adaptativa en PC, tablet y móvil.
+- v0.2–v0.3: programación 2D editable, secuencia, guardado/JSON y desarrollo orientativo.
+- v0.4–v0.7: seguimiento 2D de punzón/matriz/chapa/tope X, radios ilustrativos y avisos de geometría 2D.
+- v0.8–v0.11: visor SVG con geometría extruida nominal 3D, perfiles de herramientas genéricas y aproximación de proximidades.
+- v0.12: catálogo interno de 8 punzones y 21 matrices sin verificar.
+- v0.13: 5 referencias oficiales AMADA y 4 catálogos públicos, para consulta, no para selección CAD validada.
+- **v0.14:** importar una sola LWPOLYLINE DXF ASCII 2D para **inspección**, con vista previa, escala/unidades, validación de contorno, cotas y comparación indicativa con ficha de fabricante. No activa geometría en simulación ni CNC.
 
-## Funciones construidas
+## Advertencias
 
-- Programación 2D con edición de segmentos, ángulos y orden, guardado local, deshacer/rehacer e importación/exportación JSON.
-- Desarrollo nominal estimado por Ri, K y espesor; advertencias sobre hipótesis.
-- Seguimiento 2D de perfil con punzón, matriz, tope X, radio ilustrativo y cribado de distancias.
-- Visor de chapa 3D y herramientas extruidas genéricas, giro/zoom, estados de secuencia y cribados geométricos aproximados.
-- **v0.13:** biblioteca de herramientas paramétricas `tool-library.js`, 8 punzones y 21 matrices, identificadores estables, fichas de dimensiones y origen no verificado, integración con perfiles 2D/3D y pruebas.
+El motor de plegado es una representación geométrica de investigación: cálculos de desarrollo y colisiones **no están validados** para fabricación, CNC o seguridad de operadores. Las referencias dimensionales publicadas no bastan para reconstruir un utillaje real con garantías.
 
-- **v0.13:** 5 fichas dimensionales AMADA consultables (3 punzones, 2 matrices) con fuentes oficiales y 4 referencias de catálogos; `manufacturer-references.js`, `FUENTES_UTILLAJE.md` y pruebas. Las fichas oficiales no alimentan todavía el motor de geometría.
+## Próximos pasos
 
-## Advertencias indispensables
+- v0.15: incorporar soporte seguro de más entidades DXF y varias capas, agrupación por contorno y orientación explícita; conservar trazabilidad por fuente y versiones.
+- Preparar carga opcional, revisada y contrastada de geometrías CAD de utillaje en el motor 3D, nunca por coincidencia de dimensiones solamente.
+- Verificar en GitHub Pages la ejecución real, incluido refresco de caché PWA, después de cada commit.
 
-**Nada está validado para producción industrial.** No hay gemelos digitales oficiales, tolerancias reales, control CNC, fuerza, recuperación elástica ni colisiones CAD barridas. Las nuevas alturas y medidas de herramientas se crean para el prototipo: **no representan cotas certificadas de MECOS, AMADA, Trumpf u otros fabricantes**. La web puede publicarse mediante GitHub Pages; la publicación debe verificarse para cada commit.
-
-## Próxima fase v0.14
-
-Verificar y ampliar las referencias de catálogos con planos dimensionales completos y perfiles CAD contrastados; crear importación de geometrías de utillaje con comprobaciones de integridad y compatibilidad antes de activarlas en simulación. Mantener el diseño aprobado, publicar solo tras pruebas y verificar GitHub Pages para cada commit.
+Para continuar, comprobar primero el último commit de GitHub y ejecutar las pruebas. No cambiar ni reemplazar el boceto aprobado.

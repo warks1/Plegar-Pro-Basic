@@ -78,3 +78,11 @@
 .ed-ref-details a:focus-visible,.ed-ref-catalogs a:focus-visible{outline:2px solid #80d6ff;outline-offset:3px}
 .ed-ref-catalogs{display:flex;flex-direction:column;gap:7px;padding:4px 0}
 .ed-ref-warning{border-left:3px solid #e9a34d;background:#392917;color:#ffe2b6;padding:8px 10px;border-radius:4px}
+/* v0.14 — inspección local de DXF (separada del cálculo y del visor) */
+.cad-import-panel{min-width:0;display:flex;flex-direction:column;gap:10px;background:linear-gradient(135deg,#0b2840,#091926);border:1px solid #4c7b93;border-radius:10px;padding:13px;font-size:11px;line-height:1.5;color:#cce3ef;overflow-wrap:anywhere}
+.cad-import-panel>strong{font-size:14px;color:#a4e1ff}
+.cad-import-panel p{margin:0}.cad-file{display:flex;flex-direction:column;gap:5px;color:#b8dff8}.cad-file input{width:100%;max-width:100%;min-width:0;color:#dcecf7;background:#12314a;border:1px solid #3b6687;border-radius:6px;padding:8px;box-sizing:border-box}.cad-file input::file-selector-button{background:#236089;border:0;color:white;padding:8px;border-radius:4px;margin-right:8px}
+#cad-preview{width:100%;height:190px;display:block;background:#081a29;border:1px solid #2b5372;border-radius:6px;box-sizing:border-box}
+.cad-metrics,.cad-comparison{border-radius:6px;padding:10px;background:#0f354d;color:#e1f4ff}
+.cad-status{padding:10px;background:#17384d;border-left:3px solid #2ca9ff;color:#c5e2f3}.cad-status[data-error="true"]{background:#462e27;border-color:#f6ad60;color:#ffe1c4}
+.cad-danger{background:#44301b;color:#ffdfa7;padding:10px;border-left:3px solid #f2ad45;border-radius:5px}

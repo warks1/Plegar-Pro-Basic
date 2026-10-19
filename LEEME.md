@@ -1,9 +1,11 @@
-# Plegar Pro Plus v0.13
+# Plegar Pro Plus — v0.14
 
-Abre `index.html` en un servidor local o visita la URL publicada de GitHub Pages cuando el despliegue del último commit termine.
+Continúa el prototipo original aprobado (sin rediseñar Inicio).
 
-Esta versión incorpora fichas de utillaje paramétrico SIN VERIFICAR en Programación 2D. Ninguna de las cotas es una ficha oficial de fabricante. El resto del visor y de Inicio mantiene el diseño aprobado.
+**Nueva función:** inspección de un contorno DXF ASCII 2D LWPOLYLINE con unidades, cotas, validación geométrica y comparación no certificada con fichas AMADA. Archivo de prueba incluido: `EJEMPLO_PERFIL_UTILLAJE.dxf` (ficticio).
 
-Pruebas: `node --test tests/*.test.cjs` y `python tests/browser_check.py`. Revisa `ESTADO_PROYECTO.md` para continuar.
+Abre `index.html` mediante servidor web local o GitHub Pages, navega a **Programación 2D → Importar perfil CAD**. El DXF no modifica las piezas ni el utillaje del simulador.
 
-Fichas AMADA de solo consulta: `manufacturer-references.js` y `FUENTES_UTILLAJE.md`. No reemplazan los perfiles genéricos ni la simulación CAD.
+Pruebas: `node --test tests/*.test.cjs` y `python tests/browser_check.py`.
+
+La simulación no está validada para producción ni para garantizar seguridad de máquina.

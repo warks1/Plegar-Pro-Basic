@@ -161,3 +161,19 @@ Se crea `manufacturer-references.js` con **cinco referencias concretas AMADA**, 
 - Pruebas: `node --test tests/*.test.cjs` y `python3 tests/browser_check.py`.
 
 **Advertencia:** cota publicada ≠ geometría CAD verificada ≠ aptitud para producción. La geometría del amarre y la compatibilidad de máquina permanecen sin contrastar.
+
+## v0.14 — Importador de perfiles CAD DXF ASCII 2D (solo inspección)
+
+En **Programación 2D → Importar perfil CAD v0.14**, se puede abrir **un DXF ASCII** con **una única entidad LWPOLYLINE** de líneas rectas 2D, cerrada o abierta. El programa:
+
+- comprueba que los códigos/valores DXF estén emparejados, que los vértices estén completos, que no existan arcos bulge, grosores o elevaciones y que el contorno no tenga autointersecciones;
+- reconoce `$INSUNITS`: milímetros, pulgadas, centímetros y metros; **si falta** o es incompatible, exige que se indiquen las unidades manualmente (no da por supuestos los milímetros);
+- calcula una vista previa SVG, límites X/Y en milímetros, longitud del contorno y número de vértices; admite archivos de hasta 2 MB y 1.500 vértices, con límites dimensionales;
+- compara orientativamente el ancho y alto de la envolvente con las dimensiones publicadas de la referencia AMADA seleccionada, tolerancia ilustrativa ±0,5 mm. La orientación se deduce sólo para esta comparación; **no** se confirma la identidad del fabricante;
+- procesa la geometría **localmente**, no la guarda en el perfil de la pieza ni la traslada al motor de simulación, no genera G-code y no modifica los punzones/matrices activos. Al abandonar/reconstruir el editor se pierde esta importación, por diseño.
+
+**Formatos NO admitidos:** DWG, STEP, IGES, DXF binario, bloques INSERT, SPLINE, ARC, CIRCLE, polilíneas con bulges, entidades LINE separadas, múltiples contornos, piezas 3D o planos de trayectorias. Para trabajar con ellos se deberá incorporar un intérprete CAD específico y verificaciones adicionales. El archivo de prueba `EJEMPLO_PERFIL_UTILLAJE.dxf` **es ficticio**: no pertenece a ningún fabricante. No permite inferir amarre, tensiones, radios, colisiones o seguridad.
+
+Archivos nuevos: `cad-profile.js`, `cad-profile-view.js`, `tests/cad-profile.test.cjs`, `EJEMPLO_PERFIL_UTILLAJE.dxf`. Cambios: `editor2d.js`, `editor2d.css`, `index.html`, `sw.js`, `tests/browser_check.py`, documentación.
+
+Pruebas: `node --test tests/*.test.cjs` y `python tests/browser_check.py` (Chromium Playwright en entorno local aislado). La interfaz Inicio aprobada, imágenes, colores y disposición **no se han modificado**.

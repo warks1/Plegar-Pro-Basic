@@ -18,7 +18,7 @@ with sync_playwright() as p:
   page.set_content(html,wait_until='domcontentloaded')
   page.add_style_tag(content=css)
   page.evaluate("""() => {window.__testStorage=window.__testStorage||new Map();Object.defineProperty(window,'localStorage',{configurable:true,value:{getItem:k=>window.__testStorage.get(k)??null,setItem:(k,v)=>window.__testStorage.set(k,String(v)),removeItem:k=>window.__testStorage.delete(k)}})}""")
-  for script in ('geometry2d.js','tool-library.js','manufacturer-references.js','bendcalc.js','clearance2d.js','toolprofiles2d.js','previousbends2d.js','interference2d.js','assembly2d.js','forming2d.js','forming2d-view.js','piece3d.js','tooling3d.js','scene3d-audit.js','proximity3d.js','piece3d-view.js','editor2d.js','app.js'):
+  for script in ('geometry2d.js','tool-library.js','manufacturer-references.js','cad-profile.js','cad-profile-view.js','bendcalc.js','clearance2d.js','toolprofiles2d.js','previousbends2d.js','interference2d.js','assembly2d.js','forming2d.js','forming2d-view.js','piece3d.js','tooling3d.js','scene3d-audit.js','proximity3d.js','piece3d-view.js','editor2d.js','app.js'):
    page.evaluate((root/script).read_text())
   assert page.locator('#project-name').inner_text()=='Soporte motor S235'
   print('navigating',tag,flush=True)
@@ -31,6 +31,8 @@ with sync_playwright() as p:
   assert page.locator('#ed-vratio').inner_text().startswith('8')
   assert 'SIN VERIFICAR' in page.locator('#ed-tool-punch').inner_text()
   assert 'SIN VERIFICAR' in page.locator('#ed-tool-die').inner_text()
+  assert page.locator('#cad-file-input').count()==1
+  assert 'SIN VERIFICAR' in page.locator('.cad-danger').inner_text()
   assert page.locator('#ed-ref-item option').count()==5
   assert '50838E' in page.locator('#ed-ref-item').inner_text()
   assert 'CAD' in page.locator('.ed-ref-warning').inner_text()
@@ -44,6 +46,24 @@ with sync_playwright() as p:
   page.locator('#ed-ref-filter').select_option('die')
   assert page.locator('#ed-ref-item option').count()==2
   assert 'AMADA' in page.locator('#ed-ref-family').inner_text()
+  # CAD 2D inspection does not mutate the active punch/die selection.
+  sample='0\nSECTION\n2\nHEADER\n9\n$INSUNITS\n70\n4\n0\nENDSEC\n0\nSECTION\n2\nENTITIES\n0\nLWPOLYLINE\n90\n4\n70\n1\n10\n0\n20\n0\n10\n20\n20\n0\n10\n20\n20\n60\n10\n0\n20\n60\n0\nENDSEC\n0\nEOF\n'
+  page.locator('#cad-file-input').set_input_files({'name':'modelo.dxf','mimeType':'application/dxf','buffer':sample.encode()})
+  page.wait_for_function("document.querySelector('#cad-status').textContent.includes('DXF leído') || document.querySelector('#cad-status').textContent.includes('rechazada')")
+  print('CAD:',page.locator('#cad-status').inner_text(),flush=True)
+  assert 'DXF leído' in page.locator('#cad-status').inner_text()
+  assert '20 mm' in page.locator('#cad-metrics').inner_text()
+  assert page.locator('#cad-preview polyline').count()==1
+  if tag=='pc':
+   page.locator('.cad-import-panel').scroll_into_view_if_needed()
+   page.screenshot(path=str(root.parent/'Plegar_Pro_Plus_v014_DXF.png'),full_page=False)
+  assert page.locator('#ed-die').input_value()=='v16-88'
+  assert 'NO validada' in page.locator('#cad-comparison').inner_text() or 'Diferencia' in page.locator('#cad-comparison').inner_text()
+  assert page.evaluate('window.PlegarCadImport.getCurrent().activeInSimulation===false')
+  page.locator('#cad-file-input').set_input_files({'name':'modelo.dxf','mimeType':'application/dxf','buffer':sample.replace('10\n20\n20\n60','42\n0.5\n10\n20\n20\n60').encode()})
+  page.wait_for_function("document.querySelector('#cad-status')?.getAttribute('data-error')==='true'")
+  assert 'bulges' in page.locator('#cad-status').inner_text()
+
 
   assert page.locator('.ed-bend-point').count()==4
   assert page.locator('#ed-forming .f2d-svg').count()==1
@@ -100,7 +120,7 @@ with sync_playwright() as p:
   page.set_content(html,wait_until='domcontentloaded')
   page.add_style_tag(content=css)
   page.evaluate("""() => {window.__testStorage=window.__testStorage||new Map();Object.defineProperty(window,'localStorage',{configurable:true,value:{getItem:k=>window.__testStorage.get(k)??null,setItem:(k,v)=>window.__testStorage.set(k,String(v)),removeItem:k=>window.__testStorage.delete(k)}})}""")
-  for script in ('geometry2d.js','tool-library.js','manufacturer-references.js','bendcalc.js','clearance2d.js','toolprofiles2d.js','previousbends2d.js','interference2d.js','assembly2d.js','forming2d.js','forming2d-view.js','piece3d.js','tooling3d.js','scene3d-audit.js','proximity3d.js','piece3d-view.js','editor2d.js','app.js'):
+  for script in ('geometry2d.js','tool-library.js','manufacturer-references.js','cad-profile.js','cad-profile-view.js','bendcalc.js','clearance2d.js','toolprofiles2d.js','previousbends2d.js','interference2d.js','assembly2d.js','forming2d.js','forming2d-view.js','piece3d.js','tooling3d.js','scene3d-audit.js','proximity3d.js','piece3d-view.js','editor2d.js','app.js'):
    page.evaluate((root/script).read_text())
   if w<=1120:page.locator('#open-menu').click()
   page.locator('button.nav-item[data-screen="Programación 2D"]').click()

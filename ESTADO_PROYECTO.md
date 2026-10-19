@@ -1,4 +1,4 @@
-# Plegar Pro Plus — Punto de continuidad v0.26
+# Plegar Pro Plus — Punto de continuidad v0.27
 
 **Fecha:** 2026-10-19  
 **Repositorio:** https://github.com/warks1/Plegar-Pro-Basic  
@@ -57,3 +57,11 @@ Instrucción al recibir «Seguir»: recuperar el último commit de GitHub, compr
 - NO hay barrido continuo, pliegue activo validado, reorientación de chapa, CAD del fabricante, contacto real ni garantía de seguridad; reporte con bloqueos CNC/seguridad.
 - 189 pruebas Node superadas y navegación Playwright en 1440/820/390/320 px. El boceto Inicio y `styles.css` no cambian.
 - Siguiente fase sugerida: verificaciones geométricas de contacto activo, enclavamientos de utillaje y topes basados en datos dimensionales fiables, nunca certificación de seguridad por aproximación.
+
+## v0.27 — módulo Planos por cliente
+
+Nuevo módulo Planos sin rediseñar Inicio: carpetas de cliente, importación desde almacenamiento o cámara, búsqueda, cambio de cliente y borrado. IndexedDB local conserva fichero original, miniatura cuando es posible y una copia PDF.
+Fotos JPG/PNG/WebP: PDF con imagen real y miniatura. DXF 2D ASCII admitido: vista de inspección rasterizada en PDF y miniatura, SIN escala certificada. PDFs originales: conservados. Otros archivos (STEP, DWG, SolidWorks, etc.): PDF de ficha de archivo, NO conversión de sólidos ni CAM; original disponible siempre.
+Exportaciones: PDF, original, copia ZIP por carpeta o global con índice JSON. Compartir PDF mediante Web Share cuando el dispositivo lo permite; de lo contrario descargar PDF y preparar correo con adjunto manual. Formatos aconsejados DXF/DWG, STEP/IGES, SLDPRT/SLDDRW/SLDASM, STL/3MF, SVG y NC/G-code, sin producir conversiones falsas.
+Miniatura geométrica real para fotografía y DXF compatible; para otros tipos (PDF importado y sólidos no interpretables) se muestra identificación de formato, NO siluetas inventadas. El almacenamiento no se sincroniza y puede perderse al borrar datos del navegador: hacer copias ZIP. Límites 22 MB/archivo y 150 documentos. No integración CNC ni certificación industrial.
+Pruebas locales: 193 Node; verificaciones del navegador general y del módulo Planos a 1440/820/390/320 px. La prueba aislada de Planos emula IndexedDB porque el navegador de ensayo bloquea URLs locales.

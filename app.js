@@ -6,7 +6,7 @@ const $$ = selector => [...document.querySelectorAll(selector)];
 const icon = name => `<svg aria-hidden="true"><use href="#i-${name}"/></svg>`;
 const escapeHtml = value => String(value).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const navGroups = [
-  {title:'PRINCIPAL', items:[['Inicio','home','#168ef7'],['Proyectos','folder','#235dc2'],['Programación 2D','ruler','#ec7b19'],['Programación 3D','box','#6530f5'],['Simulación 2D','box','#0eb2c9'],['Simulación 3D','box','#663be3'],['Utillaje','wrench','#536a94'],['Materiales','box','#32ab49'],['Máquinas','box','#1b6fc2'],['Producción','wrench','#ec741b'],['Agenda','calendar','#e83d65']]},
+  {title:'PRINCIPAL', items:[['Inicio','home','#168ef7'],['Proyectos','folder','#235dc2'],['Planos','folder','#1d9cbd'],['Programación 2D','ruler','#ec7b19'],['Programación 3D','box','#6530f5'],['Simulación 2D','box','#0eb2c9'],['Simulación 3D','box','#663be3'],['Utillaje','wrench','#536a94'],['Materiales','box','#32ab49'],['Máquinas','box','#1b6fc2'],['Producción','wrench','#ec741b'],['Agenda','calendar','#e83d65']]},
   {title:'HERRAMIENTAS',items:[['Calculadora de plegado','calc','#536786'],['Curva perfecta','wrench','#1275a2'],['Comparador de V','box','#7d2bd8']]},
   {title:'CONFIGURACIÓN',items:[['Ajustes','gear','#496b91'],['Acerca de','help','#476482']]}
 ];
@@ -21,6 +21,7 @@ const materials = [
 ];
 const descriptions = {
  'Proyectos':'Proyectos de chapa, archivos asociados y revisiones. Vista inicial de demostración.',
+ 'Planos':'Archivo de planos por clientes: fotografías, ficheros CAD, PDF y exportación de originales.',
  'Programación 2D':'Editor de perfil 2D: tramos, ángulos, secuencia y estimación geométrica de desarrollo (no validada para fabricación).',
  'Programación 3D':'Previsualización 3D geométrica derivada del editor 2D, sin edición CAD en volumen.',
  'Simulación 2D':'Vista cinemática local de perfil sincronizada con Programación 2D, sin física ni colisiones verificadas.',
@@ -84,6 +85,7 @@ function showNotice(title,message){showDialog(title,`<p>${escapeHtml(message)}</
 function closeMenu(){ $('#sidebar').classList.remove('open');$('#sidebar-curtain').classList.remove('open');}
 function toggleMenu(){const opened=$('#sidebar').classList.toggle('open');$('#sidebar-curtain').classList.toggle('open',opened);}
 function switchScreen(name){
+ window.PlegarPlans?.destroy();
  window.PlegarForming2D?.destroy();
  window.PlegarPiece3DView?.destroy();
  stopPlayer();activeScreen=name;buildNav();closeMenu();
@@ -97,7 +99,12 @@ function renderModule(name){
  $('#module-title').textContent=name;$('#module-subtitle').textContent=descriptions[name]||'Módulo del nuevo Plegar Pro.';
  let content='';
  $('#module-sample').classList.remove('module-piece3d');
- if(name==='Programación 2D'){
+ if(name==='Planos'){
+   $('#module-sample').classList.remove('module-editor','module-forming','module-piece3d');
+   $('#module-sample').innerHTML='';
+   window.PlegarPlans.mount($('#module-sample'));
+   return;
+ }else if(name==='Programación 2D'){
    $('#module-sample').innerHTML='';
    window.PlegarEditor2D.mount();
    return;

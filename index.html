@@ -9,6 +9,7 @@
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
   <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="editor2d.css">
 </head>
 <body>
   <svg aria-hidden="true" class="svg-icons" xmlns="http://www.w3.org/2000/svg">
@@ -106,6 +107,8 @@
   <footer class="statusbar"><div><i class="online-dot"></i> Modo demostración</div><div><svg><use href="#i-cloud"/></svg> Datos locales del navegador</div><div class="status-spacer"></div><div>Prototipo UI · sin validación de fabricación</div><div>© 2026 AMS Engineering</div></footer>
   <dialog class="dialog" id="dialog"><div class="dialog-header"><h2 id="dialog-title">Información</h2><button id="dialog-close" aria-label="Cerrar">×</button></div><div class="dialog-body" id="dialog-body"></div></dialog>
   <div class="toast" role="status" aria-live="polite" id="toast"></div>
+  <script src="geometry2d.js" defer></script>
+  <script src="editor2d.js" defer></script>
   <script src="app.js" defer></script>
 </body>
 </html>

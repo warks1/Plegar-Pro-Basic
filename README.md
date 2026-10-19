@@ -1,36 +1,25 @@
-# Plegar Pro — Primera interfaz navegable (v1)
+# Plegar Pro Plus — interfaz aprobada + editor 2D
 
-## Alcance
-Prototipo de interfaz visual basado en la **imagen aprobada por el usuario** (incluida en `assets/referencia-aprobada.webp`). Diseño responsive para ordenador, tablet y teléfono, con las mismas áreas de navegación.
+Proyecto **Plegar Pro Plus**, desarrollado sobre `warks1/Plegar-Pro-Basic`.
 
-**No** es una aplicación CAD/CAM terminada; **no** reproduce la física de plegado, no conecta máquinas y **no** calcula desarrollos o fuerzas validadas. Las imágenes de máquina, herramientas y geometría proceden del boceto de referencia, por lo que sirven como recursos ilustrativos, no como geometrías certificadas.
+La **pantalla Inicio conserva el diseño del boceto aprobado** (`assets/referencia-aprobada.webp`). Está adaptada visualmente a PC, tablet y smartphone. Sigue siendo un prototipo visual: la máquina y el utillaje del inicio son imágenes ilustrativas.
 
-## Uso
-1. Descomprime la carpeta completa.
-2. Abre `index.html` en un navegador moderno. La navegación y los controles básicos funcionan sin conexión.
-3. Para probar instalación PWA/offline mediante service worker, usa un servidor web en `localhost` o HTTPS: `python -m http.server 8080` y navega a `http://localhost:8080`.
-4. En tablet o móvil, el menú se despliega desde la parte superior y se incorpora navegación inferior.
+## Programación 2D (v0.2)
 
-## Interacciones listas
-- Navegación por módulos.
-- Menú lateral responsive (modal en tablet y móvil).
-- Secuenciador de 6 pasos con reproducción, pausa, selector y velocidad ilustrativos.
-- Zoom visual de la fotografía de plegadora.
-- Pestañas y selección de utillaje.
-- Lista de proyectos de ejemplo, alta local de un proyecto y selección de materiales de ejemplo.
-- Acceso rápido por búsqueda de módulos, Ctrl/Cmd+K.
-- Rotación/zoom de la *imagen* de la pieza (no del CAD real).
-- Maximizar/minimizar panel de máquina.
+Abrir el menú **Programación 2D** para editar tramos, ángulos y orden de plegado. Se dibuja un perfil SVG de ejes. Es posible deshacer/rehacer, guardar localmente, importar y exportar archivos JSON de geometría.
 
-## Siguiente fase de ingeniería
-Separar la interfaz en componentes React/TypeScript; integrar un motor CAD real, geometría compartida y validación de cálculos, importar utillaje dimensional real, pruebas de colisión, almacenamiento robusto y empaquetadores de aplicaciones para Microsoft Store / App Store / Google Play. Ninguno de estos pasos se considera realizado en esta entrega.
+Los datos se guardan únicamente en **este navegador**, sin servidor ni sincronización. Para respaldo/traspaso a otro dispositivo, exportar el JSON.
 
-## Estructura
-- `index.html`: estructura semántica de la interfaz.
-- `styles.css`: identidad visual + reglas PC/tablet/móvil.
-- `app.js`: interacciones de prototipo y datos locales demostrativos.
-- `assets/`: imágenes recortadas exclusivamente del boceto aprobado, referencia íntegra e icono.
-- `manifest.webmanifest` / `sw.js`: base PWA (requiere HTTP/HTTPS para SW).
+**NO usar los resultados del editor como desarrollo de corte o programa CNC.** El perfil de ejes y la secuencia visual no incluyen tolerancias, radios, compensaciones, fibra neutra, carga o colisiones verificadas.
 
-## Copyright
-Boceto proporcionado por la conversación del usuario. Versión de interfaz técnica: prototipo publicado en este repositorio GitHub.
+## Archivos y pruebas
+
+- `index.html`, `styles.css`, `app.js`: interfaz del boceto aprobado.
+- `geometry2d.js`: geometría 2D y validación de datos (sin dependencias).
+- `editor2d.js`, `editor2d.css`: interfaz del editor 2D.
+- `sw.js`, `manifest.webmanifest`: base de instalación web (PWA experimental).
+- `assets/`: imágenes del boceto.
+- `tests/geometry2d.test.cjs`: pruebas numéricas (`node --test tests/geometry2d.test.cjs`).
+- `tests/browser_check.py`: pruebas automatizadas en entorno de navegación restringida. No sustituye pruebas reales de URL/HTTPS.
+
+Para visualizar: servir el directorio por HTTP, por ejemplo `python -m http.server 8000`, y abrir `http://localhost:8000` en un navegador autorizado. Para publicar en GitHub Pages, configurar `Settings → Pages → Deploy from a branch → main / root`.

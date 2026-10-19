@@ -21,7 +21,7 @@ const materials = [
 ];
 const descriptions = {
  'Proyectos':'Proyectos de chapa, archivos asociados y revisiones. Vista inicial de demostración.',
- 'Programación 2D':'Edición y orden de pliegues en plano. Motor geométrico pendiente de implementar y validar.',
+ 'Programación 2D':'Editor de perfil nominal 2D: tramos, ángulos y secuencia. Sin desarrollo de corte ni simulación de fabricación validados.',
  'Programación 3D':'Geometría tridimensional de la pieza. Todavía sin núcleo CAD interactivo.',
  'Simulación 2D':'Vista de perfil del punzón, matriz y chapa. La representación actual es ilustrativa.',
  'Simulación 3D':'Vista industrial de la máquina y controles de secuencia. La imagen no calcula deformación física.',
@@ -94,7 +94,11 @@ function switchScreen(name){
 function renderModule(name){
  $('#module-title').textContent=name;$('#module-subtitle').textContent=descriptions[name]||'Módulo del nuevo Plegar Pro.';
  let content='';
- if(name==='Proyectos'){
+ if(name==='Programación 2D'){
+   $('#module-sample').innerHTML='';
+   window.PlegarEditor2D.mount();
+   return;
+ }else if(name==='Proyectos'){
  content=projects.map((p,i)=>`<div class="module-tile"><img src="assets/pieza-mini.webp" alt="Soporte de chapa"/><strong>${escapeHtml(p.name)}</strong><p>${escapeHtml(p.detail)}<br>Registro local de ejemplo</p><button type="button" data-project="${i}">Seleccionar proyecto</button></div>`).join('')+`<div class="module-tile"><strong>Nuevo proyecto</strong><p>Crea un proyecto de muestra almacenado en este navegador.</p><button type="button" id="new-project">Crear proyecto</button></div>`;
  }else if(name==='Materiales'){
  content=materials.map(([title,thick],i)=>`<div class="module-tile"><img src="assets/chapa-mini.webp" alt="Muestra de chapa"/><strong>${title}</strong><p>Espesor de demostración: ${thick}</p><button type="button" data-material="${i}">Seleccionar material</button></div>`).join('');
@@ -107,6 +111,7 @@ function renderModule(name){
  }else{
  content=`<div class="module-tile"><strong>Diseño del módulo preparado</strong><p>Este módulo está identificado en el mapa maestro. Su implementación funcional corresponde a una fase posterior.</p></div>`;
  }
+ $('#module-sample').classList.remove('module-editor');
  $('#module-sample').innerHTML=content;
 }
 

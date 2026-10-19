@@ -1,0 +1,44 @@
+/* Editor 2D: extensión funcional aislada. No altera el diseño del panel Inicio aprobado. */
+.module-sample.module-editor{display:block;min-width:0;margin-top:22px}
+.editor2d{color:#e7f1ff;min-width:0}
+.ed-toolbar,.ed-actions,.ed-section-head,.ed-canvas-top,.ed-caption{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.ed-toolbar{margin-bottom:14px;border:1px solid #2a506c;border-radius:9px;padding:11px;background:#081b2d}
+.ed-chip{color:#7bd1ff;font-size:11px;letter-spacing:1px;font-weight:700}
+.ed-actions{justify-content:flex-start;gap:7px}
+.editor2d button,.ed-import{border:1px solid #315c7d;border-radius:6px;background:#0e3454;padding:9px 12px;color:#e1f1ff;min-height:37px;cursor:pointer;font-size:12px}
+.editor2d button:hover,.ed-import:hover{background:#115486;border-color:#4e9dd1}
+.editor2d button:focus-visible,.ed-import:focus-within,.editor2d input:focus-visible,.editor2d select:focus-visible{outline:2px solid #64c8ff;outline-offset:2px}
+.editor2d button:disabled{opacity:.42;cursor:not-allowed}
+#ed-save,.ed-import{background:#075da5;border-color:#268fde}
+.ed-import{position:relative;display:inline-flex;align-items:center;justify-content:center;overflow:hidden}
+.ed-import input{position:absolute;opacity:0;width:100%;height:100%;inset:0;cursor:pointer}
+.ed-grid{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(280px,.9fr);gap:14px;align-items:start}
+.ed-primary,.ed-controls{min-width:0;border:1px solid #2a506c;background:#081b2d;border-radius:10px;overflow:hidden}
+.ed-canvas-top{padding:12px 14px;border-bottom:1px solid #24506b;color:#b4cde0;letter-spacing:.4px;font-size:12px}
+.ed-canvas-top strong{color:#d5edff}
+#ed-svg{width:100%;height:auto;display:block;aspect-ratio:760/460;background:#071a2a}
+.ed-dim{fill:#dbf4ff;font:13px 'Segoe UI',sans-serif;paint-order:stroke;stroke:#062137;stroke-width:5px}
+.ed-bend-point{cursor:pointer;outline:none}
+.ed-bend-point circle{stroke:#79cfff;stroke-width:2px;fill:#092f4e}
+.ed-bend-point text{fill:#e5f7ff;font:700 12px 'Segoe UI',sans-serif}
+.ed-bend-point.current circle,.ed-bend-point:focus circle{fill:#0377d1;stroke:#e1f8ff;stroke-width:3px}
+.ed-caption{padding:13px;border-top:1px solid #24506b;font-size:12px}
+.ed-caption strong{color:#88d5ff}.ed-caption span{color:#afc4d7;font-size:11px;line-height:1.5}
+.ed-warning{margin:8px 12px 12px;padding:10px;background:#362c17;border:1px solid #8d7337;color:#f4dbab;border-radius:6px;font-size:11px;line-height:1.5}
+.ed-section{padding:13px;display:flex;flex-direction:column;gap:10px;border-bottom:1px solid #274860}
+.ed-section>strong,.ed-section-head strong{font-size:14px}
+.ed-section-head span{font-size:11px;color:#92adc5}
+.ed-cell{display:flex;flex-direction:column;gap:6px;font-size:11px;color:#b9d0df;min-width:0}
+.ed-cell input,.ed-cell select{min-height:38px;border:1px solid #38607c;background:#071724;color:#edf7ff;border-radius:6px;padding:8px 9px;width:100%;max-width:100%;font-size:13px}
+.ed-fieldgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+.ed-order{display:flex;gap:7px;flex-wrap:wrap;align-items:center}
+.editor2d .ed-order-item{background:#0b2a42;display:flex;align-items:center;gap:9px}
+.ed-order-item strong{background:#134d80;border-radius:5px;padding:3px 6px}
+.ed-order-item small{color:#99c9ee}
+.editor2d .ed-order-item.current{border-color:#37b8ff;background:#055b99;box-shadow:inset 0 0 0 1px #37b8ff}
+.ed-status{min-height:35px;margin:10px 0;padding:9px 12px;border-left:3px solid #1caaff;background:#0c273b;color:#bdd9ec;line-height:1.5;font-size:11px}
+@media (max-width:1280px){.ed-grid{grid-template-columns:minmax(0,1fr)}.ed-fieldgrid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media (max-width:700px){.module-main{min-width:0}.ed-toolbar{align-items:flex-start}.ed-toolbar .ed-actions{width:100%}.ed-toolbar .ed-actions>*{flex:1 1 120px}.ed-fieldgrid{grid-template-columns:repeat(2,minmax(0,1fr))}.ed-canvas-top{font-size:10px}.ed-caption{align-items:flex-start}.ed-section{padding:10px}.editor2d button,.ed-import{font-size:11px;padding:8px 9px}.ed-warning{font-size:10px}}
+@media (max-width:360px){.ed-fieldgrid{grid-template-columns:1fr}}
+/* Evita que los iconos de cuenta desborden la cabecera en tablet. */
+@media (min-width:701px) and (max-width:1120px){.topbar .brand{min-width:210px}.topbar .top-search{min-width:0}.topbar .top-actions{gap:8px}}

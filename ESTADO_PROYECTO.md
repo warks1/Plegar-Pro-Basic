@@ -1,9 +1,9 @@
-# Plegar Pro Plus — Estado guardado v0.15
+# Plegar Pro Plus — Estado guardado v0.16
 
 - **Repositorio:** https://github.com/warks1/Plegar-Pro-Basic
 - **Rama:** `main` (consultar el último commit confirmado; no asumir que GitHub Pages ya desplegó la actualización).
 - **Identidad visual aprobada:** `assets/referencia-aprobada.webp`. Conservar la pantalla Inicio, estilos globales y recursos originales.
-- **Versión del prototipo:** v0.15, importación DXF multicontorno/multicapa solo para inspección.
+- **Versión del prototipo:** v0.16, importación DXF multicontorno/multicapa solo para inspección.
 
 ## Capacidades actuales (resumen)
 
@@ -13,7 +13,7 @@
 - Inspección de DXF ASCII: `LWPOLYLINE` y `LINE` 2D en múltiples capas/contornos, escalado por `$INSUNITS` o selección manual, vista previa y comparación de cotas por elemento. Límite 2 MB, 100 entidades, 1500 vértices.
 - Documentación de fuentes parciales de fabricante en `FUENTES_UTILLAJE.md`.
 
-## Lo que NO hace v0.15
+## Lo que NO hace v0.16
 
 - **No** convierte contornos DXF a sólidos, **no** ejecuta CNC, **no** activa herramientas importadas, **no** verifica compatibilidad ni colisiones.
 - Rechaza entidades que aún no se puedan inspeccionar con garantías: ARC/CIRCLE/SPLINE, INSERT, bloques de entidades, DXF binario, DWG, STEP, perfiles con elevación no nula y anchos/bulges de polilínea.
@@ -30,3 +30,12 @@ Proponer inspección de segmentos con arco DXF (`ARC` / bulge) a tolerancia de d
 2. Mantener exactamente el diseño aprobado.
 3. Comprobar importador, compatibilidad v0.14, UI a 1440/820/390/320 px, y comprobar estado Pages tras cada commit.
 4. Separar claramente lo experimental de cualquier geometría verificada antes de habilitar operaciones reales.
+
+### Guardado v0.16 — 2026-10-19
+
+- DXF ASCII con segmentos `LINE`, `LWPOLYLINE`, `ARC`, `CIRCLE` y bulges por vértice.
+- Reconstrucción de arcos únicamente para vista 2D; verificación de cierre y autointersección sobre la polilínea muestreada.
+- Informe descargable JSON/CSV, cotas por entidad y capas, estado **SIN VERIFICAR**.
+- Nuevos ejemplos y 103 pruebas automáticas superadas más pruebas de navegador en cuatro anchuras.
+- No se modifica la portada aprobada ni los motores de colisión/cálculo CNC; las geometrías CAD no participan en fabricación ni simulación física.
+- Siguiente: DXF con tolerancias y sólidos paramétricos después de validar geometría y amarre.

@@ -21,9 +21,9 @@ test('la API antigua sigue rechazando varios contornos',()=>{
  const d=head()+line('A',0,0,1,0)+line('B',0,0,0,1)+end;
  assert.throws(()=>CAD.parse(d),/exactamente una/);
 });
-test('rechaza INSERT y ARC en vez de saltarlos silenciosamente',()=>{
+test('rechaza INSERT y arcos incompletos en vez de saltarlos silenciosamente',()=>{
  assert.throws(()=>CAD.parseDocument(head()+line('A',0,0,1,0)+'0\nINSERT\n2\nA\n'+end),/INSERT/);
- assert.throws(()=>CAD.parseDocument(head()+lw('A',[[0,0],[1,0],[1,1]])+'0\nARC\n'+end),/ARC/);
+ assert.throws(()=>CAD.parseDocument(head()+lw('A',[[0,0],[1,0],[1,1]])+'0\nARC\n'+end),/centro X ausente/);
 });
 test('rechaza entidades con elevación fuera de plano y líneas sin extremo',()=>{
  assert.throws(()=>CAD.parseDocument(head()+line('A',0,0,1,0).replace('11\n1','30\n3\n11\n1')+end),/elevación/);

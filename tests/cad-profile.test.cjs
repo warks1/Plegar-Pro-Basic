@@ -19,12 +19,12 @@ test('DXF sin unidades exige selección manual explícita',()=>{
  assert.throws(()=>CAD.parse(make({header:false})),/\$INSUNITS/);
  const p=CAD.parse(make({header:false}),{unitsOverride:4});assert.equal(p.assumedUnits,true);
 });
-test('Rechaza arcos bulge y ancho de polilínea',()=>{
- assert.throws(()=>CAD.parse(make({extraEntity:'42\n0.3\n'})),/bulges/);
+test('Rechaza bulge fuera de vértice y ancho de polilínea',()=>{
+ assert.throws(()=>CAD.parse(make({extraEntity:'42\n0.3\n'})),/Curvatura bulge sin vértice/);
  assert.throws(()=>CAD.parse(make({extra:'43\n1\n'})),/anchos/);
 });
-test('Rechaza doble contorno, spline y otros DXF complejos',()=>{
- const base=make();assert.throws(()=>CAD.parse(base.replace('0\nENDSEC\n0\nEOF','0\nCIRCLE\n10\n0\n20\n0\n40\n3\n0\nENDSEC\n0\nEOF')),/CIRCLE/);
+test('Rechaza doble contorno, SPLINE y DXF complejos',()=>{
+ const base=make();assert.throws(()=>CAD.parse(base.replace('0\nENDSEC\n0\nEOF','0\nSPLINE\n10\n0\n20\n0\n0\nENDSEC\n0\nEOF')),/SPLINE/);
  assert.throws(()=>CAD.parse(base.replace('0\nENDSEC\n0\nEOF',`0\nLWPOLYLINE\n90\n2\n10\n0\n20\n0\n10\n10\n20\n0\n0\nENDSEC\n0\nEOF`)),/exactamente una/);
 });
 test('Rechaza autointersecciones, puntos repetidos y cantidad declarada incorrecta',()=>{

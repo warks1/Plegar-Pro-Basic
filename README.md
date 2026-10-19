@@ -1,4 +1,4 @@
-# Plegar Pro Plus · Prototipo v0.15
+# Plegar Pro Plus · Prototipo v0.16
 
 Repositorio: `warks1/Plegar-Pro-Basic`.
 
@@ -187,3 +187,14 @@ Admite `$INSUNITS` en mm, cm, m o pulgadas y la selección manual de unidad para
 Nuevos archivos: `EJEMPLO_PERFIL_MULTICAPA.dxf`, `tests/cad-multilayer.test.cjs`. Cambios: `cad-profile.js`, `cad-profile-view.js`, `editor2d.css`, `sw.js`, `tests/browser_check.py`, documentos de continuidad. El método heredado `PlegarCadProfile.parse()` sigue admitiendo exactamente un contorno para mantener la compatibilidad con v0.14. Se incorpora `PlegarCadProfile.parseDocument()` para documentos multientidad.
 
 La importación y la comparación siguen siendo **orientativas y SIN VERIFICAR**. No pueden emplearse para certificar compatibilidad de utillaje o seguridad de la plegadora.
+
+
+## v0.16 — Arcos DXF y exportación de informe dimensional (SOLO INSPECCIÓN)
+
+En Programación 2D, el importador admite ahora entidades LINE, LWPOLYLINE con bulge, ARC y CIRCLE de DXF ASCII 2D, en diferentes capas. Verifica el estado abierto/cerrado y detecta segmentos degenerados y autointersecciones del contorno discretizado. Límite de 2 MB, 100 entidades y 1500 puntos de vista previa. Los arcos se representan por cuerdas con tolerancia nominal de 0,04 mm; sus longitudes se calculan analíticamente. La verificación de autointersecciones usa la aproximación por segmentos y no garantiza exactitud CAD por debajo de ese límite.
+
+Los botones Informe JSON e Informe CSV generan un informe local con capas, entidades, ancho, alto, longitud y número de arcos. Ambos se marcan **NO VERIFICADO / NO VÁLIDO PARA FABRICACIÓN**. Los datos DXF no se envían al servidor ni pasan al simulador, al CNC o al utillaje activo.
+
+Siguen rechazándose SPLINE, INSERT, bloques, datos 3D, DWG y STEP, elevaciones, arcos inválidos y otros datos que no se puedan representar con seguridad. Las entidades sueltas no se ensamblan automáticamente.
+
+Archivos: cad-profile.js, cad-profile-view.js, editor2d.css, sw.js, EJEMPLO_ARCOS_CAPAS.dxf, tests/cad-arcs-report.test.cjs y actualizaciones de pruebas/documentación. Pruebas finales: 103 casos automatizados y navegador en PC (1440 px), tablet (820 px) y móviles (390 y 320 px) sin errores JavaScript ni desbordamiento horizontal detectados. Esto NO equivale a una certificación geométrica o industrial.

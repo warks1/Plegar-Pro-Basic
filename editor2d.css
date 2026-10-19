@@ -91,3 +91,6 @@
 .cad-select-row .ed-cell,.cad-select-row select{min-width:0;max-width:100%;width:100%}
 #cad-preview polyline{pointer-events:none}
 @media(max-width:650px){.cad-select-row{grid-template-columns:minmax(0,1fr)}}
+
+/* v0.16: exportación accesible del informe DXF. */
+.cad-export-actions{display:flex;flex-wrap:wrap;gap:8px}.cad-export-actions button{border:1px solid #4c86a6;background:#174564;color:#e6f6ff;border-radius:6px;padding:9px 12px;min-height:40px;font:inherit;cursor:pointer}.cad-export-actions button:disabled{opacity:.45;cursor:not-allowed}.cad-export-actions button:focus-visible{outline:2px solid #6bd5ff;outline-offset:2px}

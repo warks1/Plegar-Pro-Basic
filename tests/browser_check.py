@@ -68,15 +68,32 @@ with sync_playwright() as p:
   page.locator('#cad-layer').select_option('*')
   page.locator('#cad-contour').select_option('0')
   assert page.locator('#cad-preview polyline').count()==2
+  # v0.16: curvas ARC y CIRCLE; informe local sin alterar utillaje activo.
+  arcdxf=(root/'EJEMPLO_ARCOS_CAPAS.dxf').read_bytes()
+  page.locator('#cad-file-input').set_input_files({'name':'arcos.dxf','mimeType':'application/dxf','buffer':arcdxf})
+  page.wait_for_function("document.querySelector('#cad-status').textContent.includes('3 elementos')")
+  assert page.locator('#cad-preview polyline').count()==3
+  assert page.locator('#cad-layer option').count()==4
+  assert page.locator('#cad-report-json').is_enabled()
+  assert page.locator('#cad-report-csv').is_enabled()
+  assert page.evaluate('window.PlegarCadImport.getCurrent().contours[0].arcCount')==1
+  assert page.evaluate('window.PlegarCadImport.getCurrent().contours[2].closed') is True
+  assert 'SIN VERIFICAR' in page.locator('.cad-danger').inner_text()
+  if tag=='pc':
+   with page.expect_download() as dl: page.locator('#cad-report-json').click()
+   downloaded=dl.value
+   assert downloaded.suggested_filename=='plegar-pro-informe-dxf.json'
+   with page.expect_download() as dl: page.locator('#cad-report-csv').click()
+   assert dl.value.suggested_filename.endswith('.csv')
   if tag=='pc':
    page.locator('.cad-import-panel').scroll_into_view_if_needed()
-   page.screenshot(path=str(root.parent/'Plegar_Pro_Plus_v015_DXF.png'),full_page=False)
+   page.screenshot(path=str(root.parent/'Plegar_Pro_Plus_v016_DXF.png'),full_page=False)
   assert page.locator('#ed-die').input_value()=='v16-88'
   assert 'NO validada' in page.locator('#cad-comparison').inner_text() or 'Dimensiones nominales diferentes' in page.locator('#cad-comparison').inner_text()
   assert page.evaluate('window.PlegarCadImport.getCurrent().activeInSimulation===false')
-  page.locator('#cad-file-input').set_input_files({'name':'modelo.dxf','mimeType':'application/dxf','buffer':sample.replace('10\n20\n20\n60','42\n0.5\n10\n20\n20\n60').encode()})
+  page.locator('#cad-file-input').set_input_files({'name':'modelo.dxf','mimeType':'application/dxf','buffer':sample.replace('0\nENDSEC\n0\nEOF','0\nSPLINE\n0\nENDSEC\n0\nEOF').encode()})
   page.wait_for_function("document.querySelector('#cad-status')?.getAttribute('data-error')==='true'")
-  assert 'bulges' in page.locator('#cad-status').inner_text()
+  assert 'SPLINE' in page.locator('#cad-status').inner_text()
 
 
   assert page.locator('.ed-bend-point').count()==4

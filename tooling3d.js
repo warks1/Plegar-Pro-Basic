@@ -21,22 +21,31 @@
   }
   return {vertices,faces};
  }
- function assemble(sheet,scene,visible={}){
-  if(!sheet||!Array.isArray(sheet.vertices)||!Array.isArray(sheet.faces)||!finite(sheet.width))throw new Error('Malla de chapa requerida.');
+ function prisms(sheet,scene){
+  if(!sheet||!finite(sheet.width)||sheet.width<=0||!finite(sheet.thickness)||sheet.thickness<=0)throw new Error('Dimensiones de chapa requeridas.');
   if(!scene?.toolProfiles?.punch?.outline||!scene?.toolProfiles?.die?.outline||!scene?.stop)throw new Error('Escena geométrica y utillaje requeridos.');
-  const out={vertices:sheet.vertices.map(v=>({...v})),faces:sheet.faces.map(f=>({...f,ids:[...f.ids],group:'sheet'})),width:sheet.width,thickness:sheet.thickness,groups:{sheet:1,punch:0,die:0,gauge:0}};
-  function append(mesh,key){const offset=out.vertices.length;out.vertices.push(...mesh.vertices);out.faces.push(...mesh.faces.map(f=>({...f,ids:f.ids.map(i=>i+offset)})));out.groups[key]=1;}
-  // Tools occupy an illustrative clearance beyond the sheet width on each side.
   const margin=Math.max(8,Math.min(30,sheet.width*.12));
-  if(visible.punch!==false)append(extrude(scene.toolProfiles.punch.outline,-margin,sheet.width+margin,'punch'),'punch');
-  if(visible.die!==false)append(extrude(scene.toolProfiles.die.outline,-margin,sheet.width+margin,'die'),'die');
-  if(visible.gauge!==false){
-   const g=scene.stop;
-   const outline=[{x:g.x,y:g.top},{x:g.x+g.width,y:g.top},{x:g.x+g.width,y:g.bottom},{x:g.x,y:g.bottom}];
-   const gaugeDepth=Math.max(8,Math.min(26,sheet.width*.16));
-   append(extrude(outline,Math.max(0,(sheet.width-gaugeDepth)/2),Math.min(sheet.width,(sheet.width+gaugeDepth)/2),'gauge'),'gauge');
+  const g=scene.stop;
+  if(![g.x,g.top,g.bottom,g.width].every(finite)||g.width<=0||g.bottom<=g.top)throw new Error('Tope nominal inválido.');
+  const gaugeDepth=Math.max(8,Math.min(26,sheet.width*.16));
+  return [
+   {group:'punch',outline:scene.toolProfiles.punch.outline,z0:-margin,z1:sheet.width+margin},
+   {group:'die',outline:scene.toolProfiles.die.outline,z0:-margin,z1:sheet.width+margin},
+   {group:'gauge',outline:[{x:g.x,y:g.top},{x:g.x+g.width,y:g.top},{x:g.x+g.width,y:g.bottom},{x:g.x,y:g.bottom}],z0:Math.max(0,(sheet.width-gaugeDepth)/2),z1:Math.min(sheet.width,(sheet.width+gaugeDepth)/2)}
+  ];
+ }
+ function assemble(sheet,scene,visible={}){
+  if(!sheet||!Array.isArray(sheet.vertices)||!Array.isArray(sheet.faces))throw new Error('Malla de chapa requerida.');
+  const descriptors=prisms(sheet,scene);
+  const out={vertices:sheet.vertices.map(v=>({...v})),faces:sheet.faces.map(f=>({...f,ids:[...f.ids],group:'sheet'})),width:sheet.width,thickness:sheet.thickness,groups:{sheet:1,punch:0,die:0,gauge:0}};
+  for(const d of descriptors){
+   if(visible[d.group]===false)continue;
+   const mesh=extrude(d.outline,d.z0,d.z1,d.group),offset=out.vertices.length;
+   out.vertices.push(...mesh.vertices);
+   out.faces.push(...mesh.faces.map(f=>({...f,ids:f.ids.map(i=>i+offset)})));
+   out.groups[d.group]=1;
   }
   return out;
  }
- return {extrude,assemble};
+ return {extrude,prisms,assemble};
 });

@@ -1,7 +1,7 @@
 # Plegar Pro Plus — Punto de recuperación
 
 **Fecha de guardado:** 2026-10-19  
-**Última versión desarrollada:** v0.10  
+**Última versión desarrollada:** v0.11  
 **Repositorio:** https://github.com/warks1/Plegar-Pro-Basic  
 **Rama principal:** main  
 **Commit de la versión 0.10 (anterior a esta nota):** bf6d67cacbfe9334af2cc5d2c0139d972915ca49
@@ -20,6 +20,13 @@ La referencia visual elegida por el usuario es el boceto conservado como `assets
 - Versión v0.10: identificación de tramos plegados, activos y pendientes en el visor, y panel de holguras orientativas 2D.
 - Comprobaciones automáticas registradas hasta v0.10: 59 pruebas, más comprobaciones de interfaz en cuatro tamaños, según el registro del desarrollo.
 
+## Avance v0.11 — cribado de prismas nominales 3D
+- Se añade proximity3d.js y un panel independiente de diagnóstico de volúmenes extruidos en Simulación 3D.
+- Se verifican los tramos completados de chapa contra envolventes nominales genéricas de punzón, matriz y tope, teniendo en cuenta sección XY e intervalos Z.
+- 67 pruebas numéricas y pruebas de interfaz en cuatro anchuras superadas.
+- Resultados sólo orientativos: NO son colisiones CAD reales, ni trayectorias barridas, ni validación de fabricación.
+- La pantalla Inicio y sus recursos del boceto aprobado siguen sin modificaciones.
+
 ## Límites que se deben mantener claros
 
 - La simulación 2D/3D es ilustrativa: no es una validación de colisiones CAD ni una certificación de seguridad industrial.
@@ -28,9 +35,9 @@ La referencia visual elegida por el usuario es el boceto conservado como `assets
 - GitHub Pages no se había confirmado publicado en v0.10.
 - La publicación en App Store, Microsoft Store y Google Play sigue pendiente de empaquetado, pruebas y revisión.
 
-## Siguiente fase: v0.11
+## Siguiente fase: v0.12
 
-1. Mejorar perfiles geométricos de chapa y utillaje en 3D.
+1. Añadir catálogos dimensionales con trazabilidad de fabricante y versión.
 2. Ampliar modelado y posiciones nominales de máquina, tope y herramientas.
 3. Preparar un cribado de interferencias tridimensionales, rotulado como aproximado hasta validarlo.
 4. Conservar siempre la pantalla Inicio basada en el boceto aprobado.

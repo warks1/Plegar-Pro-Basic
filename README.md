@@ -1,4 +1,4 @@
-# Plegar Pro Plus · Prototipo v0.10
+# Plegar Pro Plus · Prototipo v0.11
 
 Repositorio: `warks1/Plegar-Pro-Basic`.
 
@@ -123,3 +123,15 @@ El visor **Simulación 3D** colorea de forma distinta los segmentos *realizados*
 La nueva zona de inspección resume los cálculos **ya existentes** de proximidad de alas previas y perfiles genéricos **en 2D**. **No es un motor de colisiones 3D**: las distancias no cubren lados de herramienta, ejes, posicionamiento de topes ni la trayectoria barrida, y no garantizan seguridad de fabricación. Se mantienen los avisos para pliegues negativos sin recolocación resuelta.
 
 Pruebas: `node --test tests/*.test.cjs` y `python tests/browser_check.py` con Playwright Chromium. Sin cambios en los estilos de Inicio ni en los recursos originales del boceto aprobado.
+
+## v0.11 — Cribado nominal tridimensional de prismas extruidos (NO detección CAD)
+
+**Se conserva intacta la pantalla Inicio aprobada:** no se modifican `styles.css`, `app.js` ni los recursos originales de `assets/`. La nueva función sólo aparece en **Simulación 3D / Programación 3D**.
+
+La biblioteca `proximity3d.js` toma los **tramos ya completados** del perfil nominal (representados como bandas de espesor constante extruidas sobre el ancho ilustrativo) y calcula una distancia euclídea aproximada contra prismas de punzón, matriz y tope. Para cada par considera la distancia entre polígonos en la sección XY y la separación de sus intervalos Z. Cuando los polígonos y las bandas Z se solapan, el resultado es **0 mm (posible intersección del modelo)**; esto no es una penetración verificada en la máquina real. La matriz y el punzón comparten el ancho ilustrativo más márgenes de dibujo; el tope ocupa un bloque nominal centrado en ese ancho. Los mismos prismas nominales ahora se obtienen de `tooling3d.prisms()`, que utiliza también el renderizado para evitar diferencias de coordenadas entre visualización e inspección.
+
+Los resultados de este cribado 3D se muestran en un **panel propio** y se mantienen separados de las holguras planas de v0.10. En el primer paso, cuando no hay tramos completados, el programa no inventa una distancia mínima. El cálculo no es una validación industrial: las alas anteriores se basan en un perfil de bisagras con radios incompletos, el ancho es ilustrativo, las herramientas son extrusiones genéricas sin geometría CAD contrastada, no se modelan carriles/amarres/cuerpo de máquina, trayectorias barridas ni reposicionamientos de la chapa, y el contacto deliberado con los útiles puede aparecer como intersección nominal. **Nunca interpretar una distancia positiva como garantía de ausencia de colisión**.
+
+Se amplían las pruebas con casos de contacto, separación XY y Z, intervalos inválidos, correspondencia de prismas visibles, tramo no evaluable y cribado de pliegues anteriores. Comprobar con `node --test tests/*.test.cjs` y `python tests/browser_check.py` (Chromium/Playwright).
+
+**Pendiente v0.12:** sección de catálogos dimensionales con trazabilidad de fuentes; geometría de montaje/adaptadores; modelos de máquina y ejes verificables; motor CAD de sólidos y barrido de trayectorias para colisiones industriales; publicación GitHub Pages y validación en dispositivos físicos.

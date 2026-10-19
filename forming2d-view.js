@@ -1,5 +1,5 @@
 /* Reproductor de vista de perfil para Programación 2D y Simulación 2D.
-   El control sólo cambia un esquema cinemático, no controla una plegadora. */
+   Muestra una aproximación con radio, no controla una plegadora. */
 (function(){
 'use strict';
 const Model=window.PlegarFormingGeometry;
@@ -7,36 +7,43 @@ const as2=n=>Number(n).toLocaleString('es-ES',{maximumFractionDigits:2});
 let active=null;
 function svg(m,zoom){
  const half=m.dieOpening/2,outer=Math.max(m.left,m.right,half*2)+14;
- const s=Math.min(7.5,320/Math.max(outer,m.dieOpening*2,30))*zoom;
+ const s=Math.min(7.5,310/Math.max(outer,m.dieOpening*2,30))*zoom;
  const a=Math.PI*m.punchAngle/360;
  const toolHeight=Math.max(15,Math.min(28,m.dieOpening*1.4));
  const toolWidth=Math.tan(a)*toolHeight;
  const dieOuter=Math.max(half+16,Math.min(outer,half+42));
  const dieBottom=Math.max(m.dieDepth+22,32);
- const tip=m.depth-m.thickness;
+ const tip=m.punchTipY;
  const dimension=-Math.min(18,m.dieOpening*1.15)-m.thickness;
- const sheet=[m.wingLeft,m.center,m.wingRight].map(p=>`${p.x.toFixed(3)},${p.y.toFixed(3)}`).join(' ');
+ const line=m.centerline.map((p,i)=>`${i?'L':'M'}${p.x.toFixed(3)} ${p.y.toFixed(3)}`).join(' ');
+ // The tool shape is illustrative; the blunt nose radius is NOT a profile imported from a manufacturer.
+ const nose=m.punchNose;
+ const tipPath=`M ${-toolWidth} ${tip-toolHeight} H ${toolWidth} L ${nose*.65} ${tip-nose*.45} Q 0 ${tip+nose*.3} ${-nose*.65} ${tip-nose*.45} Z`;
  const toY=-Math.max(m.thickness+5,6);
  const warn=m.warnings.length?'#efb06e':'#59ceff';
- return `<svg class="f2d-svg" viewBox="0 0 900 480" role="img" aria-label="Vista lateral esquemática: punzón descendente, chapa que se pliega, matriz V y tope posterior. No es una simulación física validada.">
+ return `<svg class="f2d-svg" viewBox="0 0 900 480" role="img" aria-label="Vista lateral esquemática de punzón, matriz y chapa con zona curva tangente. No es una simulación física ni una verificación de colisiones.">
  <defs><pattern id="f2d-grid" width="20" height="20" patternUnits="userSpaceOnUse"><path d="M20 0V20H0" fill="none" stroke="#193a55" stroke-width=".7"/></pattern><linearGradient id="f2d-metal" x1="0" y1="0" x2="1" y2="0"><stop stop-color="#435970"/><stop offset=".48" stop-color="#b8d2e9"/><stop offset="1" stop-color="#364a60"/></linearGradient><linearGradient id="f2d-sheet" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#e0f5ff"/><stop offset="1" stop-color="#38b6ed"/></linearGradient></defs>
  <rect width="900" height="480" fill="#071a29"/><rect width="900" height="480" fill="url(#f2d-grid)"/>
  <g transform="translate(440 250) scale(${s.toFixed(5)})">
  <path d="M ${-dieOuter} 0 H ${-half} L 0 ${m.dieDepth} L ${half} 0 H ${dieOuter} V ${dieBottom} H ${-dieOuter} Z" fill="url(#f2d-metal)" stroke="#83a1ba" stroke-width=".7"/>
  <path d="M ${-half} 0 L 0 ${m.dieDepth} L ${half} 0" stroke="#b7d8ee" stroke-width=".9" fill="none"/>
- <rect x="${m.stop.x}" y="${toY-10}" width="${Math.max(2,m.thickness)}" height="10" rx="1" fill="#e7b34a" stroke="#f8d890" stroke-width=".4"/><path d="M ${m.stop.x+m.thickness/2} ${toY-10} v -15 h ${Math.max(5,m.dieOpening/3)}" stroke="#ddab4b" stroke-width="2" fill="none"/>
- <path d="M ${-toolWidth} ${tip-toolHeight} H ${toolWidth} L 0 ${tip} Z" fill="url(#f2d-metal)" stroke="#d0e5f4" stroke-width=".9"/>
- <polyline points="${sheet}" stroke="#081526" stroke-width="${m.thickness+1.6}" fill="none" stroke-linejoin="round" stroke-linecap="round"/>
- <polyline points="${sheet}" stroke="url(#f2d-sheet)" stroke-width="${m.thickness}" fill="none" stroke-linejoin="round" stroke-linecap="round"/>
- <circle cx="0" cy="${m.center.y}" r="1.5" fill="#ffb754"/>
+ <path d="${tipPath}" fill="url(#f2d-metal)" stroke="#d0e5f4" stroke-width=".9"/>
+ <path d="${line}" stroke="#081526" stroke-width="${m.thickness+1.6}" fill="none" stroke-linejoin="round" stroke-linecap="round"/>
+ <path d="${line}" stroke="url(#f2d-sheet)" stroke-width="${m.thickness}" fill="none" stroke-linejoin="round" stroke-linecap="round"/>
+ <g stroke="#f8bf56" stroke-width=".6" fill="#f8bf56"><circle cx="${-half}" cy="0" r=".9"/><circle cx="${half}" cy="0" r=".9"/></g>
+ <circle cx="0" cy="${m.center.y}" r="1.1" fill="#ffb754"/>
+ <rect x="${m.stop.x}" y="${m.stop.y-12}" width="${Math.max(2,m.thickness)}" height="10" rx="1" fill="#e7b34a" stroke="#f8d890" stroke-width=".4"/>
+ <path d="M ${m.stop.x+m.thickness/2} ${m.stop.y-12} v -15 h ${Math.max(5,m.dieOpening/3)}" stroke="#ddab4b" stroke-width="1.4" fill="none"/>
  <path d="M ${-half} ${dimension} V ${dimension-3} M ${half} ${dimension} V ${dimension-3} M ${-half} ${dimension-1.5} H ${half}" stroke="#67bce9" stroke-width=".6" fill="none" stroke-dasharray="1.5 1"/>
  </g>
- <rect x="14" y="16" width="265" height="69" rx="7" fill="#0b2941" stroke="#2b678b"/>
- <text x="27" y="36" font-size="12" fill="#96c6e4">PLEGADO ACTIVO · ${m.bend} / ${m.steps}</text><text x="27" y="57" font-size="18" font-weight="bold" fill="#e0f3ff">${as2(m.currentAngle)}° / ${as2(m.targetAngle)}°</text>
- <text x="27" y="74" font-size="11" fill="#93b9d4">Punzón ${m.punchAngle}° · Matriz V${m.dieOpening}</text>
- <text x="885" y="28" text-anchor="end" font-size="11" fill="#eac187">VISTA DE PERFIL · ILUSTRATIVA</text>
- <text x="885" y="450" text-anchor="end" font-size="11" fill="${warn}">Carrera geométrica relativa: ${as2(m.depth)} mm</text>
- <text x="15" y="455" font-size="11" fill="#c8d5df">La chapa se representa por su eje nominal: sin radio, deformación plástica ni contacto real.</text>
+ <rect x="14" y="16" width="290" height="92" rx="7" fill="#0b2941" stroke="#2b678b"/>
+ <text x="27" y="36" font-size="12" fill="#96c6e4">PLEGADO ACTIVO · ${m.bend} / ${m.steps}</text>
+ <text x="27" y="59" font-size="18" font-weight="bold" fill="#e0f3ff">${as2(m.currentAngle)}° / ${as2(m.targetAngle)}°</text>
+ <text x="27" y="77" font-size="11" fill="#93b9d4">Radio interior supuesto: ${as2(m.insideRadius)} mm</text>
+ <text x="27" y="94" font-size="11" fill="#93b9d4">Espesor ${as2(m.thickness)} mm · V${m.dieOpening} · P${m.punchAngle}°</text>
+ <text x="885" y="28" text-anchor="end" font-size="11" fill="#eac187">PERFIL CON RADIO · APROXIMACIÓN</text>
+ <text x="885" y="450" text-anchor="end" font-size="11" fill="${warn}">Descenso estimado del eje: ${as2(m.depth)} mm</text>
+ <text x="15" y="455" font-size="11" fill="#c8d5df">Solo un pliegue aislado; contactos en V y punzón NO calculados físicamente.</text>
  </svg>`;
 }
 function halt(){if(active?.timer){clearInterval(active.timer);active.timer=null;}if(active){const b=active.host.querySelector('[data-f2-action="play"]');if(b)b.textContent='▶ Reproducir';}}
@@ -64,7 +71,7 @@ function mount(host,getData,getSelection=()=>1,onSelect=()=>{}){
  let step=Math.max(0,getData().sequence.indexOf(getSelection()));
  active={host,getData,getSelection,onSelect,currentStep:step,progress:0,zoom:1,timer:null};
  host.innerHTML=`<section class="f2-view" aria-label="Seguimiento cinemático 2D de plegado">
- <div class="f2-title"><div><strong>SEGUIMIENTO DE PLEGADO · PERFIL</strong><small>Punzón superior · matriz V inferior · tope posterior · chapa</small></div><span>CINEMÁTICA CONCEPTUAL v0.4</span></div>
+ <div class="f2-title"><div><strong>SEGUIMIENTO DE PLEGADO · PERFIL</strong><small>Punzón superior · matriz V inferior · tope posterior · chapa</small></div><span>PERFIL GEOMÉTRICO v0.5</span></div>
  <div class="f2-stage"></div><div class="f2-toolbar"><strong class="f2-step-label"></strong><div class="f2-controls"><button type="button" data-f2-action="previous">← Anterior</button><button type="button" data-f2-action="play">▶ Reproducir</button><button type="button" data-f2-action="next">Siguiente →</button><button type="button" data-f2-action="reset">Reiniciar</button><button type="button" data-f2-action="zoom-out" aria-label="Reducir zoom">−</button><button type="button" data-f2-action="zoom-in" aria-label="Ampliar zoom">+</button></div></div>
  <div class="f2-slider"><label for="f2-range">Avance del pliegue</label><input id="f2-range" class="f2-range" type="range" min="0" max="100" step="1" value="0"><output class="f2-progress" for="f2-range">0 %</output></div>
  <div class="f2-steps" aria-label="Orden de plegado"></div><ul class="f2-notes"></ul></section>`;

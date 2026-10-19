@@ -1,6 +1,7 @@
-/* Plegar Pro Plus v0.4: local kinematic *illustration* of ONE bend at a time.
- * Nominal sheet centreline; no material deformation/contact forces/collision clearance.
- * All measurements in mm; signed bends require orientation changes not implemented. */
+/* Plegar Pro Plus v0.5 — rounded centreline profile for a SINGLE isolated bend.
+ * This is a geometric visualization, not an elastic/plastic/contact solver.
+ * Coordinates: x horizontal, y DOWN, mm. The nominal V shoulders are y=0.
+ * Negative bends require repositioning, which is not calculated. */
 (function(root,factory){
  const api=factory();
  if(typeof module==='object'&&module.exports)module.exports=api;
@@ -9,30 +10,82 @@
  'use strict';
  const G=typeof require==='function'?require('./geometry2d.js'):window.PlegarGeometry2D;
  const C=typeof require==='function'?require('./bendcalc.js'):window.PlegarBendCalc;
+ const rad=d=>d*Math.PI/180;
+ const round=n=>Math.round(n*1000000)/1000000;
+
+ /* Rounded centreline of symmetric bend, measured relative to arc's LOW point.
+  * R is the geometric mid-thickness radius Ri + t/2 (NOT the K-factor radius).
+  * At a flank's virtual sharp corner, the tangent setback is R*tan(theta/2).
+  */
+ function relativeY(x,beta,R){
+  const X=Math.abs(x),xt=R*Math.sin(beta);
+  if(X<=xt+1e-10) return -R*(1-Math.sqrt(Math.max(0,1-(X/R)**2)));
+  return -R*(1-Math.cos(beta))-(X-xt)*Math.tan(beta);
+ }
  function scene(profile,orderIndex=0,progress=0){
-  const piece=G.validate(profile), setup=C.validateSetup(profile.setup);
+  const piece=G.validate(profile),setup=C.validateSetup(profile.setup);
   if(!Number.isInteger(orderIndex)||orderIndex<0||orderIndex>=piece.sequence.length)throw new Error('Paso de secuencia fuera de rango.');
   if(!Number.isFinite(progress)||progress<0||progress>1)throw new Error('Progreso de reproducción entre 0 y 1.');
   const bend=piece.sequence[orderIndex];
   const die=C.DIES.find(d=>d.id===setup.die),punch=C.PUNCHES.find(p=>p.id===setup.punch);
-  const turn=piece.angles[bend-1],fold=Math.abs(turn)*progress*Math.PI/180;
+  const turn=piece.angles[bend-1],angle=Math.abs(turn)*progress,beta=rad(angle/2);
   const half=die.opening/2,left=piece.segments[bend-1],right=piece.segments[bend];
-  const depth=half*Math.tan(fold/2), dieDepth=half/Math.tan(die.angle*Math.PI/360);
-  const wingLeft={x:-left*Math.cos(fold/2),y:depth-left*Math.sin(fold/2)-piece.thickness/2};
-  const wingRight={x:right*Math.cos(fold/2),y:depth-right*Math.sin(fold/2)-piece.thickness/2};
-  const center={x:0,y:depth-piece.thickness/2};
+  const t=piece.thickness,R=setup.radius+t/2;
+  const dieDepth=half/Math.tan(rad(die.angle/2));
+  const tangentSetback=R*Math.tan(beta),tangentX=R*Math.sin(beta);
   const warnings=[];
-  const leftSupport=half/Math.max(1e-10,Math.cos(fold/2));
-  if(Math.min(left,right)+1e-7<leftSupport) warnings.push('Un ala nominal no alcanza el hombro de la V en esta geometría idealizada.');
-  if(depth+piece.thickness/2>dieDepth+0.0001)warnings.push('La geometría idealizada sobrepasa la profundidad nominal de la V: revisar configuración; esto no es una detección de colisión certificada.');
-  if(turn<0)warnings.push('Pliegue negativo: habría que reorientar la pieza; la maniobra no está modelada.');
-  if(Math.abs(turn)>150)warnings.push('Giro superior a 150°: perfil idealizado sin radios ni interferencias.');
+  const leftStraight=Math.max(0,left-tangentSetback),rightStraight=Math.max(0,right-tangentSetback);
+  if(left+1e-7<tangentSetback||right+1e-7<tangentSetback){
+   warnings.push('El radio necesita más longitud de ala que la disponible hasta el vértice nominal; el perfil se recorta solo para visualizar.');
+  }
+  if(tangentX>=half-1e-7 && beta>1e-7){
+   warnings.push('La zona redondeada alcanza el hombro de la V; el apoyo en hombros ya no se puede estimar con las caras rectas.');
+  }
+  // Nominally position the sheet on BOTH V shoulders using the local tangent
+  // slope and a half-thickness offset. This is NOT a calculated force/contact.
+  const shoulderAngle=(half<tangentX && R>0)?Math.asin(Math.min(1,half/R)):beta;
+  const cy= -relativeY(half,beta,R)-(t/2)*Math.cos(shoulderAngle);
+  const ty=cy-R*(1-Math.cos(beta));
+  const wingLeft={x:round(-tangentX-leftStraight*Math.cos(beta)),y:round(ty-leftStraight*Math.sin(beta))};
+  const wingRight={x:round(tangentX+rightStraight*Math.cos(beta)),y:round(ty-rightStraight*Math.sin(beta))};
+  const center={x:0,y:round(cy)};
+  const tangentLeft={x:round(-tangentX),y:round(ty)},tangentRight={x:round(tangentX),y:round(ty)};
+  const arc=[];
+  const samples=Math.max(8,Math.ceil(angle/3));
+  for(let k=0;k<=samples;k++){
+   const a=-beta+(2*beta*k/samples);
+   arc.push({x:round(R*Math.sin(a)),y:round(cy-R*(1-Math.cos(a)))});
+  }
+  const centerline=[wingLeft,...arc,wingRight];
+  const shoulderY=round(cy+relativeY(half,beta,R)+(t/2)*Math.cos(shoulderAngle));
+  // A shoulder beyond the modeled end of an adjacent leg cannot support it.
+  if(wingLeft.x>-half+1e-7||wingRight.x<half-1e-7){
+   warnings.push('Un ala nominal no alcanza el hombro de la V en este perfil aislado.');
+  }
+  if(cy+t/2>dieDepth+1e-6){
+   warnings.push('La cara inferior idealizada rebasa la profundidad nominal de la V; posible incompatibilidad geométrica, NO detección de colisión certificada.');
+  }
+  if(angle>0 && 180-angle<punch.angle-1e-8){
+   warnings.push('El ángulo interior objetivo es menor que el ángulo nominal del punzón seleccionado.');
+  }
+  if(angle>0 && 180-angle<die.angle-1e-8){
+   warnings.push('El ángulo interior objetivo es menor que el ángulo nominal de la matriz seleccionada.');
+  }
+  if(setup.radius<punch.nose-1e-8){
+   warnings.push('Radio interior supuesto inferior al radio nominal de punta del punzón.');
+  }
+  if(turn<0)warnings.push('Pliegue negativo: requiere reorientación física de la pieza; NO está modelada.');
+  if(angle>150)warnings.push('Pliegue superior a 150°: aproximación fuera de su aplicación habitual.');
   return {
-   bend,orderIndex,step:orderIndex+1,steps:piece.sequence.length,progress,turn,targetAngle:Math.abs(turn),currentAngle:Math.abs(turn)*progress,
-   left,right,center,wingLeft,wingRight,dieOpening:die.opening,dieDepth,punchAngle:punch.angle,
-   punchNose:punch.nose,dieAngle:die.angle,thickness:piece.thickness,depth,
-   stop:{x:right,y:-piece.thickness/2},warnings,
-   note:'Cinemática local ilustrativa de un solo pliegue. No reproduce radios, apoyo real, recuperación elástica, topes dinámicos, alas anteriores ni colisiones fiables.'
+   bend,orderIndex,step:orderIndex+1,steps:piece.sequence.length,progress,turn,
+   targetAngle:Math.abs(turn),currentAngle:angle,left,right,center,wingLeft,wingRight,
+   tangentLeft,tangentRight,centerline,dieOpening:die.opening,dieDepth,
+   punchAngle:punch.angle,punchNose:punch.nose,dieAngle:die.angle,thickness:t,
+   insideRadius:setup.radius,centreRadius:R,tangentSetback,tangentX,
+   // 'depth' is nominal centreline descent from its START position, not CNC Y.
+   depth:round(cy+t/2),punchTipY:round(cy-t/2),shoulderY,
+   stop:{x:round(Math.max(half+8,right)),y:round(-t/2)},warnings,
+   note:'Arco tangente de radio interior supuesto y espesor nominal: visualización geométrica, NO deformación plástica, contacto con fuerzas, recuperación elástica, posicionamiento dinámico del tope, simulación de sólidos, colisiones reales ni programa CNC.'
   };
  }
  return {scene};

@@ -1,4 +1,4 @@
-# Plegar Pro Plus · Prototipo v0.4
+# Plegar Pro Plus · Prototipo v0.5
 
 Repositorio: `warks1/Plegar-Pro-Basic`.
 
@@ -41,12 +41,31 @@ Servir desde HTTP: `python -m http.server 8000`, después abrir `http://localhos
 
 Para GitHub Pages: es necesario habilitar explícitamente la publicación en *Settings → Pages*, si no está configurada. No basta con subir los archivos al repositorio.
 
-## v0.4 · Vista cinemática 2D (no validada para fabricación)
 
-En **Programación 2D** y **Simulación 2D** hay una vista de perfil con punzón arriba, matriz V abajo, tope posterior fijo y chapa. Utiliza el mismo perfil local, orden de plegado, ángulos firmados, punzón genérico, matriz y espesor.
+## v0.4 — Seguimiento geométrico de perfil (NO motor físico)
 
-Control de reproducción, pausa, avance manual, pasos, selección de pliegue y zoom. Se dibuja solo el par de tramos adyacentes al pliegue activo. La carrera es una geometría cinemática ilustrativa: `profundidad = (V/2) * tan((|ángulo|*avance)/2)`; NO es una carrera real de máquina. El punzón y la matriz son símbolos genéricos y el tope no sigue la chapa.
+El apartado **Simulación 2D** presenta una vista lateral ilustrativa con punzón, matriz V, chapa y tope trasero. Los parámetros y la secuencia proceden del perfil guardado en **Programación 2D**, donde también aparece la misma vista.
 
-**No representa:** radios reales, deformación plástica, contacto, fuerzas, recuperación elástica, interferencias con alas previamente plegadas, reorientación de pieza para pliegues negativos ni seguridad. Alertas por geometría idealizada NO son una detección de colisiones verificada.
+- Controles: selección de pliegue por secuencia, anterior, siguiente, reproducción, pausa, avance manual y zoom.
+- Un único pliegue activo a la vez: `profundidad ilustrativa = (V/2) × tan((|giro| × avance)/2)`; esta función NO determina la carrera real de una máquina.
+- Las longitudes de ala representadas son los dos tramos nominales adyacentes al vértice seleccionado. El tope queda inmóvil en su posición inicial de referencia; los apoyos reales NO se calculan.
+- La chapa es una línea central de espesor nominal, dibujada como dos segmentos rectos SIN zona curva, deformación física, propiedades elásticas ni compensaciones. No incorpora la pieza plegada completa ni las interferencias con otras alas.
+- El cambio de orientación para pliegues negativos NO está simulado; el programa lo advierte.
+- Cuando el modelo idealizado no alcanza los hombros de V o supera su profundidad teórica muestra advertencias. NO equivalen a una certificación de colisión o de seguridad.
 
-Archivos: `forming2d.js`, `forming2d-view.js`, `forming2d.css` y `tests/forming2d.test.cjs`. La portada aprobada permanece sin cambios.
+**No usar la animación para programar una plegadora, evitar colisiones o verificar piezas.** El diseño visual de Inicio se conserva.
+
+Archivos nuevos: `forming2d.js` (modelo cinemático comprobable), `forming2d-view.js`, `forming2d.css`, `tests/forming2d.test.cjs`.
+
+
+## v0.5 — Arco tangente y espesor nominal en el seguimiento 2D
+
+La sección local del pliegue dejó de dibujarse como dos líneas que se unen en un vértice agudo. El esquema ahora utiliza un **arco circular tangente** entre dos tramos rectos, basado en un **radio interior supuesto `Ri`** y un radio del eje medio de la chapa `Rm = Ri + espesor/2`. El **factor K** solo se usa en el cálculo separado de desarrollo; no controla el dibujo del eje medio.
+
+- Se calcula el retranqueo nominal de tangencia `Rm × tan(giro/2)`; el sistema avisa si un ala es demasiado corta para el arco.
+- La chapa se representa con espesor y un arco suave muestreado, en lugar de una punta sin radio.
+- La chapa se coloca en relación con los hombros de la matriz V usando una aproximación geométrica de apoyo. Se advierte si la zona curva alcanza esos hombros, si un ala no llega a ellos o si el perfil nominal rebasa la profundidad V. **Estas advertencias no son verificaciones de colisiones reales.**
+- El punzón se dibuja de forma genérica con punta suavizada, pero NO se realiza cálculo físico de contacto ni de fuerza. El tope es una referencia fija, sin movimiento de ejes ni control de contacto.
+- Continúan pendientes: deformación del material, radios reales importados CAD, recuperación elástica, dimensiones exactas de fabricantes, giros de pieza para signos negativos, alas ya plegadas, sólidos 3D y colisiones certificables.
+
+Comprobación: `node --test tests/*.test.cjs` y `python tests/browser_check.py` (Chromium/Playwright). Los tests automatizados no equivalen a validación con máquina física.

@@ -31,6 +31,12 @@ with sync_playwright() as p:
   assert page.locator('#ed-vratio').inner_text().startswith('8')
   assert page.locator('.ed-bend-point').count()==4
   assert page.locator('#ed-forming .f2d-svg').count()==1
+  # v0.5: the drawing uses a sampled circular arc, not two straight legs.
+  page.locator('#f2-range').fill('100')
+  arc_path=page.locator('.f2d-svg path[stroke="url(#f2d-sheet)"]').get_attribute('d')
+  assert arc_path.count('L')>=20
+  assert 'Radio interior supuesto' in page.locator('.f2-stage').inner_text()
+  page.locator('#f2-range').fill('0')
   assert page.locator('.f2-step-label').inner_text().startswith('Paso 1')
   page.locator('[data-f2-action="next"]').click()
   assert 'pliegue 2' in page.locator('.f2-step-label').inner_text()

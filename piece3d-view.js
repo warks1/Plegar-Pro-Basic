@@ -1,18 +1,20 @@
 /* Plegar Pro Plus v0.9: shared-data projected 3D sheet + GENERIC tool envelopes. */
 (function(){
  'use strict';
- const S=window.PlegarFormingGeometry,M=window.PlegarPiece3D,T=window.PlegarTooling3D;
+ const S=window.PlegarFormingGeometry,M=window.PlegarPiece3D,T=window.PlegarTooling3D,A=window.PlegarSceneAudit3D;
  let active=null;
  const palette={sheet:{upper:'#479fc4',lower:'#225576',edge:'#9bd9f1'},punch:{cap:'#bccbd8',side:'#778e9e'},die:{cap:'#8599aa',side:'#354b5d'},gauge:{cap:'#d9ae68',side:'#926735'}};
  function render(){
   const c=active;if(!c||!c.host.isConnected)return;
   const p=c.getData(),s=S.scene(p,c.step,c.progress),sheet=M.build(s,c.width);
-  const combined=T.assemble(sheet,s,c.visible);
+  const combined=T.assemble(sheet,s,c.visible),audit=A.inspect(s,sheet);
   const projection=M.project(combined,c.yaw,c.elevation,c.zoom);
-  const polys=projection.faces.map(f=>{
+  const polys=projection.faces.filter(f=>!(f.group==='sheet'&&f.status==='pending'&&!c.showPending)).map(f=>{
    const colors=palette[f.group]||palette.sheet;
-   const fill=colors[f.kind]||colors.side||colors.edge;
-   return `<polygon data-group="${f.group}" points="${f.points.map(v=>v.x.toFixed(2)+','+v.y.toFixed(2)).join(' ')}" fill="${fill}" stroke="${f.group==='sheet'?'#b4ecff':'#bdcbd4'}" stroke-width=".8" stroke-linejoin="round"/>`;
+   const sheetHighlight=f.group==='sheet'&&c.highlightPrior;
+   const fill=sheetHighlight&&f.status==='completed'?'#db985c':sheetHighlight&&f.status==='pending'?'#657b90':colors[f.kind]||colors.side||colors.edge;
+   const opacity=sheetHighlight&&f.status==='pending'?'0.8':'1';
+   return `<polygon data-status="${f.status||''}" opacity="${opacity}" data-group="${f.group}" points="${f.points.map(v=>v.x.toFixed(2)+','+v.y.toFixed(2)).join(' ')}" fill="${fill}" stroke="${f.group==='sheet'?'#b4ecff':'#bdcbd4'}" stroke-width=".8" stroke-linejoin="round"/>`;
   }).join('');
   c.host.querySelector('.p3-stage').innerHTML=`<svg viewBox="0 0 900 480" class="p3-svg" role="img" aria-label="Vista 3D de chapa, punzón, matriz y tope nominales: esquema sin colisiones verificadas"><rect width="900" height="480" fill="#071a29"/><path d="M0 405H900M0 205H900" stroke="#14344b" stroke-width="1"/>${polys}<text x="16" y="30" fill="#a1d9f1" font-size="13">PIEZA + UTILLAJE NOMINAL · PASO ${s.step}/${s.steps} · GIRO ${Math.round(s.currentAngle*10)/10}°</text><text x="16" y="454" fill="#eec48c" font-size="12">Ancho ${c.width} mm ILUSTRATIVO · geometría genérica, sin simulación física ni CNC</text></svg>`;
   const names={punch:'Punzón',die:'Matriz',gauge:'Tope'};
@@ -21,6 +23,11 @@
    button.setAttribute('aria-pressed',String(c.visible[key]));
    button.textContent=`${c.visible[key]?'☑':'☐'} ${names[key]}`;
   }
+  const completed=audit.counts.completed, pending=audit.counts.pending;
+  c.host.querySelector('[data-p3-sheet="highlight"]').setAttribute('aria-pressed',String(c.highlightPrior));
+  c.host.querySelector('[data-p3-sheet="pending"]').setAttribute('aria-pressed',String(c.showPending));
+  const min=audit.minimum;
+  c.host.querySelector('.p3-clearance').textContent=`${audit.status}. Alas previas representadas: ${audit.priorBends.length} pliegues; tramos ilustrativos realizados ${completed}, pendientes ${pending}. ${min?`Separación plana mínima estimada: ${min.gap.toFixed(2)} mm frente a ${min.component} (${min.side}).`:'Sin medición de alas previas para este paso.'} Alertas geométricas: ${audit.warningCount}. NO valida colisiones 3D.`;
   c.host.querySelector('.p3-state').textContent=`Pliegue ${s.bend} · ${c.progress===1?'fin del paso':'avance '+Math.round(c.progress*100)+' %'} · espesor ${s.thickness} mm · V${s.dieOpening} · punzón ${s.punchAngle}° · tope X ${s.stop.x} mm · ${combined.faces.length} caras ilustrativas`;
   c.host.querySelector('.p3-width').value=String(c.width);c.host.querySelector('.p3-progress').value=String(Math.round(c.progress*100));
   c.host.querySelector('.p3-step').textContent=`Paso ${s.step} / ${s.steps}`;
@@ -30,10 +37,13 @@
  function destroy(){if(active?.host){active.host.onclick=null;active.host.oninput=null;}active=null;}
  function mount(host,getData,getSelection=()=>1,onSelect=()=>{}){
   destroy();if(!host)return;
-  const p=getData();active={host,getData,getSelection,onSelect,step:Math.max(0,p.sequence.indexOf(getSelection())),progress:1,width:100,yaw:38,elevation:24,zoom:1,visible:{punch:true,die:true,gauge:true}};
-  host.innerHTML=`<section class="p3-view" aria-label="Previsualización tridimensional de pieza y utillaje"><div class="p3-heading"><div><strong>MODELO GEOMÉTRICO 3D · CHAPA Y UTILLAJE</strong><small>Conectado a Programación 2D · perfiles paramétricos genéricos</small></div><span>PREVISUALIZACIÓN v0.9</span></div><div class="p3-stage"></div><div class="p3-state" role="status"></div><div class="p3-tool-switch" role="group" aria-label="Elementos 3D visibles"><strong>VISIBILIDAD</strong><button data-p3-toggle="punch" type="button" aria-pressed="true">☑ Punzón</button><button data-p3-toggle="die" type="button" aria-pressed="true">☑ Matriz</button><button data-p3-toggle="gauge" type="button" aria-pressed="true">☑ Tope</button></div><div class="p3-controls"><button data-p3="prev" type="button">← Pliegue</button><span class="p3-step"></span><button data-p3="next" type="button">Siguiente →</button><button data-p3="left" type="button">↶ Girar</button><button data-p3="right" type="button">↷ Girar</button><button data-p3="zin" type="button">+ Zoom</button><button data-p3="zout" type="button">− Zoom</button><button data-p3="reset" type="button">Restablecer vista</button></div><div class="p3-values"><label>Avance de pliegue <input class="p3-progress" aria-label="Avance geométrico" type="range" min="0" max="100" step="1" value="100"/></label><label>Ancho de previsualización (mm) <input class="p3-width" type="number" min="1" max="5000" step="1" value="100"/></label></div><p class="p3-disclosure">Los contornos del punzón y de la matriz se extruyen desde perfiles 2D GENÉRICOS, no procedentes de planos certificados del fabricante. El tope X es un bloque nominal fijo, sin eje controlado. La chapa tiene espesor y ancho ilustrativo, y los pliegues anteriores son bisagras aproximadas. No existen detección de colisiones CAD, trayectorias barridas, contacto, fuerzas, recuperación elástica, control CNC ni validación de seguridad. No utilizar esta vista para fabricar o asegurar una secuencia.</p></section>`;
+  const p=getData();active={host,getData,getSelection,onSelect,step:Math.max(0,p.sequence.indexOf(getSelection())),progress:1,width:100,yaw:38,elevation:24,zoom:1,visible:{punch:true,die:true,gauge:true},highlightPrior:true,showPending:true};
+  host.innerHTML=`<section class="p3-view" aria-label="Previsualización tridimensional de pieza y utillaje"><div class="p3-heading"><div><strong>MODELO GEOMÉTRICO 3D · CHAPA Y UTILLAJE</strong><small>Conectado a Programación 2D · perfiles paramétricos genéricos</small></div><span>PREVISUALIZACIÓN v0.10</span></div><div class="p3-stage"></div><div class="p3-state" role="status"></div><div class="p3-clearance" role="status" aria-label="Holguras orientativas"></div><div class="p3-sheet-switch" role="group" aria-label="Visibilidad de la secuencia"><strong>CHAPA POR SECUENCIA</strong><button type="button" data-p3-sheet="highlight" aria-pressed="true">Destacar pliegues previos</button><button type="button" data-p3-sheet="pending" aria-pressed="true">Mostrar pendientes</button><span class="p3-legend"><i class="p3-prior-dot"></i> Realizados <i class="p3-active-dot"></i> Activo <i class="p3-pending-dot"></i> Pendientes</span></div><div class="p3-tool-switch" role="group" aria-label="Elementos 3D visibles"><strong>VISIBILIDAD</strong><button data-p3-toggle="punch" type="button" aria-pressed="true">☑ Punzón</button><button data-p3-toggle="die" type="button" aria-pressed="true">☑ Matriz</button><button data-p3-toggle="gauge" type="button" aria-pressed="true">☑ Tope</button></div><div class="p3-controls"><button data-p3="prev" type="button">← Pliegue</button><span class="p3-step"></span><button data-p3="next" type="button">Siguiente →</button><button data-p3="left" type="button">↶ Girar</button><button data-p3="right" type="button">↷ Girar</button><button data-p3="zin" type="button">+ Zoom</button><button data-p3="zout" type="button">− Zoom</button><button data-p3="reset" type="button">Restablecer vista</button></div><div class="p3-values"><label>Avance de pliegue <input class="p3-progress" aria-label="Avance geométrico" type="range" min="0" max="100" step="1" value="100"/></label><label>Ancho de previsualización (mm) <input class="p3-width" type="number" min="1" max="5000" step="1" value="100"/></label></div><p class="p3-disclosure">Los colores distinguen solamente los estados hipotéticos del perfil. Las distancias son cribados 2D, no cálculos CAD 3D. Los contornos del punzón y de la matriz se extruyen desde perfiles 2D GENÉRICOS, no procedentes de planos certificados del fabricante. El tope X es un bloque nominal fijo, sin eje controlado. La chapa tiene espesor y ancho ilustrativo, y los pliegues anteriores son bisagras aproximadas. No existen detección de colisiones CAD, trayectorias barridas, contacto, fuerzas, recuperación elástica, control CNC ni validación de seguridad. No utilizar esta vista para fabricar o asegurar una secuencia.</p></section>`;
   host.onclick=e=>{
    if(!active||active.host!==host)return;
+   const sheetSwitch=e.target.closest('[data-p3-sheet]')?.dataset.p3Sheet;
+   if(sheetSwitch==='highlight'){active.highlightPrior=!active.highlightPrior;render();return;}
+   if(sheetSwitch==='pending'){active.showPending=!active.showPending;render();return;}
    const toggle=e.target.closest('[data-p3-toggle]')?.dataset.p3Toggle;
    if(toggle){if(toggle in active.visible){active.visible[toggle]=!active.visible[toggle];render();}return;}
    const k=e.target.closest('[data-p3]')?.dataset.p3;if(!k)return;

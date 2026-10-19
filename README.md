@@ -1,4 +1,4 @@
-# Plegar Pro Plus · Prototipo v0.9
+# Plegar Pro Plus · Prototipo v0.10
 
 Repositorio: `warks1/Plegar-Pro-Basic`.
 
@@ -114,3 +114,12 @@ En los módulos **Programación 3D / Simulación 3D** se representan conjuntamen
 - `tests/tooling3d.test.cjs`: pruebas de volumen nominal, correspondencia de coordenadas, visibilidad y geometría inválida; pruebas del visor integradas en `tests/browser_check.py`.
 
 **Limitación esencial:** un contorno 2D extruido y proyectado NO acredita solidez CAD, trayectorias barridas, cinemática real de máquina, deformación plástica, fuerzas de plegado ni ausencia de colisiones, incluso si las piezas se ven separadas. El orden de plegado previo sigue siendo aproximado; la geometría de fabricantes y las comprobaciones industriales están pendientes. No utilizar este prototipo para fabricación, CNC o seguridad.
+
+
+## v0.10 — Estados de chapa y distancias orientativas en visor 3D
+
+El visor **Simulación 3D** colorea de forma distinta los segmentos *realizados*, el pliegue *activo* y los *pendientes* de la secuencia. Se pueden ocultar las caras pendientes para inspeccionar el resto y alternar el resaltado, sin alterar la geometría. La etiqueta del segmento se rastrea hasta el contorno original incluso en progreso 0%, cuando la sección circular colapsa y se fusionan puntos.
+
+La nueva zona de inspección resume los cálculos **ya existentes** de proximidad de alas previas y perfiles genéricos **en 2D**. **No es un motor de colisiones 3D**: las distancias no cubren lados de herramienta, ejes, posicionamiento de topes ni la trayectoria barrida, y no garantizan seguridad de fabricación. Se mantienen los avisos para pliegues negativos sin recolocación resuelta.
+
+Pruebas: `node --test tests/*.test.cjs` y `python tests/browser_check.py` con Playwright Chromium. Sin cambios en los estilos de Inicio ni en los recursos originales del boceto aprobado.

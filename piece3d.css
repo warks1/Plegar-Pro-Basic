@@ -16,3 +16,14 @@
 .p3-tool-switch button{padding:8px 12px;min-height:40px;border-radius:6px;border:1px solid #4786ac;background:#123a58;color:#e8f4ff;cursor:pointer;font-size:12px}
 .p3-tool-switch button[aria-pressed="false"]{border-color:#405365;background:#152536;color:#9daebe}
 @media(max-width:700px){.p3-tool-switch button{flex:1 1 85px}}
+
+/* v0.10: isolated inspection UI; never modifies the approved dashboard. */
+.p3-clearance{padding:12px 14px;border-top:1px solid #567289;background:#152d42;color:#f2cfa0;font-size:12px;line-height:1.6;overflow-wrap:anywhere}
+.p3-sheet-switch{display:flex;align-items:center;flex-wrap:wrap;gap:9px;padding:10px 14px;border-top:1px solid #284a62}
+.p3-sheet-switch strong{font-size:11px;color:#81bee4}
+.p3-sheet-switch button{border:1px solid #4c8aae;border-radius:6px;background:#153d59;color:#e7f4ff;min-height:40px;padding:8px 12px;cursor:pointer}
+.p3-sheet-switch button[aria-pressed="false"]{background:#182b3a;color:#afc3d5}
+.p3-legend{display:inline-flex;align-items:center;gap:5px;font-size:11px;color:#d8e9f7;flex-wrap:wrap}
+.p3-legend i{display:inline-block;width:9px;height:9px;border-radius:2px;margin-left:7px}
+.p3-prior-dot{background:#db985c}.p3-active-dot{background:#479fc4}.p3-pending-dot{background:#657b90}
+@media(max-width:700px){.p3-sheet-switch button{flex:1 1 160px}}

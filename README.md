@@ -314,3 +314,7 @@ Los PDFs públicos se pueden descargar o compartir. Los documentos privados aña
 ## v0.30: pantalla de carga Plegar Pro Plus
 
 Pantalla completa a partir del boceto visual aprobado (`assets/splash-plegar-pro.webp`), con pulsos de luz independientes sobre las dos P, barrido energético y barra de progreso animada. El progreso mostrado es una presentación estimada y no medición física ni progreso de validación de módulos. La pantalla espera a la carga real de la página, muestra al menos 4,4 segundos (0,5 s cuando se solicita movimiento reducido), ofrece botón de omitir y nunca oculta la interfaz en caso de carga lenta. Responsive PC/tablet/móvil. Inicio original sin cambios.
+
+
+## v0.31 — Pantalla de carga adaptable (19/10/2026)
+Se conservan el boceto aprobado, las dos P animadas y la barra de progreso estimado. Se utilizan encuadres independientes para PC/tablet y móvil, con controles fuera de la imagen para que no se recorten. Se adapta al alto dinámico del móvil, giro horizontal y áreas seguras. El Inicio aprobado y styles.css permanecen intactos. Pruebas: 198 test Node y verificación visual de 1440×900, 820×1180, 390×844, 320×700, 844×390 y 667×375. El progreso mostrado es visual, no telemetría de carga de módulos.

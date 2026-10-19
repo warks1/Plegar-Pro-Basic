@@ -86,3 +86,7 @@ Planos Trenirtrade: 10 PDF fotográficos públicos, 10 miniaturas y enlaces desd
 ## v0.30 — Pantalla de carga (2026-10-19)
 
 Imagen de carga autorizada `assets/splash-plegar-pro.webp`, con dos P animadas mediante brillo y pulso independientes y efecto de estela luminosa; barra de progreso **visual estimado** de 0 a 100, mínimo 4,4 segundos, esperar `load` completo y permitir omisión. Respeta movimiento reducido, PC/tablet/móvil. No modifica dashboard Inicio aprobado. Scripts nuevos: `splash.js`, `splash.css`. Verificar GitHub Pages tras publicar.
+
+
+## v0.31 — Pantalla de carga adaptable (19/10/2026)
+Se conservan el boceto aprobado, las dos P animadas y la barra de progreso estimado. Se utilizan encuadres independientes para PC/tablet y móvil, con controles fuera de la imagen para que no se recorten. Se adapta al alto dinámico del móvil, giro horizontal y áreas seguras. El Inicio aprobado y styles.css permanecen intactos. Pruebas: 198 test Node y verificación visual de 1440×900, 820×1180, 390×844, 320×700, 844×390 y 667×375. El progreso mostrado es visual, no telemetría de carga de módulos.

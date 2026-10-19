@@ -4,7 +4,7 @@ import json,sys,re,tempfile
 root=Path(__file__).resolve().parents[1]
 html=re.sub(r'<script src="[^"]+" defer></script>', '', (root/'index.html').read_text())
 html=re.sub(r'<link rel="stylesheet"[^>]+>', '', html)
-css='\n'.join((root/x).read_text() for x in ('styles.css','editor2d.css','forming2d.css','piece3d.css','cad-mounting.css','cad-trace.css','cad-topology.css','cad-chain.css'))
+css='\n'.join((root/x).read_text() for x in ('styles.css','editor2d.css','forming2d.css','piece3d.css','cad-mounting.css','cad-trace.css','cad-topology.css','cad-chain.css','cad-crossings.css'))
 issues=[]
 artifacts=Path(tempfile.mkdtemp(prefix="plegar-v21-browser-"))
 with sync_playwright() as p:
@@ -19,7 +19,7 @@ with sync_playwright() as p:
   page.set_content(html,wait_until='domcontentloaded')
   page.add_style_tag(content=css)
   page.evaluate("""() => {window.__testStorage=window.__testStorage||new Map();Object.defineProperty(window,'localStorage',{configurable:true,value:{getItem:k=>window.__testStorage.get(k)??null,setItem:(k,v)=>window.__testStorage.set(k,String(v)),removeItem:k=>window.__testStorage.delete(k)}})}""")
-  for script in ('geometry2d.js','tool-library.js','manufacturer-references.js','cad-profile.js','cad-orientation.js','cad-trace.js','cad-profile-view.js','cad-mounting-audit.js','cad-mounting-view.js','cad-trace-view.js','cad-topology.js','cad-topology-view.js','cad-chain.js','cad-chain-view.js','bendcalc.js','clearance2d.js','toolprofiles2d.js','previousbends2d.js','interference2d.js','assembly2d.js','forming2d.js','forming2d-view.js','piece3d.js','tooling3d.js','scene3d-audit.js','proximity3d.js','piece3d-view.js','editor2d.js','app.js'):
+  for script in ('geometry2d.js','tool-library.js','manufacturer-references.js','cad-profile.js','cad-orientation.js','cad-trace.js','cad-profile-view.js','cad-mounting-audit.js','cad-mounting-view.js','cad-trace-view.js','cad-topology.js','cad-topology-view.js','cad-chain.js','cad-chain-view.js','cad-crossings.js','cad-crossings-view.js','bendcalc.js','clearance2d.js','toolprofiles2d.js','previousbends2d.js','interference2d.js','assembly2d.js','forming2d.js','forming2d-view.js','piece3d.js','tooling3d.js','scene3d-audit.js','proximity3d.js','piece3d-view.js','editor2d.js','app.js'):
    page.evaluate((root/script).read_text())
   assert page.locator('#project-name').inner_text()=='Soporte motor S235'
   print('navigating',tag,flush=True)
@@ -36,7 +36,10 @@ with sync_playwright() as p:
   assert page.locator('#cad-mount-datum').count()==1
   assert page.locator('#cad-topo-summary').count()==1
   assert page.locator('#cad-chain-summary').count()==1
+  assert page.locator('#cad-crossings-summary').count()==1
+  assert page.locator('#cad-crossings-export').is_disabled()
   assert page.locator('#cad-chain-export').is_disabled()
+  assert page.locator('#cad-crossings-export').is_disabled()
   assert page.locator('#cad-mount-export').is_disabled()
   assert 'SIN VERIFICAR' in page.locator('.cad-import-panel > .cad-danger').inner_text()
   assert page.locator('#ed-ref-item option').count()==5
@@ -60,14 +63,18 @@ with sync_playwright() as p:
   assert 'DXF leído' in page.locator('#cad-status').inner_text()
   assert '1 entidades; 1 cerradas' in page.locator('#cad-topo-summary').inner_text()
   assert '0 entidades abiertas' in page.locator('#cad-chain-summary').inner_text()
+  assert '0 cruces' in page.locator('#cad-crossings-summary').inner_text()
+  assert page.locator('#cad-crossings-export').is_enabled()
   assert 'NO HABILITADO' in page.locator('#cad-chain-summary').inner_text()
   assert page.locator('#cad-chain-export').is_enabled()
+  assert page.locator('#cad-crossings-export').is_enabled()
   assert page.locator('#cad-topo-export').is_enabled()
   page.locator('#cad-topo-tolerance').fill('2')
   page.locator('#cad-topo-tolerance').press('Tab')
   assert 'Auditoría no disponible' in page.locator('#cad-topo-summary').inner_text()
   assert page.locator('#cad-topo-export').is_disabled()
   assert page.locator('#cad-chain-export').is_disabled()
+  assert page.locator('#cad-crossings-export').is_disabled()
   page.locator('#cad-topo-tolerance').fill('0.05')
   page.locator('#cad-topo-tolerance').press('Tab')
   assert page.locator('#cad-topo-export').is_enabled()
@@ -88,6 +95,14 @@ with sync_playwright() as p:
    assert graph['readiness']['canUseCNC'] is False
    assert graph['geometryModified'] is False
    assert graph['version']=='0.21'
+  if tag=='pc':
+   with page.expect_download() as crossing_download: page.locator('#cad-crossings-export').click()
+   crossing_path=artifacts/'v22_crossings_report.json'
+   crossing_download.value.save_as(crossing_path)
+   crossing=json.loads(crossing_path.read_text())
+   assert crossing['approvedForCNC'] is False
+   assert crossing['readiness']['canGenerateSolid'] is False
+   assert crossing['version']=='0.22'
   # v0.19: SHA-256 de bytes originales y registro voluntario SOLO METADATOS.
   assert page.locator('#cad-trace-save').is_enabled()
   assert 'SIN VERIFICAR' in page.locator('.cad-trace-panel').inner_text()
@@ -127,6 +142,12 @@ with sync_playwright() as p:
   page.locator('#cad-layer').select_option('*')
   page.locator('#cad-contour').select_option('0')
   assert page.locator('#cad-preview polyline').count()==2
+  # v0.22: dos LINE cruzadas; NO se declaran aptas para fabricación.
+  crossing_dxf='0\nSECTION\n2\nHEADER\n9\n$INSUNITS\n70\n4\n0\nENDSEC\n0\nSECTION\n2\nENTITIES\n'+('0\nLINE\n8\nTEST\n10\n0\n20\n0\n11\n10\n21\n10\n')+('0\nLINE\n8\nTEST\n10\n0\n20\n10\n11\n10\n21\n0\n')+'0\nENDSEC\n0\nEOF\n'
+  page.locator('#cad-file-input').set_input_files({'name':'cruces.dxf','mimeType':'application/dxf','buffer':crossing_dxf.encode()})
+  page.wait_for_function("document.querySelector('#cad-status').textContent.includes('2 elementos')")
+  assert '1 cruces' in page.locator('#cad-crossings-summary').inner_text()
+  assert 'NO CNC' in page.locator('#cad-crossings-summary').inner_text()
   # v0.16: curvas ARC y CIRCLE; informe local sin alterar utillaje activo.
   arcdxf=(root/'EJEMPLO_ARCOS_CAPAS.dxf').read_bytes()
   page.locator('#cad-file-input').set_input_files({'name':'arcos.dxf','mimeType':'application/dxf','buffer':arcdxf})
@@ -248,7 +269,7 @@ with sync_playwright() as p:
   page.set_content(html,wait_until='domcontentloaded')
   page.add_style_tag(content=css)
   page.evaluate("""() => {window.__testStorage=window.__testStorage||new Map();Object.defineProperty(window,'localStorage',{configurable:true,value:{getItem:k=>window.__testStorage.get(k)??null,setItem:(k,v)=>window.__testStorage.set(k,String(v)),removeItem:k=>window.__testStorage.delete(k)}})}""")
-  for script in ('geometry2d.js','tool-library.js','manufacturer-references.js','cad-profile.js','cad-orientation.js','cad-trace.js','cad-profile-view.js','cad-mounting-audit.js','cad-mounting-view.js','cad-trace-view.js','cad-topology.js','cad-topology-view.js','cad-chain.js','cad-chain-view.js','bendcalc.js','clearance2d.js','toolprofiles2d.js','previousbends2d.js','interference2d.js','assembly2d.js','forming2d.js','forming2d-view.js','piece3d.js','tooling3d.js','scene3d-audit.js','proximity3d.js','piece3d-view.js','editor2d.js','app.js'):
+  for script in ('geometry2d.js','tool-library.js','manufacturer-references.js','cad-profile.js','cad-orientation.js','cad-trace.js','cad-profile-view.js','cad-mounting-audit.js','cad-mounting-view.js','cad-trace-view.js','cad-topology.js','cad-topology-view.js','cad-chain.js','cad-chain-view.js','cad-crossings.js','cad-crossings-view.js','bendcalc.js','clearance2d.js','toolprofiles2d.js','previousbends2d.js','interference2d.js','assembly2d.js','forming2d.js','forming2d-view.js','piece3d.js','tooling3d.js','scene3d-audit.js','proximity3d.js','piece3d-view.js','editor2d.js','app.js'):
    page.evaluate((root/script).read_text())
   if w<=1120:page.locator('#open-menu').click()
   page.locator('button.nav-item[data-screen="Programación 2D"]').click()

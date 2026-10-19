@@ -1,4 +1,4 @@
-# Plegar Pro Plus · Prototipo v0.21
+# Plegar Pro Plus · Prototipo v0.22
 
 Repositorio: `warks1/Plegar-Pro-Basic`.
 
@@ -234,3 +234,11 @@ El módulo independiente `cad-chain.js` clasifica conexiones **nominales** entre
 El usuario controla el mismo filtro por capa y tolerancia de 0–1 mm del módulo topológico. La vista `cad-chain-view.js` muestra el diagnóstico y permite descargar un JSON sin el archivo DXF original. **No se unen segmentos, no se convierte a 3D y ninguna coincidencia autoriza simulación, CNC o seguridad**. La interfaz Inicio no ha sufrido cambios.
 
 Tests: `tests/cad-chain.test.cjs` y ampliación de `tests/browser_check.py`; 147 pruebas Node y comprobación Playwright en 1440, 820, 390 y 320 px. No son ensayos de seguridad de máquina.
+
+## v0.22 — Cribado de cruces y continuidad nominal DXF (SOLO INSPECCIÓN)
+
+Se incorporan `cad-crossings.js`, `cad-crossings-view.js` y `cad-crossings.css`. En **Programación 2D** el panel informa de **cruces de segmentos**, **uniones T**, **solapes colineales** y **proximidades** bajo la tolerancia de 0–1 mm, respetando las capas por defecto. Exportación JSON con los bloqueos explícitos `approvedForCNC=false`, `approvedForSimulation=false`, `canGenerateSolid=false`. No une ni corrige segmentos ni modifica el DXF.
+
+**Limitaciones:** arcos `ARC`, `CIRCLE` y curvas `bulge` se evalúan sobre cuerdas discretizadas. Se limitan a 1600 segmentos y 60000 pares; cuando se alcanza el presupuesto, el informe indica **ANÁLISIS PARCIAL**. No se certifican tolerancias físicas, amarres, colisiones ni seguridad. Los extremos coincidentes siguen bajo el módulo de cadenas v0.21.
+
+Pruebas locales: 159 casos Node, Playwright Chromium a 1440, 820, 390 y 320 px; no equivale a certificación CAD ni CNC.

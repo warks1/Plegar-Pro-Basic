@@ -1,41 +1,20 @@
-# Plegar Pro Plus — Estado guardado v0.16
+# Plegar Pro Plus — Punto de recuperación v0.17
 
-- **Repositorio:** https://github.com/warks1/Plegar-Pro-Basic
-- **Rama:** `main` (consultar el último commit confirmado; no asumir que GitHub Pages ya desplegó la actualización).
-- **Identidad visual aprobada:** `assets/referencia-aprobada.webp`. Conservar la pantalla Inicio, estilos globales y recursos originales.
-- **Versión del prototipo:** v0.16, importación DXF multicontorno/multicapa solo para inspección.
+Repositorio: https://github.com/warks1/Plegar-Pro-Basic
+Rama: main. Consultar el último commit real antes de continuar.
 
-## Capacidades actuales (resumen)
+**Boceto oficial:** assets/referencia-aprobada.webp. No rediseñar la pantalla Inicio; conservar estilos globales e imágenes aprobadas.
 
-- Programación 2D editable, orden de plegado, deshacer/rehacer, guardado local y JSON.
-- Desarrollo orientativo, selección de utillajes genéricos y catálogo documental AMADA; las herramientas genéricas no tienen geometría certificada.
-- Seguimiento 2D y visor 3D paramétricos ilustrativos con controles, cribado de interferencias **aproximado** y avisos; no aptos para validar una fabricación.
-- Inspección de DXF ASCII: `LWPOLYLINE` y `LINE` 2D en múltiples capas/contornos, escalado por `$INSUNITS` o selección manual, vista previa y comparación de cotas por elemento. Límite 2 MB, 100 entidades, 1500 vértices.
-- Documentación de fuentes parciales de fabricante en `FUENTES_UTILLAJE.md`.
+## Funciones presentes
+- Programación 2D editable, cálculo orientativo de desarrollo, punzones y matrices genéricos.
+- Seguimiento 2D y visor geométrico 3D ilustrativos; no son sistemas industriales de seguridad certificados.
+- Catálogos documentales de fabricante separados del utillaje genérico.
+- Inspección DXF ASCII LINE, LWPOLYLINE, ARC, CIRCLE, capas, contornos, cotas e informe JSON/CSV.
+- v0.17: rotación 0/90/180/270°, espejo, origen nominal de envolvente, vista independiente y cotejo Y/X con tolerancia ajustable.
+- Importación CAD siempre sin activación de CNC ni simulación. Un origen nominal **NO** es un amarre real.
 
-## Lo que NO hace v0.16
+## Restricciones y siguiente fase
+No hay sólidos CAD reales, montaje certificado, ni detección de colisiones de seguridad. Validar perfiles dimensionales y geometrías mecánicas con fuentes fiables, mantener trazabilidad y pasar pruebas antes de habilitar herramientas importadas. Siguiente versión: v0.18.
 
-- **No** convierte contornos DXF a sólidos, **no** ejecuta CNC, **no** activa herramientas importadas, **no** verifica compatibilidad ni colisiones.
-- Rechaza entidades que aún no se puedan inspeccionar con garantías: ARC/CIRCLE/SPLINE, INSERT, bloques de entidades, DXF binario, DWG, STEP, perfiles con elevación no nula y anchos/bulges de polilínea.
-- LINE se representa por separado; sin construcción automática de perfiles encadenados ni inferencia de cierres.
-- No se ha publicado ni certificado una aplicación en tiendas móviles o Microsoft Store.
-
-## Próxima fase v0.16
-
-Proponer inspección de segmentos con arco DXF (`ARC` / bulge) a tolerancia de discretización explícita, validación de cerrados y perfiles conexos y posibilidad de exportar la información de inspección como informe. Mantener las mismas advertencias industriales y no activar geometría sin validación.
-
-## Instrucciones para continuar
-
-1. Recuperar el último commit del repositorio y ejecutar las pruebas con Node 22.
-2. Mantener exactamente el diseño aprobado.
-3. Comprobar importador, compatibilidad v0.14, UI a 1440/820/390/320 px, y comprobar estado Pages tras cada commit.
-4. Separar claramente lo experimental de cualquier geometría verificada antes de habilitar operaciones reales.
-
-### Guardado v0.16 — 2026-10-19
-
-- DXF ASCII con segmentos `LINE`, `LWPOLYLINE`, `ARC`, `CIRCLE` y bulges por vértice.
-- Reconstrucción de arcos únicamente para vista 2D; verificación de cierre y autointersección sobre la polilínea muestreada.
-- Informe descargable JSON/CSV, cotas por entidad y capas, estado **SIN VERIFICAR**.
-- Nuevos ejemplos y 103 pruebas automáticas superadas más pruebas de navegador en cuatro anchuras.
-- No se modifica la portada aprobada ni los motores de colisión/cálculo CNC; las geometrías CAD no participan en fabricación ni simulación física.
-- Siguiente: DXF con tolerancias y sólidos paramétricos después de validar geometría y amarre.
+## Continuación
+Al recibir «Seguir», revisar el último commit y el despliegue de GitHub Pages, ejecutar pruebas Node y pruebas visuales en PC/tablet/móvil, conservar el boceto aprobado y publicar cambios verificados.

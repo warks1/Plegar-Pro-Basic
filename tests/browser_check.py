@@ -18,7 +18,7 @@ with sync_playwright() as p:
   page.set_content(html,wait_until='domcontentloaded')
   page.add_style_tag(content=css)
   page.evaluate("""() => {window.__testStorage=window.__testStorage||new Map();Object.defineProperty(window,'localStorage',{configurable:true,value:{getItem:k=>window.__testStorage.get(k)??null,setItem:(k,v)=>window.__testStorage.set(k,String(v)),removeItem:k=>window.__testStorage.delete(k)}})}""")
-  for script in ('geometry2d.js','tool-library.js','manufacturer-references.js','cad-profile.js','cad-profile-view.js','bendcalc.js','clearance2d.js','toolprofiles2d.js','previousbends2d.js','interference2d.js','assembly2d.js','forming2d.js','forming2d-view.js','piece3d.js','tooling3d.js','scene3d-audit.js','proximity3d.js','piece3d-view.js','editor2d.js','app.js'):
+  for script in ('geometry2d.js','tool-library.js','manufacturer-references.js','cad-profile.js','cad-orientation.js','cad-profile-view.js','bendcalc.js','clearance2d.js','toolprofiles2d.js','previousbends2d.js','interference2d.js','assembly2d.js','forming2d.js','forming2d-view.js','piece3d.js','tooling3d.js','scene3d-audit.js','proximity3d.js','piece3d-view.js','editor2d.js','app.js'):
    page.evaluate((root/script).read_text())
   assert page.locator('#project-name').inner_text()=='Soporte motor S235'
   print('navigating',tag,flush=True)
@@ -74,6 +74,16 @@ with sync_playwright() as p:
   page.wait_for_function("document.querySelector('#cad-status').textContent.includes('3 elementos')")
   assert page.locator('#cad-preview polyline').count()==3
   assert page.locator('#cad-layer option').count()==4
+  page.locator('#cad-layer').select_option('*')
+  page.locator('#cad-contour').select_option('0')
+  page.locator('#cad-rotation').select_option('90')
+  page.locator('#cad-origin').select_option('center')
+  page.locator('#cad-mirror').check()
+  page.locator('#cad-tolerance').fill('0.7')
+  page.locator('#cad-tolerance').press('Tab')
+  assert 'origen DXF' in page.locator('#cad-orientation-metrics').inner_text()
+  assert page.locator('#cad-oriented-preview polyline').count()==1
+  assert page.evaluate('window.PlegarCadImport.getCurrent().activeInSimulation===false')
   assert page.locator('#cad-report-json').is_enabled()
   assert page.locator('#cad-report-csv').is_enabled()
   assert page.evaluate('window.PlegarCadImport.getCurrent().contours[0].arcCount')==1

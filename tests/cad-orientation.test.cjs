@@ -1,0 +1,12 @@
+'use strict';
+const {test}=require('node:test'),assert=require('node:assert/strict');
+const CAD=require('../cad-profile.js'),O=require('../cad-orientation.js');
+const p={points:[{x:10,y:20},{x:40,y:20},{x:40,y:40},{x:10,y:40}],bounds:{minX:10,maxX:40,minY:20,maxY:40,length:100},closed:true,index:1,layer:'PERFIL',verified:false,activeInSimulation:false};
+test('giro 90 conserva escala y cambia cotas',()=>{const r=O.inspect(p,{rotation:90});assert.equal(r.bounds.width,20);assert.equal(r.bounds.height,30);assert.equal(r.bounds.length,100);});
+test('giro 180/270',()=>{for(const rotation of [180,270]){const r=O.inspect(p,{rotation});assert.equal(r.bounds.width,rotation===180?30:20);assert.equal(r.bounds.height,rotation===180?20:30);}});
+test('espejo y origen nominal',()=>{const r=O.inspect(p,{mirror:true,anchor:'min-min'});assert.equal(r.points[1].x,-30);assert.deepEqual(r.origin,{x:10,y:20});});
+test('origen superior derecho y centro',()=>{assert.deepEqual(O.inspect(p,{anchor:'max-max'}).origin,{x:40,y:40});assert.deepEqual(O.inspect(p,{anchor:'center'}).origin,{x:25,y:30});});
+test('cotejo respeta orientación seleccionada',()=>{const r={height:30,width:20};assert.equal(O.checkDimensions(O.inspect(p,{rotation:90}),r).heightMatch,true);assert.equal(O.checkDimensions(O.inspect(p),r).heightMatch,false);});
+test('tolerancia controlada',()=>{const ref={height:30.6,width:20};assert.equal(O.checkDimensions(O.inspect(p,{rotation:90,tolerance:0.5}),ref).heightMatch,false);assert.equal(O.checkDimensions(O.inspect(p,{rotation:90,tolerance:0.7}),ref).heightMatch,true);});
+test('rechazo de entradas inválidas',()=>{for(const opts of [{rotation:45},{anchor:'punch'},{mirror:'true'},{tolerance:-1},{tolerance:11}])assert.throws(()=>O.inspect(p,opts));assert.throws(()=>O.inspect({...p,verified:true}));});
+test('informe sin amarre ni CNC',()=>{const fake={verificado:false,elementos:[],advertencias:[]};const r=O.extendReport(fake,O.inspect(p,{rotation:90}),{height:30,width:20});assert.equal(r.inspeccion_orientacion.amarre_validado,false);assert.equal(r.inspeccion_orientacion.activado_en_simulacion,false);assert.match(O.csvAppend(r.inspeccion_orientacion),/utilizable_cnc/);});

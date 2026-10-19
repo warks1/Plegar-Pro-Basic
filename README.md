@@ -1,4 +1,4 @@
-# Plegar Pro Plus · Prototipo v0.16
+# Plegar Pro Plus · Prototipo v0.17
 
 Repositorio: `warks1/Plegar-Pro-Basic`.
 
@@ -198,3 +198,10 @@ Los botones Informe JSON e Informe CSV generan un informe local con capas, entid
 Siguen rechazándose SPLINE, INSERT, bloques, datos 3D, DWG y STEP, elevaciones, arcos inválidos y otros datos que no se puedan representar con seguridad. Las entidades sueltas no se ensamblan automáticamente.
 
 Archivos: cad-profile.js, cad-profile-view.js, editor2d.css, sw.js, EJEMPLO_ARCOS_CAPAS.dxf, tests/cad-arcs-report.test.cjs y actualizaciones de pruebas/documentación. Pruebas finales: 103 casos automatizados y navegador en PC (1440 px), tablet (820 px) y móviles (390 y 320 px) sin errores JavaScript ni desbordamiento horizontal detectados. Esto NO equivale a una certificación geométrica o industrial.
+
+
+## v0.17 — Orientación y referencia nominal de perfiles DXF
+
+Se añade orientación 2D para inspección: giro de 0/90/180/270°, espejo y elección de origen nominal entre las esquinas o centro de la envolvente DXF. La cruz naranja no representa amarre verificado. Vista orientada separada del DXF original, sin escala adicional ni alteración de utillajes.
+
+Cotejo orientado contra ficha documental: altura en Y, ancho en X (si consta), tolerancia de 0 a 10 mm. Los informes JSON/CSV incluyen el origen nominal y los indicadores 'amarre_validado=false' y 'activado_en_simulacion=false'. No es una verificación mecánica ni CAD de sólidos; prohibido usar para fabricar o certificar colisiones. Se conservan intactos la imagen y los estilos de Inicio.

@@ -94,3 +94,14 @@
 
 /* v0.16: exportación accesible del informe DXF. */
 .cad-export-actions{display:flex;flex-wrap:wrap;gap:8px}.cad-export-actions button{border:1px solid #4c86a6;background:#174564;color:#e6f6ff;border-radius:6px;padding:9px 12px;min-height:40px;font:inherit;cursor:pointer}.cad-export-actions button:disabled{opacity:.45;cursor:not-allowed}.cad-export-actions button:focus-visible{outline:2px solid #6bd5ff;outline-offset:2px}
+
+/* v0.17: vista de orientación nominal DXF, sin modificar Inicio */
+.cad-orient-panel{border:1px solid #345e7e;background:#0a2437;border-radius:9px;padding:12px;display:grid;gap:10px;min-width:0}
+.cad-orient-panel>strong{font-size:12px;color:#8fddff}
+.cad-orient-controls{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;align-items:end}
+.cad-orient-controls .cad-mirror{display:flex;gap:9px;align-items:center;font-size:11px;color:#cde6f7;padding:10px 0}
+.cad-orient-controls input[type=checkbox]{width:18px;height:18px;accent-color:#229df2}
+#cad-oriented-preview{width:100%;height:min(230px,37vw);min-height:165px;display:block;border:1px solid #2b4d65;border-radius:6px;background:#061727}
+#cad-orientation-metrics{white-space:normal;overflow-wrap:anywhere}
+.cad-orient-warning{margin:4px 0;padding:8px;border:1px solid #8d7337;background:#30291d;color:#f5d9ac;border-radius:6px;font-size:11px;line-height:1.5}
+@media(max-width:650px){.cad-orient-controls{grid-template-columns:minmax(0,1fr)}#cad-oriented-preview{height:200px}}

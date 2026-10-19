@@ -1,15 +1,17 @@
-# Plegar Pro Plus — Entrega v0.17
+# Plegar Pro Plus — Entrega v0.20
 
-Ejecutar con servidor web local o GitHub Pages. Inicio mantiene la interfaz visual aprobada. Entrar en **Programación 2D → Importar DXF 2D v0.17**.
+**Ver en web (GitHub Pages):** https://warks1.github.io/Plegar-Pro-Basic/  
+**Repositorio:** https://github.com/warks1/Plegar-Pro-Basic
 
-1. Seleccionar el archivo `EJEMPLO_PERFIL_MULTICAPA.dxf`.
-2. Dejar `$INSUNITS` automático. Comprobar la vista previa y las tres capas.
-3. Cambiar la capa y elegir otro contorno: se muestran cotas individuales y la comparación documental correspondiente.
+La interfaz de Inicio y su imagen aprobada en `assets/referencia-aprobada.webp` se mantienen sin cambios.
 
-Importador **solo para inspección**, sin agregar DXF a simulación ni CNC; los datos de fabricante tampoco certifican un sólido geométrico. Ejecutar `node --test tests/*.test.cjs` y `python tests/browser_check.py` (requiere Chromium y Playwright).
+## Probar el nuevo panel
 
-**v0.16:** arcos DXF y bulges de LWPOLYLINE, informe CSV/JSON local; ver README y ESTADO_PROYECTO.
+1. Abre **Programación 2D** e importa `EJEMPLO_PERFIL_MULTICAPA.dxf` o `EJEMPLO_ARCOS_CAPAS.dxf`.
+2. En **Topología DXF y referencias A–B**, examina abiertos/cerrados y las posibles coincidencias de extremos. El filtro por capa y la tolerancia 0–1 mm son configurables.
+3. Selecciona un contorno orientado. Los puntos A–B se calculan de la **envolvente**, no representan amarres reales.
+4. Pulsa **Exportar topología y referencias JSON**; todo se procesa en el navegador y no se activa en CNC.
 
-**v0.17:** Tras importar, selecciona un contorno y prueba el giro, el espejo y el origen nominal. La cruz naranja es una referencia visual calculada, no un amarre real. Puedes descargar un informe con la orientación. Los datos son de inspección; la simulación/CNC no los utiliza.
+Pruebas: `node --test tests/*.test.cjs` y `python tests/browser_check.py` (Python Playwright + Chromium). El módulo nuevo incluye 10 pruebas topológicas.
 
-La v0.19 añade registro de inspecciones DXF solo con metadatos locales. Consultar NOTAS_v0.19.md.
+**NO APTA PARA FABRICACIÓN.** DXF, cotas, anidamientos y puntos A–B son exclusivamente orientativos; faltan geometría de sujeción, validación de sólidos CAD, datos de máquina y verificación industrial.

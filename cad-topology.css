@@ -1,0 +1,10 @@
+/* v0.20: utiliza la identidad visual CAD existente; panel adaptativo. */
+.cad-topology-panel{margin-top:16px;padding:15px;border:1px solid #315876;border-radius:12px;background:rgba(16,40,61,.64);color:#dceefa;min-width:0}
+.cad-topology-panel>strong{display:block;color:#81ccff;font-size:15px}
+.cad-topology-panel p{overflow-wrap:anywhere}
+.cad-topology-controls{display:flex;flex-wrap:wrap;align-items:end;gap:12px;margin:12px 0}
+.cad-topology-controls .ed-cell{flex:1 1 190px;min-width:0}
+.cad-topology-controls input[type=number]{width:100%;max-width:250px}
+.cad-topology-panel button{padding:10px 12px;border-radius:8px;max-width:100%;white-space:normal}
+.cad-topology-panel .cad-danger{margin-top:12px}
+@media(max-width:580px){.cad-topology-panel{padding:12px}.cad-topology-controls{display:block}.cad-topology-controls>.cad-mirror{display:block;margin-top:10px}}

@@ -218,3 +218,11 @@ La sección **Registro de inspecciones DXF** calcula una huella SHA-256 sobre lo
 La coincidencia de huellas indica coincidencia de archivos, **no** verificabilidad mecánica ni autenticidad del fabricante. La importación y el registro no modifican ningún utillaje, geometría de pieza, simulación ni fichero CNC. El historial tiene un límite de 20 inspecciones. Los nuevos archivos `cad-trace.js`, `cad-trace-view.js`, `cad-trace.css` y `tests/cad-trace.test.cjs` funcionan sin un servicio externo. Documentación: `NOTAS_v0.19.md`.
 
 Pruebas locales: 129 pruebas Node y revisión del editor a 1440, 820, 390 y 320 píxeles, todas satisfactorias. Ninguna prueba equivale a validación para fabricación.
+
+## v0.20 — Cribado topológico de DXF y puntos nominales A–B (SOLO INSPECCIÓN)
+
+En **Programación 2D → Topología DXF y referencias A–B**, tras cargar un DXF, se muestra el número de contornos abiertos/cerrados, los extremos próximos (mismo layer por defecto, tolerancia 0–1 mm), posibles contornos cerrados anidados y relaciones ambiguas por cruce/tangencia. La comprobación utiliza el perfil discretizado para visualizar arcos, no reconstruye topología CAD exacta ni interpreta huecos/superficies. Puede exportarse un informe JSON exclusivamente documental.
+
+Los puntos A–B son **extremos de la envolvente orientada**, vinculados solo a la referencia superior/inferior y desplazamiento *nominal* del inspector: **no son puntos de amarre físico**. El algoritmo no une segmentos, no modifica perfiles, no genera sólidos, no activa CNC ni da aprobaciones de colisión.
+
+Archivos: `cad-topology.js`, `cad-topology-view.js`, `cad-topology.css`, `tests/cad-topology.test.cjs`. Actualizados `index.html`, `sw.js`, `tests/browser_check.py` y documentos del proyecto. 139 pruebas automáticas Node y comprobaciones de navegador a 1440, 820, 390 y 320 px en entorno aislado. El diseño de Inicio y sus recursos gráficos son idénticos a la versión aprobada.

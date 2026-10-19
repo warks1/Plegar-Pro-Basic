@@ -10,3 +10,9 @@
 @media(max-width:700px){.p3-values{grid-template-columns:1fr}.p3-heading{padding:10px}.p3-controls{padding:10px}.p3-controls button{flex:1 1 auto}.p3-svg{min-height:180px}}
 
 .module-sample.module-piece3d{display:block;min-width:0;max-width:100%;margin-top:22px}
+/* v0.9 visibility tools, isolated to 3D module */
+.p3-tool-switch{display:flex;align-items:center;flex-wrap:wrap;gap:8px;padding:10px 14px;border-top:1px solid #284a62}
+.p3-tool-switch strong{font-size:11px;color:#81bee4;margin-right:8px}
+.p3-tool-switch button{padding:8px 12px;min-height:40px;border-radius:6px;border:1px solid #4786ac;background:#123a58;color:#e8f4ff;cursor:pointer;font-size:12px}
+.p3-tool-switch button[aria-pressed="false"]{border-color:#405365;background:#152536;color:#9daebe}
+@media(max-width:700px){.p3-tool-switch button{flex:1 1 85px}}

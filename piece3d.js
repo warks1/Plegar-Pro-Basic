@@ -37,7 +37,7 @@
   const fit=Math.min(720/Math.max(1,maxX-minX),360/Math.max(1,maxY-minY),7)*zoom;
   const midX=(minX+maxX)/2,midY=(minY+maxY)/2;
   const vertices=raw.map(p=>({x:450+(p.x-midX)*fit,y:238+(p.y-midY)*fit,depth:p.depth}));
-  const faces=mesh.faces.map((f,i)=>({kind:f.kind,points:f.ids.map(id=>vertices[id]),depth:f.ids.reduce((s,id)=>s+vertices[id].depth,0)/f.ids.length,index:i}));
+  const faces=mesh.faces.map((f,i)=>({kind:f.kind,group:f.group||'sheet',points:f.ids.map(id=>vertices[id]),depth:f.ids.reduce((s,id)=>s+vertices[id].depth,0)/f.ids.length,index:i}));
   faces.sort((a,b)=>b.depth-a.depth);
   return {vertices,faces,fit};
  }

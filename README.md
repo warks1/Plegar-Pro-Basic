@@ -1,4 +1,4 @@
-# Plegar Pro Plus · Prototipo v0.7
+# Plegar Pro Plus · Prototipo v0.9
 
 Repositorio: `warks1/Plegar-Pro-Basic`.
 
@@ -101,3 +101,16 @@ Se ha incorporado una **previsualización 3D geométrica** en los módulos «Pro
 **Importante:** esta malla se genera a partir de segmentos nominales y bisagras agudas de pliegues previos; los offsets son aproximados y no tienen radios completos en cada pliegue, intersecciones CAD, validación de solidez ni colisiones 3D. Un giro negativo se representa sin recolocación física. No sirve para decidir si un plegado es seguro ni para generar CNC. La vista de máquina del dashboard Inicio sigue siendo una fotografía/ilustración original, **no** un gemelo digital animado.
 
 Archivos nuevos: `assembly2d.js`, `piece3d.js`, `piece3d-view.js`, `piece3d.css`, `tests/assembly3d.test.cjs`. Se actualizan `forming2d.js`, `forming2d-view.js`, `app.js`, `index.html`, `sw.js`, `tests/browser_check.py` y la documentación. Caché PWA `v8`.
+
+
+## v0.9 — Utillaje genérico 3D sincronizado con Programación 2D
+
+En los módulos **Programación 3D / Simulación 3D** se representan conjuntamente las caras de chapa extruidas y las envolventes paramétricas de **punzón**, **matriz** y **tope X**, compartiendo coordenadas (x: perfil en mm, y: descendente, z: ancho ilustrativo). Las formas de punzón y matriz se obtienen de los perfiles 2D genéricos presentes en `toolprofiles2d.js` y `forming2d.js`: **no son sólidos CAD de fabricantes ni útiles certificados**. La matriz es una extrusión de su V nominal; el punzón parte de su ángulo y radio nominal. El tope es un bloque estático sin eje CNC.
+
+- `tooling3d.js`: extruye contornos con tapas y laterales y agrupa sus caras con el modelo de chapa existente en una sola escena/proyección.
+- `piece3d.js`: conserva etiquetas de grupo para diferenciar chapa, punzón, matriz y tope en la representación.
+- `piece3d-view.js`, `piece3d.css`: permiten ocultar/mostrar **independientemente** las tres herramientas y mantienen giro, zoom, paso y ancho ilustrativo.
+- `index.html` y `sw.js`: incluyen el módulo geométrico y la versión de caché `v9`. El diseño, imágenes y estilos de la portada aprobada **no se alteran**.
+- `tests/tooling3d.test.cjs`: pruebas de volumen nominal, correspondencia de coordenadas, visibilidad y geometría inválida; pruebas del visor integradas en `tests/browser_check.py`.
+
+**Limitación esencial:** un contorno 2D extruido y proyectado NO acredita solidez CAD, trayectorias barridas, cinemática real de máquina, deformación plástica, fuerzas de plegado ni ausencia de colisiones, incluso si las piezas se ven separadas. El orden de plegado previo sigue siendo aproximado; la geometría de fabricantes y las comprobaciones industriales están pendientes. No utilizar este prototipo para fabricación, CNC o seguridad.

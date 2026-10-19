@@ -18,7 +18,7 @@ with sync_playwright() as p:
   page.set_content(html,wait_until='domcontentloaded')
   page.add_style_tag(content=css)
   page.evaluate("""() => {window.__testStorage=window.__testStorage||new Map();Object.defineProperty(window,'localStorage',{configurable:true,value:{getItem:k=>window.__testStorage.get(k)??null,setItem:(k,v)=>window.__testStorage.set(k,String(v)),removeItem:k=>window.__testStorage.delete(k)}})}""")
-  for script in ('geometry2d.js','bendcalc.js','clearance2d.js','toolprofiles2d.js','previousbends2d.js','interference2d.js','assembly2d.js','forming2d.js','forming2d-view.js','piece3d.js','piece3d-view.js','editor2d.js','app.js'):
+  for script in ('geometry2d.js','bendcalc.js','clearance2d.js','toolprofiles2d.js','previousbends2d.js','interference2d.js','assembly2d.js','forming2d.js','forming2d-view.js','piece3d.js','tooling3d.js','piece3d-view.js','editor2d.js','app.js'):
    page.evaluate((root/script).read_text())
   assert page.locator('#project-name').inner_text()=='Soporte motor S235'
   print('navigating',tag,flush=True)
@@ -80,7 +80,7 @@ with sync_playwright() as p:
   page.set_content(html,wait_until='domcontentloaded')
   page.add_style_tag(content=css)
   page.evaluate("""() => {window.__testStorage=window.__testStorage||new Map();Object.defineProperty(window,'localStorage',{configurable:true,value:{getItem:k=>window.__testStorage.get(k)??null,setItem:(k,v)=>window.__testStorage.set(k,String(v)),removeItem:k=>window.__testStorage.delete(k)}})}""")
-  for script in ('geometry2d.js','bendcalc.js','clearance2d.js','toolprofiles2d.js','previousbends2d.js','interference2d.js','assembly2d.js','forming2d.js','forming2d-view.js','piece3d.js','piece3d-view.js','editor2d.js','app.js'):
+  for script in ('geometry2d.js','bendcalc.js','clearance2d.js','toolprofiles2d.js','previousbends2d.js','interference2d.js','assembly2d.js','forming2d.js','forming2d-view.js','piece3d.js','tooling3d.js','piece3d-view.js','editor2d.js','app.js'):
    page.evaluate((root/script).read_text())
   if w<=1120:page.locator('#open-menu').click()
   page.locator('button.nav-item[data-screen="Programación 2D"]').click()
@@ -111,7 +111,17 @@ with sync_playwright() as p:
   if w<=1120:page.locator('#open-menu').click()
   page.locator('button.nav-item[data-screen="Simulación 3D"]').click()
   assert page.locator('.p3-view .p3-svg').count()==1
-  assert 'malla' in page.locator('.p3-state').inner_text()
+  assert 'caras ilustrativas' in page.locator('.p3-state').inner_text()
+  assert page.locator('.p3-svg polygon[data-group="punch"]').count()>0
+  assert page.locator('.p3-svg polygon[data-group="die"]').count()>0
+  assert page.locator('.p3-svg polygon[data-group="gauge"]').count()>0
+  before=page.locator('.p3-svg polygon').count()
+  page.locator('[data-p3-toggle="punch"]').click()
+  assert page.locator('[data-p3-toggle="punch"]').get_attribute('aria-pressed')=='false'
+  assert page.locator('.p3-svg polygon[data-group="punch"]').count()==0
+  assert page.locator('.p3-svg polygon').count()<before
+  page.locator('[data-p3-toggle="punch"]').click()
+  assert page.locator('.p3-svg polygon[data-group="punch"]').count()>0
   assert page.locator('.p3-disclosure').inner_text().find('sin')>=0 or page.locator('.p3-disclosure').count()==1
   prior=page.locator('.p3-svg').inner_html()
   page.locator('[data-p3="right"]').click()

@@ -18,7 +18,7 @@ with sync_playwright() as p:
   page.set_content(html,wait_until='domcontentloaded')
   page.add_style_tag(content=css)
   page.evaluate("""() => {window.__testStorage=window.__testStorage||new Map();Object.defineProperty(window,'localStorage',{configurable:true,value:{getItem:k=>window.__testStorage.get(k)??null,setItem:(k,v)=>window.__testStorage.set(k,String(v)),removeItem:k=>window.__testStorage.delete(k)}})}""")
-  for script in ('geometry2d.js','bendcalc.js','forming2d.js','forming2d-view.js','editor2d.js','app.js'):
+  for script in ('geometry2d.js','bendcalc.js','interference2d.js','forming2d.js','forming2d-view.js','editor2d.js','app.js'):
    page.evaluate((root/script).read_text())
   assert page.locator('#project-name').inner_text()=='Soporte motor S235'
   print('navigating',tag,flush=True)
@@ -59,6 +59,11 @@ with sync_playwright() as p:
   page.locator('#ed-radius').evaluate('(el)=>el.blur()')
   assert page.locator('#ed-radius').input_value()=='3'
   assert page.locator('#ed-deduction').inner_text().endswith('mm')
+  page.locator('#ed-backgauge').fill('30')
+  page.locator('#ed-backgauge').evaluate('(el)=>el.blur()')
+  assert page.locator('#ed-backgauge').input_value()=='30'
+  assert 'Tope X 30' in page.locator('#ed-forming .f2-nominal').inner_text()
+  assert 'Tope:' in page.locator('#ed-forming .f2-notes').inner_text()
   page.locator('#ed-die').select_option('v6-88')
   assert 'V/e' in page.locator('#ed-calc-warnings').inner_text()
   page.locator('#ed-undo').click()
@@ -72,7 +77,7 @@ with sync_playwright() as p:
   page.set_content(html,wait_until='domcontentloaded')
   page.add_style_tag(content=css)
   page.evaluate("""() => {window.__testStorage=window.__testStorage||new Map();Object.defineProperty(window,'localStorage',{configurable:true,value:{getItem:k=>window.__testStorage.get(k)??null,setItem:(k,v)=>window.__testStorage.set(k,String(v)),removeItem:k=>window.__testStorage.delete(k)}})}""")
-  for script in ('geometry2d.js','bendcalc.js','forming2d.js','forming2d-view.js','editor2d.js','app.js'):
+  for script in ('geometry2d.js','bendcalc.js','interference2d.js','forming2d.js','forming2d-view.js','editor2d.js','app.js'):
    page.evaluate((root/script).read_text())
   if w<=1120:page.locator('#open-menu').click()
   page.locator('button.nav-item[data-screen="Programación 2D"]').click()
@@ -80,6 +85,7 @@ with sync_playwright() as p:
   assert page.locator('#ed-total').inner_text().startswith('476 mm')
   assert page.locator('#ed-radius').input_value()=='3'
   assert page.locator('#ed-die').input_value()=='v6-88'
+  assert page.locator('#ed-backgauge').input_value()=='30'
   assert page.locator('.f2-step').count()==5
   overflow=page.evaluate('document.documentElement.scrollWidth > innerWidth+2')
   if overflow:

@@ -20,6 +20,7 @@ function svg(m,zoom){
  const nose=m.punchNose;
  const tipPath=`M ${-toolWidth} ${tip-toolHeight} H ${toolWidth} L ${nose*.65} ${tip-nose*.45} Q 0 ${tip+nose*.3} ${-nose*.65} ${tip-nose*.45} Z`;
  const toY=-Math.max(m.thickness+5,6);
+ const overlap=m.interferences.problems.length>0;
  const warn=m.warnings.length?'#efb06e':'#59ceff';
  return `<svg class="f2d-svg" viewBox="0 0 900 480" role="img" aria-label="Vista lateral esquemática de punzón, matriz y chapa con zona curva tangente. No es una simulación física ni una verificación de colisiones.">
  <defs><pattern id="f2d-grid" width="20" height="20" patternUnits="userSpaceOnUse"><path d="M20 0V20H0" fill="none" stroke="#193a55" stroke-width=".7"/></pattern><linearGradient id="f2d-metal" x1="0" y1="0" x2="1" y2="0"><stop stop-color="#435970"/><stop offset=".48" stop-color="#b8d2e9"/><stop offset="1" stop-color="#364a60"/></linearGradient><linearGradient id="f2d-sheet" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#e0f5ff"/><stop offset="1" stop-color="#38b6ed"/></linearGradient></defs>
@@ -32,8 +33,8 @@ function svg(m,zoom){
  <path d="${line}" stroke="url(#f2d-sheet)" stroke-width="${m.thickness}" fill="none" stroke-linejoin="round" stroke-linecap="round"/>
  <g stroke="#f8bf56" stroke-width=".6" fill="#f8bf56"><circle cx="${-half}" cy="0" r=".9"/><circle cx="${half}" cy="0" r=".9"/></g>
  <circle cx="0" cy="${m.center.y}" r="1.1" fill="#ffb754"/>
- <rect x="${m.stop.x}" y="${m.stop.y-12}" width="${Math.max(2,m.thickness)}" height="10" rx="1" fill="#e7b34a" stroke="#f8d890" stroke-width=".4"/>
- <path d="M ${m.stop.x+m.thickness/2} ${m.stop.y-12} v -15 h ${Math.max(5,m.dieOpening/3)}" stroke="#ddab4b" stroke-width="1.4" fill="none"/>
+ <rect x="${m.stop.x}" y="${m.stop.top}" width="${m.stop.width}" height="${m.stop.bottom-m.stop.top}" rx="1" fill="${overlap?'#dc7770':'#e7b34a'}" stroke="#f8d890" stroke-width=".4"/>
+ <path d="M ${m.stop.x+m.stop.width/2} ${m.stop.top} v -15 h ${Math.max(5,m.dieOpening/3)}" stroke="#ddab4b" stroke-width="1.4" fill="none"/>
  <path d="M ${-half} ${dimension} V ${dimension-3} M ${half} ${dimension} V ${dimension-3} M ${-half} ${dimension-1.5} H ${half}" stroke="#67bce9" stroke-width=".6" fill="none" stroke-dasharray="1.5 1"/>
  </g>
  <rect x="14" y="16" width="290" height="92" rx="7" fill="#0b2941" stroke="#2b678b"/>
@@ -42,8 +43,9 @@ function svg(m,zoom){
  <text x="27" y="77" font-size="11" fill="#93b9d4">Radio interior supuesto: ${as2(m.insideRadius)} mm</text>
  <text x="27" y="94" font-size="11" fill="#93b9d4">Espesor ${as2(m.thickness)} mm · V${m.dieOpening} · P${m.punchAngle}°</text>
  <text x="885" y="28" text-anchor="end" font-size="11" fill="#eac187">PERFIL CON RADIO · APROXIMACIÓN</text>
+ <text x="885" y="434" text-anchor="end" font-size="11" fill="${overlap?'#ff927b':warn}">Cribado 2D: ${html(m.interferences.status)}</text>
  <text x="885" y="450" text-anchor="end" font-size="11" fill="${warn}">Descenso estimado del eje: ${as2(m.depth)} mm</text>
- <text x="15" y="455" font-size="11" fill="#c8d5df">Solo un pliegue aislado; contactos en V y punzón NO calculados físicamente.</text>
+ <text x="15" y="455" font-size="11" fill="#c8d5df">Pliegue aislado; avisos de solapamiento 2D no validan contactos físicos ni seguridad.</text>
  </svg>`;
 }
 function halt(){if(active?.timer){clearInterval(active.timer);active.timer=null;}if(active){const b=active.host.querySelector('[data-f2-action="play"]');if(b)b.textContent='▶ Reproducir';}}
@@ -60,7 +62,9 @@ function render(){
  slider.setAttribute('aria-valuetext',`${as2(m.currentAngle)} grados de ${as2(m.targetAngle)}`);
  ctl.host.querySelector('[data-f2-action="previous"]').disabled=ctl.currentStep===0;
  ctl.host.querySelector('[data-f2-action="next"]').disabled=ctl.currentStep>=order.length-1;
- ctl.host.querySelector('.f2-notes').innerHTML=m.warnings.map(w=>`<li>${html(w)}</li>`).join('')+`<li>${html(m.note)}</li>`;
+ ctl.host.querySelector('.f2-nominal').textContent=`Tope X ${as2(m.stop.x)} mm · extremo derecho: ${as2(m.wingRight.x)} mm · separación horizontal: ${as2(m.interferences.backgaugeGap)} mm · ${m.interferences.backgaugeState}`;
+ ctl.host.querySelector('.f2-nominal').dataset.status=m.interferences.problems.length?'warning':'info';
+ ctl.host.querySelector('.f2-notes').innerHTML=m.interferences.problems.map(p=>`<li><strong>${html(p.component)}:</strong> ${html(p.message)}</li>`).join('')+m.warnings.map(w=>`<li>${html(w)}</li>`).join('')+`<li>${html(m.interferences.disclosure)}</li><li>${html(m.note)}</li>`;
  const options=ctl.host.querySelector('.f2-steps');
  options.innerHTML=order.map((id,i)=>`<button type="button" class="f2-step ${i===ctl.currentStep?'selected':''}" data-f2-step="${i}" aria-pressed="${i===ctl.currentStep}">${i+1} · P${id}</button>`).join('');
 }
@@ -71,10 +75,10 @@ function mount(host,getData,getSelection=()=>1,onSelect=()=>{}){
  let step=Math.max(0,getData().sequence.indexOf(getSelection()));
  active={host,getData,getSelection,onSelect,currentStep:step,progress:0,zoom:1,timer:null};
  host.innerHTML=`<section class="f2-view" aria-label="Seguimiento cinemático 2D de plegado">
- <div class="f2-title"><div><strong>SEGUIMIENTO DE PLEGADO · PERFIL</strong><small>Punzón superior · matriz V inferior · tope posterior · chapa</small></div><span>PERFIL GEOMÉTRICO v0.5</span></div>
+ <div class="f2-title"><div><strong>SEGUIMIENTO DE PLEGADO · PERFIL</strong><small>Punzón superior · matriz V inferior · tope posterior · chapa</small></div><span>PERFIL GEOMÉTRICO v0.6</span></div>
  <div class="f2-stage"></div><div class="f2-toolbar"><strong class="f2-step-label"></strong><div class="f2-controls"><button type="button" data-f2-action="previous">← Anterior</button><button type="button" data-f2-action="play">▶ Reproducir</button><button type="button" data-f2-action="next">Siguiente →</button><button type="button" data-f2-action="reset">Reiniciar</button><button type="button" data-f2-action="zoom-out" aria-label="Reducir zoom">−</button><button type="button" data-f2-action="zoom-in" aria-label="Ampliar zoom">+</button></div></div>
  <div class="f2-slider"><label for="f2-range">Avance del pliegue</label><input id="f2-range" class="f2-range" type="range" min="0" max="100" step="1" value="0"><output class="f2-progress" for="f2-range">0 %</output></div>
- <div class="f2-steps" aria-label="Orden de plegado"></div><ul class="f2-notes"></ul></section>`;
+ <div class="f2-steps" aria-label="Orden de plegado"></div><div class="f2-nominal" role="status"></div><ul class="f2-notes"></ul></section>`;
  host.onclick=e=>{
   const ctl=active;if(!ctl||ctl.host!==host)return;
   const stepBtn=e.target.closest('[data-f2-step]');

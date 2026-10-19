@@ -69,3 +69,13 @@ La sección local del pliegue dejó de dibujarse como dos líneas que se unen en
 - Continúan pendientes: deformación del material, radios reales importados CAD, recuperación elástica, dimensiones exactas de fabricantes, giros de pieza para signos negativos, alas ya plegadas, sólidos 3D y colisiones certificables.
 
 Comprobación: `node --test tests/*.test.cjs` y `python tests/browser_check.py` (Chromium/Playwright). Los tests automatizados no equivalen a validación con máquina física.
+
+## v0.6 — Posición nominal de tope X y cribado de solapamientos 2D (NO seguridad)
+
+En **Programación 2D → Parámetros de desarrollo** se puede introducir una **posición nominal del tope X** en mm (1–10000), medida horizontalmente desde el eje teórico del pliegue en el modelo aislado. No es el eje X real de ninguna máquina ni se transfieren instrucciones a una plegadora. El valor queda guardado con el perfil y viaja en el JSON, con deshacer/rehacer e importación de perfiles anteriores mediante un valor por defecto de 120 mm.
+
+La vista de **Seguimiento de plegado · Perfil** permite comprobar cómo cambia, durante la animación del pliegue elegido, la separación horizontal nominal del extremo derecho respecto al tope fijo. Puede indicar **separado**, **contacto nominal** o **interferencia** según un test de solapamiento 2D conservador con un bloque de tope genérico. Asimismo, se calcula si la envolvente simplificada de chapa sobrepasa el contorno en V de la matriz idealizada, sin usar la geometría real del fabricante. Se muestran alertas y no se bloquea el avance del dibujo.
+
+**Limitaciones críticas:** no se calcula la posición vertical real del tope, el contacto físico, desplazamiento del material, el eje Y, las holguras reales de útiles, el punzón frente a las alas, el giro y orientación para pliegues negativos, las paredes de piezas anteriores ni colisiones 3D. Un resultado «sin alertas geométricas» no significa que el proceso esté libre de colisiones o sea seguro. No utilizar los avisos como validación para plegado o preparación CNC. Para ello son necesarios modelos dimensionales certificados, verificación de interferencias de sólidos y contraste con la máquina real.
+
+Archivos nuevos: `interference2d.js` y `tests/interference2d.test.cjs`. Se mantienen intactos los estilos e imágenes de la pantalla Inicio aprobada.

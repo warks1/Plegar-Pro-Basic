@@ -10,6 +10,7 @@
  'use strict';
  const G=typeof require==='function'?require('./geometry2d.js'):window.PlegarGeometry2D;
  const C=typeof require==='function'?require('./bendcalc.js'):window.PlegarBendCalc;
+ const I=typeof require==='function'?require('./interference2d.js'):window.PlegarInterference2D;
  const rad=d=>d*Math.PI/180;
  const round=n=>Math.round(n*1000000)/1000000;
 
@@ -76,7 +77,7 @@
   }
   if(turn<0)warnings.push('Pliegue negativo: requiere reorientación física de la pieza; NO está modelada.');
   if(angle>150)warnings.push('Pliegue superior a 150°: aproximación fuera de su aplicación habitual.');
-  return {
+  const output={
    bend,orderIndex,step:orderIndex+1,steps:piece.sequence.length,progress,turn,
    targetAngle:Math.abs(turn),currentAngle:angle,left,right,center,wingLeft,wingRight,
    tangentLeft,tangentRight,centerline,dieOpening:die.opening,dieDepth,
@@ -84,9 +85,11 @@
    insideRadius:setup.radius,centreRadius:R,tangentSetback,tangentX,
    // 'depth' is nominal centreline descent from its START position, not CNC Y.
    depth:round(cy+t/2),punchTipY:round(cy-t/2),shoulderY,
-   stop:{x:round(Math.max(half+8,right)),y:round(-t/2)},warnings,
-   note:'Arco tangente de radio interior supuesto y espesor nominal: visualización geométrica, NO deformación plástica, contacto con fuerzas, recuperación elástica, posicionamiento dinámico del tope, simulación de sólidos, colisiones reales ni programa CNC.'
+   stop:{x:setup.backgaugeX,y:round(-t/2),width:Math.max(2,t),top:round(-t/2-12),bottom:round(-t/2+4)},warnings,
+   note:'Arco tangente de radio interior supuesto y espesor nominal. Tope X estático configurado manualmente: NO representa un eje controlado. Cribado 2D genérico NO certifica colisiones, fuerzas, posicionamiento CNC ni plegados previamente ejecutados.'
   };
+  output.interferences=I.inspect(output);
+  return output;
  }
  return {scene};
 });

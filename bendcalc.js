@@ -18,7 +18,7 @@
   {id:'v10-30',name:'Matriz genérica V10 · 30°',opening:10,angle:30},
   {id:'v16-30',name:'Matriz genérica V16 · 30°',opening:16,angle:30}
  ]));
- const DEFAULT_SETUP=Object.freeze({radius:2,kFactor:0.33,punch:'p88-r1',die:'v16-88'});
+ const DEFAULT_SETUP=Object.freeze({radius:2,kFactor:0.33,punch:'p88-r1',die:'v16-88',backgaugeX:120});
  function lookup(list,id){return list.find(item=>item.id===id);}
  function validateSetup(source){
   const s={...DEFAULT_SETUP,...source};
@@ -27,7 +27,9 @@
   if(!Number.isFinite(kFactor)||kFactor<0.2||kFactor>0.6)throw new Error('Factor K entre 0,2 y 0,6.');
   if(!lookup(PUNCHES,s.punch))throw new Error('Punzón no reconocido.');
   if(!lookup(DIES,s.die))throw new Error('Matriz no reconocida.');
-  return {radius,kFactor,punch:s.punch,die:s.die};
+  const backgaugeX=Number(s.backgaugeX);
+  if(!Number.isFinite(backgaugeX)||backgaugeX<1||backgaugeX>10000)throw new Error('Posición nominal del tope X entre 1 y 10000 mm.');
+  return {radius,kFactor,punch:s.punch,die:s.die,backgaugeX};
  }
  function estimate(profile,setupInput){
   const setup=validateSetup(setupInput);

@@ -22,6 +22,7 @@
 .f2-steps .f2-step{white-space:nowrap;flex:0 0 auto;background:#102b40}
 .f2-steps .f2-step.selected{background:#005f9c;border-color:#67ceff}
 .f2-notes{padding:12px 14px 12px 32px;margin:0;background:#292617;border-top:1px solid #705b2d;color:#f2d6a9;font-size:11px;line-height:1.6}
+.f2-nominal{padding:10px 14px;border-top:1px solid #244963;background:#102a3e;color:#b4e7ff;font-size:12px;line-height:1.5}.f2-nominal[data-status="warning"]{background:#372419;color:#ffcf9c}
 .f2-inline{margin:14px 0;max-width:100%;min-width:0}
 .module-sample.module-forming{display:block;min-width:0;max-width:100%;margin-top:20px}
 @media(max-width:700px){.f2-toolbar,.f2-title{padding:10px}.f2-controls{width:100%}.f2-controls button{flex:1 1 auto}.f2-slider{grid-template-columns:1fr auto;gap:7px;padding:9px 10px}.f2-slider label{grid-column:1}.f2-slider .f2-range{grid-column:1/3;grid-row:2}.f2-slider output{grid-column:2;grid-row:1}.f2-title>span{font-size:9px}.f2d-svg{min-height:180px}}

@@ -19,7 +19,7 @@ with sync_playwright() as p:
   page.set_content(html,wait_until='domcontentloaded')
   page.add_style_tag(content=css)
   page.evaluate("""() => {window.__testStorage=window.__testStorage||new Map();Object.defineProperty(window,'localStorage',{configurable:true,value:{getItem:k=>window.__testStorage.get(k)??null,setItem:(k,v)=>window.__testStorage.set(k,String(v)),removeItem:k=>window.__testStorage.delete(k)}})}""")
-  for script in ('geometry2d.js','tool-library.js','manufacturer-references.js','cad-profile.js','cad-orientation.js','cad-trace.js','cad-profile-view.js','cad-mounting-audit.js','cad-mounting-view.js','cad-trace-view.js','cad-topology.js','cad-topology-view.js','cad-chain.js','cad-chain-view.js','cad-crossings.js','cad-crossings-view.js','cad-tangency.js','cad-tangency-view.js','bendcalc.js','clearance2d.js','toolprofiles2d.js','previousbends2d.js','interference2d.js','assembly2d.js','forming2d.js','forming2d-view.js','piece3d.js','fold-kinematics.js','tooling3d.js','scene3d-audit.js','proximity3d.js','piece3d-view.js','editor2d.js','app.js'):
+  for script in ('geometry2d.js','tool-library.js','manufacturer-references.js','cad-profile.js','cad-orientation.js','cad-trace.js','cad-profile-view.js','cad-mounting-audit.js','cad-mounting-view.js','cad-trace-view.js','cad-topology.js','cad-topology-view.js','cad-chain.js','cad-chain-view.js','cad-crossings.js','cad-crossings-view.js','cad-tangency.js','cad-tangency-view.js','bendcalc.js','clearance2d.js','toolprofiles2d.js','previousbends2d.js','interference2d.js','assembly2d.js','forming2d.js','forming2d-view.js','piece3d.js','fold-kinematics.js','tooling3d.js','scene3d-audit.js','proximity3d.js','sweep3d.js','piece3d-view.js','editor2d.js','app.js'):
    page.evaluate((root/script).read_text())
   assert page.locator('#project-name').inner_text()=='Soporte motor S235'
   print('navigating',tag,flush=True)
@@ -294,7 +294,7 @@ with sync_playwright() as p:
   page.set_content(html,wait_until='domcontentloaded')
   page.add_style_tag(content=css)
   page.evaluate("""() => {window.__testStorage=window.__testStorage||new Map();Object.defineProperty(window,'localStorage',{configurable:true,value:{getItem:k=>window.__testStorage.get(k)??null,setItem:(k,v)=>window.__testStorage.set(k,String(v)),removeItem:k=>window.__testStorage.delete(k)}})}""")
-  for script in ('geometry2d.js','tool-library.js','manufacturer-references.js','cad-profile.js','cad-orientation.js','cad-trace.js','cad-profile-view.js','cad-mounting-audit.js','cad-mounting-view.js','cad-trace-view.js','cad-topology.js','cad-topology-view.js','cad-chain.js','cad-chain-view.js','cad-crossings.js','cad-crossings-view.js','cad-tangency.js','cad-tangency-view.js','bendcalc.js','clearance2d.js','toolprofiles2d.js','previousbends2d.js','interference2d.js','assembly2d.js','forming2d.js','forming2d-view.js','piece3d.js','fold-kinematics.js','tooling3d.js','scene3d-audit.js','proximity3d.js','piece3d-view.js','editor2d.js','app.js'):
+  for script in ('geometry2d.js','tool-library.js','manufacturer-references.js','cad-profile.js','cad-orientation.js','cad-trace.js','cad-profile-view.js','cad-mounting-audit.js','cad-mounting-view.js','cad-trace-view.js','cad-topology.js','cad-topology-view.js','cad-chain.js','cad-chain-view.js','cad-crossings.js','cad-crossings-view.js','cad-tangency.js','cad-tangency-view.js','bendcalc.js','clearance2d.js','toolprofiles2d.js','previousbends2d.js','interference2d.js','assembly2d.js','forming2d.js','forming2d-view.js','piece3d.js','fold-kinematics.js','tooling3d.js','scene3d-audit.js','proximity3d.js','sweep3d.js','piece3d-view.js','editor2d.js','app.js'):
    page.evaluate((root/script).read_text())
   if w<=1120:page.locator('#open-menu').click()
   page.locator('button.nav-item[data-screen="Programación 2D"]').click()
@@ -365,6 +365,23 @@ with sync_playwright() as p:
   assert page.locator('.p3-clearance').count()==1
   assert page.locator('.p3-proximity3d').count()==1
   assert 'CRIBADO DE PRISMAS 3D' in page.locator('.p3-proximity3d').inner_text()
+  assert 'MUESTREO DEL CICLO' in page.locator('.p3-sweep').inner_text()
+  assert '25 posiciones' in page.locator('.p3-sweep').inner_text()
+  assert 'NO CNC / SIN VERIFICAR' in page.locator('.p3-sweep').inner_text()
+  # The selected bend has no previous flanges at step 1; step 3 has several.
+  page.locator('[data-p3="next"]').click()
+  assert 'MUESTREO DEL CICLO' in page.locator('.p3-sweep').inner_text()
+  page.locator('.p3-progress').fill('50')
+  assert '50.0 %' in page.locator('.p3-sweep').inner_text()
+  with page.expect_download() as dl:
+   page.locator('[data-p3="scan-export"]').click()
+  report=json.loads(dl.value.path().read_text())
+  assert report['authorization']['cnc'] is False
+  assert report['continuousSweep'] is False
+  assert report['frames']==25
+  assert report['rows'][0]['t']==0
+  assert report['rows'][-1]['t']==1
+
   assert 'NO acredita ausencia' in page.locator('.p3-proximity3d').inner_text()
   assert 'NO valida colisiones 3D' in page.locator('.p3-clearance').inner_text()
   assert page.locator('.p3-svg polygon[data-status="pending"]').count()>0

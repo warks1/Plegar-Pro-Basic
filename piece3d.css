@@ -40,3 +40,11 @@
 .p3-speed{border-radius:5px;background:#122c44;color:#ecf6ff;border:1px solid #548aaa;padding:9px;min-height:42px}
 .p3-cycle-progress{font-weight:700;color:#fff}
 @media(max-width:700px){.p3-motion-controls button{flex:1 1 140px}.p3-motion-controls label{width:100%;justify-content:space-between}}
+
+/* v0.26 — temporal nominal sampled proximity report; no collision colors. */
+.p3-sweep{padding:12px 14px;border-top:1px solid #315d72;background:#132f42;color:#dcecf5;font-size:12px;line-height:1.65;overflow-wrap:anywhere}
+.p3-sweep-marker{position:relative;height:13px;max-width:calc(100% - 28px);margin:8px 14px 0;border:1px solid #436177;border-radius:3px;background:#0c2132}
+.p3-sweep-marker i{position:absolute;top:1px;bottom:1px;width:2px;background:#d0dae1;transform:translateX(-50%)}
+.p3-sweep-actions{display:flex;padding:10px 14px;border-bottom:1px solid #315d72}
+.p3-sweep-actions button{font:inherit;font-size:12px;min-height:40px;padding:9px 13px;color:#edf8ff;border-radius:6px;background:#164665;border:1px solid #4b95c0;cursor:pointer}
+@media(max-width:700px){.p3-sweep-actions button{width:100%}}

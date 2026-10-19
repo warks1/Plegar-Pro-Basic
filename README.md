@@ -1,4 +1,4 @@
-# Plegar Pro Plus · Prototipo v0.25
+# Plegar Pro Plus · Prototipo v0.26
 
 Repositorio: `warks1/Plegar-Pro-Basic`.
 
@@ -263,3 +263,12 @@ Controles disponibles: reproducir/pausar paso, reproducir secuencia de pliegues 
 **Límites explícitos:** NO es una cinemática exacta de eje Y de Cybelec/Trumpf/Bystronic. La chapa sigue una geometría de arco supuesto, no una simulación elastoplástica de contacto; no hay velocidad ni aceleración real, fuerza, sincronización de ejes CNC, amarre, seguimiento activo del tope, retorno elástico ni despeje volumétrico barrido. Los pliegues negativos, secuencias y recolocaciones no se resuelven físicamente. La reproducción NO es apta para fabricar ni verificar colisiones o seguridad.
 
 Nuevos `fold-kinematics.js`, `tests/fold-kinematics.test.cjs`; cambios en `piece3d-view.js`, `piece3d.js`, `piece3d.css`, `app.js`, `index.html`, `sw.js` y las pruebas de navegador. Ejecutar: `node --test tests/*.test.cjs` y `python tests/browser_check.py`.
+
+
+## v0.26 — muestreo de proximidades en el ciclo cinemático 3D
+
+El módulo **Simulación 3D** ahora calcula un **muestreo discreto** de 25 posiciones (24 intervalos) de cada ciclo del punzón, incluyendo aproximación, plegado y retirada, y compara los **tramos ya plegados** del modelo de chapa con las envolventes genéricas extruidas de punzón, matriz y tope. Se reutilizan `fold-kinematics.js`, `piece3d.js` y `proximity3d.js`; nuevo `sweep3d.js`. El informe identifica primera proximidad observada y separación mínima entre las muestras, con porcentaje de ciclo, segmento y herramienta; el visor muestra marcas temporales sin añadir colores de colisión. Se puede exportar JSON con `cnc:false` y `collisionCertification:false`.
+
+**Límites importantes:** no se comprueban instantes entre muestras; no hay barrido continuo de sólidos; no se modela el contacto del pliegue activo, movimientos de topes/ejes o reorientación entre pasos. No hay CAD ni física validada de herramientas/máquina. Los resultados positivos **NO garantizan ausencia de colisión**, y los solapamientos son solo del modelo nominal. **NO CNC / SIN VERIFICAR.**
+
+Se añadieron `sweep3d.js` y `tests/sweep3d.test.cjs`; se cambiaron `piece3d-view.js`, `piece3d.css`, `index.html`, `sw.js`, `tests/browser_check.py` y documentos. Pruebas locales: **189 automáticas** más Playwright en **1440, 820, 390 y 320 px**. Identidad visual aprobada (Inicio) no modificada.

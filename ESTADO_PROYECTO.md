@@ -1,4 +1,4 @@
-# Plegar Pro Plus — Punto de continuidad v0.25
+# Plegar Pro Plus — Punto de continuidad v0.26
 
 **Fecha:** 2026-10-19  
 **Repositorio:** https://github.com/warks1/Plegar-Pro-Basic  
@@ -48,3 +48,12 @@ Instrucción al recibir «Seguir»: recuperar el último commit de GitHub, compr
 - Importante: no se han incorporado modelos CAD certificados, leyes constitutivas, contacto sólido, ejes físicos, fuerzas o evaluación de seguridad. **NO CNC / NO FABRICACIÓN**.
 - Se mantiene la imagen aprobada en `assets/referencia-aprobada.webp` y `styles.css` sin cambios.
 - Próximo paso recomendado: sincronizar cinemática 3D con un modelo mecánico contrastado (planos de montaje, alturas reales, topes, cinemática de máquina), y realizar barrido de colisiones fiable antes de evaluar uso industrial.
+
+
+## v0.26 — cribado discreto durante cinemática 3D
+
+- `sweep3d.js`: 25 posiciones nominales por ciclo; cribado de alas previas frente a prismas de punzón, matriz y tope. Guarda primer instante de proximidad y mínimo observado con porcentaje, herramienta y segmento.
+- `piece3d-view.js`: panel de texto y marcas temporales (sin colores de colisión), exportación JSON, caché de informe por proyecto/paso/ancho para que la animación conserve fluidez.
+- NO hay barrido continuo, pliegue activo validado, reorientación de chapa, CAD del fabricante, contacto real ni garantía de seguridad; reporte con bloqueos CNC/seguridad.
+- 189 pruebas Node superadas y navegación Playwright en 1440/820/390/320 px. El boceto Inicio y `styles.css` no cambian.
+- Siguiente fase sugerida: verificaciones geométricas de contacto activo, enclavamientos de utillaje y topes basados en datos dimensionales fiables, nunca certificación de seguridad por aproximación.

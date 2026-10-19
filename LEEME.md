@@ -33,3 +33,6 @@ Para los arcos circulares se calculan también las cotas X/Y extremas desde el c
 4. El motor sigue una trayectoria supuesta; NO permite certificar colisiones ni enviar datos CNC.
 
 Pruebas v0.25: 183 automáticas y navegación Playwright 1440, 820, 390, 320 px.
+
+
+**v0.26:** La simulación 3D tiene un nuevo panel de muestreo de proximidades durante el ciclo. Revisa alas anteriores, punzón, matriz y tope nominales en 25 posiciones y permite exportar JSON. No comprueba movimiento continuo ni colisión física; no usar para fabricación. Pruebas: 189 Node y cuatro resoluciones de navegador.

@@ -1,0 +1,9 @@
+.cad-mounting-panel{margin-top:12px;padding:14px;border:1px solid #426681;border-radius:10px;background:#0a2133;color:#e2edf7;display:grid;gap:10px;min-width:0}
+.cad-mounting-panel strong{color:#75ceff;font-size:14px}
+.cad-mounting-panel p{margin:0;overflow-wrap:anywhere;font-size:12px;line-height:1.55}
+.cad-mounting-controls{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.cad-mounting-controls input,.cad-mounting-controls select{max-width:100%;min-width:0}
+.cad-mount-result{padding:10px;border-radius:8px;background:#132c40;border:1px solid #33506a;white-space:normal}
+.cad-mounting-panel button{border:1px solid #3f8bd3;background:#143e61;border-radius:8px;color:#fff;padding:9px 12px;cursor:pointer;min-height:42px}
+.cad-mounting-panel button:disabled{opacity:.4;cursor:default}
+@media(max-width:680px){.cad-mounting-controls{grid-template-columns:minmax(0,1fr)}}

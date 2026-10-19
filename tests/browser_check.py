@@ -4,7 +4,7 @@ import json,sys,re
 root=Path(__file__).resolve().parents[1]
 html=re.sub(r'<script src="[^"]+" defer></script>', '', (root/'index.html').read_text())
 html=re.sub(r'<link rel="stylesheet"[^>]+>', '', html)
-css='\n'.join((root/x).read_text() for x in ('styles.css','editor2d.css','forming2d.css','piece3d.css'))
+css='\n'.join((root/x).read_text() for x in ('styles.css','editor2d.css','forming2d.css','piece3d.css','cad-mounting.css'))
 issues=[]
 with sync_playwright() as p:
  browser=p.chromium.launch(executable_path='/usr/bin/chromium',headless=True,args=['--no-sandbox','--disable-dev-shm-usage'])
@@ -18,7 +18,7 @@ with sync_playwright() as p:
   page.set_content(html,wait_until='domcontentloaded')
   page.add_style_tag(content=css)
   page.evaluate("""() => {window.__testStorage=window.__testStorage||new Map();Object.defineProperty(window,'localStorage',{configurable:true,value:{getItem:k=>window.__testStorage.get(k)??null,setItem:(k,v)=>window.__testStorage.set(k,String(v)),removeItem:k=>window.__testStorage.delete(k)}})}""")
-  for script in ('geometry2d.js','tool-library.js','manufacturer-references.js','cad-profile.js','cad-orientation.js','cad-profile-view.js','bendcalc.js','clearance2d.js','toolprofiles2d.js','previousbends2d.js','interference2d.js','assembly2d.js','forming2d.js','forming2d-view.js','piece3d.js','tooling3d.js','scene3d-audit.js','proximity3d.js','piece3d-view.js','editor2d.js','app.js'):
+  for script in ('geometry2d.js','tool-library.js','manufacturer-references.js','cad-profile.js','cad-orientation.js','cad-profile-view.js','cad-mounting-audit.js','cad-mounting-view.js','bendcalc.js','clearance2d.js','toolprofiles2d.js','previousbends2d.js','interference2d.js','assembly2d.js','forming2d.js','forming2d-view.js','piece3d.js','tooling3d.js','scene3d-audit.js','proximity3d.js','piece3d-view.js','editor2d.js','app.js'):
    page.evaluate((root/script).read_text())
   assert page.locator('#project-name').inner_text()=='Soporte motor S235'
   print('navigating',tag,flush=True)
@@ -32,7 +32,9 @@ with sync_playwright() as p:
   assert 'SIN VERIFICAR' in page.locator('#ed-tool-punch').inner_text()
   assert 'SIN VERIFICAR' in page.locator('#ed-tool-die').inner_text()
   assert page.locator('#cad-file-input').count()==1
-  assert 'SIN VERIFICAR' in page.locator('.cad-danger').inner_text()
+  assert page.locator('#cad-mount-datum').count()==1
+  assert page.locator('#cad-mount-export').is_disabled()
+  assert 'SIN VERIFICAR' in page.locator('.cad-import-panel > .cad-danger').inner_text()
   assert page.locator('#ed-ref-item option').count()==5
   assert '50838E' in page.locator('#ed-ref-item').inner_text()
   assert 'CAD' in page.locator('.ed-ref-warning').inner_text()
@@ -74,6 +76,7 @@ with sync_playwright() as p:
   page.wait_for_function("document.querySelector('#cad-status').textContent.includes('3 elementos')")
   assert page.locator('#cad-preview polyline').count()==3
   assert page.locator('#cad-layer option').count()==4
+  # v0.17: orientación independiente con origen y tolerancia sin impacto en máquina.
   page.locator('#cad-layer').select_option('*')
   page.locator('#cad-contour').select_option('0')
   page.locator('#cad-rotation').select_option('90')
@@ -84,15 +87,42 @@ with sync_playwright() as p:
   assert 'origen DXF' in page.locator('#cad-orientation-metrics').inner_text()
   assert page.locator('#cad-oriented-preview polyline').count()==1
   assert page.evaluate('window.PlegarCadImport.getCurrent().activeInSimulation===false')
+  page.locator('#cad-mount-datum').select_option('superior')
+  page.locator('#cad-mount-offset').fill('-2')
+  page.locator('#cad-mount-offset').press('Tab')
+  assert 'BLOQUEADO' in page.locator('#cad-mount-result').inner_text()
+  assert page.locator('#cad-mount-export').is_enabled()
+  if tag=='pc':
+   with page.expect_download() as mount_dl: page.locator('#cad-mount-export').click()
+   audit_path=root.parent/'v18_mount_report.json'
+   mount_dl.value.save_as(audit_path)
+   audit_report=json.loads(audit_path.read_text())
+   assert audit_report['approvedForCNC'] is False
+   assert audit_report['mountingVerified'] is False
+  page.locator('#cad-mount-offset').fill('999')
+  page.locator('#cad-mount-offset').press('Tab')
+  assert 'Auditoría no disponible' in page.locator('#cad-mount-result').inner_text()
+  assert page.locator('#cad-mount-export').is_disabled()
+  page.locator('#cad-mount-offset').fill('0')
+  page.locator('#cad-mount-offset').press('Tab')
+  page.locator('#cad-tolerance').fill('22')
+  page.locator('#cad-tolerance').press('Tab')
+  assert 'Orientación no válida' in page.locator('#cad-orientation-metrics').inner_text()
+  page.locator('#cad-tolerance').fill('0.7')
+  page.locator('#cad-tolerance').press('Tab')
+  assert page.locator('#cad-oriented-preview polyline').count()==1
   assert page.locator('#cad-report-json').is_enabled()
   assert page.locator('#cad-report-csv').is_enabled()
   assert page.evaluate('window.PlegarCadImport.getCurrent().contours[0].arcCount')==1
   assert page.evaluate('window.PlegarCadImport.getCurrent().contours[2].closed') is True
-  assert 'SIN VERIFICAR' in page.locator('.cad-danger').inner_text()
+  assert 'SIN VERIFICAR' in page.locator('.cad-import-panel > .cad-danger').inner_text()
   if tag=='pc':
    with page.expect_download() as dl: page.locator('#cad-report-json').click()
    downloaded=dl.value
    assert downloaded.suggested_filename=='plegar-pro-informe-dxf.json'
+   report_path=root.parent/'v17_download_report.json'
+   downloaded.save_as(report_path)
+   assert json.loads(report_path.read_text())['inspeccion_orientacion']['amarre_validado'] is False
    with page.expect_download() as dl: page.locator('#cad-report-csv').click()
    assert dl.value.suggested_filename.endswith('.csv')
   if tag=='pc':
@@ -161,7 +191,7 @@ with sync_playwright() as p:
   page.set_content(html,wait_until='domcontentloaded')
   page.add_style_tag(content=css)
   page.evaluate("""() => {window.__testStorage=window.__testStorage||new Map();Object.defineProperty(window,'localStorage',{configurable:true,value:{getItem:k=>window.__testStorage.get(k)??null,setItem:(k,v)=>window.__testStorage.set(k,String(v)),removeItem:k=>window.__testStorage.delete(k)}})}""")
-  for script in ('geometry2d.js','tool-library.js','manufacturer-references.js','cad-profile.js','cad-profile-view.js','bendcalc.js','clearance2d.js','toolprofiles2d.js','previousbends2d.js','interference2d.js','assembly2d.js','forming2d.js','forming2d-view.js','piece3d.js','tooling3d.js','scene3d-audit.js','proximity3d.js','piece3d-view.js','editor2d.js','app.js'):
+  for script in ('geometry2d.js','tool-library.js','manufacturer-references.js','cad-profile.js','cad-orientation.js','cad-profile-view.js','cad-mounting-audit.js','cad-mounting-view.js','bendcalc.js','clearance2d.js','toolprofiles2d.js','previousbends2d.js','interference2d.js','assembly2d.js','forming2d.js','forming2d-view.js','piece3d.js','tooling3d.js','scene3d-audit.js','proximity3d.js','piece3d-view.js','editor2d.js','app.js'):
    page.evaluate((root/script).read_text())
   if w<=1120:page.locator('#open-menu').click()
   page.locator('button.nav-item[data-screen="Programación 2D"]').click()

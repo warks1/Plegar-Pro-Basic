@@ -1,4 +1,4 @@
-# Plegar Pro Plus · Prototipo v0.13
+# Plegar Pro Plus · Prototipo v0.15
 
 Repositorio: `warks1/Plegar-Pro-Basic`.
 

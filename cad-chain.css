@@ -1,0 +1,4 @@
+/* v0.21 — identidad visual original y diseño adaptable. */
+.cad-chain-panel{margin-top:16px;padding:15px;border:1px solid #315876;border-radius:12px;background:rgba(16,40,61,.64);color:#dceefa;min-width:0}
+.cad-chain-panel>strong{display:block;color:#81ccff;font-size:15px}.cad-chain-panel p{overflow-wrap:anywhere}.cad-chain-panel button{padding:10px 12px;max-width:100%;white-space:normal;border-radius:8px}.cad-chain-panel .cad-danger{margin-top:12px}
+@media(max-width:580px){.cad-chain-panel{padding:12px}}

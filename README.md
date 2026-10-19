@@ -1,4 +1,4 @@
-# Plegar Pro Plus · Prototipo v0.17
+# Plegar Pro Plus · Prototipo v0.21
 
 Repositorio: `warks1/Plegar-Pro-Basic`.
 
@@ -226,3 +226,11 @@ En **Programación 2D → Topología DXF y referencias A–B**, tras cargar un D
 Los puntos A–B son **extremos de la envolvente orientada**, vinculados solo a la referencia superior/inferior y desplazamiento *nominal* del inspector: **no son puntos de amarre físico**. El algoritmo no une segmentos, no modifica perfiles, no genera sólidos, no activa CNC ni da aprobaciones de colisión.
 
 Archivos: `cad-topology.js`, `cad-topology-view.js`, `cad-topology.css`, `tests/cad-topology.test.cjs`. Actualizados `index.html`, `sw.js`, `tests/browser_check.py` y documentos del proyecto. 139 pruebas automáticas Node y comprobaciones de navegador a 1440, 820, 390 y 320 px en entorno aislado. El diseño de Inicio y sus recursos gráficos son idénticos a la versión aprobada.
+
+## v0.21 — Diagnóstico de cadenas y preparación 3D (solo inspección)
+
+El módulo independiente `cad-chain.js` clasifica conexiones **nominales** entre extremos de entidades DXF abiertas: cadenas, ciclos, bifurcaciones y grupos transitivos con ambigüedad. El informe identifica requisitos pendientes antes de considerar una reconstrucción CAD 3D: perfiles y huecos válidos, espesores, referencias oficiales de montaje y colisiones con geometría sólida.
+
+El usuario controla el mismo filtro por capa y tolerancia de 0–1 mm del módulo topológico. La vista `cad-chain-view.js` muestra el diagnóstico y permite descargar un JSON sin el archivo DXF original. **No se unen segmentos, no se convierte a 3D y ninguna coincidencia autoriza simulación, CNC o seguridad**. La interfaz Inicio no ha sufrido cambios.
+
+Tests: `tests/cad-chain.test.cjs` y ampliación de `tests/browser_check.py`; 147 pruebas Node y comprobación Playwright en 1440, 820, 390 y 320 px. No son ensayos de seguridad de máquina.

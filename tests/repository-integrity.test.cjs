@@ -32,3 +32,5 @@ test('the 10 public Trenirtrade PDFs and previews are complete',()=>{
   assert.ok(docs.find(doc=>doc.pdf===pdf&&doc.thumbnail===thumb),'Missing entry for '+pdf);
  }
 });
+
+test('Planos retains the Programación 2D bridge and simulation safety gate',()=>{ const editor=fs.readFileSync(path.join(root,'editor2d.js'),'utf8'); const app=fs.readFileSync(path.join(root,'app.js'),'utf8'); assert.ok(editor.includes('setPlanReference')&&editor.includes('getPlanReference')&&editor.includes('isPlanConfigured')); assert.ok(app.includes('getPlanReference')&&app.includes('isPlanConfigured')); });

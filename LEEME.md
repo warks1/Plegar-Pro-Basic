@@ -13,3 +13,6 @@ Abrir: https://warks1.github.io/Plegar-Pro-Basic/
 Versión v0.34: pantalla de arranque completa y adaptable. Las P y la barra siguen animadas. Eliminado «Omitir presentación». Sin cambios en el diseño de Inicio.
 
 Pantalla de carga v0.35: composición expandida a toda el área disponible y barra visible (PC, tablet y smartphone vertical/horizontal).
+
+
+**v0.36:** navegación de GitHub Pages con página principal desde la red cuando está disponible y respaldo offline si falla. La aplicación consulta actualizaciones del service worker al iniciar sin recargar a la fuerza. La imagen y las animaciones de carga v0.35 no cambian. Detalle en `NOTAS_v0.36.md`.

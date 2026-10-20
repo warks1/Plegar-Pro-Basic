@@ -120,3 +120,12 @@ Siguiente prioridad: ofrecer ampliación con zoom real del plano y trazado asist
 
 ### v0.35
 Ajuste de presentación a pantalla completa sin franjas de imagen no ocupadas. Sin cambiar el arte aprobado ni los módulos: splash.css, splash.js, sw.js, test responsive y documentación. Compatibilidad comprobada en 10 resoluciones simuladas y tests generales.
+
+
+## v0.36 — Evitar versiones antiguas en GitHub Pages
+
+- `sw.js`: navegación network-first, offline fallback, caché v36 y exclusión de documentos PDF de cliente en caché dinámica. El modo online prioriza la versión publicada de `index.html`.
+- `app.js`: registro del service worker sin cachear su script y comprobación al iniciar, sin actualización forzosa de pestañas con trabajo pendiente.
+- `tests/service-worker.test.cjs`: cobertura del precache, HTML online más reciente, fallback offline y no almacenamiento de PDF.
+- Pruebas locales: 209 Node, diez orientaciones/resoluciones de splash y navegación PC/tablet/móvil 390/320 px. Diseño e imágenes aprobados sin modificación.
+- Al publicar, comprobar el commit de `main` y la acción GitHub Pages. La visibilidad real en el móvil del usuario debe confirmarse allí.

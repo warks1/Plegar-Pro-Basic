@@ -1,0 +1,99 @@
+'use strict';
+const {test} = require('node:test');
+const assert = require('node:assert/strict');
+const vm = require('node:vm');
+const fs = require('node:fs');
+const path = require('node:path');
+
+const src = fs.readFileSync(path.join(__dirname, '../sw.js'), 'utf8');
+const scope = 'https://warks1.github.io/Plegar-Pro-Basic/';
+const home = scope + 'index.html';
+const response = (content, ok = true) => ({ content, ok, clone() { return response(content, ok); } });
+
+function harness() {
+  const events = {};
+  const stores = new Map();
+  const seen = [];
+  const state = { offline: false };
+  const caches = {
+    async open(name) {
+      if (!stores.has(name)) stores.set(name, new Map());
+      const items = stores.get(name);
+      return {
+        async addAll(files) {
+          for (const f of files) {
+            const uri = new URL(f, scope).href;
+            items.set(uri, response('precache:' + f));
+          }
+        },
+        async match(uri) { return items.get(typeof uri === 'string' ? uri : uri.url); },
+        async put(uri, res) { items.set(typeof uri === 'string' ? uri : uri.url, res); }
+      };
+    },
+    async keys() { return [...stores.keys()]; },
+    async delete(name) { return stores.delete(name); },
+    async match(uri) {
+      const key = typeof uri === 'string' ? uri : uri.url;
+      for (const cache of stores.values()) if (cache.has(key)) return cache.get(key);
+    }
+  };
+  const self = {
+    location: { origin: 'https://warks1.github.io' },
+    registration: { scope },
+    addEventListener(type, fn) { events[type] = fn; },
+    skipWaiting: async () => {},
+    clients: { claim: async () => {} }
+  };
+  vm.runInNewContext(src, { self, caches, URL, Response: { error: () => response('error', false) },
+    fetch: async request => {
+      const url = typeof request === 'string' ? request : request.url;
+      seen.push(url);
+      if (state.offline) throw new Error('Offline');
+      return response('network:' + url);
+    }
+  }, { filename: 'sw.js' });
+  async function trigger(type, req) {
+    let promise;
+    const event = { request: req, waitUntil(p) { promise = p; }, respondWith(p) { promise = p; } };
+    events[type](event);
+    if (promise) return await promise;
+  }
+  return { trigger, state, caches, stores, seen };
+}
+
+test('installs an offline page and cache version v36', async () => {
+  const h = harness();
+  await h.trigger('install');
+  assert.ok(h.stores.has('plegar-pro-forming2d-v36'));
+  assert.ok(await h.caches.match(home));
+});
+
+test('navigation retrieves the latest online HTML, not a stale cached version', async () => {
+  const h = harness();
+  await h.trigger('install');
+  const result = await h.trigger('fetch', { url: scope, method: 'GET', mode: 'navigate' });
+  assert.equal(result.content, 'network:' + scope);
+  assert.deepEqual(h.seen, [scope]);
+});
+
+test('offline navigation falls back to the installed page', async () => {
+  const h = harness();
+  await h.trigger('install');
+  h.state.offline = true;
+  const result = await h.trigger('fetch', { url: home, method: 'GET', mode: 'navigate' });
+  assert.equal(result.content, 'precache:./index.html');
+});
+
+test('known static resources are cached but private PDFs are not', async () => {
+  const h = harness();
+  await h.trigger('install');
+  const staticAsset = scope + 'splash.css';
+  const cached = await h.trigger('fetch', { url: staticAsset, method: 'GET', mode: 'same-origin' });
+  assert.equal(cached.content, 'precache:./splash.css');
+  assert.equal(h.seen.length, 0);
+  const doc = scope + 'planos/trenirtrade/IV6-HZ051_Soporte_lateral.pdf';
+  const live = await h.trigger('fetch', { url: doc, method: 'GET', mode: 'same-origin' });
+  assert.equal(live.content, 'network:' + doc);
+  assert.equal(await h.caches.match(doc), undefined);
+  assert.equal(h.seen.length, 1);
+});

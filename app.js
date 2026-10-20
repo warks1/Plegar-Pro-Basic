@@ -199,6 +199,9 @@ document.addEventListener('keydown',e=>{
 $('#dialog-close').addEventListener('click',()=>$('#dialog').close());
 $('#dialog').addEventListener('click',event=>{if(event.target===$('#dialog'))$('#dialog').close();});
 buildNav();renderProjects();renderMaterials();renderSteps();switchScreen('Inicio');
-if('serviceWorker' in navigator&&location.protocol.startsWith('http'))navigator.serviceWorker.register('sw.js').catch(()=>{});
+if('serviceWorker' in navigator&&location.protocol.startsWith('http')){
+  navigator.serviceWorker.register('sw.js',{updateViaCache:'none'})
+    .then(reg=>reg.update().catch(()=>{})).catch(()=>{});
+}
 
 window.PlegarApp={switchScreen};

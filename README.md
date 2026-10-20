@@ -344,3 +344,10 @@ La presentación de arranque usa los mismos elementos visuales aprobados. El fon
 ## v0.35 — pantalla de carga de borde a borde
 
 La composición aprobada se expande hasta ocupar el área de visualización, con fondo industrial de borde a borde y zona segura en iOS. Se ha elegido ajuste completo (`object-fit: fill`) para mostrar todos los elementos sin recortes, lo que puede deformar ligeramente las proporciones en pantallas extremas. La barra de progreso sigue visible; sin botón de omisión. El progreso es una animación estimada, no mide tareas individuales. La pantalla principal permanece intacta.
+
+
+## v0.36 — Publicación y caché en móviles
+
+El service worker (`sw.js`) utiliza **red primero para las páginas de navegación** de GitHub Pages, con copia offline como respaldo. Esto evita que se muestre indefinidamente un `index.html` antiguo después de publicar una versión nueva. El resto de recursos precargados siguen disponibles offline; los PDF de clientes no entran en la caché de forma automática. La aplicación comprueba actualizaciones del service worker al arrancar sin recargar forzosamente una edición en curso.
+
+Pruebas: `tests/service-worker.test.cjs` (cuatro casos nuevos); `node --test tests/*.test.cjs` (**209/209**), `python tests/splash-responsive-check.py` y `python tests/browser_check.py`. No se han cambiado la interfaz de Inicio, los modelos CAD ni las imágenes de carga.

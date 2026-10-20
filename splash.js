@@ -1,4 +1,4 @@
-/* v0.34: presentación responsive sin botón de omitir. El progreso es estimado, no es telemetría CNC. */
+/* v0.35: presentación responsive sin botón de omitir. El progreso es estimado, no es telemetría CNC. */
 (function(root){
 'use strict';
 if(!root.document)return;

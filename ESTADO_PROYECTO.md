@@ -116,3 +116,7 @@ Siguiente prioridad: ofrecer ampliación con zoom real del plano y trazado asist
 - Dos destellos de las P siguen animados. El splash se retira automáticamente al finalizar el arranque, con límite de seguridad para no bloquear el acceso.
 - Comprobación visual en diez resoluciones: PC, tablet, smartphone vertical/horizontal; 205 pruebas unitarias previas pasan.
 - Se mantienen todos los módulos Planos, Programación y las imágenes Trenirtrade.
+
+
+### v0.35
+Ajuste de presentación a pantalla completa sin franjas de imagen no ocupadas. Sin cambiar el arte aprobado ni los módulos: splash.css, splash.js, sw.js, test responsive y documentación. Compatibilidad comprobada en 10 resoluciones simuladas y tests generales.

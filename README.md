@@ -339,3 +339,8 @@ Siguiente prioridad: ofrecer ampliación con zoom real del plano y trazado asist
 
 ### v0.34 — Pantalla de carga fullscreen adaptativa, sin omitir
 La presentación de arranque usa los mismos elementos visuales aprobados. El fondo se expande a todo el viewport real (`100dvh`, zonas seguras), mientras el logotipo se encaja sin recortar las P ni el título mediante los encuadres vertical y horizontal. El porcentaje y la barra son controles reales que siguen un progreso visual estimado (no progreso de máquinas ni IA). El botón «Omitir presentación» se eliminó. Los dos brillos sobre las P conservan su animación independiente; el arranque termina por sí solo. Los originales no se han modificado. Se evita desplazar el resto de la página por la composición.
+
+
+## v0.35 — pantalla de carga de borde a borde
+
+La composición aprobada se expande hasta ocupar el área de visualización, con fondo industrial de borde a borde y zona segura en iOS. Se ha elegido ajuste completo (`object-fit: fill`) para mostrar todos los elementos sin recortes, lo que puede deformar ligeramente las proporciones en pantallas extremas. La barra de progreso sigue visible; sin botón de omisión. El progreso es una animación estimada, no mide tareas individuales. La pantalla principal permanece intacta.

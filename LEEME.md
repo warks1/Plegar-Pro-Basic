@@ -11,3 +11,5 @@ Abrir: https://warks1.github.io/Plegar-Pro-Basic/
 **No industrial:** las simulaciones y las fotos importadas no reemplazan geometría CAD verificada ni autorizan uso CNC.
 
 Versión v0.34: pantalla de arranque completa y adaptable. Las P y la barra siguen animadas. Eliminado «Omitir presentación». Sin cambios en el diseño de Inicio.
+
+Pantalla de carga v0.35: composición expandida a toda el área disponible y barra visible (PC, tablet y smartphone vertical/horizontal).

@@ -36,11 +36,16 @@ with sync_playwright() as pw:
         img_box=boxes['.pp-splash-hero']
         # Both the full-image visual composition and animated progress fit in the visible viewport.
         assert img_box['width']>=min(width*.4,350),(width,'imagen excesivamente pequeña',img_box)
+        # v0.35: sin bandas vacías creadas por object-fit: contain. La imagen escala al área disponible.
+        art_box=boxes['.pp-splash-art']
+        assert img_box['width']>=art_box['width']-2,(width,'imagen no expandida horizontalmente',img_box,art_box)
+        assert img_box['height']>=art_box['height']-2,(width,'imagen no expandida verticalmente',img_box,art_box)
+        assert img.evaluate('(el)=>getComputedStyle(el).objectFit')=='fill',(width,'la composición no ocupa el área')
         assert page.locator('.pp-splash-emblem').count()==2
         assert page.locator('.pp-splash-skip').count()==0
         assert page.evaluate('document.getElementById("startup-splash").scrollWidth<=document.getElementById("startup-splash").clientWidth+1'),width
         if (width,height) in ((1440,900),(390,844),(320,568),(844,390)):
-            page.screenshot(path=str(Path(tempfile.gettempdir())/f'plegar-v34-{width}x{height}.png'))
+            page.screenshot(path=str(Path(tempfile.gettempdir())/f'plegar-v35-{width}x{height}.png'))
         page.wait_for_timeout(550)
         assert int(page.locator('#startup-meter').get_attribute('aria-valuenow'))>=5,(width,'barra sin animar')
         assert not errors,(width,errors)

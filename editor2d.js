@@ -16,6 +16,27 @@ const fmt = n => new Intl.NumberFormat('es-ES',{maximumFractionDigits:2}).format
 const initial = {name:'Perfil omega (ejemplo)', material:'Acero S235JR', thickness:2, segments:[60,85,120,85,60], angles:[-90,90,90,-90], sequence:[1,2,3,4]};
 let state = fromEditor(initial);
 let planReference=null, planConfiguredId=null;
+const Trace=window.PlegarPlanTrace;
+let planVision={zoom:1,dx:0,dy:0,marking:false,pending:null,marks:[]};
+function traceKey(id){return 'plegar-pro-plan-visual-v1:'+String(id).slice(0,100);}
+function saveMarks(){if(!planReference)return;try{localStorage.setItem(traceKey(planReference.id),JSON.stringify(planVision.marks));}catch{inform('Las marcas no se pudieron guardar localmente.');}}
+function loadMarks(id){try{return Trace.restore(JSON.parse(localStorage.getItem(traceKey(id))||'[]'));}catch{return [];}}
+function stageTransform(){const stage=$('#ed-plan-stage');if(stage)stage.style.transform=`translate(${planVision.dx}px,${planVision.dy}px) scale(${planVision.zoom})`;const z=$('#ed-plan-zoom-label');if(z)z.textContent=Math.round(planVision.zoom*100)+' %';}
+function zoomPlan(factor){planVision.zoom=Trace.clamp(Math.round(planVision.zoom*factor*100)/100,1,5);if(planVision.zoom===1){planVision.dx=0;planVision.dy=0;}stageTransform();}
+function bindPlanViewer(){const frame=$('#ed-plan-viewer');if(!frame)return;let gesture=null;
+ frame.onwheel=e=>{e.preventDefault();zoomPlan(e.deltaY<0?1.2:1/1.2);};
+ frame.onpointerdown=e=>{
+  if(e.button!==0||!e.isPrimary)return;
+  if(planVision.marking){const r=$('#ed-plan-stage')?.getBoundingClientRect();if(!r)return;const x=(e.clientX-r.left)/r.width,y=(e.clientY-r.top)/r.height;
+    try{const pt=Trace.point(x,y);if(!planVision.pending){planVision.pending=pt;}else{planVision.marks=Trace.append(planVision.marks,planVision.pending,pt);planVision.pending=null;saveMarks();}renderPlanReference();inform('Marca visual guardada. Confirma longitudes, ángulos y espesor en los campos: NO se infieren de la fotografía.');}catch(err){inform(err.message);}return;
+  }
+  if(planVision.zoom<=1)return;gesture={id:e.pointerId,x:e.clientX,y:e.clientY,dx:planVision.dx,dy:planVision.dy};frame.setPointerCapture?.(e.pointerId);
+ };
+ frame.onpointermove=e=>{if(!gesture||e.pointerId!==gesture.id)return;const limX=frame.clientWidth*(planVision.zoom-1)/2,limY=frame.clientHeight*(planVision.zoom-1)/2;planVision.dx=Trace.clamp(gesture.dx+e.clientX-gesture.x,-limX,limX);planVision.dy=Trace.clamp(gesture.dy+e.clientY-gesture.y,-limY,limY);stageTransform();};
+ frame.onpointerup=frame.onpointercancel=e=>{if(gesture?.id===e.pointerId)gesture=null;};
+ stageTransform();
+}
+
 let selected=1, undoStack=[], redoStack=[], isInitialized=false;
 function clone(value){return JSON.parse(JSON.stringify(value));}
 function inform(message){const el=$('#editor-status');if(el){el.textContent=message;el.setAttribute('role','status');}}
@@ -82,11 +103,20 @@ function render(){
 function renderPlanReference(){
  const target=$('#ed-plan-reference');if(!target)return;
  if(!planReference){target.hidden=true;target.innerHTML='';return;}
+ const previous={};for(const id of ['length1','length2','angle','thickness'])previous[id]=$('#ed-plan-'+id)?.value??'';
  target.hidden=false;const valid=planConfiguredId===planReference.id;
- const pic=/^(data:image\/(jpeg|png);base64,|planos\/trenirtrade\/miniaturas\/)/.test(planReference.thumbnail)?`<img src="${esc(planReference.thumbnail)}" alt="Fotografía del plano seleccionado"/>`:'';
- target.innerHTML=`<div class="ed-plan-header"><strong>PLANO EN PROGRAMACIÓN · ${esc(planReference.name)}</strong><span>${esc(planReference.source)}</span></div><div class="ed-plan-body">${pic}<div><p><b>${valid?'Perfil editable creado':'Geometría pendiente de introducir'}</b>. La imagen es referencia visual; la simulación usa únicamente los tramos y ángulos que programes, nunca una interpretación automática de la foto.</p><div class="ed-plan-inputs"><label>Tramo 1 (mm)<input id="ed-plan-length1" type="number" min="0.1" max="100000" step="0.1" value="" placeholder="Ej. 30" /></label><label>Tramo 2 (mm)<input id="ed-plan-length2" type="number" min="0.1" max="100000" step="0.1" value="" placeholder="Ej. 30" /></label><label>Ángulo firmado (°)<input id="ed-plan-angle" type="number" min="-179" max="179" value="" placeholder="Ej. 90" /></label><label>Espesor (mm)<input id="ed-plan-thickness" type="number" min="0.1" max="100" step="0.1" value="" placeholder="Ej. 1.5" /></label></div><div class="ed-actions"><button id="ed-plan-create" type="button">Crear perfil 2D desde las medidas indicadas</button><button id="ed-plan-sim2d" type="button" ${!valid?'disabled':''}>Simular 2D</button><button id="ed-plan-sim3d" type="button" ${!valid?'disabled':''}>Simular 3D</button></div>${planReference.pdfUrl?`<a href="${esc(planReference.pdfUrl)}" target="_blank" rel="noopener noreferrer">Abrir PDF original en otra pestaña</a>`:''}</div></div>`;
+ const src=planReference.preview||planReference.thumbnail||'';
+ const pic=/^(data:image\/(jpeg|png|webp);base64,|planos\/trenirtrade\/(?:vistas|miniaturas)\/)/.test(src)?`<img src="${esc(src)}" alt="Plano de referencia ampliable" draggable="false" loading="eager"/>`:'<span class="ed-plan-unavailable">Este plano no tiene imagen disponible; abre el PDF original.</span>';
+ const marks=Trace.svg(planVision.marks,planVision.pending);
+ const markText=planVision.pending?'Marca el segundo extremo para completar la línea.':`${planVision.marks.length} línea(s) visual(es) B1–B${planVision.marks.length||1}. No contienen cotas.`;
+ target.innerHTML=`<div class="ed-plan-header"><strong>PLANO EN PROGRAMACIÓN · ${esc(planReference.name)}</strong><span>${esc(planReference.source)}</span></div>
+ <div class="ed-plan-visual"><div class="ed-plan-visual-toolbar" role="toolbar" aria-label="Visor del plano"><button type="button" id="ed-plan-zoom-out" aria-label="Reducir plano">− Zoom</button><span id="ed-plan-zoom-label">100 %</span><button type="button" id="ed-plan-zoom-in" aria-label="Ampliar plano">+ Zoom</button><button type="button" id="ed-plan-zoom-reset">Centrar</button><button type="button" id="ed-plan-mark-mode" aria-pressed="${planVision.marking}" class="${planVision.marking?'active':''}">✎ Marcar pliegue</button><button type="button" id="ed-plan-undo-mark" ${planVision.marks.length||planVision.pending?'':'disabled'}>Deshacer marca</button></div>
+ <div id="ed-plan-viewer" class="ed-plan-viewer ${planVision.marking?'is-marking':''}" aria-label="Visor del plano. Usa zoom y arrastra para desplazarte. Marca dos extremos por línea visual." tabindex="0"><div class="ed-plan-stage" id="ed-plan-stage">${pic}<svg class="ed-plan-overlay" viewBox="0 0 1000 1000" preserveAspectRatio="none" aria-hidden="true">${marks}</svg></div></div><p class="ed-plan-visual-note" id="ed-plan-visual-note">${markText} ${planVision.marking?'Modo marcar activo: pulsa dos puntos sobre el dibujo.':'Usa +/− para ampliar y arrastra con un dedo para mover.'}</p></div>
+ <div class="ed-plan-body"><div><p><b>${valid?'Perfil editable creado':'Geometría pendiente de introducir'}</b>. Las marcas son orientativas; el simulador utiliza solo las medidas y ángulos confirmados manualmente. <b>SIN VERIFICAR / NO CNC.</b></p><div class="ed-plan-inputs"><label>Tramo 1 (mm)<input id="ed-plan-length1" type="number" min="0.1" max="100000" step="0.1" value="" placeholder="Ej. 30" /></label><label>Tramo 2 (mm)<input id="ed-plan-length2" type="number" min="0.1" max="100000" step="0.1" value="" placeholder="Ej. 30" /></label><label>Ángulo firmado (°)<input id="ed-plan-angle" type="number" min="-179" max="179" value="" placeholder="Ej. 90" /></label><label>Espesor (mm)<input id="ed-plan-thickness" type="number" min="0.1" max="100" step="0.1" value="" placeholder="Ej. 1.5" /></label></div><div class="ed-actions"><button id="ed-plan-create" type="button">Crear perfil 2D desde las medidas indicadas</button><button id="ed-plan-sim2d" type="button" ${!valid?'disabled':''}>Simular 2D</button><button id="ed-plan-sim3d" type="button" ${!valid?'disabled':''}>Simular 3D</button></div>${planReference.pdfUrl?`<a href="${esc(planReference.pdfUrl)}" target="_blank" rel="noopener noreferrer">Abrir PDF original en otra pestaña</a>`:''}</div></div>`;
+ for(const [id,value] of Object.entries(previous))if($('#ed-plan-'+id))$('#ed-plan-'+id).value=value;
+ bindPlanViewer();
 }
-function setPlanReference(ref){planReference=ref;planConfiguredId=null;renderPlanReference();}
+function setPlanReference(ref){if(!ref||!ref.id)return;const changed=planReference?.id!==ref.id;planReference=ref;planConfiguredId=null;if(changed)planVision={zoom:1,dx:0,dy:0,marking:false,pending:null,marks:loadMarks(ref.id)};renderPlanReference();}
 function configurePlan(){if(!planReference)return;const ids=['length1','length2','angle','thickness'];const values=ids.map(id=>Number($('#ed-plan-'+id)?.value));if(ids.some((id,i)=>!$('#ed-plan-'+id)?.value.trim()||!Number.isFinite(values[i]))||values[0]<=0||values[1]<=0||values[0]>100000||values[1]>100000||Math.abs(values[2])>179||Math.abs(values[2])<.01||values[3]<.1||values[3]>100){inform('Introduce dos tramos positivos, un ángulo distinto de 0° y el espesor real del plano.');return;}
  const previous=clone(state);try{state=fromEditor({name:planReference.name.replace(/\.pdf$/i,''),material:'Acero S235JR',thickness:values[3],segments:values.slice(0,2),angles:[values[2]],sequence:[1]});}catch(e){inform(e.message);return;}
  undoStack.push(previous);redoStack=[];selected=1;planConfiguredId=planReference.id;persist();render();inform('Perfil inicial creado desde las medidas que has introducido. Completa los demás pliegues antes de simular. NO CNC.');}
@@ -131,6 +161,10 @@ function layout(){return `<section class="editor2d" aria-label="Editor de progra
  <div class="ed-section"><div class="ed-section-head"><strong>Ángulos entre tramos</strong><span>Valores entre −179° y +179°</span></div><div id="ed-angles" class="ed-fieldgrid"></div></div></div></div><p id="editor-status" class="ed-status" role="status"></p></section>`;}
 function change(event){
  const el=event.target;
+ if(['ed-plan-length1','ed-plan-length2','ed-plan-angle','ed-plan-thickness'].includes(el.id)){
+  if(planConfiguredId!==null){planConfiguredId=null;const a=$('#ed-plan-sim2d'),b=$('#ed-plan-sim3d');if(a)a.disabled=true;if(b)b.disabled=true;inform('Medidas modificadas: vuelve a pulsar Crear perfil para actualizar la simulación.');}
+  return;
+ }
  if(el.id==='ed-ref-filter'){sourceFilter=el.value;sourceSelected=null;renderOfficialReferences();return;}
  if(el.id==='ed-ref-item'){sourceSelected=el.value;renderOfficialReferences();return;}
  if(el.id==='ed-name'){const value=el.value.trim();if(!value){inform('El nombre no puede estar vacío.');render();return;}edit(d=>{d.name=value;});return;}
@@ -149,6 +183,11 @@ function actions(event){
  const sel=b.dataset.edSelect??b.dataset.edBend;
  if(sel){selected=Number(sel);render();return;}
  switch(b.id){
+ case 'ed-plan-zoom-in':zoomPlan(1.3);return;
+ case 'ed-plan-zoom-out':zoomPlan(1/1.3);return;
+ case 'ed-plan-zoom-reset':planVision.zoom=1;planVision.dx=0;planVision.dy=0;stageTransform();return;
+ case 'ed-plan-mark-mode':planVision.marking=!planVision.marking;planVision.pending=null;renderPlanReference();return;
+ case 'ed-plan-undo-mark':if(planVision.pending)planVision.pending=null;else planVision.marks.pop();saveMarks();renderPlanReference();return;
  case 'ed-plan-create':configurePlan();return;
  case 'ed-plan-sim2d':if(planConfiguredId===planReference?.id)window.PlegarApp?.switchScreen('Simulación 2D');return;
  case 'ed-plan-sim3d':if(planConfiguredId===planReference?.id)window.PlegarApp?.switchScreen('Simulación 3D');return;

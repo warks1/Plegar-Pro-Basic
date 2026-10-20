@@ -316,19 +316,31 @@ Los PDFs públicos se pueden descargar o compartir. Los documentos privados aña
 Pantalla completa a partir del boceto visual aprobado (`assets/splash-plegar-pro.webp`), con pulsos de luz independientes sobre las dos P, barrido energético y barra de progreso animada. El progreso mostrado es una presentación estimada y no medición física ni progreso de validación de módulos. La pantalla espera a la carga real de la página, muestra al menos 4,4 segundos (0,5 s cuando se solicita movimiento reducido), ofrece botón de omitir y nunca oculta la interfaz en caso de carga lenta. Responsive PC/tablet/móvil. Inicio original sin cambios.
 
 
-## v0.31 — Pantalla de carga adaptable (19/10/2026)
-Se conservan el boceto aprobado, las dos P animadas y la barra de progreso estimado. Se utilizan encuadres independientes para PC/tablet y móvil, con controles fuera de la imagen para que no se recorten. Se adapta al alto dinámico del móvil, giro horizontal y áreas seguras. El Inicio aprobado y styles.css permanecen intactos. Pruebas: 198 test Node y verificación visual de 1440×900, 820×1180, 390×844, 320×700, 844×390 y 667×375. El progreso mostrado es visual, no telemetría de carga de módulos.
+## v0.31 — Corrección responsive de la pantalla de carga (2026-10-19)
+La pantalla de carga conserva el boceto autorizado y las animaciones separadas de las P, pero utiliza dos encuadres de la misma imagen (desktop y móvil) sin incorporar la barra de 84 % dibujada en la ilustración. La barra efectiva y los textos se posicionan fuera de la ilustración, adaptándose a ancho/alto, orientación horizontal y áreas seguras de iPhone. `100dvh`, `max-height` y flexbox evitan recortes; la presentación conserva omitir y modo movimiento reducido. El progreso es estimado, no progreso real de módulos. `styles.css`, Inicio y los archivos del cliente Trenirtrade no cambian.
 
 
-# Plegar Pro Plus v0.32 — Integridad y adaptación móvil
+# Plegar Pro Plus v0.32 — Integridad de Planos y lectura adaptable
 
 Fecha: 2026-10-20.
 
-- Recuperados desde el historial de GitHub los archivos Planos omitidos por las versiones responsive: `plans-core.js`, `plans-view.js`, `plans.css`, `repo-plans.js`, 10 PDF y 10 miniaturas de Trenirtrade, y sus pruebas. Se restauraron sus blobs originales.
-- `responsive-v32.css` mejora encabezados, márgenes y áreas seguras de módulos sin rediseñar Inicio ni el splash.
-- La tabla de pliegues se desplaza horizontalmente dentro de su panel en móviles estrechos, con una indicación y acceso por teclado.
-- `tests/repository-integrity.test.cjs` comprueba scripts, hojas de estilo, caché offline, archivos PDF y miniaturas para prevenir pérdidas en futuras versiones.
-- `tests/mobile-workspace-check.py` revisa Inicio, Planos, Programación 2D y Simulación 3D en cinco tamaños (320, 390, 667 horizontal, 820, 1440 píxeles).
-- Validación local: 201 pruebas Node superadas; Planos → Programación → Simulación 3D y splash responsive probados sin desbordamiento general en los tamaños previstos.
+- Recuperados del historial de GitHub los archivos omitidos accidentalmente en v0.30/v0.31: biblioteca Planos, catálogo `repo-plans.js`, diez PDF Trenirtrade, miniaturas e índices. Recuperación por SHA original, sin alterar el contenido de los documentos.
+- Una nueva prueba `tests/repository-integrity.test.cjs` comprueba que no falten scripts, estilos, recursos del caché offline y los diez PDF/miniaturas visibles en Planos.
+- `responsive-v32.css` adapta los encabezados y márgenes de los módulos a móviles estrechos y respeta las zonas seguras del móvil. El diseño aprobado del Inicio permanece intacto.
+- En Programación 2D las tablas anchas se desplazan dentro de su panel, con indicación visible en móvil; no desplazan horizontalmente toda la aplicación.
+- La pantalla de carga conserva el diseño aprobado, P animadas y barra animada.
+- Verificado `node --test tests/*.test.cjs`: 201 tests sin errores, `tests/mobile-workspace-check.py`: cinco tamaños (320,390,667 horizontal, 820,1440), `tests/plans-programming.test.py`: cuatro tamaños, `tests/plans-browser-check.py`: cuatro tamaños, `tests/splash-responsive-check.py`: seis tamaños.
+- Los archivos PDF publicados en Trenirtrade contienen imágenes de planos originales; no se convierten en geometría CAD ni autorizan programación CNC.
 
-Los documentos fotográficos no equivalen a CAD editable ni autorizan uso CNC. El repositorio es público y los PDF de Trenirtrade también.
+## Continuidad
+
+Siguiente prioridad: ofrecer ampliación con zoom real del plano y trazado asistido de pliegues con validación manual; no inferir automáticamente dimensiones de una fotografía.
+
+## v0.33 — Visor de planos con zoom y marcado asistido (2026-10-20)
+
+- `Planos → Abrir en Programación` abre ahora el plano seleccionado en un **visor ampliado con zoom entre 100 y 500 %**, rueda del ratón o controles +/−, centrado y desplazamiento por arrastre (ratón/dedo). La fotografía original de la ficha de cliente se conserva en PDF, y los 10 PDF públicos de Trenirtrade disponen de vistas WebP de 1260 píxeles basadas en las fotografías originales, sin OCR ni alteración de las cotas.
+- El botón **Marcar pliegue** permite seleccionar dos puntos sobre el plano y superponer una línea numerada B1, B2, etc. Las marcas visuales se guardan en el `localStorage` del navegador **por identificador de plano** (máximo 24) y pueden deshacerse. No se convierten en ejes CAD ni aportan cotas automáticamente.
+- Las longitudes y ángulos siguen introduciéndose y confirmándose manualmente antes de simular. Si el usuario cambia una cota de la ficha tras configurar el perfil, se deshabilita la navegación a simulación hasta volver a crear el perfil. Todos los resultados siguen etiquetados SIN VERIFICAR / NO CNC.
+- Se conservan la interfaz de Inicio, pantalla de carga animada, documentos PDF, miniaturas, biblioteca Planos y programación/simulación previa.
+- Pruebas: `node --test tests/*.test.cjs`; `python tests/plans-zoom-trace.test.py` y `python tests/plans-programming.test.py`, `python tests/browser_check.py`, además de las pruebas existentes para móvil.
+- Limitaciones: sin vectorización OCR/IA certificada, sin conversión automática de fotos a CAD/CAM y sin inferencia de espesor o radios. Las vistas WEBP forman parte del repositorio público, como los PDF ya publicados.

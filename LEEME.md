@@ -10,4 +10,4 @@ Abrir: https://warks1.github.io/Plegar-Pro-Basic/
 
 **No industrial:** las simulaciones y las fotos importadas no reemplazan geometría CAD verificada ni autorizan uso CNC.
 
-Versión actual: v0.33. Planos → Programación 2D permite zoom, desplazar imagen y marcar líneas B1… con confirmación manual de medidas. No CAD automático ni CNC.
+Versión v0.34: pantalla de arranque completa y adaptable. Las P y la barra siguen animadas. Eliminado «Omitir presentación». Sin cambios en el diseño de Inicio.

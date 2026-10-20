@@ -1,47 +1,49 @@
-"""Prueba visual aislada del splash: imágenes reales como data URLs, sin acceso HTTP local."""
+"""Comprueba la pantalla de carga completa en orientación vertical, horizontal y formatos extremos."""
 from pathlib import Path
-import re, base64, tempfile
+import re,base64,tempfile
 from playwright.sync_api import sync_playwright
-ROOT=Path(__file__).resolve().parents[1]
-def url(p): return 'data:image/webp;base64,'+base64.b64encode((ROOT/p).read_bytes()).decode('ascii')
-html=(ROOT/'index.html').read_text()
+root=Path(__file__).resolve().parents[1]
+def as_url(p):return 'data:image/webp;base64,'+base64.b64encode((root/p).read_bytes()).decode()
+html=(root/'index.html').read_text()
 html=re.sub(r'<script src="[^"]+" defer></script>','',html)
 html=re.sub(r'<link rel="stylesheet"[^>]+>','',html)
-css=(ROOT/'styles.css').read_text()+'\n'+(ROOT/'splash.css').read_text()
-for asset in ['splash-plegar-pro.webp','splash-hero-desktop.webp','splash-hero-mobile.webp']:
-    css=css.replace('assets/'+asset,url('assets/'+asset))
-    html=html.replace('assets/'+asset,url('assets/'+asset))
+css=(root/'styles.css').read_text()+'\n'+(root/'splash.css').read_text()
+for name in ['splash-plegar-pro.webp','splash-hero-desktop.webp','splash-hero-mobile.webp','splash-composicion-pc.webp','splash-composicion-movil.webp','splash-fondo-movil.webp']:
+    css=css.replace('assets/'+name,as_url('assets/'+name))
+    html=html.replace('assets/'+name,as_url('assets/'+name))
+assert 'Omitir presentación' not in html
+assert 'startup-skip' not in (root/'splash.js').read_text()
 with sync_playwright() as pw:
     browser=pw.chromium.launch(executable_path='/usr/bin/chromium',headless=True,args=['--no-sandbox','--disable-dev-shm-usage'])
-    for width,height in [(1440,900),(820,1180),(390,844),(320,700),(844,390),(667,375)]:
+    for width,height in [(1440,900),(1920,1080),(820,1180),(1024,768),(390,844),(320,568),(375,812),(320,700),(844,390),(667,375)]:
         page=browser.new_page(viewport={'width':width,'height':height},device_scale_factor=1)
         errors=[]
-        page.on('pageerror',lambda err:errors.append(str(err)))
+        page.on('pageerror',lambda e:errors.append(str(e)))
         page.set_content(html,wait_until='load')
         page.add_style_tag(content=css)
-        page.evaluate((ROOT/'splash.js').read_text())
+        page.evaluate((root/'splash.js').read_text())
         img=page.locator('.pp-splash-hero')
-        assert img.evaluate('(el)=>el.complete && el.naturalWidth>0'),f'Imagen sin cargar {width}'
-        assert img.evaluate('(el)=>el.currentSrc.length>1000')
-        art=page.locator('.pp-splash-art').bounding_box()
-        meter=page.locator('.pp-splash-meter').bounding_box()
-        skip=page.locator('.pp-splash-skip').bounding_box()
-        for item,name in [(art,'imagen'),(meter,'barra'),(skip,'omitir')]:
-            assert item is not None, f'{name} no visible {width}'
-            assert item['x']>=-1 and item['x']+item['width']<=width+1, (width,name,item)
-            assert item['y']>=-1 and item['y']+item['height']<=height+1,(width,name,item)
-        
-        vw=page.evaluate('({doc:document.documentElement.scrollWidth, viewport:innerWidth, splash:document.getElementById("startup-splash").scrollWidth, splashClient:document.getElementById("startup-splash").clientWidth})')
-        print('Sizes',width,vw)
-        assert vw['splash']<=vw['splashClient']+1,f'Desbordamiento en splash {width} {vw}'
+        assert img.evaluate('(el)=>el.complete && el.naturalWidth>0'),f'Imagen rota {width}'
+        assert img.evaluate('(el)=>el.currentSrc.length>1000'),f'Imagen no incorporada {width}'
+        boxes={k:page.locator(k).bounding_box() for k in ('.pp-splash','.pp-splash-art','.pp-splash-hero','.pp-splash-copy','.pp-splash-meter','#startup-status')}
+        assert all(boxes.values()),(width,boxes)
+        for element,rect in boxes.items():
+            assert rect['width']>=1 and rect['height']>=1,(width,element,rect)
+            assert rect['x']>=-2 and rect['x']+rect['width']<=width+2,(width,element,rect)
+            assert rect['y']>=-2 and rect['y']+rect['height']<=height+2,(width,element,rect)
+        splash=boxes['.pp-splash']
+        assert splash['width']>=width-2 and splash['height']>=height-2,(width,height,splash)
+        img_box=boxes['.pp-splash-hero']
+        # Both the full-image visual composition and animated progress fit in the visible viewport.
+        assert img_box['width']>=min(width*.4,350),(width,'imagen excesivamente pequeña',img_box)
         assert page.locator('.pp-splash-emblem').count()==2
-        if width in (390,320,844,1440): page.screenshot(path=str(Path(tempfile.gettempdir()) / f'plegar-v31-splash-{width}.png'))
-        page.wait_for_timeout(600)
-        assert int(page.locator('#startup-meter').get_attribute('aria-valuenow'))>=5,f'Barra no progresa {width}'
-        page.locator('#startup-skip').click(timeout=2000)
-        assert page.locator('#startup-splash').get_attribute('class').find('pp-splash-done')>=0
-        assert page.locator('#brand-home').is_visible(), f'Interfaz no visible {width}'
+        assert page.locator('.pp-splash-skip').count()==0
+        assert page.evaluate('document.getElementById("startup-splash").scrollWidth<=document.getElementById("startup-splash").clientWidth+1'),width
+        if (width,height) in ((1440,900),(390,844),(320,568),(844,390)):
+            page.screenshot(path=str(Path(tempfile.gettempdir())/f'plegar-v34-{width}x{height}.png'))
+        page.wait_for_timeout(550)
+        assert int(page.locator('#startup-meter').get_attribute('aria-valuenow'))>=5,(width,'barra sin animar')
         assert not errors,(width,errors)
-        print(f'OK {width}×{height}: logotipo y barra visibles, animación, sin desbordamiento, omitir funciona')
+        print(f'OK {width}x{height}, pantalla completa, logo y progreso visibles, sin omitir')
         page.close()
     browser.close()

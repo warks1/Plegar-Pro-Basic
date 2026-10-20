@@ -1,54 +1,44 @@
-/* Pantalla de carga v0.31: misma imagen aprobada, dos encuadres, controles REALMENTE adaptativos. */
-.pp-splash{position:fixed;inset:0;z-index:3000;isolation:isolate;box-sizing:border-box;width:100%;height:100vh;height:100dvh;overflow:hidden;display:flex;align-items:center;justify-content:center;padding:max(10px,env(safe-area-inset-top)) max(12px,env(safe-area-inset-right)) max(10px,env(safe-area-inset-bottom)) max(12px,env(safe-area-inset-left));background:#020b15;color:#d5f5ff;opacity:1;visibility:visible;transition:opacity .45s ease,visibility .45s ease}
+/* v0.34 — Pantalla de carga realmente a pantalla completa: composición original escalable, progreso real superpuesto. */
+.pp-splash{position:fixed;inset:0;z-index:3000;isolation:isolate;box-sizing:border-box;width:100%;height:100vh;height:100dvh;overflow:hidden;display:grid;place-items:center;padding:max(8px,env(safe-area-inset-top)) max(8px,env(safe-area-inset-right)) max(8px,env(safe-area-inset-bottom)) max(8px,env(safe-area-inset-left));background:#020b15;color:#d5f5ff;opacity:1;visibility:visible;transition:opacity .4s ease,visibility .4s ease}
 .pp-splash.pp-splash-done{opacity:0;visibility:hidden;pointer-events:none}
-.pp-splash-background{position:absolute;inset:0;z-index:-1;background:linear-gradient(180deg,rgba(0,7,16,.68),rgba(0,13,29,.9)),url('assets/splash-plegar-pro.webp') center/cover no-repeat;filter:blur(17px) brightness(.62);transform:none}
-.pp-splash-shell{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:clamp(8px,1.5dvh,17px);width:min(100%,1200px);max-height:100%;min-height:0;overflow-x:hidden;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin;box-sizing:border-box}
-.pp-splash-art{position:relative;isolation:isolate;display:inline-block;flex:none;max-width:100%;max-height:min(66dvh,630px);overflow:hidden;line-height:0;filter:drop-shadow(0 0 18px rgba(4,154,232,.33))}
-.pp-splash-picture{display:block;max-width:100%;max-height:inherit;line-height:0}
-.pp-splash-hero{display:block;width:auto;height:auto;max-width:100%;max-height:min(66dvh,630px);object-fit:contain}
-.pp-splash-emblem{position:absolute;inset:0;pointer-events:none;background:url('assets/splash-hero-desktop.webp') center/100% 100% no-repeat;mix-blend-mode:screen;filter:brightness(1.6) saturate(1.6);opacity:.18}
-.pp-splash-emblem-a{clip-path:polygon(35% 7%,72% 7%,69% 70%,33% 70%);animation:pp-engrave-a 2.7s ease-in-out infinite alternate}
-.pp-splash-emblem-b{clip-path:polygon(46% 15%,78% 16%,77% 76%,42% 76%);animation:pp-engrave-b 2.2s ease-in-out infinite alternate}
-.pp-splash-energy{position:absolute;inset:0;pointer-events:none;opacity:.7;background:linear-gradient(110deg,transparent 25%,rgba(0,212,255,.03) 39%,rgba(119,239,255,.37) 47%,transparent 58%);mix-blend-mode:screen;animation:pp-light-trail 3.6s ease-in-out infinite}
-.pp-splash-copy{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:clamp(6px,1.3dvh,13px);width:min(92%,830px);flex:none;text-align:center;padding:0 3px 3px;box-sizing:border-box}
-.pp-splash-mobile-brand,.pp-splash-mobile-subtitle{display:none}
-.pp-splash-version{margin:0;color:#1ddcff;font-weight:700;font-size:clamp(11px,1.55vw,17px);letter-spacing:clamp(.08em,.24vw,.24em);text-shadow:0 0 13px rgba(0,207,255,.6)}
-.pp-splash-progress-row{display:flex;align-items:center;gap:clamp(6px,1.8vw,14px);width:100%;max-width:780px;min-width:0}
-.pp-splash-meter{height:clamp(13px,2.1vw,23px);flex:1;min-width:0;box-sizing:border-box;border:2px solid #1f9cde;border-radius:14px;background:rgba(0,9,22,.96);box-shadow:0 0 17px #00aaff77,inset 0 0 10px #008cda55;padding:3px;overflow:hidden}
-.pp-splash-fill{width:0;height:100%;border-radius:9px;background:repeating-linear-gradient(120deg,transparent 0 17px,rgba(255,255,255,.22) 17px 22px,transparent 22px 27px),linear-gradient(90deg,#0854d6,#00d7ff,#6ffcff);box-shadow:0 0 22px #00daff;transition:width .09s linear;position:relative}
+.pp-splash-background{position:absolute;inset:0;z-index:0;background:linear-gradient(180deg,rgba(1,8,18,.15),rgba(1,8,18,.42)),url('assets/splash-plegar-pro.webp') center center/cover no-repeat;filter:blur(12px) brightness(.95);transform:none}
+.pp-splash-shell{position:relative;z-index:1;box-sizing:border-box;width:100%;height:100%;min-height:0;max-width:1600px;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:clamp(3px,1.2dvh,16px);overflow:hidden}
+.pp-splash-art{position:relative;isolation:isolate;width:100%;min-width:0;min-height:0;flex:0 1 auto;display:flex;align-items:center;justify-content:center;overflow:hidden;line-height:0;filter:drop-shadow(0 0 16px rgba(4,154,232,.35));-webkit-mask-image:linear-gradient(to bottom,transparent 0,#000 5%,#000 97%,transparent 100%);mask-image:linear-gradient(to bottom,transparent 0,#000 5%,#000 97%,transparent 100%)}
+.pp-splash-picture{display:contents}
+.pp-splash-hero{display:block;box-sizing:border-box;width:auto;height:auto;max-width:100%;max-height:100%;object-fit:contain}
+.pp-splash-emblem{position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse at 55% 45%,rgba(15,192,255,.26),transparent 56%);mix-blend-mode:screen;filter:blur(10px);opacity:.23}
+.pp-splash-emblem-a{clip-path:polygon(33% 3%,72% 3%,70% 66%,30% 66%);animation:pp-engrave-a 2.7s ease-in-out infinite alternate}
+.pp-splash-emblem-b{clip-path:polygon(45% 11%,78% 13%,78% 69%,42% 69%);animation:pp-engrave-b 2.2s ease-in-out infinite alternate}
+.pp-splash-energy{position:absolute;inset:0;pointer-events:none;opacity:.65;background:linear-gradient(110deg,transparent 25%,rgba(0,212,255,.03) 39%,rgba(119,239,255,.35) 47%,transparent 58%);mix-blend-mode:screen;animation:pp-light-trail 3.6s ease-in-out infinite}
+.pp-splash-copy{display:flex;flex:0 0 auto;flex-direction:column;align-items:center;justify-content:center;gap:clamp(6px,1.5dvh,14px);width:min(92%,990px);min-width:0;box-sizing:border-box;text-align:center;padding:0 2px}
+.pp-splash-progress-row{display:flex;align-items:center;gap:clamp(7px,1.8vw,16px);width:100%;min-width:0}
+.pp-splash-meter{height:clamp(15px,2.5vw,25px);flex:1;min-width:0;box-sizing:border-box;border:2px solid #1f9cde;border-radius:14px;background:rgba(0,9,22,.9);box-shadow:0 0 15px #00aaff77,inset 0 0 10px #008cda55;padding:3px;overflow:hidden}
+.pp-splash-fill{width:0;height:100%;border-radius:9px;background:repeating-linear-gradient(120deg,transparent 0 17px,rgba(255,255,255,.2) 17px 22px,transparent 22px 27px),linear-gradient(90deg,#0854d6,#00d7ff,#6ffcff);box-shadow:0 0 22px #00daff;transition:width .09s linear;position:relative}
 .pp-splash-fill::after{content:"";position:absolute;right:0;top:-8px;bottom:-8px;width:7px;background:#efffff;filter:blur(5px)}
-.pp-splash-value{min-width:3.6ch;flex:none;font-size:clamp(14px,1.9vw,23px);font-variant-numeric:tabular-nums}
-.pp-splash-status{margin:0;color:#23d6f8;font-size:clamp(11px,1.45vw,16px);letter-spacing:clamp(.06em,.18vw,.2em)}
-.pp-splash-modules{margin:0;color:#bfd1df;font-size:clamp(10px,1.2vw,15px);line-height:1.35;overflow-wrap:anywhere}
-.pp-splash-skip{font:inherit;font-size:12px;background:rgba(3,38,62,.74);color:#d0ecfc;border:1px solid #2e6f90;border-radius:7px;padding:8px 14px;cursor:pointer;min-height:36px}
-.pp-splash-skip:focus-visible{outline:3px solid #70e5ff;outline-offset:2px}
-@keyframes pp-engrave-a{from{opacity:.12;transform:translateY(2px) scale(.999);filter:brightness(1.5)}to{opacity:.48;transform:translateY(-3px) scale(1.006);filter:brightness(2.15)}}
-@keyframes pp-engrave-b{from{opacity:.35;transform:translateX(-2px) scale(.998);filter:brightness(1.8)}to{opacity:.07;transform:translateX(3px) scale(1.007);filter:brightness(1.2)}}
+.pp-splash-value{min-width:3.8ch;flex:none;font-size:clamp(13px,2.2vw,24px);font-variant-numeric:tabular-nums}
+.pp-splash-status{margin:0;color:#23d6f8;font-size:clamp(10px,2.1vw,16px);letter-spacing:clamp(.04em,.18vw,.2em)}
+.pp-splash-modules{margin:0;color:#bfd1df;font-size:clamp(9px,1.7vw,15px);line-height:1.35;overflow-wrap:anywhere}
+@keyframes pp-engrave-a{from{opacity:.12;transform:translateY(2px);filter:brightness(1.5)}to{opacity:.45;transform:translateY(-3px);filter:brightness(2.15)}}
+@keyframes pp-engrave-b{from{opacity:.32;transform:translateX(-2px);filter:brightness(1.8)}to{opacity:.08;transform:translateX(3px);filter:brightness(1.2)}}
 @keyframes pp-light-trail{0%,20%{transform:translateX(-110%);opacity:0}45%{opacity:.8}80%,100%{transform:translateX(110%);opacity:0}}
-@media(max-width:700px){
- .pp-splash-shell{width:100%;gap:clamp(10px,2dvh,18px)}
- .pp-splash-art{max-width:96%;max-height:min(50dvh,385px);-webkit-mask-image:radial-gradient(ellipse 74% 72% at center,#000 60%,transparent 100%);mask-image:radial-gradient(ellipse 74% 72% at center,#000 60%,transparent 100%)}
- .pp-splash-hero{max-height:min(50dvh,385px)}
- .pp-splash-emblem{background-image:url('assets/splash-hero-mobile.webp')}
- .pp-splash-emblem-a{clip-path:polygon(7% 0%,72% 0%,68% 91%,7% 91%)}
- .pp-splash-emblem-b{clip-path:polygon(33% 9%,98% 9%,98% 94%,33% 94%)}
- .pp-splash-copy{width:min(100%,520px);gap:clamp(7px,1.5dvh,13px)}
- .pp-splash-mobile-brand{display:block;font-size:clamp(27px,8vw,47px);font-weight:900;line-height:1.06;letter-spacing:.045em;color:#d4e6f0;text-shadow:0 1px 1px #fafafa,0 4px 8px #000,0 0 18px #00bfff}
- .pp-splash-mobile-brand span{color:#1de1ff;text-shadow:0 0 19px #00bcff,0 2px 8px #000}
- .pp-splash-mobile-subtitle{display:block;margin:0;font-size:clamp(7.5px,2.2vw,11px);letter-spacing:.09em;line-height:1.35;color:#cbd8e4}
- .pp-splash-version{font-size:clamp(10px,2.8vw,13px);letter-spacing:.08em}
- .pp-splash-modules{font-size:clamp(9px,2.5vw,12px)}
- .pp-splash-progress-row{width:min(100%,480px)}
+@media (orientation:portrait){
+ .pp-splash-background{background-image:linear-gradient(180deg,rgba(1,8,18,.45),rgba(1,8,18,.73)),url('assets/splash-fondo-movil.webp') center/100% 100% no-repeat}
+ .pp-splash-emblem{background-image:url('assets/splash-fondo-movil.webp') center/100% 100% no-repeat}
+ .pp-splash-emblem-a{clip-path:polygon(30% 13%,72% 13%,69% 72%,23% 72%)}
+ .pp-splash-emblem-b{clip-path:polygon(45% 21%,85% 24%,85% 75%,38% 75%)}
+ .pp-splash-copy{width:min(97%,750px)}
 }
-@media(max-height:500px) and (orientation:landscape){
- .pp-splash-shell{flex-direction:row;gap:clamp(6px,2vw,18px);width:100%;align-items:center}
- .pp-splash-art{max-width:53%;max-height:calc(100dvh - 28px)}
- .pp-splash-hero{max-height:calc(100dvh - 28px)}
- .pp-splash-copy{width:45%;gap:4px}
- .pp-splash-mobile-brand{font-size:clamp(19px,3.6vw,34px)}
- .pp-splash-mobile-subtitle{font-size:clamp(7px,1.1vw,9px)}
- .pp-splash-version,.pp-splash-status{font-size:clamp(9px,1.3vw,12px)}
- .pp-splash-modules{font-size:clamp(8px,1.1vw,10px)}
- .pp-splash-skip{padding:3px 12px;min-height:29px}
+@media (max-width:420px){
+ .pp-splash{padding-inline:max(5px,env(safe-area-inset-left)) max(5px,env(safe-area-inset-right))}
+ .pp-splash-copy{gap:clamp(5px,1dvh,12px)}
+ .pp-splash-modules{font-size:clamp(9px,2.55vw,11px)}
 }
+@media (orientation:landscape) and (max-height:500px){
+ .pp-splash-shell{flex-direction:row;gap:clamp(6px,1vw,16px)}
+ .pp-splash-art{flex:1 1 59%;height:100%;min-width:0}
+ .pp-splash-copy{flex:1 1 39%;width:auto;gap:clamp(4px,1.5dvh,9px)}
+ .pp-splash-status{font-size:clamp(9px,1.3vw,13px)}
+ .pp-splash-modules{font-size:clamp(8px,1.1vw,11px)}
+}
+@media (max-height:450px) and (orientation:portrait){.pp-splash-copy{gap:3px}.pp-splash-status,.pp-splash-modules{font-size:9px}}
 @media(prefers-reduced-motion:reduce){.pp-splash-emblem,.pp-splash-energy{animation:none!important}.pp-splash{transition:none}.pp-splash-fill{transition:none}}

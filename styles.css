@@ -206,3 +206,8 @@
 .machine-reference-comparisons{padding:12px;border:1px solid #477790;border-radius:8px;background:#0b2638;margin-top:12px}
 .machine-reference-comparisons h3{color:#f6ca84}
 .machine-reference-comparisons p{line-height:1.55}
+
+/* Fotografía de referencia convertida en vista frontal vectorial ilustrativa. */
+.machine-photo-reference{margin:12px 0;padding:8px;border:1px solid #466d87;border-radius:9px;background:#091d2b}
+.machine-photo-reference img{display:block;max-width:100%;width:100%;height:auto;aspect-ratio:12/7;object-fit:contain;border-radius:7px;background:#142432}
+.machine-photo-reference figcaption{color:#f5c68b;font-size:11px;line-height:1.5;padding:8px 5px 3px}

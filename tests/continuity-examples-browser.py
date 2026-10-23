@@ -31,7 +31,7 @@ with sync_playwright() as pw:
   if w<=1120:page.locator('#open-menu').click()
   page.locator('button.nav-item[data-screen="Programación 2D"]').click()
   assert page.locator('#ed-example-gallery [data-example-id]').count()==4
-  svg_views=page.locator('#ed-example-gallery .example-gadget svg').all_inner_htmls()
+  svg_views=page.locator('#ed-example-gallery .example-gadget svg').evaluate_all('(els)=>els.map(el=>el.innerHTML)')
   assert len(set(svg_views))==4,'Cuatro piezas no tienen cuatro geometrías diferentes'
   page.locator('#ed-example-gallery [data-example-id="u"]').click()
   assert page.evaluate('PlegarEditor2D.getData().segments')==[55,100,55]

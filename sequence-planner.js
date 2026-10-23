@@ -14,7 +14,7 @@
  function step(profile,chosen,id){
   const n=profile.angles.length,sequence=[...chosen,id,...Array.from({length:n},(_,i)=>i+1).filter(v=>v!==id&&!chosen.includes(v))];
   const candidate={...profile,sequence},idx=chosen.length;
-  const scene=F.scene(candidate,idx,1),scan=Clearance.inspect(candidate,scene);
+  const scene=F.scene(candidate,idx,1),scan=Clearance.sweep(candidate,idx,{intervals:n<=6?4:2});
   const die=C.DIES.find(d=>d.id===candidate.setup.die),angle=Math.abs(candidate.angles[id-1]),interior=180-angle;
   const left=candidate.segments[id-1],right=candidate.segments[id],v=die.opening;
   const issues=[];
@@ -23,7 +23,8 @@
    cost+=120;issues.push('Ángulo interior menor que el ángulo de herramienta.');
   }
   if(Math.min(left,right)<.7*v){cost+=45;issues.push('Ala bajo 0,7×V; apoyo por revisar.');}
-  if(scan.possibleTableContact){cost+=100;issues.push('Posible choque con mesa en perfil nominal.');}
+  if(scan.possibleTableContact){cost+=200;issues.push('Posible choque con MESA durante ciclo nominal.');}
+  if(scan.possibleRamContact){cost+=200;issues.push('Posible choque con TRANCHA durante ciclo nominal.');}
   if(scene.interferences?.problems?.some(p=>p.code==='PRIOR_FLANGE_NEAR_TOOL')){cost+=60;issues.push('Posible choque con punzón, matriz o tope.');}
   // Un perfil con retorno se cierra prematuramente si ejecuta primero los bordes.
   // Se usa para priorizar pruebas, nunca para declarar una secuencia apta.
@@ -41,7 +42,7 @@
   for(let i=0;i<sequence.length;i++){
    const r=step(profile,sequence.slice(0,i),sequence[i]);
    score+=r.score;
-   rows.push({position:i+1,bend:r.bend,score:r.score,issues:r.issues,tableGap:r.scan.tableGap});
+   rows.push({position:i+1,bend:r.bend,score:r.score,issues:r.issues,tableGap:r.scan.tableGap,possibleRamContact:r.scan.possibleRamContact,possibleTableContact:r.scan.possibleTableContact,sampledFrames:r.scan.frames});
    for(const msg of [...r.issues,...r.scan.alerts])if(!issues.includes(msg))issues.push(msg);
   }
   return {sequence:[...sequence],score:Math.round(score*100)/100,rows,issues,
@@ -66,7 +67,7 @@
   }
   const alternatives=beam.slice(0,limit).map(item=>evaluate(profile,item.sequence));
   return {current,best:alternatives[0]||null,alternatives,searched,
-   note:'Orden sugerido por cribado discreto y reglas orientativas. La mesa y la trancha no están modeladas con CAD real; tampoco se comprueban todos los volteos ni los movimientos de extracción. NINGÚN orden está validado para CNC.'};
+   note:'Orden sugerido por cribado discreto y reglas orientativas. La mesa y la trancha se criban como envolventes introducidas cuando hay cotas; no hay CAD real; tampoco se comprueban todos los volteos ni los movimientos de extracción. NINGÚN orden está validado para CNC.'};
  }
  return {step,evaluate,suggest};
 });

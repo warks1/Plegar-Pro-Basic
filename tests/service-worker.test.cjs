@@ -61,10 +61,10 @@ function harness() {
   return { trigger, state, caches, stores, seen };
 }
 
-test('installs an offline page and cache version v46', async () => {
+test('installs an offline page and cache version v47', async () => {
   const h = harness();
   await h.trigger('install');
-  assert.ok(h.stores.has('plegar-pro-forming2d-v46'));
+  assert.ok(h.stores.has('plegar-pro-forming2d-v47'));
   assert.ok(await h.caches.match(home));
 });
 

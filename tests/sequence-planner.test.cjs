@@ -33,7 +33,7 @@ test('Planificador: no pierde pliegues, respeta orden actual y no afirma que sea
  assert.ok(result.best);
  assert.equal(result.best.sequence.length,4);
  assert.deepEqual([...result.best.sequence].sort((a,b)=>a-b),[1,2,3,4]);
- assert.ok(result.best.score<=result.current.score);
+ assert.ok(result.best.riskCount<=result.current.riskCount,'priorizar menos advertencias nominales');
  assert.equal(result.best.physicallyValidated,false);
  assert.equal(result.best.cncApproved,false);
  assert.ok(result.note.includes('NINGÚN orden'));
@@ -107,4 +107,24 @@ test('Los prismas 3D de mesa/trancha sólo aparecen con cotas aportadas',()=>{
  assert.ok(drawn.faces.some(f=>f.group==='ram'));
  assert.ok(drawn.faces.some(f=>f.group==='table'));
  assert.ok(drawn.vertices.every(v=>Number.isFinite(v.x)&&Number.isFinite(v.y)&&Number.isFinite(v.z)));
+});
+
+test('No se recomienda aplicar automáticamente ningún candidato con posibles interferencias nominales',()=>{
+ const src={...omega,segments:[8,8],angles:[90],sequence:[1]};
+ const out=P.suggest(src);
+ assert.ok(out.best);
+ assert.equal(out.best.riskCodes.includes('SHORT_FLANGE'),true);
+ assert.ok(out.best.riskCount>0);
+ assert.equal(out.recommended,null,'No aplicar a ciegas un pliegue con ala bajo el apoyo orientativo');
+ assert.equal(out.best.status,'POSIBLES INTERFERENCIAS · REVISAR');
+ assert.equal(out.best.physicallyValidated,false);
+ assert.equal(out.best.cncApproved,false);
+});
+test('Informe de secuencia identifica el paso y las razones antes de aplicar',()=>{
+ const p={...omega,setup:{...omega.setup,dieHeight:60,tableLeft:180,tableRight:180,ramWidth:95,ramBottomOffset:100}};
+ const out=P.suggest(p);
+ assert.ok(out.current.rows.every(x=>Array.isArray(x.riskCodes)&&typeof x.possibleCollision==='boolean'));
+ assert.equal(out.current.riskCount,out.current.rows.reduce((n,row)=>n+row.riskCodes.length,0));
+ assert.equal(out.best?.cncApproved,false);
+ if(out.recommended)assert.equal(out.recommended.riskCount,0);
 });

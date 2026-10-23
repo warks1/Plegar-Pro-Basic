@@ -34,3 +34,24 @@ test('Metal: no modifica estados físicos ni identifica el render como verificac
  const normal=Metal.normal({vertices:[{x:0,y:0,z:0},{x:2,y:0,z:0},{x:0,y:2,z:0}]},{ids:[0,1,2]});
  assert.ok(Math.abs(normal.z-1)<1e-8);
 });
+
+test('La chapa, punzón, matriz y topes usan acabados industriales claramente diferenciados',()=>{
+ const svg=Home.machine(shape,{stage:2,progress:.4}).svg;
+ for(const group of ['punch','die','gauge']){
+  assert.match(svg,new RegExp('id="pp-machine-metal-'+group+'"'));
+  assert.match(svg,new RegExp('data-group="'+group+'"'));
+  assert.match(svg,new RegExp('url\\(#pp-machine-metal-'+group+'\\)'));
+ }
+ assert.match(svg,/url\(#pp-machine-metal-metal\)/,'la chapa sigue usando su acabado acero');
+ assert.match(svg,/data-group="sheet"/);
+ assert.match(svg,/role="img"/);
+ // Mesa y trancha solo pueden dibujarse cuando hay cotas reales aportadas.
+ assert.doesNotMatch(svg,/data-group="table"/);
+ assert.doesNotMatch(svg,/data-group="ram"/);
+ const configured={...shape,setup:{...shape.setup,dieHeight:60,tableLeft:150,tableRight:150,ramWidth:110,ramBottomOffset:100}};
+ const withMachine=Home.machine(configured,{stage:2,progress:.4}).svg;
+ for(const group of ['table','ram']){
+  assert.match(withMachine,new RegExp('data-group="'+group+'"'));
+  assert.ok(withMachine.includes('fill="url(#pp-machine-metal-'+group+')"'));
+ }
+});

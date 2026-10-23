@@ -64,6 +64,20 @@ with sync_playwright() as pw:
   assert prev_gesture['zoom']>1 and prev_gesture['reset']==1 and prev_gesture['hasCamera']
   page.locator('#home-view-model').click()
   assert page.locator('#home-machine-cad').is_visible()
+  # Comprobar controles que parecían no tener acción en móvil y escritorio.
+  before_view=page.locator('#home-machine-cad').inner_html()
+  page.locator('#views').click()
+  assert page.locator('#home-view-menu').is_visible()
+  assert page.locator('#views').get_attribute('aria-expanded')=='true'
+  page.locator('[data-home-view="profile"]').click()
+  assert page.locator('#home-view-menu').is_hidden()
+  assert page.locator('#home-machine-cad').inner_html()!=before_view
+  assert page.locator('#home-stage-readout').is_visible()
+  page.locator('#maximize').click()
+  assert page.locator('#machine-panel').evaluate('(el)=>getComputedStyle(el).position')=='fixed'
+  page.locator('#maximize').click()
+  assert page.locator('#machine-panel').evaluate('(el)=>getComputedStyle(el).position')!='fixed'
+
   assert page.locator('.home-machine-photo').is_hidden()
   page.locator('#realistic-option').click()
   assert page.locator('.home-machine-photo').is_visible()
@@ -238,11 +252,27 @@ with sync_playwright() as pw:
   assert 'Perfil omega' in page.locator('#ed-auto-plan').inner_text()
   assert 'H matriz 60 mm' in page.locator('#ed-auto-plan').inner_text()
   assert page.locator('#ed-apply-auto').count()==1
-  page.locator('#ed-apply-auto').click()
-  assert sorted(page.evaluate('PlegarEditor2D.getData().sequence'))==[1,2,3,4]
+  if page.locator('#ed-apply-auto').is_enabled():
+   page.locator('#ed-apply-auto').click()
+   assert sorted(page.evaluate('PlegarEditor2D.getData().sequence'))==[1,2,3,4]
+  else:
+   assert 'BLOQUEADA' in page.locator('#ed-auto-plan').inner_text()
+   assert sorted(page.evaluate('PlegarEditor2D.getData().sequence'))==[1,2,3,4]
   assert 'NO CNC' in page.locator('#ed-auto-plan').inner_text()
+  page.evaluate("""() => {
+   window.__ppClicks=[];
+   const gallery=document.querySelector('#ed-example-gallery');
+   window.__ppGalleryStatus={gallery:!!gallery,parent:gallery?.parentElement?.id,
+    targetConnected:!!document.querySelector('[data-example-id="u"]')?.isConnected,
+    handler:typeof document.querySelector('#module-sample')?.onclick,
+    example:!!window.PlegarExamples3D?.get('u')};
+   document.addEventListener('click',e=>{
+    window.__ppClicks.push({tag:e.target.tagName,button:e.target.closest?.('[data-example-id]')?.dataset.exampleId,
+     path:e.composedPath().slice(0,5).map(el=>el.id||el.tagName)});
+   },true);
+  }""")
   page.locator('#ed-example-gallery [data-example-id="u"]').click()
-  assert page.evaluate('PlegarEditor2D.getData().segments')==[55,100,55]
+  assert page.evaluate('PlegarEditor2D.getData().segments')==[55,100,55], f"Canal U no se cargó: {page.evaluate('PlegarEditor2D.getData()')} errores={errors[-3:]} clicks={page.evaluate('window.__ppClicks')} gallery={page.evaluate('window.__ppGalleryStatus')}"
   page.locator('[data-ed-position="2"]').select_option('1')
   assert page.evaluate('PlegarEditor2D.getData().sequence')==[2,1]
   page.locator('#ed-order-reset').click()

@@ -38,7 +38,9 @@ function bindPlanViewer(){const frame=$('#ed-plan-viewer');if(!frame)return;let 
  stageTransform();
 }
 
-let selected=1, undoStack=[], redoStack=[], isInitialized=false, orderPick=0;
+let selected=1, undoStack=[], redoStack=[], isInitialized=false, orderPick=0, orderUsed=new Set();
+let projectWidth=100;
+try{const width=Number(localStorage.getItem('plegarpro-program-width-v1'));if(Number.isFinite(width)&&width>=1&&width<=5000)projectWidth=width;}catch{}
 function clone(value){return JSON.parse(JSON.stringify(value));}
 function inform(message){const el=$('#editor-status');if(el){el.textContent=message;el.setAttribute('role','status');}}
 function persist(){try{localStorage.setItem(STORAGE,JSON.stringify(state));return true;}catch(e){inform('El navegador no pudo guardar los datos locales. Exporta un archivo JSON.');return false;}}
@@ -71,8 +73,8 @@ function draw(){
   return `<text class="ed-dim" x="${midX.toFixed(2)}" y="${(midY-12).toFixed(2)}" text-anchor="middle">${fmt(state.segments[i])} mm</text>`;
  }).join('');
  const bends=coords.slice(1,-1).map((p,i)=>{
-  const id=i+1;
-  return `<g data-ed-bend="${id}" class="ed-bend-point ${selected===id?'current':''}" role="button" tabindex="0" aria-label="Seleccionar pliegue ${id}"><circle cx="${p.x.toFixed(2)}" cy="${p.y.toFixed(2)}" r="16"/><text x="${p.x.toFixed(2)}" y="${(p.y+4).toFixed(2)}" text-anchor="middle">${id}</text></g>`;
+  const id=i+1,position=state.sequence.indexOf(i+1)+1;
+  return `<g data-ed-bend="${id}" class="ed-bend-point ${selected===id?'current':''} ${orderUsed.has(id)?'ed-order-chosen':''}" role="button" tabindex="0" aria-label="Pliegue ${id}, paso ${position}; toca para ordenar"><circle cx="${p.x.toFixed(2)}" cy="${p.y.toFixed(2)}" r="21"/><text x="${p.x.toFixed(2)}" y="${(p.y+4).toFixed(2)}" text-anchor="middle">${id}</text><text class="ed-order-small" x="${p.x.toFixed(2)}" y="${(p.y+34).toFixed(2)}" text-anchor="middle">Paso ${position}</text></g>`;
  }).join('');
  $('#ed-svg').innerHTML=`<defs><pattern id="ed-grid" width="24" height="24" patternUnits="userSpaceOnUse"><path d="M 24 0 L 0 0 0 24" fill="none" stroke="#21445c" stroke-width=".8"/></pattern></defs><rect width="760" height="460" fill="url(#ed-grid)"/><polyline points="${polylines}" stroke="#031321" stroke-width="13" fill="none" stroke-linejoin="round" stroke-linecap="round"/><polyline points="${polylines}" stroke="#5bc8ff" stroke-width="7" fill="none" stroke-linejoin="round" stroke-linecap="round"/>${labels}${bends}`;
  $('#ed-total').textContent=`${fmt(G.totalLength(state))} mm nominales entre vértices`;
@@ -89,6 +91,22 @@ function render(){
  $('#ed-punch').value=state.setup.punch;
  $('#ed-die').value=state.setup.die;
  $('#ed-backgauge').value=String(state.setup.backgaugeX);
+ const planWidth=$('#ed-plan-width');if(planWidth)planWidth.value=String(projectWidth);
+ for(const [field,value] of Object.entries({
+  material:state.material,thickness:state.thickness,punch:state.setup.punch,die:state.setup.die,
+  radius:state.setup.radius,kfactor:state.setup.kFactor,backgauge:state.setup.backgaugeX,width:projectWidth
+ })){const input=$('#ed-quick-'+field);if(input)input.value=String(value);}
+ const quickOrder=$('#ed-quick-order');
+ if(quickOrder){quickOrder.textContent=orderPick?'Asignando paso '+orderPick+' · toca la pieza':'☞ Elegir orden tocando los pliegues';quickOrder.setAttribute('aria-pressed',String(orderPick>0));}
+ const diagnostics=$('#ed-quick-analysis');
+ if(diagnostics)try{
+  const a=window.PlegarEngineeringChecks.analyse(state,{width:projectWidth});
+  diagnostics.textContent='V≈8×e: '+fmt(a.vNominal)+' mm · V/e: '+fmt(a.vRatio)+
+   ' · Desarrollo: '+(a.flat===null?'no calculable':fmt(a.flat)+' mm')+
+   ' · Fuerza aproximada: '+(a.forceKN===null?'sin resistencia':fmt(a.forceKN)+' kN / '+fmt(a.tonnes)+' t')+
+   ' · '+a.warnings.slice(0,3).join(' · ')+'. Orientativo; NO datos CNC.';
+ }catch(error){diagnostics.textContent='Datos por revisar: '+error.message;}
+
  $('#ed-tool-punch').textContent=L.details(L.get('punch',state.setup.punch));
  $('#ed-tool-die').textContent=L.details(L.get('die',state.setup.die));
  renderOfficialReferences();
@@ -158,12 +176,31 @@ function renderCalc(){
 }
 function layout(){return `<section class="editor2d" aria-label="Editor de programación 2D">
  <div class="ed-toolbar"><span class="ed-chip">EDITOR GEOMÉTRICO · v0.7</span><div class="ed-actions"><button type="button" id="ed-undo" aria-label="Deshacer">↶ Deshacer</button><button type="button" id="ed-redo" aria-label="Rehacer">↷ Rehacer</button><button type="button" id="ed-save">Guardar</button><label class="ed-plan-export-width">Ancho 3D (mm)<input id="ed-plan-width" type="number" min="1" max="5000" step="1" value="100" inputmode="decimal"/></label><button type="button" id="ed-save-plan">Crear y guardar plano 2D + 3D</button><button type="button" id="ed-export">Exportar JSON</button><label class="ed-import">Importar JSON<input type="file" id="ed-import" accept=".json,application/json" aria-label="Importar pieza JSON"></label></div></div>
- <div class="example-gallery-wrap"><div class="example-gallery-title"><strong>CUATRO PIEZAS DE EJEMPLO · vista de su forma 3D</strong><small>Toca una tarjeta para cargarla y editar sus pliegues.</small></div><div class="example-gallery" id="ed-example-gallery"></div></div><div class="ed-plan-reference" id="ed-plan-reference" hidden></div><div class="ed-grid"><div class="ed-primary"><div class="ed-canvas-top"><strong>PERFIL 2D DE LA PIEZA</strong><span id="ed-count"></span></div><svg id="ed-svg" viewBox="0 0 760 460" role="img" aria-label="Perfil de ejes de chapa y pliegues numerados"></svg><div class="ed-caption"><strong id="ed-total"></strong><span>Ángulo firmado: positivo antihorario, negativo horario. Los tramos representan ejes rectos nominales.</span></div><p class="ed-warning">Perfil dibujado entre vértices teóricos agudos. El cálculo orientativo de desarrollo se muestra debajo, con hipótesis explícitas. No sustituye validación de plegado real ni constituye un programa CNC.</p><div class="f2-inline" id="ed-forming"></div><div class="ed-section ed-calculation"><div class="ed-section-head"><strong>Estimación del desarrollo · hipótesis geométrica</strong><span>Longitudes entre vértices teóricos (no cotas exteriores/interiores)</span></div><div class="ed-results"><div id="ed-calc-result"><small>Desarrollo nominal estimado</small><strong id="ed-flat"></strong></div><div><small>Deducción total</small><strong id="ed-deduction"></strong></div><div><small>Suma BA (arcos)</small><strong id="ed-allowance"></strong></div><div><small>Apertura V/e</small><strong id="ed-vratio"></strong></div></div><p class="ed-table-hint">Desliza la tabla hacia los lados para consultar todas las columnas →</p><div class="ed-table-wrap" tabindex="0" role="region" aria-label="Tabla de cotas por pliegue: desplázate horizontalmente"><table class="ed-bend-table"><thead><tr><th>Pliegue</th><th>Giro</th><th>Ángulo interior</th><th>BA (mm)</th><th>BD (mm)</th></tr></thead><tbody id="ed-bend-table"></tbody></table></div><p class="ed-equation">BA = θ(rad) × (Ri + K × e) · BD = 2 × (Ri + e) × tan(θ/2) − BA · Desarrollo = Σ tramos nominales − Σ BD</p><ul id="ed-calc-warnings" class="ed-calc-warnings"></ul></div><div class="ed-section"><div class="ed-section-head"><strong>Orden de plegado</strong><span>Cambia la posición o toca los pliegues en el dibujo en el orden deseado</span></div><div class="ed-actions"><button type="button" id="ed-order-pick" aria-pressed="false">☞ Elegir orden tocando los pliegues</button><button type="button" id="ed-order-reset">1, 2, 3… Restablecer</button></div><div id="ed-order" class="ed-order"></div><div class="ed-actions"><button type="button" id="ed-up">↑ Adelantar</button><button type="button" id="ed-down">↓ Retrasar</button></div></div></div>
+ <div class="ed-quick-setup" role="group" aria-label="Configuración esencial de plegado">
+ <div class="ed-quick-intro"><strong>PROGRAMACIÓN DE PLEGADO · CONTROLES PRINCIPALES</strong><span>Todos los parámetros se sincronizan con el editor inferior y el visor 3D.</span></div>
+ <label>Material<select id="ed-quick-material">${['Acero S235JR','Acero S355JR','Inox 304','Aluminio 5754'].map(m=>`<option value="${m}">${m}</option>`).join('')}</select></label>
+ <label>Espesor de chapa (mm)<input id="ed-quick-thickness" type="number" min="0.1" max="100" step="0.1" inputmode="decimal"/></label>
+ <label>Ancho de plegado (mm)<input id="ed-quick-width" type="number" min="1" max="5000" step="1" inputmode="decimal"/></label>
+ <label>Seleccionar punzón<select id="ed-quick-punch">${C.PUNCHES.map(t=>`<option value="${t.id}">${esc(t.name)}</option>`).join('')}</select></label>
+ <label>Seleccionar matriz<select id="ed-quick-die">${C.DIES.map(t=>`<option value="${t.id}">${esc(t.name)}</option>`).join('')}</select></label>
+ <label>Radio interior supuesto (mm)<input id="ed-quick-radius" type="number" min="0.1" max="500" step="0.1" inputmode="decimal"/></label>
+ <label>Factor K<input id="ed-quick-kfactor" type="number" min="0.2" max="0.6" step="0.01" inputmode="decimal"/></label>
+ <label>Posición del tope X (mm)<input id="ed-quick-backgauge" type="number" min="1" max="10000" step="0.1" inputmode="decimal"/></label>
+ <div class="ed-quick-buttons"><button id="ed-quick-order" type="button" aria-pressed="false">☞ Elegir orden tocando los pliegues</button><button id="ed-quick-new" type="button">＋ Nueva pieza</button><button id="ed-quick-v" type="button">Sugerir matriz V≈8×e</button><button id="ed-quick-sim" type="button">Simulación 3D</button></div>
+ <div id="ed-quick-analysis" class="ed-quick-info" role="status">Estimación orientativa de desarrollo, matriz y fuerza.</div>
+ </div><div class="example-gallery-wrap"><div class="example-gallery-title"><strong>CUATRO PIEZAS DE EJEMPLO · vista de su forma 3D</strong><small>Toca una tarjeta para cargarla y editar sus pliegues.</small></div><div class="example-gallery" id="ed-example-gallery"></div></div><div class="ed-plan-reference" id="ed-plan-reference" hidden></div><div class="ed-grid"><div class="ed-primary"><div class="ed-canvas-top"><strong>PERFIL 2D DE LA PIEZA</strong><span id="ed-count"></span></div><svg id="ed-svg" viewBox="0 0 760 460" role="img" aria-label="Perfil de ejes de chapa y pliegues numerados"></svg><div class="ed-caption"><strong id="ed-total"></strong><span>Ángulo firmado: positivo antihorario, negativo horario. Los tramos representan ejes rectos nominales.</span></div><p class="ed-warning">Perfil dibujado entre vértices teóricos agudos. El cálculo orientativo de desarrollo se muestra debajo, con hipótesis explícitas. No sustituye validación de plegado real ni constituye un programa CNC.</p><div class="f2-inline" id="ed-forming"></div><div class="ed-section ed-calculation"><div class="ed-section-head"><strong>Estimación del desarrollo · hipótesis geométrica</strong><span>Longitudes entre vértices teóricos (no cotas exteriores/interiores)</span></div><div class="ed-results"><div id="ed-calc-result"><small>Desarrollo nominal estimado</small><strong id="ed-flat"></strong></div><div><small>Deducción total</small><strong id="ed-deduction"></strong></div><div><small>Suma BA (arcos)</small><strong id="ed-allowance"></strong></div><div><small>Apertura V/e</small><strong id="ed-vratio"></strong></div></div><p class="ed-table-hint">Desliza la tabla hacia los lados para consultar todas las columnas →</p><div class="ed-table-wrap" tabindex="0" role="region" aria-label="Tabla de cotas por pliegue: desplázate horizontalmente"><table class="ed-bend-table"><thead><tr><th>Pliegue</th><th>Giro</th><th>Ángulo interior</th><th>BA (mm)</th><th>BD (mm)</th></tr></thead><tbody id="ed-bend-table"></tbody></table></div><p class="ed-equation">BA = θ(rad) × (Ri + K × e) · BD = 2 × (Ri + e) × tan(θ/2) − BA · Desarrollo = Σ tramos nominales − Σ BD</p><ul id="ed-calc-warnings" class="ed-calc-warnings"></ul></div><div class="ed-section"><div class="ed-section-head"><strong>Orden de plegado</strong><span>Cambia la posición o toca los pliegues en el dibujo en el orden deseado</span></div><div class="ed-actions"><button type="button" id="ed-order-pick" aria-pressed="false">☞ Elegir orden tocando los pliegues</button><button type="button" id="ed-order-reset">1, 2, 3… Restablecer</button></div><div id="ed-order" class="ed-order"></div><div class="ed-actions"><button type="button" id="ed-up">↑ Adelantar</button><button type="button" id="ed-down">↓ Retrasar</button></div></div></div>
  <div class="ed-controls"><div class="ed-section"><strong>Datos de la pieza</strong><label class="ed-cell"><span>Nombre</span><input id="ed-name" maxlength="70" autocomplete="off"></label><label class="ed-cell"><span>Material (texto de proyecto)</span><select id="ed-material"><option value="Acero S235JR">Acero S235JR</option><option value="Acero S355JR">Acero S355JR</option><option value="Inox 304">Inox 304</option><option value="Aluminio 5754">Aluminio 5754</option></select></label><label class="ed-cell"><span>Espesor nominal (mm)</span><input id="ed-thickness" type="number" min="0.1" max="100" step="0.1" inputmode="decimal"></label></div>
  <div class="ed-section"><strong>Parámetros de desarrollo</strong><label class="ed-cell"><span>Radio interior supuesto Ri (mm) · introducido por usuario</span><input id="ed-radius" type="number" min="0.1" max="500" step="0.1" inputmode="decimal"></label><label class="ed-cell"><span>Factor K (0,20–0,60) · ajustar con ensayo</span><input id="ed-kfactor" type="number" min="0.2" max="0.6" step="0.01" inputmode="decimal"></label><label class="ed-cell"><span>Punzón — biblioteca nominal sin verificar</span><select id="ed-punch">${C.PUNCHES.map(p=>`<option value="${p.id}">${esc(p.name)}</option>`).join('')}</select></label><label class="ed-cell"><span>Matriz — biblioteca nominal sin verificar</span><select id="ed-die">${C.DIES.map(d=>`<option value="${d.id}">${esc(d.name)}</option>`).join('')}</select></label><div class="ed-tool-card" aria-label="Ficha de herramienta seleccionada"><strong>Fichas de utillaje · biblioteca paramétrica v0.12</strong><p><b>Punzón:</b> <span id="ed-tool-punch"></span></p><p><b>Matriz:</b> <span id="ed-tool-die"></span></p><p class="ed-tool-warning">Modelos internos SIN VERIFICAR. No se atribuyen a MECOS, AMADA ni a otros fabricantes; comprobar DXF oficial, tolerancias, amarre y altura real antes de fabricar.</p></div><div class="ed-reference-library" aria-label="Referencias dimensionales de fabricantes"><strong>Referencias de fabricante · v0.13</strong><p class="ed-ref-note">Cotas documentadas de herramientas AMADA concretas. <b>SOLO CONSULTA:</b> no cambian el punzón o la matriz genéricos del cálculo ni su simulación. No hay DXF/CAD completo ni compatibilidad certificada.</p><label class="ed-cell"><span>Tipo de útil documentado</span><select id="ed-ref-filter"><option value="all">Todos</option><option value="punch">Punzones</option><option value="die">Matrices</option></select></label><label class="ed-cell"><span>Referencia concreta de fabricante</span><select id="ed-ref-item"></select></label><div class="ed-ref-details" role="group" aria-label="Ficha oficial de dimensiones"><b id="ed-ref-family"></b><p id="ed-ref-dimensions"></p><p id="ed-ref-mounting"></p><p id="ed-ref-origin"></p><a id="ed-ref-link" href="#" target="_blank" rel="noopener noreferrer">Abrir ficha o catálogo del fabricante ↗</a></div><div class="ed-ref-catalogs" id="ed-ref-catalogs" aria-label="Catálogos de fabricante"></div><p class="ed-ref-warning">Dimensiones publicadas por fabricante ≠ sólido CAD verificado. El modelo geométrico seleccionado arriba sigue siendo interno y SIN VERIFICAR. No usar estas fichas como certificación de fabricación.</p></div><div id="ed-cad-slot"></div><label class="ed-cell"><span>Posición nominal del tope X desde el eje de plegado (mm)</span><input id="ed-backgauge" type="number" min="1" max="10000" step="0.1" inputmode="decimal"></label><p class="ed-mini">El tope es una referencia fija y genérica; el valor X no procede de una máquina real. La V seleccionada no determina automáticamente el radio; se introduce Ri por separado. El cálculo no predice recuperación elástica, fuerza, interferencias ni ala mínima.</p></div><div class="ed-section"><div class="ed-section-head"><strong>Tramos rectos</strong><span>Longitudes en mm</span></div><div id="ed-segments" class="ed-fieldgrid"></div><div class="ed-actions"><button type="button" id="ed-add">+ Añadir tramo</button><button type="button" id="ed-remove">− Quitar último</button></div></div>
  <div class="ed-section"><div class="ed-section-head"><strong>Ángulos entre tramos</strong><span>Valores entre −179° y +179°</span></div><div id="ed-angles" class="ed-fieldgrid"></div></div></div></div><p id="editor-status" class="ed-status" role="status"></p></section>`;}
 function change(event){
  const el=event.target;
+ if(el.id.startsWith('ed-quick-')){
+  const field=el.id.slice(9);
+  if(field==='width'){const v=readNumber(el,1,5000);if(v!==null){projectWidth=v;try{localStorage.setItem('plegarpro-program-width-v1',String(v));}catch{}render();}return;}
+  const mapping={material:'ed-material',thickness:'ed-thickness',punch:'ed-punch',die:'ed-die',radius:'ed-radius',kfactor:'ed-kfactor',backgauge:'ed-backgauge'};
+  if(mapping[field]){const original=$('#'+mapping[field]);if(original){original.value=el.value;change({target:original});}return;}
+ }
+ if(el.id==='ed-plan-width'){const v=readNumber(el,1,5000);if(v!==null){projectWidth=v;try{localStorage.setItem('plegarpro-program-width-v1',String(v));}catch{}render();}return;}
  if(['ed-plan-length1','ed-plan-length2','ed-plan-angle','ed-plan-thickness'].includes(el.id)){
   if(planConfiguredId!==null){planConfiguredId=null;const a=$('#ed-plan-sim2d'),b=$('#ed-plan-sim3d');if(a)a.disabled=true;if(b)b.disabled=true;inform('Medidas modificadas: vuelve a pulsar Crear perfil para actualizar la simulación.');}
   return;
@@ -188,10 +225,12 @@ function change(event){
 function actions(event){
  const b=event.target.closest('button,[data-ed-bend]');if(!b)return;
  const example=b.closest('[data-example-id]')?.dataset.exampleId;
- if(example){const record=window.PlegarExamples3D?.get(example);if(record){orderPick=0;loadProfile(record.profile);inform('Pieza '+record.label+' cargada. Cambia el orden o reproduce sus pliegues.');}return;}
+ if(example){const record=window.PlegarExamples3D?.get(example);if(record){orderPick=0;orderUsed.clear();loadProfile(record.profile,{width:record.width});inform('Pieza '+record.label+' cargada. Cambia el orden o reproduce sus pliegues.');}return;}
  const sel=b.dataset.edSelect??b.dataset.edBend;
  if(sel){selected=Number(sel);
   if(orderPick&&b.dataset.edBend){
+   if(orderUsed.has(selected)){inform('Ese pliegue ya está elegido. Toca otro.');return;}
+   orderUsed.add(selected);
    const position=orderPick-1;
    if(state.sequence.indexOf(selected)!==position){edit(d=>{const at=d.sequence.indexOf(selected);d.sequence.splice(at,1);d.sequence.splice(position,0,selected);});}
    orderPick=orderPick>=state.angles.length?0:orderPick+1;
@@ -200,8 +239,11 @@ function actions(event){
   return;
  }
  switch(b.id){
- case 'ed-order-pick':orderPick=orderPick?0:1;render();inform(orderPick?'Toca los pliegues numerados sobre el dibujo, desde el primero.':'Selección cancelada.');return;
- case 'ed-order-reset':orderPick=0;selected=1;edit(d=>{d.sequence=d.angles.map((_,i)=>i+1);});inform('Orden restablecido.');return;
+ case 'ed-quick-new':{orderPick=0;orderUsed.clear();loadProfile({name:'Nueva pieza',material:state.material,thickness:state.thickness,segments:[100,100],angles:[90],sequence:[1],setup:clone(state.setup)},{width:projectWidth});inform('Nueva pieza creada: introduce medidas y ángulos.');return;}
+ case 'ed-quick-v':{const wanted=8*state.thickness,selectedDie=C.DIES.filter(d=>d.angle===88).sort((a,b)=>Math.abs(a.opening-wanted)-Math.abs(b.opening-wanted))[0];if(selectedDie){edit(d=>{d.setup.die=selectedDie.id;});inform('Matriz orientativa '+selectedDie.name+' seleccionada. Confirmar compatibilidad antes de fabricar.');}return;}
+ case 'ed-quick-sim':window.PlegarApp?.switchScreen('Simulación 3D');return;
+ case 'ed-quick-order':case 'ed-order-pick':orderPick=orderPick?0:1;orderUsed.clear();render();if(orderPick)$('#ed-svg')?.scrollIntoView({behavior:'smooth',block:'center'});inform(orderPick?'Toca los pliegues numerados sobre el dibujo, desde el primero.':'Selección cancelada.');return;
+ case 'ed-order-reset':orderPick=0;orderUsed.clear();selected=1;edit(d=>{d.sequence=d.angles.map((_,i)=>i+1);});inform('Orden restablecido.');return;
  case 'ed-plan-zoom-in':zoomPlan(1.3);return;
  case 'ed-plan-zoom-out':zoomPlan(1/1.3);return;
  case 'ed-plan-zoom-reset':planVision.zoom=1;planVision.dx=0;planVision.dy=0;stageTransform();return;
@@ -220,7 +262,7 @@ function actions(event){
  }
  case 'ed-save':inform(persist()?'Datos guardados en este navegador.':'No se pudo guardar en este navegador.');break;
   case 'ed-save-plan':{
-   const widthField=$('#ed-plan-width'),width=Number(widthField?.value);
+   const widthField=$('#ed-plan-width'),width=projectWidth;
    if(!widthField?.value.trim()||!Number.isFinite(width)||width<1||width>5000){inform('Introduce un ancho 3D entre 1 y 5000 mm.');break;}
    if(!window.PlegarPlans?.saveProgram){inform('Motor Planos no disponible.');break;}
    window.PlegarPlans.saveProgram(clone(state),{width,sourcePlanId:planReference?.id||null})
@@ -256,15 +298,16 @@ function mount(){
  target.onkeydown=event=>{if((event.key==='Enter'||event.key===' ')&&event.target.matches('[data-ed-bend]')){event.preventDefault();event.target.dispatchEvent(new MouseEvent('click',{bubbles:true}));}};
  isInitialized=true;
 }
-function loadProfile(profile){
+function loadProfile(profile,{width=null}={}){
  const next=fromEditor(profile);
- orderPick=0;
+ if(Number.isFinite(width)&&width>=1&&width<=5000){projectWidth=width;try{localStorage.setItem('plegarpro-program-width-v1',String(width));}catch{}}
+ orderPick=0;orderUsed.clear();
  undoStack.push(clone(state));if(undoStack.length>50)undoStack.shift();
  redoStack=[];state=next;selected=next.sequence[0]||1;planReference=null;planConfiguredId=null;
  planVision={zoom:1,dx:0,dy:0,marking:false,pending:null,marks:[]};
  persist();if(document.querySelector('#ed-svg'))render();return clone(state);
 }
 function loadLocal(){try{const raw=localStorage.getItem(STORAGE);return raw?fromEditor(JSON.parse(raw)):null;}catch{return null;}}
-function setSequence(next){orderPick=0;return edit(d=>{d.sequence=[...next];});}
+function setSequence(next){orderPick=0;orderUsed.clear();return edit(d=>{d.sequence=[...next];});}
 window.PlegarEditor2D={mount,setPlanReference,loadProfile,setSequence,getPlanReference:()=>planReference,isPlanConfigured:()=>!planReference||planConfiguredId===planReference.id,getData:()=>clone(state),getSelection:()=>selected,selectBend:id=>{if(state.sequence.includes(id)){selected=id;render();}}};
 })();

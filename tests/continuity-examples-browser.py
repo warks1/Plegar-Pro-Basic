@@ -122,18 +122,18 @@ with sync_playwright() as pw:
   assert page.locator('#ed-dimensions-body tr').count()==page.evaluate('PlegarEditor2D.getData().segments.length')
   assert page.locator('.ed-dimensions-panel').is_visible()
   assert page.locator('.ed-dimensions-panel').evaluate('(el)=>el.compareDocumentPosition(document.querySelector(".ed-quick-setup")) & Node.DOCUMENT_POSITION_FOLLOWING')!=0
-  first=page.locator('#ed-dimensions-body [data-ed-segment="0"]')
+  first=page.locator('#ed-dimensions-body [data-ed-program-segment="0"]')
   original=first.input_value()
   first.fill('72')
   first.dispatch_event('change')
   assert page.evaluate('PlegarEditor2D.getData().segments[0]')==72
-  assert page.locator('#ed-dimensions-body [data-ed-segment="0"]').input_value()=='72'
-  page.locator('#ed-dimensions-body [data-ed-angle="0"]').fill('-83')
-  page.locator('#ed-dimensions-body [data-ed-angle="0"]').dispatch_event('change')
+  assert page.locator('#ed-dimensions-body [data-ed-program-segment="0"]').input_value()=='72'
+  page.locator('#ed-dimensions-body [data-ed-program-angle="0"]').fill('-83')
+  page.locator('#ed-dimensions-body [data-ed-program-angle="0"]').dispatch_event('change')
   assert page.evaluate('PlegarEditor2D.getData().angles[0]')==-83
   assert page.locator('#ed-svg .ed-bend-point').count()==page.evaluate('PlegarEditor2D.getData().angles.length')
-  page.locator('#ed-dimensions-body [data-ed-segment="0"]').fill(original)
-  page.locator('#ed-dimensions-body [data-ed-segment="0"]').dispatch_event('change')
+  page.locator('#ed-dimensions-body [data-ed-program-segment="0"]').fill(original)
+  page.locator('#ed-dimensions-body [data-ed-program-segment="0"]').dispatch_event('change')
   # Un toast puede estar activo tras navegar; solo el aviso vacío debe desaparecer.
   page.evaluate("document.querySelector('#toast').textContent=''")
   assert page.locator('#toast').evaluate('(el)=>getComputedStyle(el).visibility')=='hidden'

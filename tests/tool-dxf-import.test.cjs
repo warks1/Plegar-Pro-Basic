@@ -274,3 +274,45 @@ test('Perfiles heredados sin holes se normalizan sin cambiar su forma',()=>{
  assert.deepEqual(D.read()[0].holes,[]);
  D.remove(r.id);
 });
+
+
+test('Exportación DXF en mm conserva una sección con huecos y la reimporta sin pérdidas',()=>{
+ const outer=[[0,0],[100,0],[100,120],[0,120]],hole=[[25,25],[45,25],[45,50],[25,50]];
+ const file=multi([{points:outer},{points:hole}]);
+ const record=D.add({brand:'MECOS',kind:'die',code:'V24-HUECO',name:'Matriz perfil hueco'},file);
+ const exported=D.exportSectionDXF(record);
+ assert.match(exported,/\$INSUNITS\n70\n4/);
+ assert.equal((exported.match(/0\nLWPOLYLINE/g)||[]).length,2);
+ const round=D.parseDXF(exported);
+ assert.equal(round.holeCount,1);
+ assert.equal(round.areaMm2,record.areaMm2);
+ assert.deepEqual(round.points,record.points);
+ assert.deepEqual(round.holes,record.holes);
+ assert.equal(round.collisionApproved,false);
+ const svg=D.exportSectionSVG(record);
+ assert.match(svg,/<svg[^>]+mm"[^>]+mm"/);
+ assert.match(svg,/fill-rule="evenodd"/);
+ assert.match(svg,/mm²/);
+ assert.doesNotMatch(svg,/<script>/);
+ assert.ok(D.remove(record.id));
+});
+test('Exportación DXF discretiza arcos sin aprobar CNC ni crear radios falsos',()=>{
+ const curved=D.add({brand:'AMADA',kind:'punch',code:'P-CURVO',name:'Punzón de perfil curvo'},
+  dxf({points:[[0,0],[40,0],[40,40],[0,40]],bulge:true}));
+ const dx=D.exportSectionDXF(curved),imported=D.parseDXF(dx);
+ assert.equal(imported.arcCount,0,'El DXF exportado contiene los puntos muestreados, no arcos originales');
+ assert.ok(Math.abs(imported.areaMm2-curved.areaMm2)<.05);
+ assert.equal(imported.geometryCertified,false);
+ assert.ok(D.exportSectionSVG(curved).includes('DXF'));
+ D.remove(curved.id);
+});
+test('SVG de referencia maliciosa escapa título, no permite modificar puntos del origen',()=>{
+ const record=D.add({brand:'EUROSTAMP',kind:'die',code:'<script>x</script>',name:'V de prueba'},dxf());
+ const original=structuredClone(D.read()[0].points);
+ const svg=D.exportSectionSVG(record);
+ assert.doesNotMatch(svg,/<script>/);
+ assert.match(svg,/&lt;script&gt;/);
+ assert.match(svg,/width="136mm"/);
+ assert.deepEqual(D.read()[0].points,original);
+ D.remove(record.id);
+});

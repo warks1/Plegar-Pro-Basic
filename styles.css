@@ -193,3 +193,16 @@
 .machine-measurement-field input{max-width:100%;width:100%;min-height:43px;background:#061927;border-radius:6px;border:1px solid #5b879f;color:#fff;padding:8px;font-size:15px}
 .machine-measurement-editor [data-machine-save]{border:1px solid #49a9ee;background:#0761a8;color:#fff;padding:11px 14px;font-weight:700;border-radius:7px;min-height:44px;max-width:100%}
 @media(max-width:620px){.machine-measurement-fields{grid-template-columns:minmax(0,1fr)}.machine-measurement-editor{padding:9px}}
+
+
+/* Auditoría: el botón de minimizar calculadora modifica realmente el panel. */
+.calculator-panel.calculator-collapsed .calc-main,
+.calculator-panel.calculator-collapsed .calc-output,
+.calculator-panel.calculator-collapsed .calc-tabs{display:none!important}
+.calculator-panel.calculator-collapsed{min-height:0;align-self:start}
+.module-tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr));gap:10px}
+.module-tiles .module-tile{min-width:0}
+.module-tiles [data-tool-set]{min-height:42px;border-radius:7px;background:#0c63a1;color:#fff;border:1px solid #348cba;padding:10px;cursor:pointer}
+.machine-reference-comparisons{padding:12px;border:1px solid #477790;border-radius:8px;background:#0b2638;margin-top:12px}
+.machine-reference-comparisons h3{color:#f6ca84}
+.machine-reference-comparisons p{line-height:1.55}

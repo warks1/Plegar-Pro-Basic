@@ -35,6 +35,7 @@ test('Visor 3D mantiene el largo axial medido como profundidad geométrica',()=>
  const image=V.render(r,{yaw:32,pitch:22,zoom:1});
  assert.match(image,/L axial 835 mm/);
  assert.match(image,/data-3d-face="hole-wall"/);
+ assert.doesNotMatch(image,/NaN|Infinity/,'La proyección debe tener coordenadas SVG finitas');
  assert.match(image,/fill-rule="evenodd"/);
  assert.match(image,/SIN VERIFICAR/);
 });

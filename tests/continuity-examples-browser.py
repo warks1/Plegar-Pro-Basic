@@ -415,6 +415,8 @@ with sync_playwright() as pw:
    else:
     assert page.locator('#module-title').inner_text()==target,target
     assert page.locator('#module-sample').is_visible(),target
+  page.locator('[data-app-back]').click()
+  assert page.locator('#module-title').inner_text()==screens[-2]
   page.locator('#avatar').evaluate("(el)=>el.click()")
   assert page.locator('#module-title').inner_text()=='Ajustes'
   page.locator('[data-pp-settings-action="reset"]').click()

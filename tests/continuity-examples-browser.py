@@ -28,6 +28,32 @@ with sync_playwright() as pw:
    const raw=PlegarSequenceTimeline.advance;
    PlegarSequenceTimeline.advance=(state,dt,steps,options)=>raw(state,dt*120,steps,options);
   }""")
+  # Comprobar gestos sintéticos Pointer Events con la misma lógica de captura táctil.
+  def gesture(selector):
+   return page.evaluate("""selector => {
+    const el=document.querySelector(selector),r=el.getBoundingClientRect(),
+      x=r.left+r.width/2,y=r.top+r.height/2;
+    const send=(type,id,dx,dy)=>el.dispatchEvent(new PointerEvent(type,{
+     pointerId:id,pointerType:'touch',clientX:x+dx,clientY:y+dy,bubbles:true,cancelable:true}));
+    send('pointerdown',51,-60,0);send('pointerdown',52,60,0);
+    send('pointermove',52,125,0);
+    const zoom=Number(el.dataset.touchScale);
+    send('pointerup',51,-60,0);send('pointerup',52,125,0);
+    el.dispatchEvent(new MouseEvent('dblclick',{bubbles:true,cancelable:true}));
+    return {zoom,reset:Number(el.dataset.touchScale),hasCamera:!!el.querySelector('.touch-camera-content,.p3-camera-content,.f2-camera-content')};
+   }""",selector)
+  assert page.locator('.home-machine-photo').is_visible()
+  assert page.locator('#realistic-option').get_attribute('aria-pressed')=='true'
+  assert page.locator('#home-machine-cad').is_hidden()
+  main_gesture=gesture('#home-machine-3d')
+  assert main_gesture['zoom']>1 and main_gesture['reset']==1 and main_gesture['hasCamera']
+  prev_gesture=gesture('#home-preview-3d')
+  assert prev_gesture['zoom']>1 and prev_gesture['reset']==1 and prev_gesture['hasCamera']
+  page.locator('#home-view-model').click()
+  assert page.locator('#home-machine-cad').is_visible()
+  assert page.locator('.home-machine-photo').is_hidden()
+  page.locator('#realistic-option').click()
+  assert page.locator('.home-machine-photo').is_visible()
   # Inicio: visor geométrico animado y cuatro miniaturas de distinta geometría.
   assert page.locator('#home-machine-3d svg.home-simulation-svg').count()==1
   assert page.locator('#home-machine-3d polygon[data-group="punch"]').count()>0
@@ -42,6 +68,7 @@ with sync_playwright() as pw:
   assert page.locator('#project-name').inner_text()=='Cubierta lateral Inox 304'
   assert page.locator('#home-preview-3d').inner_html()!=previous
   page.locator('#play').click()
+  assert page.locator('#home-machine-cad').is_visible(), 'Reproducir debe usar el modelo geométrico'
   page.wait_for_function("""() => document.querySelector('#step-description')?.textContent==='Pieza terminada' &&
    document.querySelector('#home-machine-3d polygon[data-group="punch"]')""",timeout=10000)
   print('Inicio animado, vista previa y cuatro miniaturas verificadas',w,flush=True)
@@ -79,6 +106,7 @@ with sync_playwright() as pw:
   assert page.evaluate('PlegarEditor2D.getData().sequence')==[2,1]
   if w<=1120:page.locator('#open-menu').click()
   page.locator('button.nav-item[data-screen="Simulación 2D"]').click()
+  assert gesture('.f2-stage')['zoom']>1
   page.locator('[data-f2-action="play"]').click()
   page.wait_for_function("""() => document.querySelector('.f2-step-label')?.textContent.includes('Paso 2 de 2') &&
    document.querySelector('.f2-progress')?.textContent.includes('100 %')""",timeout=12000)
@@ -88,6 +116,7 @@ with sync_playwright() as pw:
   assert page.locator('.p3-order-list select').count()==2
   page.locator('[data-p3-order="0"]').select_option('1')
   assert page.evaluate('PlegarEditor2D.getData().sequence')==[1,2]
+  assert gesture('.p3-stage')['zoom']>1
   page.locator('[data-p3="play"]').click()
   page.wait_for_function("""() => document.querySelector('.p3-step')?.textContent.includes('Paso 2 / 2') &&
    document.querySelector('.p3-progress')?.value==='100'""",timeout=12000)

@@ -315,6 +315,62 @@
   store([r,...list]);return r;
  }
  function remove(id){const list=read();store(list.filter(r=>r.id!==id));return list.length!==read().length;}
+ // Exportación vectorial sólo de secciones verificadas por el parser:
+ // perfil exterior + huecos. Nunca exporta un volumen CAD ni NC.
+ function exportSectionDXF(record){
+  const v=normalizeRecord(record);
+  const lines=[];
+  const pair=(k,value)=>{lines.push(String(k),String(value));};
+  pair(0,'SECTION');pair(2,'HEADER');pair(9,'$INSUNITS');pair(70,4);pair(0,'ENDSEC');
+  pair(0,'SECTION');pair(2,'ENTITIES');
+  for(const contour of [v.points,...v.holes]){
+   pair(0,'LWPOLYLINE');pair(90,contour.length);pair(70,1);pair(8,'0');
+   for(const p of contour){pair(10,p.x.toFixed(6));pair(20,p.y.toFixed(6));}
+  }
+  pair(0,'ENDSEC');pair(0,'EOF');
+  const dx=lines.join('\n')+'\n';
+  // Una copia utilizable vuelve a importarse como sección métrica sin ambigüedad.
+  const check=parseDXF(dx);
+  if(check.holeCount!==v.holeCount||Math.abs(check.areaMm2-v.areaMm2)>0.05)
+   throw Error('La sección DXF exportada no conserva la geometría; comprueba el archivo.');
+  return dx;
+ }
+ function exportSectionSVG(record){
+  const v=normalizeRecord(record),b=v.bounds,pad=18,areaLabel=num(v.areaMm2);
+  const width=b.width+pad*2,height=b.height+pad*2;
+  const fmt=n=>Number(n.toFixed(6));
+  const pt=p=>[fmt(p.x-b.minX+pad),fmt(b.maxY-p.y+pad)];
+  const contourPath=ps=>ps.map((p,i)=>{const xy=pt(p);return (i?'L':'M')+xy[0]+' '+xy[1];}).join(' ')+' Z';
+  const outline=[v.points,...v.holes].map(contourPath).join(' ');
+  const center=fmt(pad+b.width/2),vertical=fmt(pad+b.height/2),right=fmt(pad+b.width+10);
+  const label=esc(v.brand+' · '+v.code);
+  return '<?xml version="1.0" encoding="UTF-8"?>\n'+
+   '<svg xmlns="http://www.w3.org/2000/svg" width="'+fmt(width)+'mm" height="'+fmt(height)+'mm" '+
+   'viewBox="0 0 '+fmt(width)+' '+fmt(height)+'" aria-label="Sección DXF medida en milímetros">'+
+   '<title>'+label+' · sección 2D no certificada</title>'+
+   '<desc>Perfil vectorial en milímetros, '+v.holeCount+' huecos, área neta '+areaLabel+' mm². No CNC ni colisiones.</desc>'+
+   '<path d="'+outline+'" fill="#85b6d2" fill-rule="evenodd" stroke="#15354c" stroke-width=".45"/>'+
+   '<path d="M'+pad+' '+(pad-6)+'H'+fmt(pad+b.width)+
+   ' M'+right+' '+pad+'V'+fmt(pad+b.height)+'" fill="none" stroke="#196da2" stroke-width=".3"/>'+
+   '<text x="'+center+'" y="'+(pad-8)+'" text-anchor="middle" font-size="3.5" fill="#164a6d">'+num(b.width)+' mm</text>'+
+   '<text x="'+(right+3)+'" y="'+vertical+'" transform="rotate(-90 '+(right+3)+' '+vertical+')" '+
+   'text-anchor="middle" font-size="3.5" fill="#164a6d">'+num(b.height)+' mm</text>'+
+   '</svg>';
+ }
+ function safeFileName(v,ext){
+  const name=(v.code||'perfil').normalize('NFKD').replace(/[\\u0300-\\u036f]/g,'')
+    .replace(/[^a-z0-9_-]+/gi,'-').replace(/^-+|-+$/g,'').slice(0,55)||'perfil';
+  return 'Plegar-Pro-'+name+'.'+ext;
+ }
+ function downloadFile(data,kind,record){
+  const v=normalizeRecord(record),mime=kind==='dxf'?'application/dxf':'image/svg+xml';
+  const ext=kind==='dxf'?'dxf':'svg';
+  const url=root.URL.createObjectURL(new Blob([data],{type:mime+';charset=utf-8'}));
+  const link=root.document.createElement('a');
+  link.href=url;link.download=safeFileName(v,ext);
+  root.document.body.appendChild(link);link.click();link.remove();
+  setTimeout(()=>root.URL.revokeObjectURL(url),1200);
+ }
  function render(r,mode='2d'){
   if(!['2d','3d'].includes(mode))throw Error('Vista incorrecta.');
   const v=normalizeRecord(r),b=v.bounds,span=Math.max(b.width/175,b.height/105,.01);
@@ -349,7 +405,10 @@
    ' · '+r.holeCount+' hueco(s) · sección neta '+num(r.areaMm2)+' mm²</small>'+
   '<small>Origen: archivo local '+esc(r.sourceFile||'sin nombre')+' · '+esc(r.sourceFormat)+(r.unitsDeclared?' · mm en DXF':' · mm confirmados manualmente')+'</small>'+
   '<span class="mfg-warning">PERFIL IMPORTADO · amarre/capacidad sin certificar · NO COLISIONES/CNC</span>'+
-  '<button type="button" data-dxf-remove="'+esc(r.id)+'">Eliminar esta copia local</button></article>';
+  '<div class="tool-dxf-file-actions">'+
+  '<button type="button" data-dxf-section="dxf" data-dxf-id="'+esc(r.id)+'">Exportar sección DXF (mm)</button>'+
+  '<button type="button" data-dxf-section="svg" data-dxf-id="'+esc(r.id)+'">Exportar plano SVG (mm)</button>'+
+  '<button type="button" data-dxf-remove="'+esc(r.id)+'">Eliminar copia local</button></div></article>';
  function html(){
   return '<section class="tool-dxf-importer" aria-label="Importar perfiles CAD DXF en milímetros">'+
    '<details><summary>Importar perfil DXF de punzón o matriz · ver sección 2D y volumen 3D</summary>'+
@@ -367,6 +426,8 @@
    '<p class="tool-dxf-feedback" role="status"></p></details>'+
    '<div class="tool-dxf-current"><h3>Mis perfiles CAD locales (sin validar)</h3>'+
    '<p>El dibujo respeta las coordenadas de la sección DXF y recorta los huecos interiores. El volumen 3D representa una extrusión visual sin largo axial aunque lo declares (no se escala su profundidad). '+
+   'Puedes exportar el contorno como DXF LWPOLYLINE en mm (los arcos se mantienen discretizados a 0,05 mm) '+
+   'o como SVG acotado de sección. Exportar NO genera un sólido CAD, ni NC, ni datos de amarre. '+
    'No se conectan estos perfiles automáticamente al planificador ni al motor de colisiones.</p>'+
    '<p class="tool-dxf-count" role="status"></p>'+
    '<div class="tool-dxf-backup" role="group" aria-label="Copias de perfiles propios">'+
@@ -413,6 +474,18 @@
    finally{target.value='';}
   };
   host.onclick=e=>{
+   const section=e.target.closest('[data-dxf-section]');
+   if(section){
+    try{
+     const record=read().find(x=>x.id===section.dataset.dxfId);
+     if(!record)throw Error('Perfil no encontrado.');
+     const format=section.dataset.dxfSection;
+     if(!['dxf','svg'].includes(format))throw Error('Formato no admitido.');
+     downloadFile(format==='dxf'?exportSectionDXF(record):exportSectionSVG(record),format,record);
+     feedback().textContent='Sección '+format.toUpperCase()+' exportada en milímetros. Geometría no certificada ni válida para CNC.';
+    }catch(err){feedback().textContent='No se pudo exportar: '+err.message;}
+    return;
+   }
    if(e.target.closest('[data-dxf-export]')){
     const url=root.URL.createObjectURL(new Blob([exportBackup()],{type:'application/json;charset=utf-8'}));
     const link=root.document.createElement('a');
@@ -427,5 +500,5 @@
   };
   paint();
  }
- return {KEY,BRANDS,parseDXF,validatePoints,validateGeometry,normalizeRecord,add,read,remove,store,exportBackup,importBackup,render,html,mount};
+ return {KEY,BRANDS,parseDXF,validatePoints,validateGeometry,normalizeRecord,add,read,remove,store,exportBackup,importBackup,exportSectionDXF,exportSectionSVG,render,html,mount};
 });

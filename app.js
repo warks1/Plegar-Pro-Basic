@@ -137,12 +137,14 @@ function renderModule(name){
   else{
    const el=$('#module-sample');
    el.classList.remove('module-editor','module-forming','module-piece3d');
-   el.innerHTML='<div id="manufacturer-catalog" aria-label="Biblioteca por fabricante"></div>'+
+   el.innerHTML='<div id="tool-dxf-panel" aria-label="Importar perfiles reales DXF de utillaje"></div>'+
+    '<div id="manufacturer-catalog" aria-label="Biblioteca por fabricante"></div>'+
     '<details class="mfg-internal"><summary>Herramientas genéricas del simulador · seleccionar punzón o matriz</summary>'+
     '<p>Las fichas anteriores son documentales. Este catálogo interno de herramientas paramétricas NO representa las geometrías del fabricante.</p>'+
     '<div class="module-tiles">'+[...lib.PUNCHES,...lib.DIES].map(tool=>
      '<div class="module-tile"><strong>'+escapeHtml(tool.name)+'</strong><p>'+escapeHtml(lib.details(tool))+
      '</p><button type="button" data-tool-set="'+tool.kind+':'+tool.id+'">Seleccionar '+(tool.kind==='die'?'matriz':'punzón')+' nominal</button></div>').join('')+'</div></details>';
+   window.PlegarToolDXF?.mount($('#tool-dxf-panel'));
    catalog.mount($('#manufacturer-catalog'));
    return;
   }

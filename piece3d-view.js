@@ -26,13 +26,10 @@
    c.cameraKey=cameraKey;
   }
   const projection=M.project(combined,c.yaw,c.elevation,c.zoom,c.cameraBounds);
-  const polys=projection.faces.filter(q=>!(q.group==='sheet'&&q.status==='pending'&&!c.showPending)).map(q=>{
-   const colors=palette[q.group]||palette.sheet;
-   const emphasize=q.group==='sheet'&&c.highlightPrior;
-   const fill=emphasize&&q.status==='completed'?'#db985c':emphasize&&q.status==='pending'?'#657b90':colors[q.kind]||colors.side||colors.edge;
-   return `<polygon data-status="${q.status||''}" opacity="${emphasize&&q.status==='pending'?'0.8':'1'}" data-group="${q.group}" points="${q.points.map(v=>v.x.toFixed(2)+','+v.y.toFixed(2)).join(' ')}" fill="${fill}" stroke="${q.group==='sheet'?'#b4ecff':'#bdcbd4'}" stroke-width=".8" stroke-linejoin="round"/>`;
-  }).join('');
-  c.host.querySelector('.p3-camera-content').innerHTML=`<svg viewBox="0 0 900 480" class="p3-svg" role="img" aria-label="Cinemática ilustrativa del plegado con movimiento del punzón y deformación nominal de la chapa"><rect width="900" height="480" fill="#071a29"/><path d="M0 405H900M0 205H900" stroke="#14344b" stroke-width="1"/>${polys}<text x="16" y="30" fill="#a1d9f1" font-size="13">CICLO 3D · PASO ${s.step}/${s.steps} · ${f.phase.toUpperCase()} · ÁNGULO ${Math.round(f.angle*10)/10}°</text><text x="16" y="454" fill="#eec48c" font-size="12">Ancho ${c.width} mm ILUSTRATIVO · recorrido nominal, sin control CNC ni física validada</text></svg>`;
+  const rendering=window.PlegarMetalRender;
+  const visibleFaces=projection.faces.filter(q=>!(q.group==='sheet'&&q.status==='pending'&&!c.showPending));
+  const polys=rendering.polys(combined,{faces:visibleFaces},'pp-live-metal',{material:p.material,highlightPrior:c.highlightPrior});
+  c.host.querySelector('.p3-camera-content').innerHTML=`<svg viewBox="0 0 900 480" class="p3-svg" role="img" aria-label="Cinemática ilustrativa del plegado con movimiento del punzón y deformación nominal de la chapa">${rendering.defs('pp-live-metal')}${rendering.background('pp-live-metal')}${polys}<text x="16" y="30" fill="#a1d9f1" font-size="13">CICLO 3D · PASO ${s.step}/${s.steps} · ${f.phase.toUpperCase()} · ÁNGULO ${Math.round(f.angle*10)/10}°</text><text x="16" y="454" fill="#eec48c" font-size="12">Ancho ${c.width} mm ILUSTRATIVO · recorrido nominal, sin control CNC ni física validada</text></svg>`;
   const names={punch:'Punzón',die:'Matriz',gauge:'Tope',table:'Mesa (cotas)',ram:'Trancha (cotas)'};
   for(const key of Object.keys(names)){
    const button=c.host.querySelector(`[data-p3-toggle="${key}"]`);

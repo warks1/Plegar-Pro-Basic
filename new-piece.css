@@ -1,0 +1,53 @@
+/* Plegar Pro Basic v0.50 · Asistente compartido 2D/3D de creación de piezas. */
+.np-dialog{width:min(1120px,calc(100vw - 24px));max-width:none;max-height:min(95dvh,950px);padding:0;margin:auto;border:1px solid #4d9bc1;border-radius:12px;background:#091b2c;color:#e8f5ff;box-shadow:0 22px 85px #000c;overflow:hidden}
+.np-dialog::backdrop{background:rgba(0,7,14,.85);backdrop-filter:blur(3px)}
+.np-dialog .np-header{display:flex;align-items:start;justify-content:space-between;gap:18px;padding:17px 20px;background:linear-gradient(100deg,#174160,#08253c);border-bottom:1px solid #376886}
+.np-dialog h2{font-size:clamp(16px,2.5vw,22px);margin:0;color:#6acaff;line-height:1.35}
+.np-dialog .np-header p{font-size:12px;line-height:1.5;color:#c9dfed;margin:6px 0 0}
+.np-dialog .np-header button{border-radius:8px;font-size:22px;min-width:42px;min-height:42px}
+.np-dialog .np-content{padding:15px 18px;max-height:calc(min(95dvh,950px) - 175px);overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
+.np-dialog fieldset{border:1px solid #386887;border-radius:9px;margin:0 0 14px;padding:13px;min-width:0;background:#10283b}
+.np-dialog legend{font-size:14px;color:#71ccfc;font-weight:700;padding:0 9px}
+.np-dialog label{display:grid;gap:5px;min-width:0;font-size:12px;color:#d3e9f8}
+.np-dialog input,.np-dialog select{width:100%;min-width:0;min-height:44px;border-radius:6px;border:1px solid #5a8eae;background:#071a2b;padding:8px;color:#fff;font-size:16px}
+.np-dialog input:focus-visible,.np-dialog select:focus-visible,.np-dialog button:focus-visible,.np-dialog [data-np-touch]:focus-visible{outline:2px solid #9fe7ff;outline-offset:2px}
+.np-dialog button{background:#11517b;border:1px solid #5ca8d1;color:#f0f9ff;border-radius:7px;cursor:pointer;min-height:42px;padding:8px 12px}
+.np-dialog button:hover{background:#1876a9}
+.np-dialog .np-fieldgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:11px}
+.np-dialog #np-rows{display:grid;gap:9px}
+.np-dialog .np-row{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;background:#0b2132;border:1px solid #305775;border-radius:8px;padding:12px;min-width:0}
+.np-dialog .np-row-heading{grid-column:1/-1;display:flex;justify-content:space-between;align-items:center;gap:6px;color:#80d3ff;font-size:12px}
+.np-dialog .np-row-heading span{color:#b8cfdd}
+.np-dialog .np-add-controls{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.np-dialog .np-visuals{display:grid;grid-template-columns:1fr 1fr;gap:10px;min-width:0}
+.np-dialog #np-drawing,.np-dialog #np-volume{min-width:0;overflow:hidden;border:1px solid #345d73;border-radius:8px;background:#071a2b;display:grid;place-items:center}
+.np-dialog #np-drawing svg,.np-dialog #np-volume svg{width:100%;height:auto;display:block;max-width:100%}
+.np-dialog .np-bend{cursor:pointer}
+.np-dialog .np-bend circle{fill:#126294;stroke:#c5ecff;stroke-width:2}
+.np-dialog .np-bend.selected circle{fill:#208c69;stroke:#9dffe2;stroke-width:3}
+.np-dialog .np-bend text{fill:white;font-size:14px;font-weight:700;pointer-events:none}
+.np-dialog .np-bend .np-order-number{fill:#b8e7ff;font-size:11px}
+.np-dialog .np-dimension{fill:#e5f5ff;font-size:13px;stroke:#071a29;stroke-width:4px;paint-order:stroke}
+.np-dialog #np-sequence{font-size:13px;color:#a8e4ff;line-height:1.6}
+.np-dialog #np-estimate,.np-dialog #np-count{font-size:12px;color:#bfd7e9}
+.np-dialog .np-caution{font-size:12px;line-height:1.6;padding:10px;color:#ffdaa3;border:1px solid #886632;background:#35291b;border-radius:8px}
+.np-dialog .np-bottom{display:flex;gap:8px;align-items:center;justify-content:flex-end;flex-wrap:wrap;padding:12px 18px;border-top:1px solid #396986;background:#092337}
+.np-dialog #np-status{margin-right:auto;font-size:12px;color:#f6cb8e;max-width:500px;line-height:1.45}
+.np-dialog .np-primary{background:#0877ba;border-color:#76d0ff;font-weight:700}
+@media(max-width:800px){
+ .np-dialog .np-fieldgrid{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .np-dialog .np-row{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(max-width:600px){
+ .np-dialog{width:calc(100vw - 12px);height:calc(100dvh - 12px);max-height:calc(100dvh - 12px);border-radius:8px}
+ .np-dialog .np-header{padding:10px 12px}
+ .np-dialog .np-content{max-height:none;flex:1;overflow-y:auto;padding:10px}
+ .np-dialog[open]{display:flex;flex-direction:column}
+ .np-dialog .np-fieldgrid{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+ .np-dialog .np-visuals{grid-template-columns:1fr}
+ .np-dialog .np-row{grid-template-columns:repeat(2,minmax(0,1fr));padding:9px;gap:8px}
+ .np-dialog .np-bottom{padding:10px;flex:none}
+ .np-dialog .np-bottom button{flex:1 1 40%;font-size:12px}
+ .np-dialog #np-status{flex:1 1 100%;max-width:none}
+}
+@media(max-width:350px){.np-dialog .np-fieldgrid{grid-template-columns:1fr}}

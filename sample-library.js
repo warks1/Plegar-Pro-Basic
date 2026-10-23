@@ -32,6 +32,18 @@
  function list(){return sampleData.map(valid);}
  function get(id){return list().find(p=>p.id===id)||null;}
  function byName(name){return list().find(s=>s.name.trim().toLocaleLowerCase('es-ES')===String(name||'').trim().toLocaleLowerCase('es-ES'))||null;}
+ function draft(name='Nuevo proyecto',detail=''){
+  const countMatch=String(detail).match(/(\d+)\s+pliegues?/i);
+  const n=Math.max(1,Math.min(8,countMatch?Number(countMatch[1]):1));
+  const thickMatch=String(detail).match(/(\d+(?:[.,]\d+)?)\s*mm/i);
+  const thickness=thickMatch?Number(thickMatch[1].replace(',','.')):2;
+  const t=Number.isFinite(thickness)&&thickness>=.1&&thickness<=100?thickness:2;
+  const segments=Array.from({length:n+1},(_,i)=>i===0||i===n?65:100);
+  const angles=Array.from({length:n},(_,i)=>i%2===0?90:-90);
+  const profile={...G.validate({name:String(name||'Pieza sin nombre'),material:'Acero S235JR',thickness:t,segments,angles,sequence:angles.map((_,i)=>i+1)}),
+   setup:{radius:Math.max(.5,t),kFactor:.33,punch:'p88-r1',die:t<=1.5?'v12-88':t<=2.1?'v16-88':'v24-88',backgaugeX:120}};
+  return {id:null,name:profile.name,width:100,profile,kind:'draft',note:'BORRADOR AUTOMÁTICO: medidas y ángulos no proceden del plano original. Verificar antes de usar.'};
+ }
  function drawing(id){const sample=get(id);if(!sample)throw Error('Pieza de ejemplo no encontrada.');return D.create(sample.profile,{width:sample.width});}
  const escape=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
  function paired(profile,width){
@@ -47,5 +59,5 @@
    +'<p>Modelo geométrico de demostración, editable y con sus propias cotas.</p>'
    +'<div class="sample-catalog-buttons"><button type="button" data-action="sample-program" data-sample-program="'+escape(sample.id)+'">Programar 2D</button><button type="button" data-action="sample-save" data-sample-save="'+escape(sample.id)+'">Guardar planos 2D/3D</button></div></article>';
  }
- return {list,get,byName,drawing,paired,projectCard};
+ return {list,get,byName,draft,drawing,paired,projectCard};
 });

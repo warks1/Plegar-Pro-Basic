@@ -2,7 +2,7 @@
 (function(){
 'use strict';
 const H=()=>window.PlegarHome3D,E=()=>window.PlegarExamples3D,Editor=()=>window.PlegarEditor2D,TL=()=>window.PlegarSequenceTimeline;
-const $=s=>document.querySelector(s),state={step:1,cycle:0,width:100,zoom:1,yaw:38,elevation:24,previewZoom:1,previewYaw:38,raf:null,last:null,paint:null,cameraKey:'',camera:null,profileKey:'',maximized:false,mode:'photo'};
+const $=s=>document.querySelector(s),state={step:1,cycle:0,width:100,zoom:1,yaw:38,elevation:24,previewZoom:1,previewYaw:38,raf:null,last:null,paint:null,cameraKey:'',camera:null,profileKey:'',maximized:false,mode:'photo',loop:true,holdUntil:null};
 let machineGestures=null,previewGestures=null;
 const Sample=()=>window.PlegarSampleLibrary;
 function program(){return Editor()?.getData();}
@@ -36,7 +36,7 @@ function bounds(p){
 function count(){const p=program();return p?H().steps(p):2;}
 function stop(){
  if(state.raf!==null){cancelAnimationFrame(state.raf);state.raf=null;}
- state.last=null;state.paint=null;
+ state.last=null;state.paint=null;state.holdUntil=null;
  const btn=$('#play');if(btn){btn.setAttribute('aria-label','Reproducir pliegues seguidos');$('#play-icon use')?.setAttribute('href','#i-play');}
 }
 function speed(){return Number($('#speed')?.value)||1100;}
@@ -104,12 +104,24 @@ function tick(now){
  if(state.last===null)state.last=now;
  const dt=Math.min(100,Math.max(0,now-state.last));state.last=now;
  const total=count();
- if(state.step===1){state.step=2;state.cycle=0;}
- if(state.step<total){
+ if(state.holdUntil!==null){
+  // Mostrar la pieza terminada brevemente antes de comenzar otra vuelta.
+  // No se detiene la reproducción: solamente el usuario puede pausarla.
+  if(now>=state.holdUntil){
+   state.holdUntil=null;state.step=2;state.cycle=0;
+  }
+ }else if(state.step===1){
+  state.step=2;state.cycle=0;
+ }else if(state.step<total){
   const next=TL().advance({step:state.step-2,cycle:state.cycle},dt,total-2,{duration:speed()});
   state.step=next.step+2;state.cycle=next.cycle;
-  if(next.finished){state.step=total;state.cycle=1;stop();}
- }else stop();
+  if(next.finished){
+   state.step=total;state.cycle=1;
+   if(state.loop)state.holdUntil=now+480;
+   else stop();
+  }
+ }else if(state.loop)state.holdUntil=now+480;
+ else stop();
  if(state.paint===null||now-state.paint>=33||state.raf===null){paint();state.paint=now;}
  if(state.raf!==null)state.raf=requestAnimationFrame(tick);
 }
@@ -228,6 +240,10 @@ function init(){
  });
  document.addEventListener('keydown',event=>{
   if(event.key==='Escape'&&menu&&!menu.hidden){menu.hidden=true;$('#views')?.setAttribute('aria-expanded','false');}
+ });
+ $('#home-loop')?.addEventListener('change',e=>{
+  state.loop=!!e.target.checked;
+  if(!state.loop&&state.step>=count()&&state.raf!==null){stop();paint();}
  });
  $('#timeline').addEventListener('input',e=>seek(e.target.value));
  const steps=$('#steps');steps.addEventListener('click',e=>{const b=e.target.closest('[data-home-step]');if(b){e.stopPropagation();seek(b.dataset.homeStep);}});

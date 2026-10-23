@@ -12,7 +12,9 @@
   id:'bystronic-ep-ii-31-100-2006',manufacturer:'Bystronic',model:'EP II 31-100',year:2006,
   matchingStatus:'CANDIDATO: confirmar placa de modelo y número de serie',
   bendingLengthMm:3100,forceTonnes:100,betweenUprightsMm:2550,throatDepthMm:400,
-  tableTopHeightFromFloorMm:925,ramStrokeMm:200,
+  tableTopHeightFromFloorMm:925,ramStrokeMm:200,motorPowerKw:11,connectedPowerKw:15,machineWeightKg:9000,
+  // La unidad del anuncio incorpora X/R y coronación; la configuración de otra unidad puede variar.
+  listedEquipment:Object.freeze({backgaugeAxes:['X','R'],hydraulicCrowning:true,infraredSafety:true,upperToolingIncluded:true,lowerToolingIncluded:false}),
   footprintMm:{length:5200,width:2100,height:2900},
   control:'Cybelec DNC 8805',
   geometry:{
@@ -59,6 +61,9 @@
    [['Fuerza','100 toneladas'],['Longitud de plegado','3.100 mm'],['Distancia entre columnas','2.550 mm'],
     ['Profundidad garganta','400 mm'],['Altura superior de mesa al suelo','925 mm'],
     ['Carrera vertical de la trancha','200 mm'],['Control de la unidad anunciada','Cybelec DNC 8805'],
+    ['Motor de la unidad anunciada','11 kW'],['Potencia total conectada','15 kW'],
+    ['Peso aproximado','9.000 kg'],['Tope trasero anunciado','2 ejes · X + R'],
+    ['Coronación','Hidráulica · según anuncio'],['Protección anunciada','Infrarrojos'],
     ['Dimensiones exteriores','5.200 × 2.100 × 2.900 mm']].map(([k,v])=>'<div><small>'+k+'</small><strong>'+v+'</strong></div>').join('')+
    '</div>'+
    '<h3>Sección y envolventes de colisión: pendientes</h3>'+
@@ -72,6 +77,14 @@
    '<button type="button" data-machine-save>Guardar medidas en el programa activo</button>'+
    '<p class="machine-reference-warning">Estos datos permiten un cribado geométrico nominal, pero NO prueban que una trayectoria sea segura. No utilizar altura de mesa 925 mm ni carrera 200 mm para rellenar esta sección.</p>'+
    '</div>'+
+   '<div class="machine-reference-comparisons"><h3>Otras fuentes consultadas · NO intercambiar modelos</h3>'+
+   '<p><strong>Bystronic Xpert Pro 100/3100 (ficha oficial moderna):</strong> mesa de 74 mm, carrera 250 mm, altura libre 640 mm y distancia entre montantes 2.750 mm. '+
+   'Estos valores pertenecen a otra generación y <strong>NO se cargan</strong> en la EP II de 2006. '+
+   '<a target="_blank" rel="noopener noreferrer" href="https://www.bystronic.com/sites/default/files/2026-03/tp007-BE-Techdaten-Xpert%20Pro_en_GB_0.pdf">Fuente Bystronic oficial ↗</a></p>'+
+   '<p><strong>Bystronic-Beyeler PR 100×3100 (2004):</strong> apertura de 450 mm, carrera de 315 mm y 2.750 mm entre montantes. '+
+   'Es otro modelo, no una cota de la EP II. '+
+   '<a target="_blank" rel="noopener noreferrer" href="https://www.mastergroup.it/en/scheda_tecnica.php?idProdotto=2517">Ficha del modelo PR ↗</a></p>'+
+   '<p>Exapro y Kitmondo comparten el identificador P250930038: son copias del mismo anuncio, no mediciones independientes.</p></div>'+
    '<p><a href="'+r.source.url+'" target="_blank" rel="noopener noreferrer">Consultar fuente del anuncio de 2006 ↗</a> · Revisado el '+r.source.checkedOn+'.</p>'+
    '<p class="machine-reference-warning">No utilizar esta ficha para autorizar pliegues, calcular trayectorias CNC ni garantizar ausencia de choques. Faltan planos y cotas calibradas de tu unidad.</p>'+
    '</section>';

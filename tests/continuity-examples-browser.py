@@ -134,7 +134,8 @@ with sync_playwright() as pw:
   assert page.locator('#ed-svg .ed-bend-point').count()==page.evaluate('PlegarEditor2D.getData().angles.length')
   page.locator('#ed-dimensions-body [data-ed-segment="0"]').fill(original)
   page.locator('#ed-dimensions-body [data-ed-segment="0"]').dispatch_event('change')
-  # El aviso vacío no debe ocultar los botones inferiores.
+  # Un toast puede estar activo tras navegar; solo el aviso vacío debe desaparecer.
+  page.evaluate("document.querySelector('#toast').textContent=''")
   assert page.locator('#toast').evaluate('(el)=>getComputedStyle(el).visibility')=='hidden'
   assert page.locator('#toast').evaluate('(el)=>getComputedStyle(el).pointerEvents')=='none'
   page.locator('#ed-quick-material').select_option('Inox 304')

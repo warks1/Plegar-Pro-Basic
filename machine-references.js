@@ -56,6 +56,8 @@
   const r=validateMachineRef(reference);
   return '<section class="machine-reference" aria-label="Datos de plegadora Bystronic de 2006">'+
    '<h2>Bystronic EP II 31-100 · Año 2006</h2>'+
+   '<figure class="machine-photo-reference"><img src="assets/bystronic-frontal-referencia.svg" loading="lazy" alt="Vista frontal esquemática basada en la fotografía enviada: laterales rojos, trancha superior, amarres, mesa y topes; sin cotas ni CAD comprobado">'+
+   '<figcaption>Vista frontal dibujada a partir de la fotografía de referencia. No equivale a plano oficial de máquina ni identifica por sí sola una EP II concreta.</figcaption></figure>'+
    '<p class="machine-reference-warning">REFERENCIA DE MODELO CANDIDATO, NO IDENTIFICACIÓN DE TU MÁQUINA. Confirmar placa. Los datos proceden de un anuncio, no de planos de fabricante.</p>'+
    '<div class="machine-reference-grid">'+
    [['Fuerza','100 toneladas'],['Longitud de plegado','3.100 mm'],['Distancia entre columnas','2.550 mm'],

@@ -156,7 +156,10 @@ function init(){
  const steps=$('#steps');steps.addEventListener('click',e=>{const b=e.target.closest('[data-home-step]');if(b){e.stopPropagation();seek(b.dataset.homeStep);}});
  const list=$('#projects');list.addEventListener('click',e=>{const b=e.target.closest('[data-project]');if(b){e.stopPropagation();selectProject(Number(b.dataset.project));}});
  const obs=new MutationObserver(()=>{if(visible())sync();else stop();});obs.observe($('#summary-cards'),{attributes:true,attributeFilter:['hidden']});
- sync();connectSavedDrawings();
+ sync();
+ // Sustituir las miniaturas provisionales del arranque por plano 2D + pieza 3D de cada proyecto.
+ const rows=window.PlegarApp?.getProjects?.();if(rows)$('#projects').innerHTML=projectRows(rows);
+ connectSavedDrawings();
 }
 window.PlegarHomeDashboard={init,sync,stop,projectRows,projectThumb,selectProject};
 init();

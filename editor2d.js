@@ -348,5 +348,6 @@ function loadProfile(profile,{width=null}={}){
 }
 function loadLocal(){try{const raw=localStorage.getItem(STORAGE);return raw?fromEditor(JSON.parse(raw)):null;}catch{return null;}}
 function setSequence(next){orderPick=0;orderUsed.clear();return edit(d=>{d.sequence=[...next];});}
-window.PlegarEditor2D={mount,setPlanReference,loadProfile,setSequence,getPlanReference:()=>planReference,isPlanConfigured:()=>!planReference||planConfiguredId===planReference.id,getData:()=>clone(state),getWidth:()=>projectWidth,getSelection:()=>selected,selectBend:id=>{if(state.sequence.includes(id)){selected=id;render();}}};
+function setDie(id){if(!C.DIES.some(d=>d.id===id))throw Error('Matriz no reconocida.');return edit(d=>{d.setup.die=id;});}
+window.PlegarEditor2D={mount,setPlanReference,loadProfile,setSequence,setDie,getPlanReference:()=>planReference,isPlanConfigured:()=>!planReference||planConfiguredId===planReference.id,getData:()=>clone(state),getWidth:()=>projectWidth,getSelection:()=>selected,selectBend:id=>{if(state.sequence.includes(id)){selected=id;render();}}};
 })();

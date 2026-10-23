@@ -175,3 +175,8 @@ Ajuste de presentación a pantalla completa sin franjas de imagen no ocupadas. S
 - `flat-pattern-view.js`: vista de la tira plana según el modo seleccionado, con zonas de arco, centros de pliegue y cotas acumuladas. El resultado se anula si los tramos son demasiado cortos; no se exporta un corte validado.
 - En Programación 2D se eligen modo de cota, Ri, espesor, K; nuevo botón de calibración matemática de K a partir de un ensayo real (requiere medir la probeta). Sensibilidad entre K=0,30 y K=0,50. Los perfiles heredados continúan con referencia exterior para no romper la compatibilidad.
 - La hoja de trabajo muestra la referencia y centros de pliegue; el plano 2D/3D generado aclara que es nominal y añade desarrollo calculado, si es viable. Fórmulas no consideran springback, ancho variable, conformado plástico complejo ni tablas reales de máquina; NO apto para CNC ni fabricación sin calibración.
+
+## v0.46 · Módulos de cálculo y comparador V conectados (23 octubre 2026)
+- «Calculadora de plegado» recupera el programa, base de cotas, Ri, K, ancho, desarrollo, fuerza orientativa, BA/BD, posiciones de pliegue y banda de sensibilidad.
+- «Comparador de V» ofrece las aperturas GENÉRICAS: V/e, ala mínima orientativa, fuerza nominal, avisos de ángulo y apertura, botón para enviar matriz al editor 2D. No varía Ri ni deducciones automáticamente sin una relación física confirmada.
+- «Curva perfecta» permanece sin resultados automáticos no verificados.

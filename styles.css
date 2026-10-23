@@ -88,3 +88,19 @@
  .machine-panel .heading-actions #home-view-model{display:inline-flex!important;align-items:center;justify-content:center;white-space:normal;min-height:36px;padding:6px 9px;flex:1 1 110px}
  .machine-panel .heading-actions #maximize{display:inline-flex;align-items:center;justify-content:center;min-width:36px;min-height:36px}
 }
+
+/* v0.46 · comparador de V y calculadora enlazados al motor de desarrollo */
+.development-tools{border:1px solid #356a87;background:#0b2539;border-radius:10px;padding:16px;max-width:100%;min-width:0;line-height:1.6}
+.development-tools h2{font-size:17px;color:#64cfff;margin:0 0 10px}
+.development-tools>p{font-size:12px;color:#cae1ee;line-height:1.6}
+.development-tools button{border:1px solid #488eb9;border-radius:6px;padding:8px 10px;background:#135e88;color:white;min-height:38px;white-space:normal}
+.development-kpi{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:12px}
+.development-kpi>div{border:1px solid #325972;border-radius:7px;padding:9px;background:#102f48;min-width:0}
+.development-kpi small{display:block;color:#9fcfea;font-size:11px}
+.development-kpi strong{display:block;font-size:16px;color:#e2f7ff;overflow-wrap:anywhere}
+.development-table-scroll{overflow-x:auto;max-width:100%;margin:12px 0;border:1px solid #31556c;border-radius:7px}
+.development-table-scroll table{min-width:700px;width:100%;border-collapse:collapse;font-size:11px}
+.development-table-scroll th,.development-table-scroll td{text-align:left;padding:8px;border-bottom:1px solid #294a62;vertical-align:top}
+.development-table-scroll th{background:#123751;color:#b9e9fc}
+.development-table-scroll [data-dev-status="REVISAR"],.development-table-scroll [data-dev-status="NO DESARROLLABLE"]{background:#352a21}
+@media(max-width:650px){.development-tools{padding:9px}.development-kpi{grid-template-columns:repeat(2,minmax(0,1fr))}}

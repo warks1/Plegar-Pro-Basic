@@ -130,8 +130,12 @@ function renderModule(name){
  content=`<div class="module-tile"><img src="assets/${name==='Simulación 3D'?'maquina':'seccion-2d'}.webp" alt="Referencia aprobada"/><strong>Imagen del boceto original</strong><p>Reproduce la identidad visual aprobada. No realiza simulación geométrica.</p><button type="button" data-screen="Inicio">Abrir panel principal</button></div><div class="module-tile"><strong>Controles de secuencia</strong><p>En Inicio puedes avanzar, retroceder o reproducir automáticamente los seis pasos ilustrativos.</p></div>`;
  }else if(name==='Utillaje'||name==='Máquinas'){
  content=`<div class="module-tile"><img src="assets/${name==='Máquinas'?'maquina':'utillaje'}.webp" alt="Biblioteca"/><strong>${name==='Máquinas'?'Bystronic Xpert Pro 100':'Punzón y matriz del boceto'}</strong><p>Imagen ilustrativa. Datos dimensionales por verificar con fabricante.</p></div>`;
- }else if(name==='Calculadora de plegado'||name==='Comparador de V'||name==='Curva perfecta'){
- content='<div class="module-tile"><img src="assets/calculadora.webp" alt="Esquema técnico"/><strong>Interfaz del módulo</strong><p>Motor de ingeniería pendiente de implementación. No emitir resultados de fabricación sin validación.</p><button type="button" data-screen="Inicio">Ver calculadora visual</button></div>';
+ }else if(name==='Calculadora de plegado'||name==='Comparador de V'){
+  const profile=window.PlegarEditor2D?.getData();
+  try{content=window.PlegarDevelopmentTools.html(name==='Comparador de V'?'comparison':'calculator',profile,{width:window.PlegarEditor2D.getWidth()});}
+  catch(error){content='<div class="module-tile"><strong>Cálculo no disponible</strong><p>'+escapeHtml(error.message)+'</p><button data-screen="Programación 2D">Revisar parámetros de plegado</button></div>';}
+ }else if(name==='Curva perfecta'){
+  content='<div class="module-tile"><strong>Curva perfecta · pendiente de modelización</strong><p>La sucesión de golpes requiere radios, material, capacidad y utillaje físico verificado. No se proporcionarán ángulos de máquina sin datos contrastados.</p><button data-screen="Programación 2D">Abrir Programa 2D</button></div>';
  }else{
  content=`<div class="module-tile"><strong>Diseño del módulo preparado</strong><p>Este módulo está identificado en el mapa maestro. Su implementación funcional corresponde a una fase posterior.</p></div>`;
  }
@@ -175,7 +179,12 @@ function projectAction(i,action){
 document.addEventListener('click',event=>{
  const screen=event.target.closest('[data-screen]');if(screen){switchScreen(screen.dataset.screen);return;}
  const step=event.target.closest('[data-step]');if(step){stopPlayer();setStep(Number(step.dataset.step));return;}
- const projectButton=event.target.closest('[data-project-action]');
+ const chosenDie=event.target.closest('[data-dev-die]');if(chosenDie){
+   try{window.PlegarEditor2D.setDie(chosenDie.dataset.devDie);switchScreen('Programación 2D');toast('Matriz nominal aplicada. Revisa radio interior y compatibilidad real.');}
+   catch(error){toast('No se pudo seleccionar la matriz: '+error.message);}return;
+  }
+  if(event.target.closest('[data-dev-open-editor]')){switchScreen('Programación 2D');return;}
+  const projectButton=event.target.closest('[data-project-action]');
  if(projectButton){projectAction(Number(projectButton.dataset.projectIndex),projectButton.dataset.projectAction);return;}
  const attach=event.target.closest('[data-attach-project]');if(attach){
   const i=Number(attach.dataset.attachProject),data=window.PlegarEditor2D?.getData();

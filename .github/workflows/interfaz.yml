@@ -1,0 +1,22 @@
+name: Plegar Pro Plus - navegador 2D y 3D
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  interfaz:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Preparar Chromium
+        run: |
+          python -m pip install playwright
+          python -m playwright install --with-deps chromium
+      - name: Probar secuencia 2D/3D y cuatro gadgets
+        run: python tests/continuity-examples-browser.py

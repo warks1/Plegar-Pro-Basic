@@ -138,15 +138,16 @@ function render(){
 
  $('#ed-tool-punch').textContent=L.details(L.get('punch',state.setup.punch));
  const auto=$('#ed-auto-plan');if(auto)try{
-  const result=window.PlegarSequencePlanner.suggest(state),best=result.best;
-  const height=window.PlegarMachineClearance.dieHeight(state),unknown=result.best?.issues?.filter(x=>/INCOMPLETA/.test(x))||[];
+  const result=window.PlegarSequencePlanner.suggest(state),best=result.best,eligible=result.recommended;
+  const height=window.PlegarMachineClearance.dieHeight(state),unknown=best?.issues?.filter(x=>/incompleta/i.test(x))||[];
   auto.innerHTML='<strong>ORDEN INTELIGENTE · CRIBADO NOMINAL (NO CNC)</strong>'+
    '<p>Matriz H: '+(height===null?'desconocida':fmt(height)+' mm')+' · Orden actual: '+result.current.sequence.join(' → ')+' · Puntuación '+fmt(result.current.score)+'</p>'+
-   (best?'<p>Orden sugerido para revisar: <b>'+best.sequence.join(' → ')+'</b> · puntuación '+fmt(best.score)+'. Ningún orden está certificado.</p>':'<p>'+esc(result.note)+'</p>')+
+   (best?'<p>Mejor candidato nominal: <b>'+best.sequence.join(' → ')+'</b> · puntuación '+fmt(best.score)+' · <strong>'+esc(best.status)+'</strong> · alertas '+best.riskCount+'.</p>':'<p>'+esc(result.note)+'</p>')+
+   (!eligible&&best?'<p role="alert">Aplicación automática BLOQUEADA: los candidatos examinados presentan posibles interferencias. Comprueba utillaje, máquina y orden.</p>':'')+
    '<p>'+esc((best?.issues||result.current.issues).filter(x=>/omega|mesa|Trancha|Matriz H|altura/i.test(x)).slice(0,3).join(' · ')||'Falta validar geometría de trancha, mesa, útiles y recolocación con cotas reales.')+'</p>'+
    '<p>'+esc(result.note)+'</p>'+
    (unknown.length?'<p>Cotas pendientes: '+esc(unknown[0])+'</p>':'');
-  const b=$('#ed-apply-auto');if(b)b.disabled=!best||best.sequence.every((v,i)=>v===state.sequence[i]);
+  const b=$('#ed-apply-auto');if(b){b.disabled=!eligible||eligible.sequence.every((v,i)=>v===state.sequence[i]);b.title=eligible?'Sin alertas nominales detectadas; NO CNC':'Bloqueado: posibles interferencias detectadas.';}
  }catch(error){auto.textContent='Secuenciador pendiente de revisar: '+error.message;}
  $('#ed-tool-die').textContent=L.details(L.get('die',state.setup.die));
  renderOfficialReferences();
@@ -338,8 +339,8 @@ function actions(event){
  case 'ed-quick-v':{const wanted=8*state.thickness,selectedDie=C.DIES.filter(d=>d.angle===88).sort((a,b)=>Math.abs(a.opening-wanted)-Math.abs(b.opening-wanted))[0];if(selectedDie){edit(d=>{d.setup.die=selectedDie.id;});inform('Matriz orientativa '+selectedDie.name+' seleccionada. Confirmar compatibilidad antes de fabricar.');}return;}
  case 'ed-quick-sim':window.PlegarApp?.switchScreen('Simulación 3D');return;
  case 'ed-apply-auto':{
-  try{const advice=window.PlegarSequencePlanner.suggest(state),next=advice.best?.sequence;
-   if(!next){inform('No se encontró una alternativa nominal; revisar la secuencia manualmente.');return;}
+  try{const advice=window.PlegarSequencePlanner.suggest(state),next=advice.recommended?.sequence;
+   if(!next){inform('Aplicación automática bloqueada: no hay secuencia sin alertas nominales. Revisar máquina, punzón, matriz y orden.');return;}
    orderPick=0;orderUsed.clear();selected=next[0];edit(d=>{d.sequence=next.slice();});
    inform('Orden sugerido aplicado al modelo 2D/3D. AÚN NO VALIDADO: comprobar trancha, mesa, matriz y recorrido en máquina real.');
   }catch(error){inform('No se pudo aplicar el orden: '+error.message);}return;

@@ -195,3 +195,35 @@
 .ed-calibrate-controls input{display:block;margin-top:5px;min-height:37px;width:100%;background:#102a42;color:#fff;border:1px solid #478eb9;border-radius:5px;padding:7px}
 .ed-calibrate-controls button{min-height:37px;color:white;border:1px solid #43b8ea;background:#126392;border-radius:6px;padding:9px 11px}
 .ed-measurement-note{font-size:11px;color:#e7c39d;line-height:1.5}
+
+/* v0.49 · medidas editables en primer plano: el operario no debe buscar las cotas al final */
+.ed-dimensions-panel{margin:0 0 14px;padding:14px;background:linear-gradient(155deg,#103450,#071e31);border:1px solid #408bad;border-radius:10px;box-shadow:inset 0 1px 0 #75baff23;min-width:0}
+.ed-dimensions-heading{display:flex;gap:9px;flex-wrap:wrap;align-items:baseline;justify-content:space-between}
+.ed-dimensions-heading strong{font-size:15px;color:#66ceff;letter-spacing:.35px}
+.ed-dimensions-heading span{font-size:12px;color:#e4f5ff}
+.ed-dimensions-panel p{font-size:12px;line-height:1.5;color:#c0dbe9;margin:9px 0}
+.ed-dimensions-scroll{width:100%;max-width:100%;overflow-x:auto;overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch;border:1px solid #376886;border-radius:8px}
+.ed-dimensions-table{width:100%;min-width:660px;border-collapse:collapse;table-layout:fixed;font-size:12px}
+.ed-dimensions-table th,.ed-dimensions-table td{padding:9px 7px;text-align:left;border-bottom:1px solid #284e67}
+.ed-dimensions-table thead th{background:#123952;color:#a8deff;font-weight:700}
+.ed-dimensions-table thead th:nth-child(1){width:83px}
+.ed-dimensions-table thead th:nth-child(2){width:118px}
+.ed-dimensions-table thead th:nth-child(3){width:75px}
+.ed-dimensions-table thead th:nth-child(4){width:98px}
+.ed-dimensions-table thead th:nth-child(5){width:100px}
+.ed-dimensions-table thead th:nth-child(6){width:135px}
+.ed-dimensions-table tbody th{white-space:nowrap;color:#e0f2ff;font-weight:600}
+.ed-dimensions-table input,.ed-dimensions-table select{font-size:15px;min-height:43px;max-width:100%;width:100%;color:#fff;background:#061928;border:1px solid #5e93b5;border-radius:6px;padding:7px}
+.ed-dimensions-table input:focus,.ed-dimensions-table select:focus{outline:2px solid #7bd4ff;outline-offset:1px}
+.ed-dimensions-table .ed-dim-selected{background:#124467}
+.editor2d .ed-dim-bend-button{min-height:42px;min-width:42px;font-weight:700;background:#115e91;color:white;border:1px solid #72c6f0}
+.ed-dim-sum{color:#aec6d5;font-variant-numeric:tabular-nums;white-space:nowrap}
+.ed-dimensions-foot{font-size:11px!important}
+.ed-dimensions-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.ed-dimensions-actions button{flex:1 1 auto;min-height:43px}
+@media(max-width:700px){
+ .ed-dimensions-panel{padding:10px}
+ .ed-dimensions-heading strong{font-size:13px}
+ .ed-dimensions-scroll{margin:0}
+ .ed-dimensions-actions button{flex:1 1 100%;text-align:center}
+}

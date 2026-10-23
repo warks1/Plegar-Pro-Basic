@@ -128,8 +128,10 @@ function renderModule(name){
  content=materials.map(([title,thick],i)=>`<div class="module-tile"><img src="assets/chapa-mini.webp" alt="Muestra de chapa"/><strong>${title}</strong><p>Espesor de demostración: ${thick}</p><button type="button" data-material="${i}">Seleccionar material</button></div>`).join('');
  }else if(name==='Simulación 3D'||name==='Simulación 2D'){
  content=`<div class="module-tile"><img src="assets/${name==='Simulación 3D'?'maquina':'seccion-2d'}.webp" alt="Referencia aprobada"/><strong>Imagen del boceto original</strong><p>Reproduce la identidad visual aprobada. No realiza simulación geométrica.</p><button type="button" data-screen="Inicio">Abrir panel principal</button></div><div class="module-tile"><strong>Controles de secuencia</strong><p>En Inicio puedes avanzar, retroceder o reproducir automáticamente los seis pasos ilustrativos.</p></div>`;
- }else if(name==='Utillaje'||name==='Máquinas'){
- content=`<div class="module-tile"><img src="assets/${name==='Máquinas'?'maquina':'utillaje'}.webp" alt="Biblioteca"/><strong>${name==='Máquinas'?'Bystronic Xpert Pro 100':'Punzón y matriz del boceto'}</strong><p>Imagen ilustrativa. Datos dimensionales por verificar con fabricante.</p></div>`;
+ }else if(name==='Máquinas'){
+ content=window.PlegarMachineReferences?.html()||'<div class="module-tile">Ficha técnica de máquinas no disponible.</div>';
+ }else if(name==='Utillaje'){
+ content='<div class="module-tile"><img src="assets/utillaje.webp" alt="Utillaje de referencia"/><strong>Punzón y matriz del boceto</strong><p>Imagen ilustrativa. Datos dimensionales por verificar con fabricante.</p></div>';
  }else if(name==='Calculadora de plegado'||name==='Comparador de V'){
   const profile=window.PlegarEditor2D?.getData();
   try{content=window.PlegarDevelopmentTools.html(name==='Comparador de V'?'comparison':'calculator',profile,{width:window.PlegarEditor2D.getWidth()});}

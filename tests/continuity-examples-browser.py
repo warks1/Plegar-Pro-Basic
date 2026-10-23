@@ -144,6 +144,32 @@ with sync_playwright() as pw:
   assert page.evaluate('PlegarEditor2D.getData().setup.dieHeight') is None
   if w<=1120:page.locator('#open-menu').click()
   page.locator('button.nav-item[data-screen="Utillaje"]').click()
+  # Importación métrica desde un contorno cerrado real del archivo, sin convertirlo en útil homologado.
+  page.locator('.tool-dxf-importer summary').click()
+  dxf_rows=[
+   '0','SECTION','2','HEADER','9','$INSUNITS','70','4','0','ENDSEC',
+   '0','SECTION','2','ENTITIES','0','LWPOLYLINE','90','4','70','1',
+   '10','0','20','0','10','40','20','0','10','40','20','65','10','0','20','65',
+   '0','ENDSEC','0','EOF'
+  ]
+  page.locator('.tool-dxf-form [name="brand"]').select_option('MECOS')
+  page.locator('.tool-dxf-form [name="kind"]').select_option('die')
+  page.locator('.tool-dxf-form [name="code"]').fill('V-LOCAL-PRUEBA')
+  page.locator('.tool-dxf-form [name="description"]').fill('Sección DXF real de prueba')
+  page.locator('.tool-dxf-form [name="lengthMm"]').fill('835')
+  page.locator('.tool-dxf-form [name="file"]').set_input_files({
+   "name":"perfil-de-prueba.dxf","mimeType":"text/plain","buffer":('\n'.join(dxf_rows)+'\n').encode('utf-8')
+  })
+  page.locator('.tool-dxf-form button[type="submit"]').click()
+  page.wait_for_function("""() => document.querySelectorAll('.tool-dxf-card').length===1 ||
+   document.querySelector('.tool-dxf-feedback')?.textContent.includes('No se pudo importar')""",timeout=8000)
+  assert page.locator('.tool-dxf-card').count()==1, f"Importador: {page.locator('.tool-dxf-feedback').inner_text()} errores={errors[-3:]}"
+  assert page.locator('.tool-dxf-art').count()==2
+  assert '40 × 65 mm' in page.locator('.tool-dxf-card').inner_text()
+  assert 'NO COLISIONES/CNC' in page.locator('.tool-dxf-card').inner_text()
+  assert page.evaluate("JSON.parse(localStorage.getItem('plegarpro-tool-dxf-v1'))[0].collisionApproved")==False
+  page.locator('[data-dxf-remove]').click()
+  assert page.locator('.tool-dxf-card').count()==0
   assert page.locator('.mfg-card').count()>=20
   assert page.locator('.mfg-card .mfg-art').count()>=80
   assert page.locator('.mfg-card').count()>=40

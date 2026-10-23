@@ -1,0 +1,21 @@
+/* Importador local de DXF ASCII cerrado: contornos reales de sección en mm.
+   Las fichas importadas nunca se consideran datos verificados de colisión. */
+.tool-dxf-importer{padding:10px;margin:0 0 16px;border-radius:11px;border:1px solid #3b6b8e;background:#0b293f;display:grid;gap:12px;max-width:100%;min-width:0}
+.tool-dxf-importer>details{border:1px solid #4883a9;border-radius:8px;background:#102f46;padding:11px;min-width:0}
+.tool-dxf-importer summary{font-size:14px;font-weight:700;color:#bce9ff;cursor:pointer;padding:6px;line-height:1.4}
+.tool-dxf-importer details>p,.tool-dxf-current>p{font-size:12px;color:#c5ddea;line-height:1.55}
+.tool-dxf-form{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.tool-dxf-form>label{display:grid;gap:6px;font-size:12px;color:#e3f5ff;min-width:0}
+.tool-dxf-form>label>input:not([type="checkbox"]),.tool-dxf-form select{width:100%;min-width:0;min-height:42px;border-radius:6px;border:1px solid #679aba;background:#061d30;color:#fff;padding:8px}
+.tool-dxf-form input[type="file"]{font-size:12px}
+.tool-dxf-consent{grid-column:1/-1;display:flex!important;flex-direction:row;gap:8px;align-items:center;line-height:1.45}
+.tool-dxf-consent input{min-width:22px;width:22px;height:22px;accent-color:#1eabf8}
+.tool-dxf-form button,.tool-dxf-card button{min-height:42px;border-radius:6px;border:1px solid #4fa6df;background:#06578d;color:#fff;padding:9px 12px;cursor:pointer;font-weight:700}
+.tool-dxf-form button{grid-column:1/-1}
+.tool-dxf-feedback{font-size:12px;color:#ffdaa4;line-height:1.45}
+.tool-dxf-current h3{font-size:15px;margin:0 0 5px;color:#a7e9ff}
+.tool-dxf-count{font-weight:650;color:#d6eaff;font-size:12px}
+.tool-dxf-card{border-color:#3d8199!important}
+.tool-dxf-card button{background:#513642;border-color:#ad7284}
+.tool-dxf-card svg{background:#061624}
+@media(max-width:680px){.tool-dxf-form{grid-template-columns:1fr}.tool-dxf-importer{padding:7px}.tool-dxf-importer>details{padding:8px}}

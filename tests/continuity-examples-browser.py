@@ -96,8 +96,15 @@ with sync_playwright() as pw:
   assert page.locator('#home-preview-3d').inner_html()!=previous
   page.locator('#play').click()
   assert page.locator('#home-machine-cad').is_visible(), 'Reproducir debe usar el modelo geométrico'
+  assert page.locator('#home-loop').is_checked()
   page.wait_for_function("""() => document.querySelector('#step-description')?.textContent==='Pieza terminada' &&
    document.querySelector('#home-machine-3d polygon[data-group="punch"]')""",timeout=10000)
+  # Una vez completado el ciclo se reinicia automáticamente, sin segundo toque en Play.
+  page.wait_for_function("""() => document.querySelector('#step-description')?.textContent.startsWith('Pliegue') &&
+    document.querySelector('#play')?.getAttribute('aria-label')?.includes('Pausar')""",timeout=7000)
+  page.locator('#play').click()
+  assert 'Reproducir' in page.locator('#play').get_attribute('aria-label')
+
   print('Inicio animado, vista previa y cuatro miniaturas verificadas',w,flush=True)
   if w<=1120:page.locator('#open-menu').click()
   page.locator('button.nav-item[data-screen="Máquinas"]').click()
@@ -293,9 +300,15 @@ with sync_playwright() as pw:
   page.locator('[data-p3-order="0"]').select_option('1')
   assert page.evaluate('PlegarEditor2D.getData().sequence')==[1,2]
   assert gesture('.p3-stage')['zoom']>1
+  assert page.locator('.p3-loop').is_checked()
   page.locator('[data-p3="play"]').click()
   page.wait_for_function("""() => document.querySelector('.p3-step')?.textContent.includes('Paso 2 / 2') &&
    document.querySelector('.p3-progress')?.value==='100'""",timeout=12000)
+  page.wait_for_function("""() => document.querySelector('.p3-step')?.textContent.includes('Paso 1 / 2') &&
+    document.querySelector('[data-p3="play"]')?.getAttribute('aria-pressed')==='true'""",timeout=7000)
+  page.locator('[data-p3="play"]').click()
+  assert page.locator('[data-p3="play"]').get_attribute('aria-pressed')=='false'
+
   page.locator('.p3-example-gallery [data-example-id="omega"]').click()
   assert len(page.evaluate('PlegarEditor2D.getData().segments'))==5
   assert page.locator('.p3-svg polygon[data-group="sheet"]').count()>0

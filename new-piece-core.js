@@ -15,17 +15,25 @@
    segments:[100,100],angles:[90],sequence:[1],setup};
  }
  function clone(input){
+  // Copiar también los parámetros locales: el borrador no debe modificar la pieza abierta.
   return {...input,segments:[...input.segments],angles:[...input.angles],
-    sequence:[...input.sequence],setup:{...input.setup}};
+    sequence:[...input.sequence],setup:{...input.setup},
+    ...(input.bendOverrides!==undefined?{
+      bendOverrides:input.bendOverrides.map(entry=>entry===null?null:{...entry})
+    }:{})};
  }
  function add(draft){
   if(draft.segments.length>=G.MAX_SEGMENTS)throw Error('Máximo '+G.MAX_SEGMENTS+' tramos.');
-  const p=clone(draft);p.segments.push(100);p.angles.push(90);p.sequence.push(p.angles.length);return p;
+  const p=clone(draft);p.segments.push(100);p.angles.push(90);p.sequence.push(p.angles.length);
+  if(p.bendOverrides!==undefined)p.bendOverrides.push({radius:null,kFactor:null});
+  return p;
  }
  function remove(draft){
   if(draft.segments.length<=2)throw Error('Una pieza debe tener como mínimo dos tramos.');
   const p=clone(draft);p.segments.pop();p.angles.pop();
-  p.sequence=p.sequence.filter(id=>id<=p.angles.length);return p;
+  p.sequence=p.sequence.filter(id=>id<=p.angles.length);
+  if(p.bendOverrides!==undefined)p.bendOverrides.pop();
+  return p;
  }
  function reposition(draft,bend,position){
   if(!Number.isInteger(bend)||bend<1||bend>draft.angles.length||

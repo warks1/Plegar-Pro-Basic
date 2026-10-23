@@ -1,6 +1,6 @@
 """Prueba real de navegador: cuatro tarjetas 3D, orden editable y ciclo continuo."""
 from pathlib import Path
-import re
+import re, shutil
 from playwright.sync_api import sync_playwright
 
 ROOT=Path(__file__).resolve().parents[1]
@@ -11,7 +11,7 @@ links=re.findall(r'<link rel="stylesheet" href="([^"]+)">',html)
 html=re.sub(r'<link rel="stylesheet"[^>]*>','',html)
 css='\n'.join((ROOT/path).read_text() for path in links)
 with sync_playwright() as pw:
- browser=pw.chromium.launch(headless=True,args=['--no-sandbox','--disable-dev-shm-usage'])
+ browser=pw.chromium.launch(headless=True,args=['--no-sandbox','--disable-dev-shm-usage'],**({'channel':'chrome'} if shutil.which('google-chrome') else {}))
  for w,h in [(1280,860),(390,844)]:
   context=browser.new_context(viewport={'width':w,'height':h})
   page=context.new_page()

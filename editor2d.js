@@ -418,6 +418,20 @@ function mount(){
  // Escucha delegada en el contenedor: la interfaz se reconstruye al cambiar de módulo.
  target.onchange=event=>{if(event.target.id==='ed-import')imported(event);else change(event);};
  target.onclick=actions;
+ // Capturar el toque sobre la tarjeta para que siga funcionando tras re-renderizar.
+ if(!target.dataset.examplePickerBound){
+  target.addEventListener('click',event=>{
+   const button=event.target.closest?.('#ed-example-gallery [data-example-id]');
+   if(!button)return;
+   const record=window.PlegarExamples3D?.get(button.dataset.exampleId);
+   if(!record)return;
+   event.preventDefault();event.stopPropagation();
+   orderPick=0;orderUsed.clear();
+   loadProfile(record.profile,{width:record.width});
+   inform('Pieza '+record.label+' cargada. Cambia el orden o reproduce sus pliegues.');
+  },true);
+  target.dataset.examplePickerBound='true';
+ }
  target.onkeydown=event=>{if((event.key==='Enter'||event.key===' ')&&event.target.matches('[data-ed-bend]')){event.preventDefault();event.target.dispatchEvent(new MouseEvent('click',{bubbles:true}));}};
  isInitialized=true;
 }

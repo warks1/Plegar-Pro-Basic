@@ -45,7 +45,7 @@
   return {yaw:((yaw%360)+360)%360,pitch:clamp(pitch,-80,80),zoom:clamp(zoom,.35,3.5)};
  }
  function projection(model,raw={}){
-  const camera=options(raw),b=model.bounds,cosY=Math.cos(rad(camera.yaw)),sinY=Math.sin(rad(camera.y)),
+  const camera=options(raw),b=model.bounds,cosY=Math.cos(rad(camera.yaw)),sinY=Math.sin(rad(camera.yaw)),
    cosP=Math.cos(rad(camera.pitch)),sinP=Math.sin(rad(camera.pitch)),
    ox=(b.minX+b.maxX)/2,oy=(b.minY+b.maxY)/2,oz=model.zLength/2;
   const rotate=(p,z)=>{

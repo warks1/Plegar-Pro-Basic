@@ -142,3 +142,10 @@ Ajuste de presentación a pantalla completa sin franjas de imagen no ocupadas. S
 - Pantalla aprobada conservada. Simulación 3D con cámaras frontal/superior y recálculo de encuadre al cambiar tramos. Caché v38.
 - Las pruebas automáticas del motor (GitHub Actions 39944417736) finalizaron correctamente; el navegador real iOS/Android está pendiente.
 - Sigue sin haber extracción automática de CAD desde imágenes, modelos sólidos certificados, simulación física o aprobación CNC/seguridad.
+
+## v0.39 — 23 octubre 2026
+- Motor `sequence-timeline.js` compartido: en Reproducción 2D y 3D, el botón principal reproduce TODOS los pliegues consecutivamente sin esperar clicks ni introducir pausas visuales. Sólo se detiene al terminar el último, si se pulsa Pausar o si el usuario cambia ajustes. El movimiento físico de recolocación no se representa.
+- Orden editable en Programación 2D mediante selector de posición, adelantar/retrasar, reset y modo táctil para ir tocando los vértices B1…Bn en el orden deseado.
+- En Simulación/Programación 3D se incorporan selectores de pliegue por paso, que intercambian posiciones preservando la secuencia válida y guardada.
+- Motor `examples3d.js`: cuatro piezas de ejemplo (L, U, Z, Omega) con dimensiones, ángulos y tarjetas SVG 3D distintas, calculadas directamente desde los vértices del perfil y su anchura extruida. Accesibles en Programación 2D y en Simulación/Programación 3D.
+- Incluye actualizaciones del precaché PWA v39 y scripts de prueba de navegador. No implementa física de recolocación, control CNC ni seguridad.

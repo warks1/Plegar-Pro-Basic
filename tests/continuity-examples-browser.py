@@ -225,6 +225,21 @@ with sync_playwright() as pw:
   assert page.locator('.tool-dxf-card .tool-dxf-art [fill-rule="evenodd"]').count()==3
   assert page.evaluate("JSON.parse(localStorage.getItem('plegarpro-tool-dxf-v1'))[0].holes.length")==1
   assert page.evaluate("JSON.parse(localStorage.getItem('plegarpro-tool-dxf-v1'))[0].collisionApproved")==False
+  # Exportación CAD de la sección importada: los huecos siguen siendo vacíos en DXF y SVG.
+  assert page.locator('[data-dxf-section]').count()==2
+  result=page.evaluate("""() => {
+   const r=PlegarToolDXF.read()[0],d=PlegarToolDXF.exportSectionDXF(r),
+    s=PlegarToolDXF.exportSectionSVG(r),parsed=PlegarToolDXF.parseDXF(d);
+   return {holes:parsed.holeCount,area:parsed.areaMm2,svg:s.includes('fill-rule="evenodd"'),
+    millimeters:s.includes('mm"'),approved:parsed.collisionApproved};
+  }""")
+  assert result=={'holes':1,'area':11500,'svg':True,'millimeters':True,'approved':False}
+  with page.expect_download(timeout=10000) as dxf_download:
+   page.locator('[data-dxf-section="dxf"]').click()
+  assert dxf_download.value.suggested_filename.endswith('.dxf')
+  with page.expect_download(timeout=10000) as svg_download:
+   page.locator('[data-dxf-section="svg"]').click()
+  assert svg_download.value.suggested_filename.endswith('.svg')
   page.locator('[data-dxf-remove]').click()
   assert page.locator('.tool-dxf-card').count()==0
   assert page.locator('.mfg-card').count()>=20

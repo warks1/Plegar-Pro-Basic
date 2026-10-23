@@ -157,3 +157,9 @@ Ajuste de presentación a pantalla completa sin franjas de imagen no ocupadas. S
 - `engineering-checks.js`: diagnóstico estático de desarrollo, V/espesor, fuerza aproximada con Rm supuesto por material, ala corta y posibles intersecciones del perfil. **No** es cálculo de fabricante, máquina ni seguridad.
 - `sheet-offset.js`: geometría de miter limitada y compartida entre `piece3d.js` y `plan-drawing.js` para mejorar la coherencia de espesores en los vértices. No se modelan radios de pliegue reales ni springback.
 - Se conserva el diseño aprobado de Inicio y la aplicación es adaptativa. Pendiente: extracción CAD paramétrica de capturas/fotos, geometría exacta de planos de clientes, simulación física, secuencia real de recolocación, límites por máquina y colisiones/posprocesado CNC certificados.
+
+## v0.43 · 23 octubre 2026
+- Tarjetas Proyectos: plano y pieza 3D, acciones directas Programar 2D/Simular 3D/Guardar en Planos; borradores sin cotas confirmadas no se guardan como planos de fabricación.
+- `bend-workplan.js`: hoja de secuencia según el orden táctil, material, punzón, matriz, alas, giros, fuerza aproximada, advertencias y exportación CSV. NO CNC.
+- El ancho confirmado de Programación 2D se propaga al visor 3D. Caché v43.
+- Sigue pendiente validar física de contacto, geometrías oficiales, colisiones y fabricación.

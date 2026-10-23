@@ -166,3 +166,15 @@
 .ed-bend-point .ed-order-small{font-size:12px;fill:#9bddff;pointer-events:none}
 .ed-bend-point.ed-order-chosen circle{fill:#187d57;stroke:#78ffd1;stroke-width:3}
 #ed-quick-order[aria-pressed="true"]{background:#078365;border-color:#a1f3da}
+
+/* v0.43 · hoja de proceso de plegado, accesible también en móvil */
+.ed-workplan-panel{border:1px solid #376f91;background:#09273b;border-radius:9px;padding:12px;margin:10px 0;color:#dff0fa;min-width:0}
+.ed-workplan-heading{display:flex;flex-wrap:wrap;gap:8px;align-items:baseline;margin-bottom:8px}
+.ed-workplan-heading strong{font-size:12px;color:#54c8ff}
+.ed-workplan-heading span{font-size:11px;color:#aacce0}
+.ed-workplan-scroll{max-width:100%;overflow-x:auto;border:1px solid #31536c;border-radius:6px}
+.ed-workplan-scroll table{border-collapse:collapse;width:100%;min-width:890px;font-size:11px}
+.ed-workplan-scroll th,.ed-workplan-scroll td{padding:7px;text-align:left;border-bottom:1px solid #31536c;vertical-align:top}
+.ed-workplan-scroll th{color:#b3e4fd;background:#11334e}
+.ed-workplan-note{font-size:11px;line-height:1.6;color:#afcfe4}
+#ed-export-workplan{background:#115684;color:#f2fcff;border:1px solid #48b3ed;border-radius:7px;padding:9px 11px;cursor:pointer;min-height:38px}

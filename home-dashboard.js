@@ -2,7 +2,7 @@
 (function(){
 'use strict';
 const H=()=>window.PlegarHome3D,E=()=>window.PlegarExamples3D,Editor=()=>window.PlegarEditor2D,TL=()=>window.PlegarSequenceTimeline;
-const $=s=>document.querySelector(s),state={step:1,cycle:0,width:100,zoom:1,yaw:38,previewZoom:1,previewYaw:38,raf:null,last:null,paint:null,cameraKey:'',camera:null,profileKey:'',maximized:false,mode:'photo'};
+const $=s=>document.querySelector(s),state={step:1,cycle:0,width:100,zoom:1,yaw:38,elevation:24,previewZoom:1,previewYaw:38,raf:null,last:null,paint:null,cameraKey:'',camera:null,profileKey:'',maximized:false,mode:'photo'};
 let machineGestures=null,previewGestures=null;
 const Sample=()=>window.PlegarSampleLibrary;
 function program(){return Editor()?.getData();}
@@ -30,7 +30,7 @@ function projectRows(items){
 function escape(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
 function visible(){return !$('#summary-cards')?.hidden;}
 function bounds(p){
- const k=JSON.stringify([p,state.width]);if(k!==state.cameraKey){state.cameraKey=k;state.camera=H().boundsFor(p,state.width,38,24);}
+ const k=JSON.stringify([p,state.width,state.yaw,state.elevation]);if(k!==state.cameraKey){state.cameraKey=k;state.camera=H().boundsFor(p,state.width,state.yaw,state.elevation);}
  return state.camera;
 }
 function count(){const p=program();return p?H().steps(p):2;}
@@ -58,6 +58,7 @@ function setMode(mode){
  const photo=$('.home-machine-photo'),cad=$('#home-machine-cad');
  if(photo)photo.hidden=state.mode!=='photo';
  if(cad)cad.hidden=state.mode!=='cad';
+ const readout=$('#home-stage-readout');if(readout)readout.hidden=state.mode!=='cad';
  const imgButton=$('#realistic-option'),modelButton=$('#home-view-model');
  for(const [button,pressed] of [[imgButton,state.mode==='photo'],[modelButton,state.mode==='cad']]){
   if(button){button.setAttribute('aria-pressed',String(pressed));button.classList.toggle('selected',pressed);}
@@ -70,8 +71,9 @@ function draw(){
  if(!visible())return;
  const p=program();if(!p)return;
  try{
-  const m=H().machine(p,{stage:state.step,progress:state.cycle,width:state.width,yaw:38,elevation:24,zoom:state.zoom,bounds:bounds(p)});
+  const m=H().machine(p,{stage:state.step,progress:state.cycle,width:state.width,yaw:state.yaw,elevation:state.elevation,zoom:state.zoom,bounds:bounds(p)});
   $('#home-machine-cad').innerHTML=m.svg;
+  const hud=$('#home-stage-readout');if(hud)hud.textContent='Paso '+state.step+'/'+count()+' · '+m.frame.phase+' · Y: '+m.frame.punchY.toFixed(1)+' mm · Ángulo: '+m.frame.angle.toFixed(1)+'° · Modelo nominal';
  }catch(err){stop();$('#home-machine-cad').textContent='Error de cinemática: '+err.message;}
 }
 function preview(){
@@ -140,6 +142,38 @@ function cloneControl(id,handler,event='click'){
  const node=document.getElementById(id);if(!node)return;
  const fresh=node.cloneNode(true);node.replaceWith(fresh);fresh.addEventListener(event,handler);
 }
+function chooseView(view){
+ const poses={profile:[0,0],front:[90,0],top:[0,90],iso:[38,24]};
+ if(!poses[view])return;
+ stop();state.yaw=poses[view][0];state.elevation=poses[view][1];state.cameraKey='';
+ machineGestures?.reset();setMode('cad');draw();
+}
+function exportUhd(){
+ const svg=$('#home-machine-cad svg');
+ if(!svg)throw Error('Abre primero Cinemática 3D.');
+ // Render SVG escalable: PNG UHD 3840×2160 con márgenes, sin deformar la geometría.
+ const clone=svg.cloneNode(true);clone.setAttribute('xmlns','http://www.w3.org/2000/svg');
+ const source=new Blob([new XMLSerializer().serializeToString(clone)],{type:'image/svg+xml;charset=utf-8'});
+ const sourceUrl=URL.createObjectURL(source),img=new Image();
+ img.onload=()=>{
+  try{
+   const canvas=document.createElement('canvas');canvas.width=3840;canvas.height=2160;
+   const ctx=canvas.getContext('2d');if(!ctx)throw Error('Canvas UHD no disponible en este dispositivo.');
+   ctx.fillStyle='#071726';ctx.fillRect(0,0,3840,2160);
+   const height=Math.round(3840*480/900);ctx.drawImage(img,0,Math.floor((2160-height)/2),3840,height);
+   canvas.toBlob(blob=>{
+    if(!blob){window.alert('El dispositivo no ha podido generar la imagen UHD.');return;}
+    const url=URL.createObjectURL(blob),a=document.createElement('a');
+    a.href=url;a.download='Plegar-Pro-Simulacion-3D-UHD-3840x2160.png';
+    document.body.appendChild(a);a.click();a.remove();
+    setTimeout(()=>URL.revokeObjectURL(url),3000);
+   },'image/png');
+  }catch(error){window.alert('Exportación UHD: '+error.message);}
+  finally{URL.revokeObjectURL(sourceUrl);}
+ };
+ img.onerror=()=>{URL.revokeObjectURL(sourceUrl);window.alert('No se pudo exportar el gráfico UHD.');};
+ img.src=sourceUrl;
+}
 function normalized(name){
  return String(name||'').replace(/\.(pdf|json|svg)$/i,'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim().toLocaleLowerCase('es-ES');
 }
@@ -173,12 +207,27 @@ function init(){
    'preview-open':()=>{const p=program();if(!p)return;$('#dialog-title').textContent='Pieza del programa: '+p.name;$('#dialog-body').innerHTML=H().preview(p,{width:state.width,yaw:state.previewYaw,zoom:1.5})+'<p>Vista nominal del perfil programado: no contiene taladros ni geometría CAD no proporcionada.</p>';$('#dialog').showModal();},
    'machine-info':()=>{const p=program();$('#toast').textContent='Cinemática basada en '+p.name+': punzón, matriz y chapa dinámicos. Sin contacto físico certificado.';$('#toast').classList.add('show');},
    'view-option':()=>window.PlegarApp.switchScreen('Simulación 3D'),
-   'views':()=>window.PlegarApp.switchScreen('Simulación 3D'),
+   'views':()=>{const menu=$('#home-view-menu');if(!menu)return;menu.hidden=!menu.hidden;$('#views')?.setAttribute('aria-expanded',String(!menu.hidden));},
    'realistic-option':()=>{stop();setMode('photo');},
    'home-view-model':()=>setMode('cad')
   };
   cloneControl(id,handlers[id]||(()=>{}),id==='timeline'||id==='speed'?'change':'click');
  }
+ const menu=$('#home-view-menu');
+ menu?.addEventListener('click',event=>{
+  const control=event.target.closest('[data-home-view]');if(!control)return;
+  const view=control.dataset.homeView;menu.hidden=true;$('#views')?.setAttribute('aria-expanded','false');
+  if(view==='export'){try{setMode('cad');draw();exportUhd();}catch(error){window.alert(error.message);}}
+  else chooseView(view);
+ });
+ document.addEventListener('click',event=>{
+  if(menu&&!menu.hidden&&!event.target.closest('#views')&&!event.target.closest('#home-view-menu')){
+   menu.hidden=true;$('#views')?.setAttribute('aria-expanded','false');
+  }
+ });
+ document.addEventListener('keydown',event=>{
+  if(event.key==='Escape'&&menu&&!menu.hidden){menu.hidden=true;$('#views')?.setAttribute('aria-expanded','false');}
+ });
  $('#timeline').addEventListener('input',e=>seek(e.target.value));
  const steps=$('#steps');steps.addEventListener('click',e=>{const b=e.target.closest('[data-home-step]');if(b){e.stopPropagation();seek(b.dataset.homeStep);}});
  const list=$('#projects');list.addEventListener('click',e=>{const b=e.target.closest('[data-project]');if(b){e.stopPropagation();selectProject(Number(b.dataset.project));}});

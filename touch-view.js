@@ -19,7 +19,7 @@
  }
  function attach(surface,content,{minZoom=.7,maxZoom=4}={}){
   if(!surface||!content)throw Error('Se necesita la superficie y la capa del visor.');
-  const pointers=new Map();let state={scale:1,x:0,y:0},gesture=null,lastTap=0;
+  const pointers=new Map();let state={scale:1,x:0,y:0},gesture=null,lastTap=0,lastTapPoint=null,hadMotion=false,hadMultiple=false,origin=null;
   const bound=s=>({...s,x:clamp(s.x,-surface.clientWidth*Math.max(1,s.scale),surface.clientWidth*Math.max(1,s.scale)),
    y:clamp(s.y,-surface.clientHeight*Math.max(1,s.scale),surface.clientHeight*Math.max(1,s.scale))});
   function render(){
@@ -39,12 +39,14 @@
   function down(e){
    if(e.pointerType==='mouse'&&e.button!==0)return;
    const p={x:e.clientX,y:e.clientY};pointers.set(e.pointerId,p);
+   if(pointers.size===1){origin=p;hadMotion=false;hadMultiple=false;}else hadMultiple=true;
    try{surface.setPointerCapture(e.pointerId);}catch{/* Eventos simulados no requieren captura. */}
    begin();if(e.cancelable)e.preventDefault();
   }
   function move(e){
    if(!pointers.has(e.pointerId))return;
    pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});
+   if(origin&&distance(origin,{x:e.clientX,y:e.clientY})>9)hadMotion=true;
    const values=[...pointers.values()];
    if(!gesture)return;
    if(values.length>=2&&gesture.kind==='pinch'){
@@ -56,7 +58,18 @@
    }else{begin();return;}
    render();if(e.cancelable)e.preventDefault();
   }
-  function up(e){if(!pointers.has(e.pointerId))return;pointers.delete(e.pointerId);begin();}
+  function up(e){
+   if(!pointers.has(e.pointerId))return;
+   const last=pointers.size===1,position=pointers.get(e.pointerId);
+   pointers.delete(e.pointerId);
+   if(last&&!hadMotion&&!hadMultiple&&e.pointerType==='touch'){
+    const now=Date.now();
+    if(lastTap&&now-lastTap<=340&&lastTapPoint&&distance(position,lastTapPoint)<30){
+     reset();lastTap=0;lastTapPoint=null;
+    }else{lastTap=now;lastTapPoint=position;}
+   }
+   begin();
+  }
   function doubleTap(e){if(e.cancelable)e.preventDefault();reset();}
   function zoomBy(factor,x=null,y=null){
    const r=rect();state=bound(zoomAt(state,factor,{x:x??r.left+r.width/2,y:y??r.top+r.height/2},r,minZoom,maxZoom));

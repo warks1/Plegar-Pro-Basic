@@ -78,3 +78,13 @@
 .p3-stage:active,.f2-stage:active{cursor:grabbing}
 .p3-stage .p3-camera-content,.f2-stage .f2-camera-content{display:block;height:auto}
 @media(max-width:620px){.heading-actions #home-view-model,.heading-actions #realistic-option{font-size:10px;min-height:33px}}
+
+/* v0.44: no ocultar foto ni modo cinemático en la cabecera de móviles. */
+@media(max-width:700px){
+ .machine-panel .panel-heading{flex-wrap:wrap;align-items:flex-start;gap:7px}
+ .machine-panel .panel-heading>div:first-child{flex:1 1 180px;min-width:0}
+ .machine-panel .heading-actions{display:flex;flex:1 1 100%;width:100%;flex-wrap:wrap;gap:6px}
+ .machine-panel .heading-actions #realistic-option,
+ .machine-panel .heading-actions #home-view-model{display:inline-flex!important;align-items:center;justify-content:center;white-space:normal;min-height:36px;padding:6px 9px;flex:1 1 110px}
+ .machine-panel .heading-actions #maximize{display:inline-flex;align-items:center;justify-content:center;min-width:36px;min-height:36px}
+}

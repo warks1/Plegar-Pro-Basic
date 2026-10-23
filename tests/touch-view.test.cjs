@@ -34,5 +34,9 @@ test('arrastre y zoom de 2 dedos sobre capa persistente, doble clic centra sin a
  assert.deepEqual(api.getState(),{scale:1,x:0,y:0});
  api.zoomBy(1.3);assert.ok(api.getState().scale>1);
  api.reset();assert.equal(api.getState().scale,1);
+ api.zoomBy(1.8);
+ fire('pointerdown',21,250,150);fire('pointerup',21,250,150);
+ fire('pointerdown',22,253,153);fire('pointerup',22,253,153);
+ assert.equal(api.getState().scale,1,'el doble toque debe restablecer la vista táctil');
  api.destroy();assert.equal(listeners.size,0);
 });

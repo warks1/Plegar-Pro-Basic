@@ -416,6 +416,7 @@
   '<small>Origen: archivo local '+esc(r.sourceFile||'sin nombre')+' · '+esc(r.sourceFormat)+(r.unitsDeclared?' · mm en DXF':' · mm confirmados manualmente')+'</small>'+
   '<span class="mfg-warning">PERFIL IMPORTADO · amarre/capacidad sin certificar · NO COLISIONES/CNC</span>'+
   '<div class="tool-dxf-file-actions">'+
+  '<button type="button" data-dxf-3d-open="'+esc(r.id)+'">Inspeccionar 3D · girar y ampliar</button>'+
   '<button type="button" data-dxf-section="dxf" data-dxf-id="'+esc(r.id)+'">Exportar sección DXF (mm)</button>'+
   '<button type="button" data-dxf-section="svg" data-dxf-id="'+esc(r.id)+'">Exportar plano SVG (mm)</button>'+
   '<button type="button" data-dxf-remove="'+esc(r.id)+'">Eliminar copia local</button></div></article>';
@@ -435,11 +436,27 @@
    '<button type="submit">Importar y dibujar perfil</button></form>'+
    '<p class="tool-dxf-feedback" role="status"></p></details>'+
    '<div class="tool-dxf-current"><h3>Mis perfiles CAD locales (sin validar)</h3>'+
-   '<p>El dibujo respeta las coordenadas de la sección DXF y recorta los huecos interiores. El volumen 3D representa una extrusión visual sin largo axial aunque lo declares (no se escala su profundidad). '+
+   '<p>El dibujo respeta las coordenadas de la sección DXF y recorta los huecos interiores. La miniatura 3D es esquemática; el visor 3D interactivo usa las cotas reales de sección y la longitud axial indicada, cuando existe, para proyectar la extrusión geométrica. '+
    'Puedes exportar el contorno como DXF LWPOLYLINE en mm (los arcos se mantienen discretizados a 0,05 mm) '+
    'o como SVG acotado de sección. Exportar NO genera un sólido CAD, ni NC, ni datos de amarre. '+
    'No se conectan estos perfiles automáticamente al planificador ni al motor de colisiones.</p>'+
    '<p class="tool-dxf-count" role="status"></p>'+
+   '<section class="tool-dxf-3d-viewer" hidden aria-label="Visor tridimensional de perfil DXF no validado">'+
+   '<div class="tool-dxf-3d-heading"><strong data-dxf-3d-title>Inspección 3D del perfil</strong>'+
+   '<button type="button" data-dxf-3d-action="close" aria-label="Cerrar visor 3D">Cerrar ×</button></div>'+
+   '<div class="tool-dxf-3d-stage" tabindex="0" aria-label="Arrastra con el dedo o ratón para girar el utillaje; flechas de teclado para orientar">'+
+   '<div data-dxf-3d-output></div></div>'+
+   '<div class="tool-dxf-3d-controls">'+
+   '<button type="button" data-dxf-3d-action="left" aria-label="Girar a la izquierda">↶ Girar</button>'+
+   '<button type="button" data-dxf-3d-action="right" aria-label="Girar a la derecha">↷ Girar</button>'+
+   '<button type="button" data-dxf-3d-action="up">Inclinar ↑</button>'+
+   '<button type="button" data-dxf-3d-action="down">Inclinar ↓</button>'+
+   '<button type="button" data-dxf-3d-action="zoom-in">Zoom +</button>'+
+   '<button type="button" data-dxf-3d-action="zoom-out">Zoom −</button>'+
+   '<button type="button" data-dxf-3d-action="profile">Vista perfil</button>'+
+   '<button type="button" data-dxf-3d-action="reset">Isométrica</button>'+
+   '</div>'+
+   '<p class="tool-dxf-3d-note" role="status">Visor gráfico de una sección DXF extruida, no modelo de amarre ni verificación de colisiones.</p></section>'+
    '<div class="tool-dxf-backup" role="group" aria-label="Copias de perfiles propios">'+
    '<button type="button" data-dxf-export>Exportar biblioteca JSON</button>'+
    '<label>Importar copia JSON <input data-dxf-backup-file type="file" accept=".json,application/json"></label>'+
@@ -450,10 +467,69 @@
  function mount(host){
   if(!host)return;
   host.innerHTML=html();
+  let selected3D=null,camera3D={yaw:32,pitch:22,zoom:1},pointer3D=null;
+  const viewer=host.querySelector('.tool-dxf-3d-viewer'),stage=host.querySelector('.tool-dxf-3d-stage');
+  function draw3D(){
+   if(!selected3D){viewer.hidden=true;return;}
+   const record=read().find(p=>p.id===selected3D);
+   if(!record){selected3D=null;viewer.hidden=true;return;}
+   try{
+    const three=root.PlegarToolDXF3D;
+    if(!three?.render)throw Error('Visor interactivo no cargado.');
+    viewer.hidden=false;
+    viewer.querySelector('[data-dxf-3d-title]').textContent=record.brand+' · '+record.code+' · '+record.name;
+    viewer.querySelector('[data-dxf-3d-output]').innerHTML=three.render(record,camera3D);
+    const length=record.lengthMm!==null?number(record.lengthMm)+' mm aportados':'SIN MEDIR';
+    viewer.querySelector('.tool-dxf-3d-note').textContent=
+     'Largo axial: '+length+' · perfil '+number(record.bounds.width)+' × '+
+     number(record.bounds.height)+' mm, '+record.holeCount+
+     ' hueco(s). Sección geométrica importada; ni amarre ni colisiones/CNC verificados.';
+   }catch(e){
+    viewer.hidden=false;
+    viewer.querySelector('[data-dxf-3d-output]').textContent='No se pudo representar el perfil: '+e.message;
+   }
+  }
+  const number=v=>Number(v).toLocaleString('es-ES',{maximumFractionDigits:2});
+  function change3D(action){
+   const clamp=(v,lo,hi)=>Math.min(hi,Math.max(lo,v));
+   switch(action){
+    case 'left':camera3D.yaw-=15;break;
+    case 'right':camera3D.yaw+=15;break;
+    case 'up':camera3D.pitch=clamp(camera3D.pitch+10,-80,80);break;
+    case 'down':camera3D.pitch=clamp(camera3D.pitch-10,-80,80);break;
+    case 'zoom-in':camera3D.zoom=clamp(camera3D.zoom*1.2,.35,3.5);break;
+    case 'zoom-out':camera3D.zoom=clamp(camera3D.zoom/1.2,.35,3.5);break;
+    case 'profile':camera3D={yaw:0,pitch:0,zoom:1};break;
+    case 'reset':camera3D={yaw:32,pitch:22,zoom:1};break;
+    case 'close':selected3D=null;pointer3D=null;break;
+    default:return;
+   }
+   draw3D();
+  }
+  stage.addEventListener('pointerdown',e=>{
+   if(!selected3D||pointer3D)return;
+   pointer3D={id:e.pointerId,x:e.clientX,y:e.clientY};
+   try{stage.setPointerCapture(e.pointerId);}catch{}
+  });
+  stage.addEventListener('pointermove',e=>{
+   if(!pointer3D||pointer3D.id!==e.pointerId)return;
+   const dx=e.clientX-pointer3D.x,dy=e.clientY-pointer3D.y;
+   pointer3D.x=e.clientX;pointer3D.y=e.clientY;
+   camera3D.yaw+=dx*.55;camera3D.pitch=Math.max(-80,Math.min(80,camera3D.pitch+dy*.4));
+   draw3D();
+  });
+  const endPointer=e=>{if(pointer3D?.id===e.pointerId)pointer3D=null;};
+  stage.addEventListener('pointerup',endPointer);
+  stage.addEventListener('pointercancel',endPointer);
+  stage.addEventListener('keydown',e=>{
+   const key={'ArrowLeft':'left','ArrowRight':'right','ArrowUp':'up','ArrowDown':'down','+':'zoom-in','-':'zoom-out'}[e.key];
+   if(key){e.preventDefault();change3D(key);}
+  });
   const list=()=>read(),paint=()=>{
    const arr=list();
    host.querySelector('.tool-dxf-count').textContent=arr.length+' perfiles importados en este navegador, máximo '+MAX_FILES+'.';
    host.querySelector('.tool-dxf-results').innerHTML=arr.map(card).join('')||'<p>No hay perfiles DXF importados.</p>';
+   if(selected3D)draw3D();
   };
   const feedback=()=>host.querySelector('.tool-dxf-feedback');
   host.onsubmit=async e=>{
@@ -484,6 +560,16 @@
    finally{target.value='';}
   };
   host.onclick=e=>{
+   const open=e.target.closest('[data-dxf-3d-open]');
+   if(open){
+    selected3D=open.getAttribute('data-dxf-3d-open');
+    camera3D={yaw:32,pitch:22,zoom:1};
+    draw3D();
+    viewer.scrollIntoView?.({block:'nearest',behavior:'smooth'});
+    return;
+   }
+   const action=e.target.closest('[data-dxf-3d-action]');
+   if(action){change3D(action.getAttribute('data-dxf-3d-action'));return;}
    const section=e.target.closest('[data-dxf-section]');
    if(section){
     try{

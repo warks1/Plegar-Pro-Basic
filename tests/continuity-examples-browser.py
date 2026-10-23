@@ -225,6 +225,22 @@ with sync_playwright() as pw:
   assert page.locator('.tool-dxf-card .tool-dxf-art [fill-rule="evenodd"]').count()==3
   assert page.evaluate("JSON.parse(localStorage.getItem('plegarpro-tool-dxf-v1'))[0].holes.length")==1
   assert page.evaluate("JSON.parse(localStorage.getItem('plegarpro-tool-dxf-v1'))[0].collisionApproved")==False
+  # El visor 3D se construye desde el DXF, no una imagen repetida por marca.
+  page.locator('.tool-dxf-card [data-dxf-3d-open]').click()
+  assert page.locator('.tool-dxf-3d-viewer').is_visible()
+  assert page.locator('.tool-dxf-3d-canvas').count()==1
+  assert page.locator('.tool-dxf-3d-canvas [data-3d-face="hole-wall"]').count()>0
+  assert 'NaN' not in page.locator('.tool-dxf-3d-canvas').evaluate('(el)=>el.outerHTML')
+  assert 'LONGITUD AXIAL DESCONOCIDA' in page.locator('.tool-dxf-3d-canvas').text_content()
+  first_svg=page.locator('.tool-dxf-3d-canvas').evaluate('(el)=>el.outerHTML')
+  page.locator('[data-dxf-3d-action="right"]').click()
+  assert page.locator('.tool-dxf-3d-canvas').evaluate('(el)=>el.outerHTML')!=first_svg
+  page.locator('[data-dxf-3d-action="profile"]').click()
+  assert 'Giro 0°' in page.locator('.tool-dxf-3d-canvas').text_content()
+  page.locator('[data-dxf-3d-action="zoom-in"]').click()
+  assert 'zoom 1.20×' in page.locator('.tool-dxf-3d-canvas').text_content()
+  page.locator('[data-dxf-3d-action="close"]').click()
+  assert page.locator('.tool-dxf-3d-viewer').is_hidden()
   # Exportación CAD de la sección importada: los huecos siguen siendo vacíos en DXF y SVG.
   assert page.locator('[data-dxf-section]').count()==2
   result=page.evaluate("""() => {

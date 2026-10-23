@@ -55,3 +55,26 @@
 .project-plan-dialog .sample-plan-pair{height:auto;min-height:220px}
 .project-plan-dialog .sample-plan-view,.project-plan-dialog .sample-part-view{aspect-ratio:900/600}
 @media(max-width:620px){.project-plan-dialog .sample-plan-pair{grid-template-columns:1fr;min-height:0}.project-plan-dialog .sample-plan-view,.project-plan-dialog .sample-part-view{min-height:135px}}
+
+/* v0.44 · foto original Bystronic y gestos táctiles sobre los visores.
+   No altera menú, tipografía ni la maquetación aprobada. */
+.touch-gesture-host{position:relative;overflow:hidden;min-width:0;touch-action:none;overscroll-behavior:contain;user-select:none;-webkit-user-select:none;cursor:grab}
+.touch-gesture-host:active{cursor:grabbing}
+.touch-camera-content,.p3-camera-content,.f2-camera-content{width:100%;height:100%;transform-origin:center center;will-change:transform}
+.home-machine-3d{position:absolute;inset:0;min-height:0!important;width:100%;height:100%}
+.home-machine-3d .touch-camera-content{position:relative}
+.home-machine-3d .home-machine-photo{position:absolute;inset:0;display:block;width:100%;height:100%;object-fit:cover;pointer-events:none;transform:none;transition:none}
+.home-machine-3d .home-machine-photo[hidden],.home-machine-3d #home-machine-cad[hidden]{display:none!important}
+.home-machine-3d #home-machine-cad{position:absolute;inset:0;pointer-events:none}
+.home-machine-3d #home-machine-cad svg{height:100%;width:100%;min-height:0;display:block}
+.home-machine-3d svg.home-simulation-svg{min-height:0;max-height:100%;aspect-ratio:auto}
+.heading-actions #realistic-option[aria-pressed="true"],.heading-actions #home-view-model[aria-pressed="true"]{background:#075ab3;color:#e8f7ff;border-color:#218dff}
+.stage-tools{z-index:3}.axis-legend{z-index:2}.machine-stage #home-scene-label{z-index:2;pointer-events:none}
+#home-preview-3d{position:absolute;inset:0;min-height:0!important;height:100%;width:100%}
+#home-preview-camera,#home-preview-drawing{height:100%;width:100%}
+#home-preview-drawing svg{display:block;width:100%;height:100%;min-height:0}
+.preview-image #home-preview-source{pointer-events:none}
+.p3-stage,.f2-stage{touch-action:none;overscroll-behavior:contain;user-select:none;-webkit-user-select:none;cursor:grab}
+.p3-stage:active,.f2-stage:active{cursor:grabbing}
+.p3-stage .p3-camera-content,.f2-stage .f2-camera-content{display:block;height:auto}
+@media(max-width:620px){.heading-actions #home-view-model,.heading-actions #realistic-option{font-size:10px;min-height:33px}}

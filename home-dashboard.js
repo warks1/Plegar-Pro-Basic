@@ -2,7 +2,8 @@
 (function(){
 'use strict';
 const H=()=>window.PlegarHome3D,E=()=>window.PlegarExamples3D,Editor=()=>window.PlegarEditor2D,TL=()=>window.PlegarSequenceTimeline;
-const $=s=>document.querySelector(s),state={step:1,cycle:0,width:100,zoom:1,yaw:38,previewZoom:1,previewYaw:38,raf:null,last:null,paint:null,cameraKey:'',camera:null,profileKey:'',maximized:false};
+const $=s=>document.querySelector(s),state={step:1,cycle:0,width:100,zoom:1,yaw:38,previewZoom:1,previewYaw:38,raf:null,last:null,paint:null,cameraKey:'',camera:null,profileKey:'',maximized:false,mode:'photo'};
+let machineGestures=null,previewGestures=null;
 const Sample=()=>window.PlegarSampleLibrary;
 function program(){return Editor()?.getData();}
 function projectProfile(p,i){
@@ -52,23 +53,36 @@ function updateControls(){
  $('#step-count').textContent='Paso '+state.step+' / '+labels.length;
  $('#step-description').textContent=labels[state.step-1];
 }
+function setMode(mode){
+ state.mode=mode==='cad'?'cad':'photo';
+ const photo=$('.home-machine-photo'),cad=$('#home-machine-cad');
+ if(photo)photo.hidden=state.mode!=='photo';
+ if(cad)cad.hidden=state.mode!=='cad';
+ const imgButton=$('#realistic-option'),modelButton=$('#home-view-model');
+ for(const [button,pressed] of [[imgButton,state.mode==='photo'],[modelButton,state.mode==='cad']]){
+  if(button){button.setAttribute('aria-pressed',String(pressed));button.classList.toggle('selected',pressed);}
+ }
+ const label=$('#home-scene-label');if(label)label.textContent=state.mode==='photo'
+  ?'FOTOGRAFÍA REAL DE REFERENCIA · PARA ANIMAR ELIGE CINEMÁTICA 3D'
+  :'CINEMÁTICA GEOMÉTRICA EN MOVIMIENTO · NO CONTROL CNC NI MÁQUINA CALIBRADA';
+}
 function draw(){
  if(!visible())return;
  const p=program();if(!p)return;
  try{
   const m=H().machine(p,{stage:state.step,progress:state.cycle,width:state.width,yaw:38,elevation:24,zoom:state.zoom,bounds:bounds(p)});
-  $('#home-machine-3d').innerHTML=m.svg;
- }catch(err){stop();$('#home-machine-3d').textContent='Error de cinemática: '+err.message;}
+  $('#home-machine-cad').innerHTML=m.svg;
+ }catch(err){stop();$('#home-machine-cad').textContent='Error de cinemática: '+err.message;}
 }
 function preview(){
  if(!visible())return;
  const p=program();if(!p)return;
  try{
-  $('#home-preview-3d').innerHTML=H().preview(p,{width:state.width,yaw:state.previewYaw,elevation:25,zoom:state.previewZoom});
+  $('#home-preview-drawing').innerHTML=H().preview(p,{width:state.width,yaw:state.previewYaw,elevation:25,zoom:state.previewZoom});
   $('#active-project-thumb').innerHTML=H().thumb(p,{width:state.width});
   $('#project-name').textContent=p.name;
   $('#home-preview-source').textContent='Perfil 3D del programa: '+p.name+' · Sin plano CAD certificado';
- }catch(err){$('#home-preview-3d').textContent='No se puede representar el perfil: '+err.message;}
+ }catch(err){$('#home-preview-drawing').textContent='No se puede representar el perfil: '+err.message;}
 }
 function paint(){updateControls();draw();}
 function tick(now){
@@ -88,6 +102,7 @@ function tick(now){
 function toggle(){
  if(state.raf!==null){stop();draw();return;}
  if(state.step>=count()){state.step=1;state.cycle=0;}
+ setMode('cad'); // La foto sigue disponible; la animación utiliza la geometría 3D real del programa.
  state.last=null;state.paint=null;state.raf=requestAnimationFrame(tick);
  $('#play-icon use')?.setAttribute('href','#i-pause');$('#play')?.setAttribute('aria-label','Pausar reproducción continua');
 }
@@ -136,25 +151,29 @@ async function connectSavedDrawings(){
 }
 function init(){
  const host=$('#home-machine-3d');if(!host)return;
- for(const id of ['step-back','step-next','play','timeline','speed','zoom-in','zoom-out','center-view','reset-view','rotate-prev','rotate-next','preview-zoom','preview-reset','preview-open','machine-info','view-option','views','realistic-option']){
+ for(const id of ['step-back','step-next','play','timeline','speed','zoom-in','zoom-out','center-view','reset-view','rotate-prev','rotate-next','preview-zoom','preview-reset','preview-open','machine-info','view-option','views','realistic-option','home-view-model']){
   const handlers={
    'step-back':()=>seek(state.step-1),'step-next':()=>seek(state.step+1),'play':toggle,
-   'zoom-in':()=>{state.zoom=Math.min(1.7,state.zoom+.1);draw();},'zoom-out':()=>{state.zoom=Math.max(.8,state.zoom-.1);draw();},
-   'center-view':()=>{state.zoom=1;draw();},'reset-view':()=>{state.zoom=1;draw();},
+   'zoom-in':()=>machineGestures?.zoomBy(1.2),'zoom-out':()=>machineGestures?.zoomBy(1/1.2),
+   'center-view':()=>machineGestures?.reset(),'reset-view':()=>machineGestures?.reset(),
    'rotate-prev':()=>{state.previewYaw-=12;preview();},'rotate-next':()=>{state.previewYaw+=12;preview();},
-   'preview-zoom':()=>{state.previewZoom=state.previewZoom>=1.7?1:state.previewZoom+.1;preview();},
-   'preview-reset':()=>{state.previewYaw=38;state.previewZoom=1;preview();},
+   'preview-zoom':()=>previewGestures?.zoomBy(1.2),
+   'preview-reset':()=>{state.previewYaw=38;state.previewZoom=1;previewGestures?.reset();preview();},
    'preview-open':()=>{const p=program();if(!p)return;$('#dialog-title').textContent='Pieza del programa: '+p.name;$('#dialog-body').innerHTML=H().preview(p,{width:state.width,yaw:state.previewYaw,zoom:1.5})+'<p>Vista nominal del perfil programado: no contiene taladros ni geometría CAD no proporcionada.</p>';$('#dialog').showModal();},
    'machine-info':()=>{const p=program();$('#toast').textContent='Cinemática basada en '+p.name+': punzón, matriz y chapa dinámicos. Sin contacto físico certificado.';$('#toast').classList.add('show');},
    'view-option':()=>window.PlegarApp.switchScreen('Simulación 3D'),
    'views':()=>window.PlegarApp.switchScreen('Simulación 3D'),
-   'realistic-option':()=>{ $('#toast').textContent='Vista CAD activa. No es una fotografía estática.';$('#toast').classList.add('show');}
+   'realistic-option':()=>{stop();setMode('photo');},
+   'home-view-model':()=>setMode('cad')
   };
   cloneControl(id,handlers[id]||(()=>{}),id==='timeline'||id==='speed'?'change':'click');
  }
  $('#timeline').addEventListener('input',e=>seek(e.target.value));
  const steps=$('#steps');steps.addEventListener('click',e=>{const b=e.target.closest('[data-home-step]');if(b){e.stopPropagation();seek(b.dataset.homeStep);}});
  const list=$('#projects');list.addEventListener('click',e=>{const b=e.target.closest('[data-project]');if(b){e.stopPropagation();selectProject(Number(b.dataset.project));}});
+ machineGestures=window.PlegarTouchView.attach($('#home-machine-3d'),$('#home-machine-camera'));
+ previewGestures=window.PlegarTouchView.attach($('#home-preview-3d'),$('#home-preview-camera'));
+ setMode('photo');
  const obs=new MutationObserver(()=>{if(visible())sync();else stop();});obs.observe($('#summary-cards'),{attributes:true,attributeFilter:['hidden']});
  sync();
  // Sustituir las miniaturas provisionales del arranque por plano 2D + pieza 3D de cada proyecto.

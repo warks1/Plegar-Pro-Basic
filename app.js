@@ -192,7 +192,7 @@ function projectAction(i,action){
 function updateToolCard(kind,id){
  const tool=window.PlegarToolLibrary?.get(kind,id);
  if(!tool)return;
- const rows=$('.tool-specs > div');
+ const rows=[...document.querySelectorAll('.tool-specs > div')];
  if(rows.length<7)return;
  const values=[
   id,

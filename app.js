@@ -132,11 +132,20 @@ function renderModule(name){
  }else if(name==='Máquinas'){
  content=window.PlegarMachineReferences?.html(window.PlegarEditor2D?.getData()?.setup)||'<div class="module-tile">Ficha técnica de máquinas no disponible.</div>';
  }else if(name==='Utillaje'){
-  const lib=window.PlegarToolLibrary;
-  content='<p>Utillajes paramétricos internos. No son fichas ni límites de fabricantes verificados; seleccionarlos modifica el programa actual.</p>'+
-   '<div class="module-tiles">'+[...lib.PUNCHES,...lib.DIES].map(tool=>
-   '<div class="module-tile"><strong>'+escapeHtml(tool.name)+'</strong><p>'+escapeHtml(lib.details(tool))+
-   '</p><button type="button" data-tool-set="'+tool.kind+':'+tool.id+'">Seleccionar '+(tool.kind==='die'?'matriz':'punzón')+'</button></div>').join('')+'</div>';
+  const lib=window.PlegarToolLibrary,catalog=window.PlegarManufacturerCatalog;
+  if(!catalog){content='<p>Catálogo de fabricantes no disponible. Reabre la aplicación para actualizar.</p>';}
+  else{
+   const el=$('#module-sample');
+   el.classList.remove('module-editor','module-forming','module-piece3d');
+   el.innerHTML='<div id="manufacturer-catalog" aria-label="Biblioteca por fabricante"></div>'+
+    '<details class="mfg-internal"><summary>Herramientas genéricas del simulador · seleccionar punzón o matriz</summary>'+
+    '<p>Las fichas anteriores son documentales. Este catálogo interno de herramientas paramétricas NO representa las geometrías del fabricante.</p>'+
+    '<div class="module-tiles">'+[...lib.PUNCHES,...lib.DIES].map(tool=>
+     '<div class="module-tile"><strong>'+escapeHtml(tool.name)+'</strong><p>'+escapeHtml(lib.details(tool))+
+     '</p><button type="button" data-tool-set="'+tool.kind+':'+tool.id+'">Seleccionar '+(tool.kind==='die'?'matriz':'punzón')+' nominal</button></div>').join('')+'</div></details>';
+   catalog.mount($('#manufacturer-catalog'));
+   return;
+  }
  }else if(name==='Ajustes'){
   $('#module-sample').classList.remove('module-editor','module-forming','module-piece3d');
   window.PlegarSettings.mount($('#module-sample'));return;

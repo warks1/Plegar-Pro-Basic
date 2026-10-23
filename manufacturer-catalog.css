@@ -1,0 +1,26 @@
+/* Catálogo documental de utillaje - vistas 2D y 3D esquemáticas, NO CAD certificado. */
+.mfg-catalog{display:grid;gap:12px;padding:6px 0;max-width:100%}
+.mfg-catalog>h2{margin:0;color:#91defd;font-size:19px}
+.mfg-catalog>p{font-size:12px;line-height:1.5;color:#bdd9e8;margin:4px 0}
+.mfg-controls{display:grid;grid-template-columns:1fr 1fr minmax(150px,1.4fr);gap:10px;padding:12px;border:1px solid #345e79;border-radius:9px;background:#0b283c}
+.mfg-controls label{display:grid;gap:6px;font-weight:650;font-size:12px;color:#d4ecff}
+.mfg-controls select,.mfg-controls input{width:100%;min-width:0;background:#061b2c;color:#f5fbff;border:1px solid #598aab;border-radius:5px;min-height:42px;padding:8px}
+.mfg-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr));gap:11px}
+.mfg-card{border:1px solid #385e7a;border-radius:11px;background:linear-gradient(140deg,#0e3048,#091c2c);padding:10px;display:grid;gap:7px;min-width:0}
+.mfg-card>strong{color:#eaf8ff;font-size:13px;overflow-wrap:anywhere}
+.mfg-card>p{font-size:12px;color:#c3e5f6;line-height:1.4;margin:0}
+.mfg-card>small{font-size:11px;color:#c3dbef;line-height:1.4}
+.mfg-card .mfg-provenance{color:#9dbcce}
+.mfg-card .mfg-warning{font-size:10px;font-weight:700;color:#ffdeb0;border-left:3px solid #ffc06b;background:#2a251d;padding:6px 8px}
+.mfg-card a{color:#83d9ff;text-decoration:underline;font-size:11px;overflow-wrap:anywhere}
+.mfg-dual{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.mfg-art{display:block;width:100%;height:auto;aspect-ratio:242/174;border:1px solid #345872;border-radius:7px}
+.mfg-legend{border:1px dashed #c19e58;background:#242318;padding:9px;color:#ffddaa!important}
+.mfg-count{font-weight:700;color:#8de2ff!important}
+.mfg-internal{padding:14px;border:1px solid #416884;border-radius:9px;background:#092338}
+.mfg-internal summary{cursor:pointer;padding:8px;font-weight:700;font-size:14px;color:#bee6fb}
+.mfg-internal p{color:#c4ddea;font-size:12px}
+@media(max-width:760px){.mfg-controls{grid-template-columns:1fr 1fr}.mfg-controls label:last-child{grid-column:1/-1}}
+@media(max-width:430px){.mfg-controls{grid-template-columns:1fr}.mfg-controls label:last-child{grid-column:auto}.mfg-grid{grid-template-columns:1fr}.mfg-card{padding:8px}}
+html[data-pp-theme="light"] .mfg-controls,html[data-pp-theme="light"] .mfg-internal{background:#163e58}
+html[data-pp-theme="light"] .mfg-catalog>p{color:#32536c}

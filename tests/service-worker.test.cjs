@@ -61,14 +61,16 @@ function harness() {
   return { trigger, state, caches, stores, seen };
 }
 
-test('installs an offline page and cache version v57', async () => {
+test('installs an offline page and cache version v58', async () => {
   const h = harness();
   await h.trigger('install');
-  assert.ok(h.stores.has('plegar-pro-forming2d-v57'));
+  assert.ok(h.stores.has('plegar-pro-forming2d-v58'));
   assert.ok(await h.caches.match(home));
   assert.ok(await h.caches.match(scope+'machine-references.js'),'Ficha de máquina disponible sin conexión');
   assert.ok(await h.caches.match(scope+'settings.js'),'Preferencias disponibles offline');
   assert.ok(await h.caches.match(scope+'settings.css'),'Estilos accesibles offline');
+  assert.ok(await h.caches.match(scope+'manufacturer-catalog.js'),'Catálogo documental sin conexión');
+  assert.ok(await h.caches.match(scope+'manufacturer-catalog.css'),'Vista de utillaje sin conexión');
 });
 
 test('navigation retrieves the latest online HTML, not a stale cached version', async () => {

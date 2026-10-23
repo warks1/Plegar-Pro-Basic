@@ -128,6 +128,22 @@ with sync_playwright() as pw:
   assert page.evaluate('PlegarEditor2D.getData().setup.tableLeft') is None
   assert page.evaluate('PlegarEditor2D.getData().setup.dieHeight') is None
   if w<=1120:page.locator('#open-menu').click()
+  page.locator('button.nav-item[data-screen="Utillaje"]').click()
+  assert page.locator('.mfg-card').count()>=20
+  assert page.locator('.mfg-card .mfg-art').count()>=40
+  assert page.locator('.mfg-card .mfg-warning').count()>=20
+  assert page.locator('.mfg-card [data-tool-set]').count()==0
+  page.locator('[data-mfg-filter="brand"]').select_option('Bystronic')
+  assert page.locator('.mfg-card').count()>=4
+  assert page.locator('.mfg-card').first.locator('strong').inner_text().startswith('Bystronic')
+  page.locator('[data-mfg-filter="brand"]').select_option('EUROSTAMP')
+  page.locator('[data-mfg-filter="kind"]').select_option('die')
+  page.locator('[data-mfg-filter="q"]').fill('V24')
+  assert page.locator('.mfg-card').count()==1
+  assert 'V 24 mm' in page.locator('.mfg-card').inner_text()
+  assert 'H 55 mm' in page.locator('.mfg-card').inner_text()
+  assert page.locator('.mfg-card a[href^="https://"]').count()==1
+  if w<=1120:page.locator('#open-menu').click()
   page.locator('button.nav-item[data-screen="Proyectos"]').click()
   assert page.locator('.project-work-buttons').count()>=12
   assert page.locator('[data-project-action="plan"]').count()>=12

@@ -326,7 +326,7 @@ test('LWPOLYLINE rechaza elevación Z, grosor CAD y normal invertida o inclinada
   assert.throws(()=>D.parseDXF(altered(values)),/elevada|espesor|XY/);
  }
  assert.throws(()=>D.parseDXF(altered('70\n16\n')),/banderas/);
- assert.throws(()=>D.parseDXF(altered('43\nno-es-numero\n')),/anchura variable/);
+ assert.throws(()=>D.parseDXF(altered('43\nno-es-numero\n')),/anchura de polilínea variable/);
 });
 test('DXF incompleto, EOF ausente o código de grupo sin valor se rechaza',()=>{
  const text=dxf();

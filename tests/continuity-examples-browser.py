@@ -377,6 +377,51 @@ with sync_playwright() as pw:
   assert page.locator('.ps-item').count()==2
   page.locator('[data-ps-action="close"]').last.click()
 
+  # Preferencias, accesibilidad y rutas reales del menú (PC y smartphone).
+  if w<=1120:page.locator('#open-menu').click()
+  page.locator('button.nav-item[data-screen="Ajustes"]').click()
+  assert page.locator('.pp-settings [data-pp-setting]').count()==11
+  page.locator('[data-pp-setting="theme"]').select_option('light')
+  assert page.evaluate('document.documentElement.dataset.ppTheme')=='light'
+  page.locator('[data-pp-setting="accent"]').select_option('amber')
+  assert page.evaluate('document.documentElement.dataset.ppAccent')=='amber'
+  page.locator('[data-pp-setting="reducedMotion"]').check()
+  assert page.evaluate('document.documentElement.dataset.ppMotion')=='reduced'
+  for key,value in [('camera','profile'),('homeView','cad'),('speed','2'),('exportResolution','1080')]:
+   page.locator('[data-pp-setting="'+key+'"]').select_option(value)
+  page.locator('[data-pp-setting="repeat"]').uncheck()
+  assert page.evaluate("JSON.parse(localStorage.getItem('plegarpro-settings-v1')).repeat")==False
+  page.locator('#module-view .module-top [data-screen="Inicio"]').click()
+  assert page.locator('#home-machine-cad').is_visible()
+  assert not page.locator('#home-loop').is_checked()
+  assert page.locator('#speed').input_value()=='550'
+  page.locator('#calc-close').click()
+  assert page.locator('.calculator-panel').evaluate("(el)=>el.classList.contains('calculator-collapsed')")
+  page.locator('#calc-close').click()
+  assert not page.locator('.calculator-panel').evaluate("(el)=>el.classList.contains('calculator-collapsed')")
+  page.locator('#tool-tabs [data-tab="Punzones"]').click()
+  page.locator('#tool-select').select_option('punch:p30-r1')
+  assert page.evaluate('PlegarEditor2D.getData().setup.punch')=='p30-r1'
+  page.locator('#tool-tabs [data-tab="Matrices"]').click()
+  page.locator('#tool-select').select_option('die:v24-88')
+  assert page.evaluate('PlegarEditor2D.getData().setup.die')=='v24-88'
+  screens=page.locator('#menu-nav button.nav-item[data-screen]').evaluate_all(
+   "(els)=>els.map(el=>el.dataset.screen)")
+  assert len(screens)>=17
+  for target in screens:
+   if w<=1120:page.locator('#open-menu').click()
+   page.locator('#menu-nav button.nav-item[data-screen="'+target+'"]').click()
+   if target=='Inicio':assert page.locator('#summary-cards').is_visible()
+   else:
+    assert page.locator('#module-title').inner_text()==target,target
+    assert page.locator('#module-sample').is_visible(),target
+  page.locator('#avatar').evaluate("(el)=>el.click()")
+  assert page.locator('#module-title').inner_text()=='Ajustes'
+  page.locator('[data-pp-settings-action="reset"]').click()
+  assert page.evaluate('PlegarSettings.get().theme')=='dark'
+  assert page.evaluate('PlegarSettings.get().repeat')==True
+  assert page.evaluate('PlegarSettings.get().exportResolution')=='2160'
+
   assert page.evaluate('document.documentElement.scrollWidth <= innerWidth+2'),"Desbordamiento horizontal"
   assert not errors,(w,errors)
   print(f'Cinemática continua y 4 piezas 3D · {w} px OK',flush=True)

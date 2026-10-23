@@ -3,7 +3,7 @@
  */
 (function(){
  'use strict';
- const K=window.PlegarFoldKinematics,M=window.PlegarPiece3D,T=window.PlegarTooling3D,A=window.PlegarSceneAudit3D,P=window.PlegarProximity3D,S=window.PlegarSweep3D;
+ const K=window.PlegarFoldKinematics,M=window.PlegarPiece3D,T=window.PlegarTooling3D,A=window.PlegarSceneAudit3D,P=window.PlegarProximity3D,S=window.PlegarSweep3D,TL=window.PlegarSequenceTimeline,E=window.PlegarExamples3D;
  let active=null;
  const palette={sheet:{upper:'#479fc4',lower:'#225576',edge:'#9bd9f1'},punch:{cap:'#bccbd8',side:'#778e9e'},die:{cap:'#8599aa',side:'#354b5d'},gauge:{cap:'#d9ae68',side:'#926735'}};
  function render(){
@@ -52,17 +52,22 @@
   c.host.querySelector('.p3-sweep-marker').innerHTML=sweep.rows.filter(row=>row.minimum?.mm<=sweep.nearMm).map(row=>`<i title="Muestra ${row.percent.toFixed(1)} %: distancia nominal ${row.minimum.mm.toFixed(2)} mm" style="left:${row.percent}%"></i>`).join('');
   c.host.querySelector('[data-p3="scan-export"]').disabled=false;
   c.host.querySelector('.p3-state').textContent=`Pliegue ${s.bend} · fase ${f.phase} · avance de conformado ${Math.round(f.formingProgress*100)} % · espesor ${s.thickness} mm · V${s.dieOpening} · punzón ${s.punchAngle}° · tope X ${s.stop.x} mm · ${combined.faces.length} caras ilustrativas`;
-  c.host.querySelector('.p3-kinematics').textContent=`FASE: ${f.phase.toUpperCase()} · Punzón Y nominal ${f.punchY.toFixed(2)} mm · holgura de retirada ${f.punchLift.toFixed(2)} mm · ángulo representado ${f.angle.toFixed(1)}° · matriz fija · tope nominal fijo. ${c.holdUntil!==null?'FIN DE PASO · recolocación posterior no calculada. ':''}${f.notice}. NO CNC / SIN VERIFICAR.`;
+  c.host.querySelector('.p3-kinematics').textContent=`FASE: ${f.phase.toUpperCase()} · Punzón Y nominal ${f.punchY.toFixed(2)} mm · holgura de retirada ${f.punchLift.toFixed(2)} mm · ángulo representado ${f.angle.toFixed(1)}° · matriz fija · tope nominal fijo. REPRODUCCIÓN SEGUIDA · recolocación física entre pasos no calculada. ${f.notice}. NO CNC / SIN VERIFICAR.`;
   c.host.querySelector('.p3-width').value=String(c.width);
   c.host.querySelector('.p3-progress').value=String(Math.round(c.cycle*100));
   c.host.querySelector('.p3-step').textContent=`Paso ${s.step} / ${s.steps}`;
   c.host.querySelector('.p3-cycle-progress').textContent=`${Math.round(c.cycle*100)} %`;
   c.host.querySelector('[data-p3="prev"]').disabled=c.step===0;
   c.host.querySelector('[data-p3="next"]').disabled=c.step===p.sequence.length-1;
-  c.host.querySelector('[data-p3="play"]').textContent=c.playing?'⏸ Pausar':'▶ Reproducir paso';
-  c.host.querySelector('[data-p3="all"]').textContent=c.playing&&c.all?'⏸ Pausar secuencia':'⏵ Reproducir secuencia';
+  c.host.querySelector('[data-p3="play"]').textContent=c.playing?'⏸ Pausar':'▶ Reproducir sin pausas';
+  c.host.querySelector('[data-p3="all"]').textContent=c.playing&&c.all?'⏸ Pausar secuencia':'⏵ Desde el primer pliegue';
   c.host.querySelector('[data-p3="play"]').setAttribute('aria-pressed',String(c.playing&&!c.all));
   c.host.querySelector('[data-p3="all"]').setAttribute('aria-pressed',String(c.playing&&c.all));
+  const key=p.sequence.join(',');
+  if(c.orderKey!==key){
+   c.host.querySelector('.p3-order-list').innerHTML=p.sequence.map((id,i)=>`<div class="p3-order-slot"><button data-p3-step="${i}" type="button" aria-label="Ver paso ${i+1}">Paso ${i+1}</button><select data-p3-order="${i}" aria-label="Pliegue para el paso ${i+1}">${p.sequence.map((_,j)=>`<option value="${j+1}" ${id===j+1?'selected':''}>Pliegue ${j+1}</option>`).join('')}</select></div>`).join('');
+   c.orderKey=key;
+  }
  }
  function pause(){if(!active)return;active.playing=false;active.all=false;active.lastFrame=null;active.holdUntil=null;if(active.raf!==null){cancelAnimationFrame(active.raf);active.raf=null;}}
  function destroy(){pause();if(active?.host){active.host.onclick=null;active.host.oninput=null;active.host.onchange=null;}active=null;}
@@ -70,14 +75,10 @@
   const c=active;if(!c||!c.playing||!c.host.isConnected){pause();return;}
   if(c.lastFrame===null)c.lastFrame=now;
   const dt=Math.min(100,Math.max(0,now-c.lastFrame));c.lastFrame=now;
-  c.cycle=Math.min(1,c.cycle+dt*c.speed/4000);
-  if(c.cycle>=1){
-   if(c.all&&c.step<c.getData().sequence.length-1){
-    if(c.holdUntil===null)c.holdUntil=now+500;
-    else if(now>=c.holdUntil){c.step++;c.cycle=0;c.holdUntil=null;c.lastFrame=now;c.onSelect(c.getData().sequence[c.step]);}
-   }
-   else pause();
-  }
+  const next=TL.advance({step:c.step,cycle:c.cycle},dt,c.getData().sequence.length,{speed:c.speed});
+  c.step=next.step;c.cycle=next.cycle;
+  if(next.transition)c.onSelect(c.getData().sequence[c.step]);
+  if(next.finished)pause();
   // Keep rendering below ~30 fps on mobile, without changing the actual timeline.
   if(c.lastPaint===null||now-c.lastPaint>=33||!c.playing){render();c.lastPaint=now;}
   if(c.playing)c.raf=requestAnimationFrame(animation);
@@ -86,17 +87,26 @@
   const c=active;if(!c)return;
   if(c.playing){pause();render();return;}
   if(all){c.step=0;c.cycle=0;c.onSelect(c.getData().sequence[0]);}
-  else if(c.cycle>=1)c.cycle=0;
-  c.playing=true;c.all=all;c.holdUntil=null;c.lastFrame=null;c.lastPaint=null;
+  else if(c.cycle>=1){c.step=0;c.cycle=0;c.onSelect(c.getData().sequence[0]);}
+  c.playing=true;c.all=all;c.lastFrame=null;c.lastPaint=null;
   render();c.raf=requestAnimationFrame(animation);
  }
  function mount(host,getData,getSelection=()=>1,onSelect=()=>{}){
   destroy();if(!host)return;
   const p=getData();active={host,getData,getSelection,onSelect,step:Math.max(0,p.sequence.indexOf(getSelection())),cycle:0,width:100,yaw:38,elevation:24,zoom:1,speed:1,raf:null,playing:false,all:false,holdUntil:null,lastFrame:null,lastPaint:null,visible:{punch:true,die:true,gauge:true},highlightPrior:true,showPending:true};
-  host.innerHTML=`<section class="p3-view" aria-label="Simulación cinemática tridimensional ilustrativa"><div class="p3-heading"><div><strong>CINEMÁTICA 3D · CHAPA, PUNZÓN, MATRIZ Y TOPE</strong><small>Secuencia desde Programación 2D · geometrías paramétricas genéricas</small></div><span>PREVISUALIZACIÓN v0.37</span></div><div class="p3-stage"></div><div class="p3-kinematics" role="status" aria-label="Fase de movimiento de plegado"></div><div class="p3-state" role="status"></div><div class="p3-clearance" role="status" aria-label="Holguras orientativas en 2D"></div><div class="p3-proximity3d" role="status" aria-label="Cribado volumétrico nominal 3D"></div><div class="p3-sweep" role="status" aria-label="Muestreo nominal de proximidades durante el ciclo"></div><div class="p3-sweep-marker" aria-hidden="true"></div><div class="p3-sweep-actions"><button data-p3="scan-export" type="button">Exportar informe de muestreo JSON</button></div><div class="p3-motion-controls" role="group" aria-label="Controles de cinemática de plegado"><button data-p3="play" type="button" aria-pressed="false">▶ Reproducir paso</button><button data-p3="all" type="button" aria-pressed="false">⏵ Reproducir secuencia</button><button data-p3="rewind" type="button">↤ Reiniciar paso</button><label>Velocidad <select class="p3-speed" aria-label="Velocidad de reproducción"><option value="0.5">0,5×</option><option value="1" selected>1×</option><option value="2">2×</option></select></label></div><div class="p3-sheet-switch" role="group" aria-label="Visibilidad de la secuencia"><strong>CHAPA POR SECUENCIA</strong><button type="button" data-p3-sheet="highlight" aria-pressed="true">Destacar pliegues previos</button><button type="button" data-p3-sheet="pending" aria-pressed="true">Mostrar pendientes</button><span class="p3-legend"><i class="p3-prior-dot"></i> Realizados <i class="p3-active-dot"></i> Activo <i class="p3-pending-dot"></i> Pendientes</span></div><div class="p3-tool-switch" role="group" aria-label="Elementos 3D visibles"><strong>VISIBILIDAD</strong><button data-p3-toggle="punch" type="button" aria-pressed="true">☑ Punzón</button><button data-p3-toggle="die" type="button" aria-pressed="true">☑ Matriz</button><button data-p3-toggle="gauge" type="button" aria-pressed="true">☑ Tope</button></div><div class="p3-controls"><button data-p3="prev" type="button">← Pliegue</button><span class="p3-step"></span><button data-p3="next" type="button">Siguiente →</button><button data-p3="profile" type="button">Vista de perfil</button><button data-p3="front" type="button">Frontal</button><button data-p3="top" type="button">Superior</button><button data-p3="iso" type="button">Isométrica</button><button data-p3="left" type="button">↶ Girar</button><button data-p3="right" type="button">↷ Girar</button><button data-p3="zin" type="button">+ Zoom</button><button data-p3="zout" type="button">− Zoom</button><button data-p3="reset" type="button">Restablecer vista</button></div><div class="p3-values"><label>Ciclo: aproximación → plegado → retirada <span class="p3-cycle-progress">0 %</span><input class="p3-progress" aria-label="Avance del ciclo cinemático" type="range" min="0" max="100" step="1" value="0"/></label><label>Ancho de previsualización (mm) <input class="p3-width" type="number" min="1" max="5000" step="1" value="100"/></label></div><p class="p3-disclosure">Cinemática esquemática: el punzón desciende, la chapa cambia de curvatura nominal y después el punzón se retira. No es el ciclo real de un control Cybelec, ni simula movimiento de topes/ejes, fuerza, contacto sólido, retorno elástico o recolocación de la pieza entre pliegues. Un pliegue negativo requiere reorientación física no calculada. Utillaje y máquina son genéricos, sin geometrías de fabricante verificadas. v0.26 añade muestreo discreto de alas anteriores y prismas nominales; NO comprueba el espacio entre muestras ni el pliegue activo. No existen comprobaciones fiables de colisiones barridas. NO utilizar para fabricación, CNC ni seguridad.</p></section>`;
+  host.innerHTML=`<section class="p3-view" aria-label="Simulación cinemática tridimensional ilustrativa"><div class="p3-heading"><div><strong>CINEMÁTICA 3D · CHAPA, PUNZÓN, MATRIZ Y TOPE</strong><small>Secuencia desde Programación 2D · geometrías paramétricas genéricas</small></div><span>PREVISUALIZACIÓN v0.39</span></div><div class="example-gallery-wrap"><div class="example-gallery-title"><strong>CUATRO PIEZAS DE EJEMPLO</strong><small>Toca su silueta 3D para cargar el programa.</small></div><div class="example-gallery p3-example-gallery"></div></div><div class="p3-stage"></div><div class="p3-kinematics" role="status" aria-label="Fase de movimiento de plegado"></div><div class="p3-state" role="status"></div><div class="p3-clearance" role="status" aria-label="Holguras orientativas en 2D"></div><div class="p3-proximity3d" role="status" aria-label="Cribado volumétrico nominal 3D"></div><div class="p3-sweep" role="status" aria-label="Muestreo nominal de proximidades durante el ciclo"></div><div class="p3-sweep-marker" aria-hidden="true"></div><div class="p3-sweep-actions"><button data-p3="scan-export" type="button">Exportar informe de muestreo JSON</button></div><div class="p3-motion-controls" role="group" aria-label="Controles de cinemática de plegado"><button data-p3="play" type="button" aria-pressed="false">▶ Reproducir sin pausas</button><button data-p3="all" type="button" aria-pressed="false">⏵ Desde el primer pliegue</button><button data-p3="rewind" type="button">↤ Reiniciar paso</button><label>Velocidad <select class="p3-speed" aria-label="Velocidad de reproducción"><option value="0.5">0,5×</option><option value="1" selected>1×</option><option value="2">2×</option></select></label></div><div class="p3-order-controls" role="group" aria-label="Orden de plegado editable"><strong>ORDEN DE PLEGADO · Selecciona cada pliegue</strong><p>Elige qué pliegue va en cada paso. Los números se intercambian y se guardan en Programación 2D.</p><div class="p3-order-list"></div></div><div class="p3-sheet-switch" role="group" aria-label="Visibilidad de la secuencia"><strong>CHAPA POR SECUENCIA</strong><button type="button" data-p3-sheet="highlight" aria-pressed="true">Destacar pliegues previos</button><button type="button" data-p3-sheet="pending" aria-pressed="true">Mostrar pendientes</button><span class="p3-legend"><i class="p3-prior-dot"></i> Realizados <i class="p3-active-dot"></i> Activo <i class="p3-pending-dot"></i> Pendientes</span></div><div class="p3-tool-switch" role="group" aria-label="Elementos 3D visibles"><strong>VISIBILIDAD</strong><button data-p3-toggle="punch" type="button" aria-pressed="true">☑ Punzón</button><button data-p3-toggle="die" type="button" aria-pressed="true">☑ Matriz</button><button data-p3-toggle="gauge" type="button" aria-pressed="true">☑ Tope</button></div><div class="p3-controls"><button data-p3="prev" type="button">← Pliegue</button><span class="p3-step"></span><button data-p3="next" type="button">Siguiente →</button><button data-p3="profile" type="button">Vista de perfil</button><button data-p3="front" type="button">Frontal</button><button data-p3="top" type="button">Superior</button><button data-p3="iso" type="button">Isométrica</button><button data-p3="left" type="button">↶ Girar</button><button data-p3="right" type="button">↷ Girar</button><button data-p3="zin" type="button">+ Zoom</button><button data-p3="zout" type="button">− Zoom</button><button data-p3="reset" type="button">Restablecer vista</button></div><div class="p3-values"><label>Ciclo: aproximación → plegado → retirada <span class="p3-cycle-progress">0 %</span><input class="p3-progress" aria-label="Avance del ciclo cinemático" type="range" min="0" max="100" step="1" value="0"/></label><label>Ancho de previsualización (mm) <input class="p3-width" type="number" min="1" max="5000" step="1" value="100"/></label></div><p class="p3-disclosure">Cinemática esquemática: el punzón desciende, la chapa cambia de curvatura nominal y después el punzón se retira. No es el ciclo real de un control Cybelec, ni simula movimiento de topes/ejes, fuerza, contacto sólido, retorno elástico o recolocación de la pieza entre pliegues. Un pliegue negativo requiere reorientación física no calculada. Utillaje y máquina son genéricos, sin geometrías de fabricante verificadas. v0.26 añade muestreo discreto de alas anteriores y prismas nominales; NO comprueba el espacio entre muestras ni el pliegue activo. No existen comprobaciones fiables de colisiones barridas. NO utilizar para fabricación, CNC ni seguridad.</p></section>`;
+  host.querySelector('.p3-example-gallery').innerHTML=E.cards(p.name);
   host.onclick=e=>{
    if(!active||active.host!==host)return;
    const c=active;
+   const ex=e.target.closest('[data-example-id]')?.dataset.exampleId;
+   if(ex){const item=E.get(ex);if(item){
+    pause();window.PlegarEditor2D.loadProfile(item.profile);
+    c.step=0;c.cycle=0;c.width=item.width;c.cameraKey=null;c.scanKey=null;c.orderKey=null;
+    host.querySelector('.p3-example-gallery').innerHTML=E.cards(item.profile.name);render();
+   }return;}
+   const stepBtn=e.target.closest('[data-p3-step]');
+   if(stepBtn){pause();c.step=Math.max(0,Math.min(c.getData().sequence.length-1,Number(stepBtn.dataset.p3Step)));c.cycle=0;c.onSelect(c.getData().sequence[c.step]);render();return;}
    const sheetSwitch=e.target.closest('[data-p3-sheet]')?.dataset.p3Sheet;
    if(sheetSwitch==='highlight'){c.highlightPrior=!c.highlightPrior;render();return;}
    if(sheetSwitch==='pending'){c.showPending=!c.showPending;render();return;}
@@ -128,7 +138,17 @@
    else return;
    render();
   };
-  host.onchange=e=>{if(!active||active.host!==host)return;if(e.target.matches('.p3-speed')){active.speed=Number(e.target.value);}};
+  host.onchange=e=>{
+   if(!active||active.host!==host)return;
+   if(e.target.matches('.p3-speed')){active.speed=Number(e.target.value);return;}
+   if(e.target.matches('[data-p3-order]')){
+    const c=active,index=Number(e.target.dataset.p3Order),id=Number(e.target.value),order=c.getData().sequence.slice();
+    if(!Number.isInteger(index)||index<0||index>=order.length||!order.includes(id))return;
+    pause();const old=order[index],other=order.indexOf(id);order[index]=id;order[other]=old;
+    if(window.PlegarEditor2D?.setSequence(order)){c.step=index;c.cycle=0;c.scanKey=null;c.cameraKey=null;c.orderKey=null;c.onSelect(id);}
+    render();
+   }
+  };
   render();
  }
  window.PlegarPiece3DView={mount,destroy};

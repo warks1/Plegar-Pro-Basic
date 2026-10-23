@@ -478,11 +478,13 @@
    '<label>Importar copia JSON <input data-dxf-backup-file type="file" accept=".json,application/json"></label>'+
    '<small>La copia contiene las coordenadas importadas y las referencias locales, no los archivos DXF originales. '+
    'Al restaurar se combinan fichas sin borrar las existentes y se mantienen siempre desactivadas las colisiones y CNC.</small></div>'+
+   '<div data-tool-fit-host aria-label="Cotejo nominal de montaje local"></div>'+
    '<div class="mfg-grid tool-dxf-results"></div></div></section>';
  }
  function mount(host){
   if(!host)return;
   host.innerHTML=html();
+  root.PlegarToolFitAudit?.mount(host.querySelector('[data-tool-fit-host]'));
   let selected3D=null,camera3D={yaw:32,pitch:22,zoom:1},pointer3D=null;
   const viewer=host.querySelector('.tool-dxf-3d-viewer'),stage=host.querySelector('.tool-dxf-3d-stage');
   function draw3D(){
@@ -545,6 +547,7 @@
    const arr=list();
    host.querySelector('.tool-dxf-count').textContent=arr.length+' perfiles importados en este navegador, máximo '+MAX_FILES+'.';
    host.querySelector('.tool-dxf-results').innerHTML=arr.map(card).join('')||'<p>No hay perfiles DXF importados.</p>';
+   root.PlegarToolFitAudit?.refresh?.();
    if(selected3D)draw3D();
   };
   const feedback=()=>host.querySelector('.tool-dxf-feedback');

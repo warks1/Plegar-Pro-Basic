@@ -163,3 +163,9 @@ Ajuste de presentación a pantalla completa sin franjas de imagen no ocupadas. S
 - `bend-workplan.js`: hoja de secuencia según el orden táctil, material, punzón, matriz, alas, giros, fuerza aproximada, advertencias y exportación CSV. NO CNC.
 - El ancho confirmado de Programación 2D se propaga al visor 3D. Caché v43.
 - Sigue pendiente validar física de contacto, geometrías oficiales, colisiones y fabricación.
+
+## Continuidad v0.44 · restauración de imagen y gestos (23 octubre 2026)
+- Inicio abre con fotografía original `assets/maquina.webp` de Bystronic. Dos botones alternan «Máquina» (foto fija) y «Cinemática 3D» (modelo geométrico). Reproducir cambia al modelo animado; la fotografía nunca se declara una simulación real.
+- Nuevo motor independiente `touch-view.js` con drag a un dedo/ratón, pellizco a dos dedos para zoom 0,7–4x y doble toque/doble clic para centrar. Se aplica al panel principal, vista previa, Seguimiento 2D y Simulación 3D sin borrar sus vistas al actualizar los fotogramas.
+- Botones anteriores de zoom, cámaras y orden se conservan. Los gestos transforman la cámara de presentación y no alteran medidas, coordenadas de fabricación ni la simulación de máquina.
+- Actualización de caché offline v44 y precarga del archivo de imagen existente; pruebas Node y Chromium por verificar.

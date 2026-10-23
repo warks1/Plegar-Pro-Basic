@@ -42,24 +42,27 @@
   return {bend:id,score:cost,issues,riskCodes,possibleCollision:riskCodes.length>0,scan};
  }
  function evaluate(profile,sequence){
-  let score=0;const rows=[],issues=[],riskCodes=[];
+  let score=0;const rows=[],issues=[],riskCodes=[],unknown=new Set();
   for(let i=0;i<sequence.length;i++){
    const r=step(profile,sequence.slice(0,i),sequence[i]);
    score+=r.score;
    rows.push({position:i+1,bend:r.bend,score:r.score,issues:r.issues,riskCodes:r.riskCodes,possibleCollision:r.possibleCollision,tableGap:r.scan.tableGap,possibleRamContact:r.scan.possibleRamContact,possibleTableContact:r.scan.possibleTableContact,sampledFrames:r.scan.frames});
    for(const code of r.riskCodes)if(!riskCodes.includes(code))riskCodes.push(code);
+   for(const dimension of r.scan.unknown)unknown.add(dimension);
    for(const msg of [...r.issues,...r.scan.alerts])if(!issues.includes(msg))issues.push(msg);
   }
+  const missingDimensions=[...unknown];
   return {sequence:[...sequence],score:Math.round(score*100)/100,rows,issues,
-   riskCodes,riskCount:rows.reduce((n,r)=>n+r.riskCodes.length,0),
-   status:riskCodes.length?'POSIBLES INTERFERENCIAS · REVISAR':'CRIBADO NOMINAL · NO VERIFICADO',
+   riskCodes,riskCount:rows.reduce((n,r)=>n+r.riskCodes.length,0),missingDimensions,
+   status:riskCodes.length?'POSIBLES INTERFERENCIAS · REVISAR':
+    missingDimensions.length?'MÁQUINA INCOMPLETA · NO APLICABLE':'CRIBADO NOMINAL · NO VERIFICADO',
    physicallyValidated:false,cncApproved:false};
  }
  function suggest(source,{beamWidth=18,limit=4}={}){
   const profile={...G.validate(source),setup:C.validateSetup(source.setup)},n=profile.angles.length;
   if(!Number.isInteger(beamWidth)||beamWidth<1||beamWidth>60||!Number.isInteger(limit)||limit<1||limit>10)throw Error('Límites de búsqueda inválidos.');
   const current=evaluate(profile,profile.sequence);
-  if(n>12)return {current,best:null,alternatives:[],searched:0,note:'Más de 12 pliegues: cálculo acotado no ejecutado. Revisar secuencia manualmente. NO CNC.'};
+  if(n>12)return {current,best:null,recommended:null,alternatives:[],searched:0,note:'Más de 12 pliegues: cálculo acotado no ejecutado. Revisar secuencia manualmente. NO CNC.'};
   let beam=[{sequence:[],score:0}],searched=0;
   for(let depth=0;depth<n;depth++){
    const next=[];
@@ -75,9 +78,11 @@
    beam=next.slice(0,beamWidth);
   }
   const alternatives=beam.slice(0,limit).map(item=>evaluate(profile,item.sequence));
-  const recommended=alternatives.find(candidate=>candidate.riskCount===0)||null;
+  // Un dato desconocido NO equivale a una holgura válida; no permitir
+  // secuenciación automática cuando la mesa/trancha no están caracterizadas.
+  const recommended=alternatives.find(candidate=>candidate.riskCount===0&&candidate.missingDimensions.length===0)||null;
   return {current,best:alternatives[0]||null,recommended,alternatives,searched,
-   note:'Ordenes candidatos por cribado discreto: se descartan de la aplicación automática los que presentan posibles interferencias modeladas. Datos de mesa, trancha y herramientas incompletos, volteos y retirada no validados. NINGÚN orden está validado para CNC.'};
+   note:'Órdenes candidatos por cribado discreto: la aplicación automática exige cero alertas modeladas y cotas locales de mesa/trancha completas. Aunque se hayan introducido cotas, faltan barridos continuos, verificación CAD de útiles y máquina, volteos y retirada. NINGÚN orden está validado para CNC.'};
  }
  return {step,evaluate,suggest};
 });

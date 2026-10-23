@@ -49,7 +49,7 @@ test('Almacena perfiles propios localmente sin atribuir certificado CAD ni habil
  assert.match(view,/ESCALA MÉTRICA/);
  assert.match(solid,/EXTRUSIÓN VISUAL/);
  assert.notEqual(view,solid);
- assert.match(D.html(),/una sola polilínea LWPOLYLINE cerrada/);
+ assert.match(D.html(),/LWPOLYLINE o POLYLINE\/VERTEX/);
  assert.ok(D.remove(record.id));
  assert.equal(D.read().length,0);
 });
@@ -80,4 +80,48 @@ test('Se detiene ante bulges no finitos y curvas desmesuradas, sin dibujar geome
  const d=dxf({points:[[0,0],[40,0],[40,40],[0,40]]});
  assert.throws(()=>D.parseDXF(d.replace('10\n0\n20\n0','10\n0\n20\n0\n42\nno-es-numero')),/Bulge DXF no válido/);
  assert.throws(()=>D.parseDXF(d.replace('10\n0\n20\n0','10\n0\n20\n0\n42\n999999')),/Bulge DXF no válido/);
+});
+
+function classic({flags=1,points=rect,bulge=0,z=0,vertexFlag=0,ending=true,extra=[]}={}){
+ const rows=[[0,'SECTION'],[2,'HEADER'],[9,'$INSUNITS'],[70,4],[0,'ENDSEC'],
+  [0,'SECTION'],[2,'ENTITIES'],[0,'POLYLINE'],[66,1],[70,flags],[10,0],[20,0],[30,0]];
+ for(let i=0;i<points.length;i++){
+  const [x,y]=points[i];
+  rows.push([0,'VERTEX'],[10,x],[20,y],[30,z],[70,vertexFlag]);
+  if(i===0&&bulge)rows.push([42,bulge]);
+ }
+ if(ending)rows.push([0,'SEQEND']);
+ rows.push(...extra,[0,'ENDSEC'],[0,'EOF']);
+ return pairs(rows);
+}
+test('Importa POLYLINE clásica en mm y dibuja el mismo perfil que LWPOLYLINE',()=>{
+ const old=D.parseDXF(classic()),modern=D.parseDXF(dxf());
+ assert.equal(old.sourceFormat,'DXF ASCII POLYLINE');
+ assert.equal(old.bounds.width,100);
+ assert.equal(old.bounds.height,150);
+ assert.deepEqual(old.points,modern.points);
+ assert.equal(old.geometryCertified,false);
+ const record=D.add({brand:'MECOS',kind:'die',code:'V-CLASICO',name:'Sección clásica'},classic());
+ assert.equal(record.sourceFormat,'DXF ASCII POLYLINE');
+ assert.equal(D.read()[0].sourceFormat,'DXF ASCII POLYLINE');
+ assert.match(D.render(record,'2d'),/Sección: 100 × 150 mm/);
+ assert.ok(D.remove(record.id));
+});
+test('POLYLINE clásica con arco circular conserva radio sin sustituirlo por línea recta',()=>{
+ const r=D.parseDXF(classic({points:[[0,0],[40,0],[40,40],[0,40]],bulge:1}));
+ assert.equal(r.arcCount,1);
+ assert.equal(r.chordErrorMm,.05);
+ assert.ok(r.points.length>15);
+ assert.ok(Math.abs(r.bounds.height-60)<.1);
+ assert.equal(r.collisionApproved,false);
+});
+test('POLYLINE clásica rechaza mallas, elevaciones, vertices spline o seqend ausente',()=>{
+ assert.throws(()=>D.parseDXF(classic({flags:8})),/3D, malla/);
+ assert.throws(()=>D.parseDXF(classic({vertexFlag:32})),/VERTEX 3D/);
+ assert.throws(()=>D.parseDXF(classic({z:2})),/fuera del plano/);
+ assert.throws(()=>D.parseDXF(classic({ending:false})),/sin SEQEND/);
+ assert.throws(()=>D.parseDXF(classic({flags:0,points:rect})),/cerrada/);
+ assert.throws(()=>D.parseDXF(classic({extra:[[0,'INSERT'],[2,'extra']]})),/entidades geométricas no soportadas/);
+ const bad=classic().replace('0\nPOLYLINE\n66','0\nPOLYLINE\n230\n-1\n66');
+ assert.throws(()=>D.parseDXF(bad),/inclinada/);
 });

@@ -189,6 +189,23 @@ function projectAction(i,action){
  toast('Proyecto '+record.name+' cargado · '+item.kind+'.');
 }
 
+function updateToolCard(kind,id){
+ const tool=window.PlegarToolLibrary?.get(kind,id);
+ if(!tool)return;
+ const rows=$('.tool-specs > div');
+ if(rows.length<7)return;
+ const values=[
+  id,
+  kind==='die'?tool.opening.toFixed(2)+' mm':'No aplica · punzón',
+  tool.angle+'°',
+  tool.height===null?'No documentada':tool.height.toFixed(2)+' mm',
+  'No documentado',
+  kind==='punch'?'R'+tool.nose+' mm':'No documentado',
+  'No validada'
+ ];
+ rows.forEach((row,i)=>{const dd=row.querySelector('dd');if(dd)dd.textContent=values[i]||'—';});
+}
+
 // Delegación: navegación y selecciones. Todas las superficies que actúan son botones reales.
 document.addEventListener('click',event=>{
  if(event.target.closest('[data-machine-save]')){
@@ -248,7 +265,7 @@ document.addEventListener('click',event=>{
   sel.disabled=false;
   sel.innerHTML=(kind==='punch'?window.PlegarToolLibrary.PUNCHES:window.PlegarToolLibrary.DIES)
    .map(x=>'<option value="'+x.kind+':'+x.id+'">'+escapeHtml(x.name)+'</option>').join('');
-  $('#tool-code').textContent=sel.value.split(':')[1];
+  updateToolCard(kind,sel.value.split(':')[1]);
   return;
  }
  const calc=event.target.closest('[data-calc]');if(calc){
@@ -292,7 +309,7 @@ $('#tool-select').addEventListener('change',event=>{
   try{
    const done=kind==='die'?window.PlegarEditor2D.setDie(id):window.PlegarEditor2D.setPunch(id);
    if(!done)throw Error('No se pudo guardar.');
-   $('#tool-code').textContent=id;toast('Herramienta nominal '+item.name+' aplicada al programa.');
+   updateToolCard(kind,id);toast('Herramienta nominal '+item.name+' aplicada al programa.');
   }catch(e){toast(e.message);}
  });
 $('#open-menu').setAttribute('aria-expanded','false');

@@ -19,6 +19,17 @@ with sync_playwright() as pw:
   page.on('pageerror',lambda err:errors.append(str(err)))
   page.set_content(html,wait_until='domcontentloaded')
   page.add_style_tag(content=css)
+  # La página de pruebas se inyecta en about:blank (origen opaco): no dispone de
+  # localStorage real. Simular su contrato en memoria para probar el flujo UI.
+  page.evaluate("""() => {
+    const data=new Map();
+    Object.defineProperty(window,'localStorage',{configurable:true,value:{
+      getItem:key=>data.has(key)?data.get(key):null,
+      setItem:(key,value)=>data.set(key,String(value)),
+      removeItem:key=>data.delete(key),
+      clear:()=>data.clear()
+    }});
+  }""")
   page.evaluate("document.getElementById('startup-splash')?.remove()")
   for source in scripts:
    if source=='splash.js':continue

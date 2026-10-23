@@ -113,6 +113,26 @@ function cloneControl(id,handler,event='click'){
  const node=document.getElementById(id);if(!node)return;
  const fresh=node.cloneNode(true);node.replaceWith(fresh);fresh.addEventListener(event,handler);
 }
+function normalized(name){
+ return String(name||'').replace(/\.(pdf|json|svg)$/i,'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim().toLocaleLowerCase('es-ES');
+}
+async function connectSavedDrawings(){
+ try{
+  const db=await window.PlegarPlans?.openDb();if(!db)return;
+  const plans=await new Promise((resolve,reject)=>{
+   const req=db.transaction('plans','readonly').objectStore('plans').getAll();
+   req.onsuccess=()=>resolve(req.result||[]);req.onerror=()=>reject(req.error);
+  });
+  const current=window.PlegarApp?.getProjects?.()||[];
+  let linked=false;
+  current.forEach((p,i)=>{
+   if(p.profile)return;
+   const row=plans.find(doc=>doc.profile&&normalized(doc.name)===normalized(p.name));
+   if(row&&window.PlegarApp.linkProjectPlan(i,row.profile,row.width||100))linked=true;
+  });
+  if(linked){$('#projects').innerHTML=projectRows(window.PlegarApp.getProjects());if(visible())sync();}
+ }catch{/* Biblioteca local puede no estar disponible en modo privado. */}
+}
 function init(){
  const host=$('#home-machine-3d');if(!host)return;
  for(const id of ['step-back','step-next','play','timeline','speed','zoom-in','zoom-out','center-view','reset-view','rotate-prev','rotate-next','preview-zoom','preview-reset','preview-open','machine-info','view-option','views','realistic-option']){
@@ -135,7 +155,7 @@ function init(){
  const steps=$('#steps');steps.addEventListener('click',e=>{const b=e.target.closest('[data-home-step]');if(b){e.stopPropagation();seek(b.dataset.homeStep);}});
  const list=$('#projects');list.addEventListener('click',e=>{const b=e.target.closest('[data-project]');if(b){e.stopPropagation();selectProject(Number(b.dataset.project));}});
  const obs=new MutationObserver(()=>{if(visible())sync();else stop();});obs.observe($('#summary-cards'),{attributes:true,attributeFilter:['hidden']});
- sync();
+ sync();connectSavedDrawings();
 }
 window.PlegarHomeDashboard={init,sync,stop,projectRows,projectThumb,selectProject};
 init();

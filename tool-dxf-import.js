@@ -358,7 +358,7 @@
    '</svg>';
  }
  function safeFileName(v,ext){
-  const name=(v.code||'perfil').normalize('NFKD').replace(/[\\u0300-\\u036f]/g,'')
+  const name=(v.code||'perfil').normalize('NFKD').replace(/[\u0300-\u036f]/g,'')
     .replace(/[^a-z0-9_-]+/gi,'-').replace(/^-+|-+$/g,'').slice(0,55)||'perfil';
   return 'Plegar-Pro-'+name+'.'+ext;
  }

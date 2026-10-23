@@ -15,6 +15,7 @@ const esc = value => String(value).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;
 const fmt = n => new Intl.NumberFormat('es-ES',{maximumFractionDigits:2}).format(n);
 const initial = {name:'Perfil omega (ejemplo)', material:'Acero S235JR', thickness:2, segments:[60,85,120,85,60], angles:[-90,90,90,-90], sequence:[1,2,3,4]};
 let state = fromEditor(initial);
+try {const raw=localStorage.getItem(STORAGE);if(raw)state=fromEditor(JSON.parse(raw));}catch { /* Mantener ejemplo por defecto si el perfil guardado está dañado. */ }
 let planReference=null, planConfiguredId=null;
 const Trace=window.PlegarPlanTrace;
 let planVision={zoom:1,dx:0,dy:0,marking:false,pending:null,marks:[]};
@@ -261,7 +262,7 @@ function loadProfile(profile){
  undoStack.push(clone(state));if(undoStack.length>50)undoStack.shift();
  redoStack=[];state=next;selected=next.sequence[0]||1;planReference=null;planConfiguredId=null;
  planVision={zoom:1,dx:0,dy:0,marking:false,pending:null,marks:[]};
- persist();render();return clone(state);
+ persist();if(document.querySelector('#ed-svg'))render();return clone(state);
 }
 function loadLocal(){try{const raw=localStorage.getItem(STORAGE);return raw?fromEditor(JSON.parse(raw)):null;}catch{return null;}}
 function setSequence(next){orderPick=0;return edit(d=>{d.sequence=[...next];});}

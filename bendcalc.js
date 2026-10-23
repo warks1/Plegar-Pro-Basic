@@ -89,7 +89,7 @@
    if(i<rows.length){
     const row=rows[i],bendStart=cursor,bendEnd=bendStart+row.allowance;
     row.flatStart=bendStart;row.flatEnd=bendEnd;row.flatCenter=(bendStart+bendEnd)/2;
-    flatBends.push({bend:i+1,start:bendStart,end:bendEnd,center:row.flatCenter,allowance:row.allowance,angle:row.angle});
+    flatBends.push({bend:i+1,start:bendStart,end:bendEnd,center:row.flatCenter,allowance:row.allowance,angle:row.angle,radius:row.radius,kFactor:row.kFactor,neutralRadius:row.neutralRadius});
     cursor=bendEnd;
    }
   }

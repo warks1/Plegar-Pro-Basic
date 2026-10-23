@@ -161,6 +161,21 @@ with sync_playwright() as pw:
   page.locator('#ed-basis').select_option('outer')
   assert page.evaluate('PlegarEditor2D.getData().setup.dimensionBasis')=='outer'
   assert page.locator('#ed-flat-pattern .ed-flat-table-wrap tr').count()>1
+  start_flat=page.evaluate('PlegarBendCalc.estimate(PlegarEditor2D.getData(),PlegarEditor2D.getData().setup).flat')
+  page.locator('[data-ed-bend-radius="0"]').fill('3.4')
+  page.locator('[data-ed-bend-radius="0"]').dispatch_event('change')
+  assert page.evaluate('PlegarEditor2D.getData().bendOverrides[0].radius')==3.4
+  adjusted=page.evaluate('PlegarBendCalc.estimate(PlegarEditor2D.getData(),PlegarEditor2D.getData().setup).flat')
+  assert abs(start_flat-adjusted)>0.01
+  page.locator('[data-ed-bend-k="1"]').fill('0.4')
+  page.locator('[data-ed-bend-k="1"]').dispatch_event('change')
+  assert page.evaluate('PlegarEditor2D.getData().bendOverrides[1].kFactor')==0.4
+  page.locator('[data-ed-bend-k="1"]').fill('')
+  page.locator('[data-ed-bend-k="1"]').dispatch_event('change')
+  page.locator('[data-ed-bend-radius="0"]').fill('')
+  page.locator('[data-ed-bend-radius="0"]').dispatch_event('change')
+  assert page.evaluate('PlegarEditor2D.getData().bendOverrides[0].radius') is None
+  assert page.evaluate('PlegarEditor2D.getData().bendOverrides[1].kFactor') is None
   measured=page.evaluate('PlegarBendCalc.estimate(PlegarEditor2D.getData(),{...PlegarEditor2D.getData().setup,kFactor:0.42}).flat')
   page.locator('#ed-trial-flat').fill(str(measured))
   page.locator('#ed-calibrate-k').click()

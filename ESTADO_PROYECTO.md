@@ -180,3 +180,8 @@ Ajuste de presentación a pantalla completa sin franjas de imagen no ocupadas. S
 - «Calculadora de plegado» recupera el programa, base de cotas, Ri, K, ancho, desarrollo, fuerza orientativa, BA/BD, posiciones de pliegue y banda de sensibilidad.
 - «Comparador de V» ofrece las aperturas GENÉRICAS: V/e, ala mínima orientativa, fuerza nominal, avisos de ángulo y apertura, botón para enviar matriz al editor 2D. No varía Ri ni deducciones automáticamente sin una relación física confirmada.
 - «Curva perfecta» permanece sin resultados automáticos no verificados.
+
+## v0.52 — Radios y K por pliegue (23 octubre 2026)
+- `bendOverrides` opcional permite especificar Ri/K para B1…Bn, heredando valores generales. Se valida, persiste y sincroniza al reordenar, agregar o quitar pliegues.
+- Motor geométrico, BA/BD y posiciones del desarrollo aplican Ri/K efectivos de cada B. La calibración del K general se desactiva si hay K locales; la sensibilidad cambia solo K heredado.
+- Calculadora, vista desplegada, hoja de secuencia y CSV muestran radios/factores K por pliegue. NO CNC ni datos calibrados de máquina.

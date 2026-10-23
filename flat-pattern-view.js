@@ -19,7 +19,7 @@
    const a=x(b.start),c=x(b.end),mid=x(b.center);
    return '<rect x="'+fmt(a)+'" y="75" width="'+fmt(Math.max(0,c-a))+'" height="55" fill="#e8a444" opacity=".95"/>'+
    '<line x1="'+fmt(mid)+'" x2="'+fmt(mid)+'" y1="60" y2="147" stroke="#5d2a04" stroke-width="1.2" stroke-dasharray="4 3"/>'+
-   '<title>B'+b.bend+': '+fmt(b.center)+' mm desde el origen, BA '+fmt(b.allowance)+' mm</title>';
+   '<title>B'+b.bend+': '+fmt(b.center)+' mm desde el origen, BA '+fmt(b.allowance)+' mm, Ri '+fmt(b.radius)+' mm, K '+Number(b.kFactor).toFixed(3)+'</title>';
   }).join('');
   const straight=result.flatSegments.map(s=>'<rect x="'+fmt(x(s.start))+'" y="75" width="'+fmt(Math.max(0,(s.end-s.start)*scale))+'" height="55" fill="#2c9cd2"/>').join('');
   const dots=result.flatBends.map((b,i)=>{

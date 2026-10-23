@@ -230,6 +230,7 @@ function init(){
  for(const id of ['step-back','step-next','play','timeline','speed','zoom-in','zoom-out','center-view','reset-view','rotate-prev','rotate-next','preview-zoom','preview-reset','preview-open','machine-info','view-option','views','realistic-option','home-view-model']){
   const handlers={
    'step-back':()=>seek(state.step-1),'step-next':()=>seek(state.step+1),'play':toggle,
+   'speed':()=>{const key={'2000':'0.5','1100':'1','550':'2'}[$('#speed')?.value];if(key)try{window.PlegarSettings?.set?.('speed',key);}catch{}},
    'zoom-in':()=>machineGestures?.zoomBy(1.2),'zoom-out':()=>machineGestures?.zoomBy(1/1.2),
    'center-view':()=>machineGestures?.reset(),'reset-view':()=>machineGestures?.reset(),
    'rotate-prev':()=>{state.previewYaw-=12;preview();},'rotate-next':()=>{state.previewYaw+=12;preview();},

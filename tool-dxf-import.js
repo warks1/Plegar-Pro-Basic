@@ -134,16 +134,52 @@
      throw Error('La polilínea debe estar cerrada.');
     const count=row.find(c=>c.code===90);
     if(count&&Number(count.value)!==points.length)throw Error('Conteo de vértices DXF inconsistente.');
-    polys.push(sampleBulges(points));
-   }else if(['LINE','ARC','CIRCLE','SPLINE','ELLIPSE','POLYLINE','VERTEX','INSERT','HATCH','REGION','3DSOLID'].includes(q.value)){
+    polys.push({...sampleBulges(points),sourceFormat:'DXF ASCII LWPOLYLINE'});
+   }else if(q.value==='POLYLINE'){
+    // Sección 2D DXF clásico R12: POLYLINE, VERTEX*, SEQEND.
+    const header=[];
+    for(i++;i<pairs.length&&pairs[i].code!==0;i++)header.push(pairs[i]);
+    const get=(arr,code,def)=>arr.find(c=>c.code===code)?.value??def;
+    const flags=Number(get(header,70,'0'));
+    if(!Number.isInteger(flags)||(flags&~1))throw Error('POLYLINE 3D, malla o spline no admitida.');
+    for(const c of header)if([30,39].includes(c.code)&&(!finite(Number(c.value))||Math.abs(Number(c.value))>1e-8))
+      throw Error('POLYLINE con elevación o espesor no nulos.');
+    const nx=Number(get(header,210,'0')),ny=Number(get(header,220,'0')),nz=Number(get(header,230,'1'));
+    if(!finite(nx)||!finite(ny)||!finite(nz)||Math.abs(nx)>1e-8||Math.abs(ny)>1e-8||Math.abs(nz-1)>1e-8)
+     throw Error('POLYLINE inclinada: exporta sección XY.');
+    let foundEnd=false;const vertices=[];
+    while(i<pairs.length&&pairs[i].code===0){
+     if(pairs[i].value==='SEQEND'){foundEnd=true;break;}
+     if(pairs[i].value!=='VERTEX')throw Error('POLYLINE sin SEQEND o con entidades intercaladas.');
+     const fields=[];
+     for(i++;i<pairs.length&&pairs[i].code!==0;i++)fields.push(pairs[i]);
+     const vf=Number(get(fields,70,'0'));
+     if(!Number.isInteger(vf)||vf!==0)throw Error('VERTEX 3D, malla o spline no admitido.');
+     const xs=fields.filter(c=>c.code===10),ys=fields.filter(c=>c.code===20);
+     if(xs.length!==1||ys.length!==1)throw Error('VERTEX sin coordenadas X/Y únicas.');
+     const z=Number(get(fields,30,'0'));
+     if(!finite(z)||Math.abs(z)>1e-8)throw Error('VERTEX elevado fuera del plano XY.');
+     const bulges=fields.filter(c=>c.code===42);
+     if(bulges.length>1)throw Error('VERTEX con bulges duplicados.');
+     for(const c of fields)
+      if([40,41].includes(c.code)&&(!finite(Number(c.value))||Math.abs(Number(c.value))>1e-10))
+       throw Error('POLYLINE con anchura variable no admitida.');
+     vertices.push({x:Number(xs[0].value),y:Number(ys[0].value),bulge:Number(bulges[0]?.value??0)});
+     if(vertices.length>MAX_POINTS)throw Error('POLYLINE con demasiados vértices.');
+    }
+    if(!foundEnd)throw Error('POLYLINE: falta SEQEND.');
+    if(!(flags&1)&&!(vertices.length>2&&dist2(vertices[0],vertices[vertices.length-1])<1e-10))
+     throw Error('La POLYLINE debe estar cerrada.');
+    polys.push({...sampleBulges(vertices),sourceFormat:'DXF ASCII POLYLINE'});
+   }else{
     unsupported.push(q.value);
    }
   }
-  if(!entities||!polys.length)throw Error('Se requiere DXF ASCII con una LWPOLYLINE cerrada en ENTITIES.');
+  if(!entities||!polys.length)throw Error('Se requiere DXF ASCII con una LWPOLYLINE o POLYLINE cerrada en ENTITIES.');
   if(polys.length!==1||unsupported.length)throw Error('El archivo contiene varios perfiles o entidades geométricas no soportadas ('+unsupported.slice(0,4).join(', ')+'). Exporta únicamente una sección exterior cerrada.');
   const result=validatePoints(polys[0].points);
   return {...result,arcCount:polys[0].arcCount,chordErrorMm:polys[0].chordErrorMm,
-   unit:'mm',unitsDeclared:units===4,sourceFormat:'DXF ASCII LWPOLYLINE',geometryCertified:false,collisionApproved:false};
+   unit:'mm',unitsDeclared:units===4,sourceFormat:polys[0].sourceFormat,geometryCertified:false,collisionApproved:false};
  }
  function normalizeRecord(r){
   if(!r||typeof r!=='object')throw Error('Registro no válido.');
@@ -160,7 +196,8 @@
    lengthMm,points:geometry.points,bounds:geometry.bounds,areaMm2:geometry.areaMm2,
    sourceFile:String(r.sourceFile||'').slice(0,140),importedAt:String(r.importedAt||''),
    unitsDeclared:r.unitsDeclared===true,arcCount:Number.isInteger(r.arcCount)&&r.arcCount>0?r.arcCount:0,
-   chordErrorMm:r.arcCount>0?CHORD_ERROR_MM:0,sourceFormat:'DXF ASCII LWPOLYLINE',
+   chordErrorMm:r.arcCount>0?CHORD_ERROR_MM:0,
+   sourceFormat:r.sourceFormat==='DXF ASCII POLYLINE'?'DXF ASCII POLYLINE':'DXF ASCII LWPOLYLINE',
    geometryCertified:false,collisionApproved:false,simulatable:false};
  }
  function read(){
@@ -179,7 +216,7 @@
   if(list.length>=MAX_FILES)throw Error('Máximo de '+MAX_FILES+' perfiles locales. Exporta y elimina uno antes de añadir.');
   const uid='local-'+(Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,10));
   const r=normalizeRecord({...metadata,id:uid,points:parsed.points,unitsDeclared:parsed.unitsDeclared,
-    arcCount:parsed.arcCount,importedAt:new Date().toISOString()});
+    arcCount:parsed.arcCount,sourceFormat:parsed.sourceFormat,importedAt:new Date().toISOString()});
   store([r,...list]);return r;
  }
  function remove(id){const list=read();store(list.filter(r=>r.id!==id));return list.length!==read().length;}
@@ -211,13 +248,13 @@
   '<small>Perfil de sección importado: '+num(r.bounds.width)+' × '+num(r.bounds.height)+' mm'+
    (r.lengthMm!==null?' · Largo declarado '+num(r.lengthMm)+' mm':' · Longitud axial desconocida')+
    (r.arcCount?' · '+r.arcCount+' arco(s) discretizados; error de cuerda ≤0,05 mm':'')+'</small>'+
-  '<small>Origen: archivo local '+esc(r.sourceFile||'sin nombre')+(r.unitsDeclared?' · mm en DXF':' · mm confirmados manualmente')+'</small>'+
+  '<small>Origen: archivo local '+esc(r.sourceFile||'sin nombre')+' · '+esc(r.sourceFormat)+(r.unitsDeclared?' · mm en DXF':' · mm confirmados manualmente')+'</small>'+
   '<span class="mfg-warning">PERFIL IMPORTADO · amarre/capacidad sin certificar · NO COLISIONES/CNC</span>'+
   '<button type="button" data-dxf-remove="'+esc(r.id)+'">Eliminar esta copia local</button></article>';
  function html(){
   return '<section class="tool-dxf-importer" aria-label="Importar perfiles CAD DXF en milímetros">'+
    '<details><summary>Importar perfil DXF de punzón o matriz · ver sección 2D y volumen 3D</summary>'+
-   '<p>Importa un <strong>DXF ASCII con una sola polilínea LWPOLYLINE cerrada</strong>, sección de contorno exterior, con segmentos rectos o arcos circulares DXF (bulge) aproximados con error de cuerda máximo 0,05 mm; sin bloques ni huecos. '+
+   '<p>Importa un <strong>DXF ASCII con una sola polilínea cerrada LWPOLYLINE o POLYLINE/VERTEX</strong>, sección de contorno exterior, con segmentos rectos o arcos circulares DXF (bulge) aproximados con error de cuerda máximo 0,05 mm; sin bloques ni huecos. '+
    'Los puntos se leen en milímetros, sin reescalar. DXF 3D, STEP, SPLINE, varios perfiles y unidades diferentes deben convertirse externamente sin perder geometría. '+
    'No se publica el archivo: queda únicamente en este navegador.</p>'+
    '<form class="tool-dxf-form"><label>Marca<select name="brand">'+BRANDS.map(x=>'<option>'+esc(x)+'</option>').join('')+'</select></label>'+

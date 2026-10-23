@@ -208,8 +208,45 @@
   }catch{return [];}
  }
  function store(list){
-  const safe=list.slice(0,MAX_FILES).map(normalizeRecord);
+  if(!Array.isArray(list)||list.length>MAX_FILES)throw Error('El almacén supera el máximo de '+MAX_FILES+' perfiles.');
+  const safe=list.map(normalizeRecord);
+  if(new Set(safe.map(x=>x.id)).size!==safe.length)throw Error('Identificadores duplicados de perfiles.');
   try{root.localStorage.setItem(KEY,JSON.stringify(safe));return safe;}catch{throw Error('No se pudo guardar el perfil en este dispositivo (almacenamiento bloqueado o lleno).');}
+ }
+ function exportBackup(){
+  return JSON.stringify({
+   format:'plegar-pro-tool-profiles',version:1,
+   exportedAt:new Date().toISOString(),
+   note:'Contornos DXF muestreados en mm. NO CAD homologado, NO validación de colisiones/CNC.',
+   profiles:read()
+  },null,2);
+ }
+ function importBackup(json){
+  if(typeof json!=='string'||json.length>2000000)throw Error('Copia demasiado grande (máximo 2 MB).');
+  let backup;
+  try{backup=JSON.parse(json);}catch{throw Error('Archivo JSON no válido.');}
+  if(!backup||backup.format!=='plegar-pro-tool-profiles'||backup.version!==1||
+    !Array.isArray(backup.profiles)||backup.profiles.length>MAX_FILES)
+   throw Error('Formato o versión de copia no compatible.');
+  // Validar TODO antes de escribir: una ficha inválida no puede corromper la biblioteca.
+  const incoming=backup.profiles.map(normalizeRecord);
+  if(new Set(incoming.map(x=>x.id)).size!==incoming.length)throw Error('Copia con identificadores duplicados.');
+  const existing=read(),byId=new Map(existing.map(x=>[x.id,x]));
+  let added=0;
+  for(const profile of incoming){
+   if(byId.has(profile.id)){
+    const old=byId.get(profile.id);
+    // La hora/metadatos pueden variar, pero un mismo ID no puede contener otros puntos.
+    if(old.brand!==profile.brand||old.kind!==profile.kind||
+      JSON.stringify(old.points)!==JSON.stringify(profile.points))
+     throw Error('La copia contiene un perfil distinto con identificador ya existente.');
+    continue;
+   }
+   byId.set(profile.id,profile);added++;
+  }
+  if(byId.size>MAX_FILES)throw Error('Demasiados perfiles al combinar bibliotecas (máximo '+MAX_FILES+').');
+  store([...byId.values()]);
+  return {added,total:byId.size};
  }
  function add(metadata,dxfText,opts){
   const parsed=parseDXF(dxfText,opts),list=read();
@@ -269,7 +306,13 @@
    '<div class="tool-dxf-current"><h3>Mis perfiles CAD locales (sin validar)</h3>'+
    '<p>El dibujo respeta las coordenadas de la sección DXF. El volumen 3D representa una extrusión visual sin largo axial salvo que lo declares. '+
    'No se conectan estos perfiles automáticamente al planificador ni al motor de colisiones.</p>'+
-   '<p class="tool-dxf-count" role="status"></p><div class="mfg-grid tool-dxf-results"></div></div></section>';
+   '<p class="tool-dxf-count" role="status"></p>'+
+   '<div class="tool-dxf-backup" role="group" aria-label="Copias de perfiles propios">'+
+   '<button type="button" data-dxf-export>Exportar biblioteca JSON</button>'+
+   '<label>Importar copia JSON <input data-dxf-backup-file type="file" accept=".json,application/json"></label>'+
+   '<small>La copia contiene las coordenadas importadas y las referencias locales, no los archivos DXF originales. '+
+   'Al restaurar se combinan fichas sin borrar las existentes y se mantienen siempre desactivadas las colisiones y CNC.</small></div>'+
+   '<div class="mfg-grid tool-dxf-results"></div></div></section>';
  }
  function mount(host){
   if(!host)return;
@@ -295,11 +338,32 @@
     paint();form.reset();feedback().textContent='Perfil DXF guardado y representado en 2D/3D. NO validado para colisiones.';
    }catch(err){feedback().textContent='No se pudo importar: '+err.message;}
   };
+  host.onchange=async e=>{
+   const target=e.target;
+   if(!target.matches('[data-dxf-backup-file]'))return;
+   const file=target.files?.[0];if(!file)return;
+   try{
+    if(file.size>2000000)throw Error('La copia supera 2 MB.');
+    const result=importBackup(await file.text());
+    paint();
+    feedback().textContent='Copia restaurada: '+result.added+' fichas nuevas; '+result.total+' en total. Sin certificar colisiones.';
+   }catch(err){feedback().textContent='Restauración rechazada: '+err.message;}
+   finally{target.value='';}
+  };
   host.onclick=e=>{
+   if(e.target.closest('[data-dxf-export]')){
+    const url=root.URL.createObjectURL(new Blob([exportBackup()],{type:'application/json;charset=utf-8'}));
+    const link=root.document.createElement('a');
+    link.href=url;link.download='plegar-pro-perfiles-utillaje.json';
+    root.document.body.appendChild(link);link.click();link.remove();
+    setTimeout(()=>root.URL.revokeObjectURL(url),1200);
+    feedback().textContent='Copia JSON exportada. Consérvala fuera de este navegador.';
+    return;
+   }
    const target=e.target.closest('[data-dxf-remove]');if(!target)return;
    remove(target.dataset.dxfRemove);paint();feedback().textContent='Copia local eliminada. Las fichas de fabricante permanecen intactas.';
   };
   paint();
  }
- return {KEY,BRANDS,parseDXF,validatePoints,normalizeRecord,add,read,remove,render,html,mount};
+ return {KEY,BRANDS,parseDXF,validatePoints,normalizeRecord,add,read,remove,store,exportBackup,importBackup,render,html,mount};
 });

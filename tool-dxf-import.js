@@ -47,6 +47,59 @@
   if(maxX-minX<.001||maxY-minY<.001)throw Error('Dimensión de perfil inferior a 0,001 mm.');
   return {points:p,bounds:{minX,maxX,minY,maxY,width:maxX-minX,height:maxY-minY},areaMm2:Math.abs(area(p))};
  }
+ // Separar material y huecos sin inventar sólidos CAD. Se admiten un
+ // perímetro exterior y como máximo 8 cavidades de perfil, sin islas anidadas.
+ const MAX_CONTOURS=9;
+ function insideStrict(point,poly){
+  let hits=false;
+  for(let i=0,j=poly.length-1;i<poly.length;j=i++){
+   const a=poly[i],b=poly[j],cross=(point.x-a.x)*(b.y-a.y)-(point.y-a.y)*(b.x-a.x);
+   if(Math.abs(cross)<1e-8&&point.x>=Math.min(a.x,b.x)-1e-8&&
+     point.x<=Math.max(a.x,b.x)+1e-8&&point.y>=Math.min(a.y,b.y)-1e-8&&
+     point.y<=Math.max(a.y,b.y)+1e-8)return false;
+   if((a.y>point.y)!==(b.y>point.y)){
+    const x=a.x+(point.y-a.y)*(b.x-a.x)/(b.y-a.y);
+    if(point.x<x)hits=!hits;
+   }
+  }
+  return hits;
+ }
+ function contoursCross(a,b){
+  for(let i=0;i<a.length;i++)for(let j=0;j<b.length;j++)
+   if(isIntersect(a[i],a[(i+1)%a.length],b[j],b[(j+1)%b.length]))return true;
+  return false;
+ }
+ function validateGeometry(outside,holes=[]){
+  if(!Array.isArray(holes)||holes.length>=MAX_CONTOURS)
+   throw Error('Máximo de 8 huecos por sección de utillaje.');
+  const outer=validatePoints(outside),cavities=holes.map(validatePoints);
+  if(outer.points.length+cavities.reduce((sum,h)=>sum+h.points.length,0)>MAX_POINTS)
+   throw Error('La sección DXF supera el límite total de 400 vértices.');
+  for(const h of cavities){
+   if(contoursCross(outer.points,h.points)||!h.points.every(p=>insideStrict(p,outer.points)))
+    throw Error('Un hueco invade o toca el contorno exterior.');
+   for(const other of cavities){
+    if(h===other)continue;
+    if(contoursCross(h.points,other.points)||insideStrict(h.points[0],other.points))
+     throw Error('Huecos solapados, en contacto o anidados: geometría no admitida.');
+   }
+  }
+  const material=outer.areaMm2-cavities.reduce((a,h)=>a+h.areaMm2,0);
+  if(material<=1e-7)throw Error('La sección no contiene material válido.');
+  return {points:outer.points,holes:cavities.map(x=>x.points),bounds:outer.bounds,
+   areaMm2:material,holeCount:cavities.length};
+ }
+ function fromContours(polys){
+  if(polys.length>MAX_CONTOURS)throw Error('Máximo: una sección exterior y 8 huecos.');
+  if(polys.reduce((sum,p)=>sum+p.points.length,0)>MAX_POINTS)
+   throw Error('Demasiados vértices: límite 400 sumando todos los contornos.');
+  const areaOf=p=>Math.abs(area(p.points));
+  const sorted=[...polys].sort((a,b)=>areaOf(b)-areaOf(a));
+  return {...validateGeometry(sorted[0].points,sorted.slice(1).map(p=>p.points)),
+   arcCount:polys.reduce((n,p)=>n+p.arcCount,0),
+   chordErrorMm:polys.some(p=>p.arcCount)?CHORD_ERROR_MM:0,
+   sourceFormat:[...new Set(polys.map(p=>p.sourceFormat))].join(' + ')};
+ }
  // Los bulges DXF describen arcos circulares firmados. Aproximamos
  // únicamente la representación, con desviación de cuerda máxima de 0,05 mm.
  // No se pierde el dato de que hubo curvas y nunca se certifica su geometría.
@@ -176,10 +229,10 @@
    }
   }
   if(!entities||!polys.length)throw Error('Se requiere DXF ASCII con una LWPOLYLINE o POLYLINE cerrada en ENTITIES.');
-  if(polys.length!==1||unsupported.length)throw Error('El archivo contiene varios perfiles o entidades geométricas no soportadas ('+unsupported.slice(0,4).join(', ')+'). Exporta únicamente una sección exterior cerrada.');
-  const result=validatePoints(polys[0].points);
-  return {...result,arcCount:polys[0].arcCount,chordErrorMm:polys[0].chordErrorMm,
-   unit:'mm',unitsDeclared:units===4,sourceFormat:polys[0].sourceFormat,geometryCertified:false,collisionApproved:false};
+  if(unsupported.length)throw Error('DXF con entidades geométricas no soportadas ('+unsupported.slice(0,4).join(', ')+'). Exporta solo polilíneas cerradas.');
+  const result=fromContours(polys);
+  return {...result,unit:'mm',unitsDeclared:units===4,
+   geometryCertified:false,collisionApproved:false};
  }
  function normalizeRecord(r){
   if(!r||typeof r!=='object')throw Error('Registro no válido.');
@@ -187,17 +240,21 @@
   if(!['punch','die'].includes(r.kind))throw Error('Tipo de útil desconocido.');
   const code=String(r.code||'').trim(),name=String(r.name||'').trim();
   if(!code||code.length>70||!name||name.length>120)throw Error('Referencia y descripción obligatorias (máximo 70/120 caracteres).');
-  const geometry=validatePoints(r.points);
+  const geometry=validateGeometry(r.points,r.holes??[]);
   const id=String(r.id||'').trim();
   if(!/^local-[a-z0-9-]{8,60}$/.test(id))throw Error('Identificador local no válido.');
   const lengthMm=r.lengthMm===null||r.lengthMm===''||r.lengthMm===undefined?null:Number(r.lengthMm);
   if(lengthMm!==null&&(!finite(lengthMm)||lengthMm<=0||lengthMm>10000))throw Error('Longitud nominal de herramienta incorrecta.');
   return {id,brand:r.brand,kind:r.kind,code,name,
-   lengthMm,points:geometry.points,bounds:geometry.bounds,areaMm2:geometry.areaMm2,
+   lengthMm,points:geometry.points,holes:geometry.holes,holeCount:geometry.holeCount,
+   bounds:geometry.bounds,areaMm2:geometry.areaMm2,
    sourceFile:String(r.sourceFile||'').slice(0,140),importedAt:String(r.importedAt||''),
    unitsDeclared:r.unitsDeclared===true,arcCount:Number.isInteger(r.arcCount)&&r.arcCount>0?r.arcCount:0,
    chordErrorMm:r.arcCount>0?CHORD_ERROR_MM:0,
-   sourceFormat:r.sourceFormat==='DXF ASCII POLYLINE'?'DXF ASCII POLYLINE':'DXF ASCII LWPOLYLINE',
+   sourceFormat:['DXF ASCII POLYLINE','DXF ASCII LWPOLYLINE',
+     'DXF ASCII POLYLINE + DXF ASCII LWPOLYLINE',
+     'DXF ASCII LWPOLYLINE + DXF ASCII POLYLINE'].includes(r.sourceFormat)?
+     r.sourceFormat:'DXF ASCII LWPOLYLINE',
    geometryCertified:false,collisionApproved:false,simulatable:false};
  }
  function read(){
@@ -238,7 +295,8 @@
     const old=byId.get(profile.id);
     // La hora/metadatos pueden variar, pero un mismo ID no puede contener otros puntos.
     if(old.brand!==profile.brand||old.kind!==profile.kind||
-      JSON.stringify(old.points)!==JSON.stringify(profile.points))
+      JSON.stringify(old.points)!==JSON.stringify(profile.points)||
+      JSON.stringify(old.holes)!==JSON.stringify(profile.holes))
      throw Error('La copia contiene un perfil distinto con identificador ya existente.');
     continue;
    }
@@ -252,7 +310,7 @@
   const parsed=parseDXF(dxfText,opts),list=read();
   if(list.length>=MAX_FILES)throw Error('Máximo de '+MAX_FILES+' perfiles locales. Exporta y elimina uno antes de añadir.');
   const uid='local-'+(Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,10));
-  const r=normalizeRecord({...metadata,id:uid,points:parsed.points,unitsDeclared:parsed.unitsDeclared,
+  const r=normalizeRecord({...metadata,id:uid,points:parsed.points,holes:parsed.holes,unitsDeclared:parsed.unitsDeclared,
     arcCount:parsed.arcCount,sourceFormat:parsed.sourceFormat,importedAt:new Date().toISOString()});
   store([r,...list]);return r;
  }
@@ -263,36 +321,40 @@
   const x=n=>Number((121+(n-(b.minX+b.maxX)/2)/span).toFixed(2));
   const y=n=>Number((82-(n-(b.minY+b.maxY)/2)/span).toFixed(2));
   const points=v.points.map(p=>[x(p.x),y(p.y)]);
+  const holes=v.holes.map(contour=>contour.map(p=>[x(p.x),y(p.y)]));
   const line=p=>p.map((q,i)=>(i?'L':'M')+q[0]+' '+q[1]).join(' ')+' Z';
-  const front=line(points);
+  const front=[points,...holes].map(line).join(' ');
   const fill=v.kind==='punch'?'#2e90cb':'#a34f58',edge=v.kind==='punch'?'#b1e2ff':'#ffc0c0';
   const depth=mode==='3d'?18:0;
-  const sides=depth?points.map((q,i)=>{
-   const n=points[(i+1)%points.length];
+  const sideFaces=profile=>profile.map((q,i)=>{
+   const n=profile[(i+1)%profile.length];
    return '<path d="M'+q[0]+' '+q[1]+'L'+n[0]+' '+n[1]+'L'+(n[0]+depth)+' '+(n[1]-10)+'L'+(q[0]+depth)+' '+(q[1]-10)+'Z" fill="#324e63" stroke="#9bc5df" stroke-width=".5"/>';
-  }).join(''):'';
+  }).join('');
+  const sides=depth?[points,...holes].map(sideFaces).join(''):'';
   return '<svg class="mfg-art tool-dxf-art" viewBox="0 0 242 174" role="img" aria-label="Perfil importado de DXF en mm, '+esc(mode)+'; sin validación CNC">'+
    '<rect width="242" height="174" fill="#061624"/><path d="M121 18V145 M18 145H222" stroke="#34546b" stroke-dasharray="3 3" stroke-width=".8"/>'+
-   (depth?'<path d="'+front+'" transform="translate(18,-10)" fill="#1d394c" stroke="#bce2ef" stroke-width=".8"/>':'')+
-   sides+'<path data-dxf-profile="'+esc(v.id)+'" d="'+front+'" fill="'+fill+'" stroke="'+edge+'" stroke-width="1.4" fill-opacity=".88"/>'+
+   (depth?'<path d="'+front+'" transform="translate(18,-10)" fill="#1d394c" fill-rule="evenodd" stroke="#bce2ef" stroke-width=".8"/>':'')+
+   sides+'<path data-dxf-profile="'+esc(v.id)+'" d="'+front+'" fill="'+fill+'" fill-rule="evenodd" stroke="'+edge+'" stroke-width="1.4" fill-opacity=".88"/>'+
    '<text x="10" y="15" fill="#a0e8ff" font-size="11">'+mode.toUpperCase()+' · '+esc(v.brand)+'</text>'+
-   '<text x="10" y="154" fill="#d5eaff" font-size="10">Sección: '+num(b.width)+' × '+num(b.height)+' mm</text>'+
-   '<text x="10" y="167" fill="#ffdaaa" font-size="8">'+(depth?'EXTRUSIÓN VISUAL · PROFUNDIDAD NO MEDIDA':'DXF ESCALA MÉTRICA · NO CNC')+'</text></svg>';
+   '<text x="10" y="151" fill="#d5eaff" font-size="10">Sección: '+num(b.width)+' × '+num(b.height)+' mm</text>'+
+   '<text x="10" y="160" fill="#b2e3f9" font-size="8">Huecos: '+v.holeCount+' · Área neta '+num(v.areaMm2)+' mm²</text>'+
+   '<text x="10" y="170" fill="#ffdaaa" font-size="8">'+(depth?'EXTRUSIÓN VISUAL · PROFUNDIDAD NO MEDIDA':'DXF ESCALA MÉTRICA · NO CNC')+'</text></svg>';
  }
  const card=r=>'<article class="mfg-card tool-dxf-card" data-dxf-id="'+esc(r.id)+'">'+
   '<div class="mfg-dual">'+render(r,'2d')+render(r,'3d')+'</div>'+
   '<strong>'+esc(r.brand)+' · '+esc(r.code)+'</strong><p>'+esc(r.name)+'</p>'+
   '<small>Perfil de sección importado: '+num(r.bounds.width)+' × '+num(r.bounds.height)+' mm'+
    (r.lengthMm!==null?' · Largo declarado '+num(r.lengthMm)+' mm':' · Longitud axial desconocida')+
-   (r.arcCount?' · '+r.arcCount+' arco(s) discretizados; error de cuerda ≤0,05 mm':'')+'</small>'+
+   (r.arcCount?' · '+r.arcCount+' arco(s) discretizados; error de cuerda ≤0,05 mm':'')+
+   ' · '+r.holeCount+' hueco(s) · sección neta '+num(r.areaMm2)+' mm²</small>'+
   '<small>Origen: archivo local '+esc(r.sourceFile||'sin nombre')+' · '+esc(r.sourceFormat)+(r.unitsDeclared?' · mm en DXF':' · mm confirmados manualmente')+'</small>'+
   '<span class="mfg-warning">PERFIL IMPORTADO · amarre/capacidad sin certificar · NO COLISIONES/CNC</span>'+
   '<button type="button" data-dxf-remove="'+esc(r.id)+'">Eliminar esta copia local</button></article>';
  function html(){
   return '<section class="tool-dxf-importer" aria-label="Importar perfiles CAD DXF en milímetros">'+
    '<details><summary>Importar perfil DXF de punzón o matriz · ver sección 2D y volumen 3D</summary>'+
-   '<p>Importa un <strong>DXF ASCII con una sola polilínea cerrada LWPOLYLINE o POLYLINE/VERTEX</strong>, sección de contorno exterior, con segmentos rectos o arcos circulares DXF (bulge) aproximados con error de cuerda máximo 0,05 mm; sin bloques ni huecos. '+
-   'Los puntos se leen en milímetros, sin reescalar. DXF 3D, STEP, SPLINE, varios perfiles y unidades diferentes deben convertirse externamente sin perder geometría. '+
+   '<p>Importa un <strong>DXF ASCII con una sección exterior cerrada LWPOLYLINE o POLYLINE/VERTEX y hasta 8 huecos interiores cerrados</strong>, con segmentos rectos o arcos circulares DXF (bulge) aproximados con error de cuerda máximo 0,05 mm; sin bloques, islas anidadas ni perfiles que se toquen o crucen. '+
+   'Los puntos se leen en milímetros, sin reescalar. DXF 3D, STEP, SPLINE, contornos exteriores separados o unidades diferentes deben convertirse externamente sin perder geometría. '+
    'No se publica el archivo: queda únicamente en este navegador.</p>'+
    '<form class="tool-dxf-form"><label>Marca<select name="brand">'+BRANDS.map(x=>'<option>'+esc(x)+'</option>').join('')+'</select></label>'+
    '<label>Tipo<select name="kind"><option value="punch">Punzón</option><option value="die">Matriz</option></select></label>'+
@@ -304,7 +366,7 @@
    '<button type="submit">Importar y dibujar perfil</button></form>'+
    '<p class="tool-dxf-feedback" role="status"></p></details>'+
    '<div class="tool-dxf-current"><h3>Mis perfiles CAD locales (sin validar)</h3>'+
-   '<p>El dibujo respeta las coordenadas de la sección DXF. El volumen 3D representa una extrusión visual sin largo axial salvo que lo declares. '+
+   '<p>El dibujo respeta las coordenadas de la sección DXF y recorta los huecos interiores. El volumen 3D representa una extrusión visual sin largo axial aunque lo declares (no se escala su profundidad). '+
    'No se conectan estos perfiles automáticamente al planificador ni al motor de colisiones.</p>'+
    '<p class="tool-dxf-count" role="status"></p>'+
    '<div class="tool-dxf-backup" role="group" aria-label="Copias de perfiles propios">'+
@@ -365,5 +427,5 @@
   };
   paint();
  }
- return {KEY,BRANDS,parseDXF,validatePoints,normalizeRecord,add,read,remove,store,exportBackup,importBackup,render,html,mount};
+ return {KEY,BRANDS,parseDXF,validatePoints,validateGeometry,normalizeRecord,add,read,remove,store,exportBackup,importBackup,render,html,mount};
 });

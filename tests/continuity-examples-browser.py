@@ -199,6 +199,34 @@ with sync_playwright() as pw:
   assert page.locator('.tool-dxf-art').count()==2
   page.locator('[data-dxf-remove]').click()
   assert page.locator('.tool-dxf-card').count()==0
+  # DXF con dos polilíneas: sección exterior + hueco interior auténtico, sin macizo falso.
+  loops=[
+   [(0,0),(100,0),(100,120),(0,120)],
+   [(25,25),(45,25),(45,50),(25,50)]
+  ]
+  cavity_rows=['0','SECTION','2','HEADER','9','$INSUNITS','70','4','0','ENDSEC',
+   '0','SECTION','2','ENTITIES']
+  for contour in loops:
+   cavity_rows+=['0','LWPOLYLINE','90',str(len(contour)),'70','1']
+   for x,y in contour:cavity_rows+=['10',str(x),'20',str(y)]
+  cavity_rows+=['0','ENDSEC','0','EOF']
+  page.locator('.tool-dxf-form [name="brand"]').select_option('EUROSTAMP')
+  page.locator('.tool-dxf-form [name="kind"]').select_option('die')
+  page.locator('.tool-dxf-form [name="code"]').fill('V-HUECO-TEST')
+  page.locator('.tool-dxf-form [name="description"]').fill('Matriz con cavidad exterior validada')
+  page.locator('.tool-dxf-form [name="file"]').set_input_files({
+   "name":"matriz-con-hueco.dxf","mimeType":"text/plain",
+   "buffer":('\n'.join(cavity_rows)+'\n').encode('utf-8')})
+  page.locator('.tool-dxf-form button[type="submit"]').click()
+  page.wait_for_function("() => document.querySelectorAll('.tool-dxf-card').length===1",timeout=8000)
+  assert '1 hueco(s)' in page.locator('.tool-dxf-card').inner_text()
+  assert '11.500 mm²' in page.locator('.tool-dxf-card').inner_text()
+  assert page.locator('.tool-dxf-card .tool-dxf-art').count()==2
+  assert page.locator('.tool-dxf-card .tool-dxf-art [fill-rule="evenodd"]').count()==3
+  assert page.evaluate("JSON.parse(localStorage.getItem('plegarpro-tool-dxf-v1'))[0].holes.length")==1
+  assert page.evaluate("JSON.parse(localStorage.getItem('plegarpro-tool-dxf-v1'))[0].collisionApproved")==False
+  page.locator('[data-dxf-remove]').click()
+  assert page.locator('.tool-dxf-card').count()==0
   assert page.locator('.mfg-card').count()>=20
   assert page.locator('.mfg-card .mfg-art').count()>=80
   assert page.locator('.mfg-card').count()>=40

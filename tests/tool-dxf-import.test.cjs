@@ -32,7 +32,7 @@ test('Rechaza cotas no declaradas, pulgadas y curvas sin linealización',()=>{
  assert.ok(rounded.points.length>4,'Los arcos DXF generan vértices de precisión controlada');
  assert.equal(rounded.collisionApproved,false);
  assert.throws(()=>D.parseDXF(dxf({closed:false})),/cerrada/);
- assert.throws(()=>D.parseDXF(dxf({extra:[[0,'CIRCLE'],[10,0],[20,0],[40,2]]})),/varios perfiles o entidades/);
+ assert.throws(()=>D.parseDXF(dxf({extra:[[0,'CIRCLE'],[10,0],[20,0],[40,2]]})),/entidades geométricas no soportadas/);
  assert.throws(()=>D.parseDXF(dxf({points:[[0,0],[10,10],[0,10],[10,0]]})),/autointersecado/);
  assert.throws(()=>D.parseDXF(dxf({points:[[0,0],[1000000,0],[1000000,3],[0,3]]})),/fuera de rango/);
 });
@@ -178,4 +178,99 @@ test('La importación de copias anula certificaciones falsas y respeta el format
  assert.equal(D.read()[0].simulatable,false);
  assert.equal(D.read()[0].sourceFormat,'DXF ASCII LWPOLYLINE');
  D.remove(record.id);
+});
+
+
+const outerSection=[[0,0],[100,0],[100,120],[0,120]];
+function multi(loops,{mixed=false}={}){
+ const rows=[[0,'SECTION'],[2,'HEADER'],[9,'$INSUNITS'],[70,4],[0,'ENDSEC'],
+  [0,'SECTION'],[2,'ENTITIES']];
+ for(let k=0;k<loops.length;k++){
+  const {points,bulge=0}=loops[k];
+  if(mixed&&k%2===1){
+   rows.push([0,'POLYLINE'],[66,1],[70,1],[30,0]);
+   for(let i=0;i<points.length;i++){
+    const [x,y]=points[i];rows.push([0,'VERTEX'],[10,x],[20,y],[30,0]);
+    if(i===0&&bulge)rows.push([42,bulge]);
+   }
+   rows.push([0,'SEQEND']);
+  }else{
+   rows.push([0,'LWPOLYLINE'],[90,points.length],[70,1]);
+   for(let i=0;i<points.length;i++){
+    const [x,y]=points[i];rows.push([10,x],[20,y]);
+    if(i===0&&bulge)rows.push([42,bulge]);
+   }
+  }
+ }
+ rows.push([0,'ENDSEC'],[0,'EOF']);
+ return pairs(rows);
+}
+test('Dos contornos DXF se reconocen como exterior y hueco sin sumar materia ficticia',()=>{
+ const hole=[[25,25],[45,25],[45,50],[25,50]];
+ const file=multi([{points:hole},{points:outerSection}]);
+ const r=D.parseDXF(file);
+ assert.equal(r.holeCount,1);
+ assert.equal(r.holes.length,1);
+ assert.equal(r.areaMm2,11500);
+ assert.equal(r.bounds.width,100);
+ assert.equal(r.bounds.height,120);
+ assert.equal(r.collisionApproved,false);
+ const imported=D.add({brand:'Bystronic',kind:'die',code:'M-RECT-HUECO',name:'Matriz con vacío de prueba'},file);
+ assert.equal(imported.holeCount,1);
+ assert.match(D.render(imported,'2d'),/fill-rule="evenodd"/);
+ assert.match(D.render(imported,'2d'),/Huecos: 1/);
+ assert.match(D.render(imported,'3d'),/Huecos: 1/);
+ const path=D.render(imported,'2d').match(/data-dxf-profile="[^"]+" d="([^"]+)"/)[1];
+ assert.equal((path.match(/M/g)||[]).length,2,'Dos subtrayectorias SVG para una pieza hueca');
+ assert.equal(D.read()[0].holes[0][0].x,25);
+ assert.ok(D.remove(imported.id));
+});
+test('Contornos mixtos DXF R12 y LWPOLYLINE admiten dos huecos sin islas ficticias',()=>{
+ const inside1=[[12,12],[30,12],[30,25],[12,25]];
+ const inside2=[[60,70],[78,70],[78,85],[60,85]];
+ const r=D.parseDXF(multi([{points:inside1},{points:outerSection},{points:inside2}],{mixed:true}));
+ assert.equal(r.holeCount,2);
+ assert.equal(r.areaMm2,12000-234-270);
+ assert.match(r.sourceFormat,/POLYLINE/);
+ assert.ok(r.holes.every(c=>c.length===4));
+});
+test('Rechaza disjuntos, huecos salientes, solapados y anidados sin guardar',()=>{
+ const outside=[[150,150],[180,150],[180,170],[150,170]];
+ const inside=[[25,25],[45,25],[45,50],[25,50]];
+ const overlap=[[38,35],[55,35],[55,60],[38,60]];
+ const nested=[[29,29],[34,29],[34,32],[29,32]];
+ const protrude=[[95,95],[110,95],[110,110],[95,110]];
+ for(const second of [outside,protrude]){
+  assert.throws(()=>D.parseDXF(multi([{points:outerSection},{points:second}])),/hueco/i);
+ }
+ for(const second of [overlap,nested]){
+  assert.throws(()=>D.parseDXF(multi([{points:outerSection},{points:inside},{points:second}])),/Huecos/);
+ }
+ assert.throws(()=>D.parseDXF(multi(new Array(10).fill(null).map((_,i)=>({
+  points:i===0?outerSection:[[2+i*6,2],[4+i*6,2],[4+i*6,4],[2+i*6,4]]
+ })))),/Máximo/);
+});
+test('Copia JSON conserva huecos y rehúsa reutilizar ID con cavidad diferente',()=>{
+ const file=multi([{points:outerSection},{points:[[25,25],[45,25],[45,50],[25,50]]}]);
+ const added=D.add({brand:'MECOS',kind:'die',code:'TEST-HUECO',name:'Sección con cavidad'},file);
+ const original=D.exportBackup();
+ const broken=JSON.parse(original);
+ broken.profiles[0].holes[0][0].x=26;
+ assert.throws(()=>D.importBackup(JSON.stringify(broken)),/identificador ya existente/);
+ assert.deepEqual(D.importBackup(original),{added:0,total:1});
+ assert.equal(D.read()[0].areaMm2,11500);
+ D.remove(added.id);
+ assert.deepEqual(D.importBackup(original),{added:1,total:1});
+ assert.equal(D.read()[0].holes.length,1);
+ assert.equal(D.read()[0].collisionApproved,false);
+ D.remove(added.id);
+});
+test('Perfiles heredados sin holes se normalizan sin cambiar su forma',()=>{
+ const r=D.add({brand:'AMADA',kind:'punch',code:'HEREDADO',name:'Punzón de ejemplo'},dxf());
+ const raw=JSON.parse(global.localStorage.getItem(D.KEY));
+ delete raw[0].holes;
+ global.localStorage.setItem(D.KEY,JSON.stringify(raw));
+ assert.equal(D.read()[0].holeCount,0);
+ assert.deepEqual(D.read()[0].holes,[]);
+ D.remove(r.id);
 });

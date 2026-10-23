@@ -128,3 +128,28 @@ test('Informe de secuencia identifica el paso y las razones antes de aplicar',()
  assert.equal(out.best?.cncApproved,false);
  if(out.recommended)assert.equal(out.recommended.riskCount,0);
 });
+
+test('Secuencia automática bloqueada si se desconocen dimensiones de mesa o trancha',()=>{
+ const p=S.get('escuadra-l').profile;
+ const result=P.suggest(p);
+ assert.ok(result.best);
+ assert.ok(result.best.missingDimensions.length>=4);
+ assert.equal(result.recommended,null,'Una máquina sin cotas no puede autorizar un orden automático');
+ assert.equal(result.best.physicallyValidated,false);
+ const partial={...p,setup:{...p.setup,dieHeight:60,tableLeft:180,tableRight:180}};
+ const q=P.suggest(partial);
+ assert.ok(q.best.missingDimensions.includes('Ancho de trancha'));
+ assert.ok(q.best.missingDimensions.includes('Distancia punta-pie de trancha'));
+ assert.equal(q.recommended,null,'No confundir datos parciales con validación de colisiones');
+});
+test('No se inventan dimensiones ni se cambian las cotas originales durante el cribado',()=>{
+ const p=S.get('canal-u').profile,unchanged=JSON.stringify(p);
+ const r=P.suggest(p);
+ assert.equal(JSON.stringify(p),unchanged);
+ assert.ok(r.current.missingDimensions.length>0);
+ assert.ok(r.alternatives.every(x=>Array.isArray(x.missingDimensions)));
+ if(r.recommended){
+  assert.equal(r.recommended.riskCount,0);
+  assert.equal(r.recommended.missingDimensions.length,0);
+ }
+});

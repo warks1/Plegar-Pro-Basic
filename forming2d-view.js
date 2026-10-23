@@ -65,14 +65,26 @@ function animation(now){
  const ctl=active;if(!ctl||ctl.timer===null||!ctl.host.isConnected){halt();return;}
  if(ctl.lastFrame===null)ctl.lastFrame=now;
  const dt=Math.min(100,Math.max(0,now-ctl.lastFrame));ctl.lastFrame=now;
- const next=TL().advance({step:ctl.currentStep,cycle:ctl.progress},dt,ctl.getData().sequence.length,{speed:ctl.speed});
- ctl.currentStep=next.step;ctl.progress=next.cycle;
- if(next.transition){
-  ctl.selfSelecting=true;
-  try{ctl.onSelect(ctl.getData().sequence[ctl.currentStep]);}finally{ctl.selfSelecting=false;}
+ let finished=false,transition=false;
+ if(ctl.holdUntil!==null){
+  if(now>=ctl.holdUntil){
+   ctl.currentStep=0;ctl.progress=0;ctl.holdUntil=null;transition=true;
+   ctl.selfSelecting=true;
+   try{ctl.onSelect(ctl.getData().sequence[0]);}finally{ctl.selfSelecting=false;}
+  }
+ }else{
+  const next=TL().advance({step:ctl.currentStep,cycle:ctl.progress},dt,ctl.getData().sequence.length,{speed:ctl.speed});
+  ctl.currentStep=next.step;ctl.progress=next.cycle;finished=next.finished;transition=next.transition;
+  if(next.transition){
+   ctl.selfSelecting=true;
+   try{ctl.onSelect(ctl.getData().sequence[ctl.currentStep]);}finally{ctl.selfSelecting=false;}
+  }
+  if(next.finished){
+   if(ctl.loop)ctl.holdUntil=now+550; // Pieza terminada a la vista, sin detener reproducción.
+   else halt();
+  }
  }
- if(next.finished)halt();
- if(ctl.lastPaint===null||now-ctl.lastPaint>=33||next.finished||next.transition){render();ctl.lastPaint=now;}
+ if(ctl.lastPaint===null||now-ctl.lastPaint>=33||finished||transition){render();ctl.lastPaint=now;}
  if(ctl.timer!==null)ctl.timer=requestAnimationFrame(animation);
 }
 function destroy(){halt();active?.touchCamera?.destroy();active=null;}
@@ -97,6 +109,7 @@ function render(){
   : 'MODO CONFORMADO · avance angular sin aproximación ni retirada. Activa Ciclo completo para ver las tres fases.';
  ctl.host.querySelector('[data-f2-action="previous"]').disabled=ctl.currentStep===0;
  ctl.host.querySelector('[data-f2-action="next"]').disabled=ctl.currentStep>=order.length-1;
+ const loopBox=ctl.host.querySelector('.f2-loop');if(loopBox)loopBox.checked=ctl.loop;
  ctl.host.querySelector('.f2-nominal').textContent=`Tope X ${as2(m.stop.x)} mm · extremo derecho: ${as2(m.wingRight.x)} mm · separación horizontal: ${as2(m.interferences.backgaugeGap)} mm · ${m.interferences.backgaugeState}`;
  ctl.host.querySelector('.f2-nominal').dataset.status=m.interferences.problems.length?'warning':'info';
  ctl.host.querySelector('.f2-prior-summary').textContent=`Perfil completo: ${m.assembly.contour.length} puntos · ${m.assembly.completed.length} pliegues previos · ${m.assembly.pending} pliegues pendientes. ${m.previous.paths.length?'Holguras 2D orientativas de alas contiguas: '+m.interferences.flangeClearances.map(v=>`${v.component} ${as2(v.gap)} mm`).join(' · '):'No hay alas previas contiguas comprobables en este paso.'}`;
@@ -109,10 +122,11 @@ function mount(host,getData,getSelection=()=>1,onSelect=()=>{}){
  destroy();
  if(!host)return;
  let step=Math.max(0,getData().sequence.indexOf(getSelection()));
- active={host,getData,getSelection,onSelect,currentStep:step,progress:0,zoom:1,mode:'bend',timer:null,lastFrame:null,lastPaint:null,speed:1,selfSelecting:false,cameraKey:null,bounds:null};
+ active={host,getData,getSelection,onSelect,currentStep:step,progress:0,zoom:1,mode:'cycle',timer:null,lastFrame:null,lastPaint:null,speed:Number(window.PlegarSettings?.get?.().speed)||1,
+ loop:window.PlegarSettings?.get?.().repeat!==false,holdUntil:null,selfSelecting:false,cameraKey:null,bounds:null};
  host.innerHTML=`<section class="f2-view" aria-label="Seguimiento cinemático 2D de plegado">
  <div class="f2-title"><div><strong>SEGUIMIENTO DE PLEGADO · PERFIL</strong><small>Punzón superior · matriz V inferior · tope posterior · chapa</small></div><span>PERFIL GEOMÉTRICO v0.39</span></div>
- <div class="f2-stage" aria-label="Mueve la simulación 2D con un dedo y usa dos dedos para cambiar el zoom"><div class="f2-camera-content"></div></div><div class="f2-toolbar"><strong class="f2-step-label"></strong><div class="f2-controls"><button type="button" data-f2-action="previous">← Anterior</button><button type="button" data-f2-action="play">▶ Reproducir sin pausas</button><button type="button" data-f2-action="mode" aria-pressed="false">☐ Ciclo completo</button><button type="button" data-f2-action="next">Siguiente →</button><button type="button" data-f2-action="reset">Reiniciar</button><button type="button" data-f2-action="zoom-out" aria-label="Reducir zoom">−</button><button type="button" data-f2-action="zoom-in" aria-label="Ampliar zoom">+</button></div></div>
+ <div class="f2-stage" aria-label="Mueve la simulación 2D con un dedo y usa dos dedos para cambiar el zoom"><div class="f2-camera-content"></div></div><div class="f2-toolbar"><strong class="f2-step-label"></strong><div class="f2-controls"><button type="button" data-f2-action="previous">← Anterior</button><button type="button" data-f2-action="play">▶ Reproducir sin pausas</button><button type="button" data-f2-action="mode" aria-pressed="false">☐ Ciclo completo</button><button type="button" data-f2-action="next">Siguiente →</button><button type="button" data-f2-action="reset">Reiniciar</button><label class="f2-loop-control"><input class="f2-loop" type="checkbox" checked> Repetir secuencia</label><button type="button" data-f2-action="zoom-out" aria-label="Reducir zoom">−</button><button type="button" data-f2-action="zoom-in" aria-label="Ampliar zoom">+</button></div></div>
  <div class="f2-cycle-state" role="status" aria-label="Fase cinemática 2D"></div><div class="f2-slider"><label for="f2-range">Avance del ciclo o conformado</label><input id="f2-range" class="f2-range" type="range" min="0" max="100" step="1" value="0"><output class="f2-progress" for="f2-range">0 %</output></div>
  <div class="f2-steps" aria-label="Orden de plegado"></div><div class="f2-prior-summary" role="status"></div><div class="f2-nominal" role="status"></div><ul class="f2-notes"></ul></section>`;
  active.touchCamera=window.PlegarTouchView.attach(host.querySelector('.f2-stage'),host.querySelector('.f2-camera-content'));
@@ -122,15 +136,15 @@ function mount(host,getData,getSelection=()=>1,onSelect=()=>{}){
   if(stepBtn){halt();ctl.currentStep=Number(stepBtn.dataset.f2Step);ctl.progress=0;ctl.onSelect(ctl.getData().sequence[ctl.currentStep]);render();return;}
   const action=e.target.closest('[data-f2-action]')?.dataset.f2Action;
   if(!action)return;
-  if(action==='mode'){halt();ctl.mode=ctl.mode==='bend'?'cycle':'bend';ctl.progress=0;render();return;}
+  if(action==='mode'){halt();ctl.mode=ctl.mode==='bend'?'cycle':'bend';ctl.progress=0;ctl.holdUntil=null;render();return;}
   if(action==='play'){
    if(ctl.timer!==null){halt();render();return;}
    if(ctl.progress>=1){ctl.currentStep=0;ctl.progress=0;}
    ctl.host.querySelector('[data-f2-action="play"]').textContent='⏸ Pausar';
-   ctl.lastFrame=null;ctl.lastPaint=null;
+   ctl.holdUntil=null;ctl.lastFrame=null;ctl.lastPaint=null;
    ctl.timer=requestAnimationFrame(animation);return;
   }
-  halt();
+  halt();ctl.holdUntil=null;
   if(action==='previous'||action==='next'){
    ctl.currentStep=Math.max(0,Math.min(ctl.getData().sequence.length-1,ctl.currentStep+(action==='next'?1:-1)));
    ctl.progress=0;ctl.onSelect(ctl.getData().sequence[ctl.currentStep]);
@@ -140,7 +154,17 @@ function mount(host,getData,getSelection=()=>1,onSelect=()=>{}){
   if(action==='zoom-out')ctl.zoom=Math.max(.7,Math.round((ctl.zoom-.1)*10)/10);
   render();
  };
- host.oninput=e=>{if(!e.target.matches('.f2-range')||!active||active.host!==host)return;halt();active.progress=Number(e.target.value)/100;render();};
+ host.oninput=e=>{
+  if(!active||active.host!==host)return;
+  if(e.target.matches('.f2-loop')){
+   active.loop=e.target.checked;
+   try{window.PlegarSettings?.set?.('repeat',active.loop);}catch{}
+   if(!active.loop&&active.holdUntil!==null){halt();active.holdUntil=null;}
+   render();return;
+  }
+  if(!e.target.matches('.f2-range'))return;
+  halt();active.holdUntil=null;active.progress=Number(e.target.value)/100;render();
+ };
  render();
 }
 function refresh(){const ctl=active;if(!ctl||ctl.selfSelecting)return;halt();let next=ctl.getData().sequence.indexOf(ctl.getSelection());if(next>=0)ctl.currentStep=next;render();}

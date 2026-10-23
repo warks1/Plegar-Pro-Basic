@@ -88,10 +88,10 @@ function renderDimensionTable(){
   const bend=i+1,hasBend=i<state.angles.length,angle=state.angles[i];
   return '<tr'+(hasBend&&selected===bend?' class="ed-dim-selected"':'')+'>'+
    '<th scope="row">Tramo '+(i+1)+'</th>'+
-   '<td><input data-ed-segment="'+i+'" type="number" inputmode="decimal" min="0.1" max="100000" step="0.1" value="'+length+'" aria-label="Medida del tramo '+(i+1)+' en milímetros"></td>'+
+   '<td><input data-ed-program-segment="'+i+'" type="number" inputmode="decimal" min="0.1" max="100000" step="0.1" value="'+length+'" aria-label="Medida del tramo '+(i+1)+' en milímetros"></td>'+
    '<td>'+(hasBend?'<button type="button" data-ed-focus="'+bend+'" class="ed-dim-bend-button" aria-label="Seleccionar pliegue '+bend+'">B'+bend+'</button>':'—')+'</td>'+
-   '<td>'+(hasBend?'<input data-ed-angle="'+i+'" type="number" inputmode="decimal" min="-179" max="179" step="0.1" value="'+angle+'" aria-label="Ángulo firmado del pliegue '+bend+' en grados">':'—')+'</td>'+
-   '<td>'+(hasBend?'<select data-ed-position="'+bend+'" aria-label="Orden del pliegue '+bend+'">'+state.sequence.map((id,j)=>'<option value="'+(j+1)+'"'+(id===bend?' selected':'')+'>Paso '+(j+1)+'</option>').join('')+'</select>':'—')+'</td>'+
+   '<td>'+(hasBend?'<input data-ed-program-angle="'+i+'" type="number" inputmode="decimal" min="-179" max="179" step="0.1" value="'+angle+'" aria-label="Ángulo firmado del pliegue '+bend+' en grados">':'—')+'</td>'+
+   '<td>'+(hasBend?'<select data-ed-program-position="'+bend+'" aria-label="Orden del pliegue '+bend+'">'+state.sequence.map((id,j)=>'<option value="'+(j+1)+'"'+(id===bend?' selected':'')+'>Paso '+(j+1)+'</option>').join('')+'</select>':'—')+'</td>'+
    '<td class="ed-dim-sum">'+fmt(accumulated)+' mm</td></tr>';
  }).join('');
  const total=$('#ed-dimensions-total');
@@ -288,9 +288,9 @@ if(el.id==='ed-table-left'){if(el.value.trim()===''){edit(d=>{d.setup.tableLeft=
  if(el.id==='ed-ram-offset'){if(el.value.trim()===''){edit(d=>{d.setup.ramBottomOffset=null;});return;}const v=readNumber(el,10,500);if(v!==null)edit(d=>{d.setup.ramBottomOffset=v;});return;}
  if(el.id==='ed-backgauge'){const v=readNumber(el,1,10000);if(v!==null)edit(d=>{d.setup.backgaugeX=v;});return;}
  if(el.id==='ed-thickness'){const v=readNumber(el,.1,100);if(v!==null)edit(d=>{d.thickness=v;});return;}
- if(el.matches('[data-ed-segment]')){const v=readNumber(el,.1,100000);if(v!==null)edit(d=>{d.segments[Number(el.dataset.edSegment)]=v;});return;}
- if(el.matches('[data-ed-angle]')){const v=readNumber(el,-179,179);if(v!==null)edit(d=>{d.angles[Number(el.dataset.edAngle)]=v;});return;}
-  if(el.matches('[data-ed-position]')){const id=Number(el.dataset.edPosition),position=Number(el.value);
+ if(el.matches('[data-ed-segment],[data-ed-program-segment]')){const v=readNumber(el,.1,100000);if(v!==null)edit(d=>{d.segments[Number(el.dataset.edSegment??el.dataset.edProgramSegment)]=v;});return;}
+ if(el.matches('[data-ed-angle],[data-ed-program-angle]')){const v=readNumber(el,-179,179);if(v!==null)edit(d=>{d.angles[Number(el.dataset.edAngle??el.dataset.edProgramAngle)]=v;});return;}
+  if(el.matches('[data-ed-position],[data-ed-program-position]')){const id=Number(el.dataset.edPosition??el.dataset.edProgramPosition),position=Number(el.value);
    if(!Number.isInteger(position)||position<1||position>state.sequence.length)return;
    selected=id;edit(d=>{const at=d.sequence.indexOf(id);d.sequence.splice(at,1);d.sequence.splice(position-1,0,id);});
    inform('Orden actualizado y sincronizado con simulación 2D/3D.');return;}

@@ -61,15 +61,17 @@ function harness() {
   return { trigger, state, caches, stores, seen };
 }
 
-test('installs an offline page and cache version v62', async () => {
+test('installs an offline page and cache version v63', async () => {
   const h = harness();
   await h.trigger('install');
-  assert.ok(h.stores.has('plegar-pro-forming2d-v62'));
+  assert.ok(h.stores.has('plegar-pro-forming2d-v63'));
   assert.ok(await h.caches.match(home));
   assert.ok(await h.caches.match(scope+'machine-references.js'),'Ficha de máquina disponible sin conexión');
   assert.ok(await h.caches.match(scope+'settings.js'),'Preferencias disponibles offline');
   assert.ok(await h.caches.match(scope+'settings.css'),'Estilos accesibles offline');
   assert.ok(await h.caches.match(scope+'manufacturer-catalog.js'),'Catálogo documental sin conexión');
+  assert.ok(await h.caches.match(scope+'tool-dxf-import.js'),'Importador DXF disponible sin conexión');
+  assert.ok(await h.caches.match(scope+'tool-dxf-import.css'),'Importación métrica accesible offline');
   assert.ok(await h.caches.match(scope+'manufacturer-drawings.js'),'Planos didácticos de utillaje disponibles sin conexión');
   assert.ok(await h.caches.match(scope+'manufacturer-catalog.css'),'Vista de utillaje sin conexión');
   assert.ok(await h.caches.match(scope+'assets/bystronic-frontal-referencia.svg'),'Referencia visual de Bystronic disponible offline');

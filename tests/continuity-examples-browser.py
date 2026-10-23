@@ -230,6 +230,7 @@ with sync_playwright() as pw:
   assert page.locator('.tool-dxf-3d-viewer').is_visible()
   assert page.locator('.tool-dxf-3d-canvas').count()==1
   assert page.locator('.tool-dxf-3d-canvas [data-3d-face="hole-wall"]').count()>0
+  assert 'NaN' not in page.locator('.tool-dxf-3d-canvas').evaluate('(el)=>el.outerHTML')
   assert 'LONGITUD AXIAL DESCONOCIDA' in page.locator('.tool-dxf-3d-canvas').text_content()
   first_svg=page.locator('.tool-dxf-3d-canvas').evaluate('(el)=>el.outerHTML')
   page.locator('[data-dxf-3d-action="right"]').click()

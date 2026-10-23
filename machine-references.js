@@ -84,7 +84,10 @@
    '<p><strong>Bystronic-Beyeler PR 100×3100 (2004):</strong> apertura de 450 mm, carrera de 315 mm y 2.750 mm entre montantes. '+
    'Es otro modelo, no una cota de la EP II. '+
    '<a target="_blank" rel="noopener noreferrer" href="https://www.mastergroup.it/en/scheda_tecnica.php?idProdotto=2517">Ficha del modelo PR ↗</a></p>'+
-   '<p>Exapro y Kitmondo comparten el identificador P250930038: son copias del mismo anuncio, no mediciones independientes.</p></div>'+
+   '<p>Exapro y Kitmondo comparten el identificador P250930038: son copias del mismo anuncio, no mediciones independientes.</p>'+
+   '<p>Para obtener las cotas de sección correctas de TU unidad, consulta el manual y los planos identificados por número de serie en '+
+   '<a target="_blank" rel="noopener noreferrer" href="https://www.bystronic.com/che/en/mybystronic">myBystronic · documentación técnica oficial</a>, '+
+   'o solicita al servicio técnico los planos acotados de mesa, trancha y sistema de amarre. No se descargan automáticamente datos privados del fabricante.</p></div>'+
    '<p><a href="'+r.source.url+'" target="_blank" rel="noopener noreferrer">Consultar fuente del anuncio de 2006 ↗</a> · Revisado el '+r.source.checkedOn+'.</p>'+
    '<p class="machine-reference-warning">No utilizar esta ficha para autorizar pliegues, calcular trayectorias CNC ni garantizar ausencia de choques. Faltan planos y cotas calibradas de tu unidad.</p>'+
    '</section>';

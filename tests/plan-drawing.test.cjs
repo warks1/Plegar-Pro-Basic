@@ -39,3 +39,39 @@ test('Planos: rechaza ancho, segmentos o ángulos no válidos',()=>{
  assert.throws(()=>Draw.create({...shape,segments:[10]},{}));
  assert.throws(()=>Draw.create({...shape,angles:[-190,90,90,-90]},{}));
 });
+
+test('Planos: guardado completo en IndexedDB conserva PDF, vistas SVG y perfil editable',async()=>{
+ const Core=require('../plans-core.js');
+ globalThis.PlegarPlansCore=Core;globalThis.PlegarPlanDrawing=Draw;
+ const stores={folders:new Map(),plans:new Map()};
+ const request=value=>{const r={onsuccess:null,onerror:null,result:undefined};queueMicrotask(()=>{r.result=value;r.onsuccess?.();});return r;};
+ const db={
+  createObjectStore(name){stores[name]=new Map();return {createIndex(){}};},
+  transaction(name){const tx={oncomplete:null,onerror:null,onabort:null};const map=stores[name];
+   tx.objectStore=()=>({
+    getAll:()=>request([...map.values()]),
+    get:id=>request(map.get(id)),
+    put:row=>{map.set(row.id,row);queueMicrotask(()=>tx.oncomplete?.());},
+    delete:id=>{map.delete(id);queueMicrotask(()=>tx.oncomplete?.());}
+   });return tx;}
+ };
+ globalThis.indexedDB={open(){const r={result:db,onupgradeneeded:null,onsuccess:null,onerror:null};queueMicrotask(()=>{r.onupgradeneeded?.();r.onsuccess?.();});return r;}};
+ globalThis.Image=class{set src(value){this.source=value;queueMicrotask(()=>this.onload?.());}};
+ globalThis.document={createElement(name){assert.equal(name,'canvas');return {
+  width:0,height:0,getContext(){return {fillRect(){},drawImage(){},set fillStyle(v){}};},
+  toBlob(callback){callback(new Blob([Uint8Array.of(255,216,255,217)],{type:'image/jpeg'}));}
+ };}};
+ const Plans=require('../plans-view.js');
+ const saved=await Plans.saveProgram(shape,{width:175,name:'Soporte generado'});
+ assert.match(saved.name,/Soporte generado.pdf/);
+ const record=stores.plans.get(saved.id);
+ assert.equal(record.width,175);
+ assert.equal(record.profile.segments.length,5);
+ assert.match(record.svg2d,/PLANO 2D/);
+ assert.match(record.svg3d,/VISTA AXONOMÉTRICA 3D/);
+ assert.equal(record.originalName,'Soporte generado.json');
+ assert.ok((await record.original.text()).includes('plegar-pro-profile2d'));
+ assert.ok(Buffer.from(await record.pdf.arrayBuffer()).toString('latin1').startsWith('%PDF-1.4'));
+ assert.ok(stores.folders.size===1);
+ await assert.rejects(()=>Plans.saveProgram(shape,{width:5001}),/Ancho 3D/);
+});

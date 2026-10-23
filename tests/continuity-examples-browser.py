@@ -248,6 +248,10 @@ with sync_playwright() as pw:
   page.locator('[data-np-angle="0"]').fill('120')
   page.locator('[data-np-angle="0"]').dispatch_event('change')
   page.locator('[data-np-direction="0"]').select_option('down')
+  assert page.locator('[data-np-field="width"]').input_value()=='220', 'Las cotas han contaminado el campo ancho.'
+  assert page.locator('[data-np-length="0"]').input_value()=='35'
+  assert page.locator('[data-np-length="1"]').input_value()=='75'
+  assert page.locator('[data-np-angle="0"]').input_value()=='120'
   page.locator('[data-np-action="create"]').click()
   assert page.locator('#module-title').inner_text()=='Programación 3D', {'actual':page.locator('#module-title').inner_text(),'dialogOpen':page.locator('#new-piece-dialog').evaluate('(e)=>e.open'),'wizardStatus':page.locator('#np-status').inner_text(),'name':page.evaluate('PlegarEditor2D.getData().name')}
   assert page.evaluate('PlegarEditor2D.getData().name')=='Perfil creado desde 3D'

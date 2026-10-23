@@ -52,7 +52,7 @@
     flatLine=calc.flat===null?'Desarrollo NO CALCULABLE · revisar cotas':'Desarrollo nominal '+fmt(calc.flat)+' mm · Ri '+fmt(calc.setup.radius)+' · K '+calc.setup.kFactor;
    }catch{/* El plano sigue siendo geométrico aunque los parámetros de fabricación no estén validados. */}
   }
-  const status='PERFIL DE EJES · '+reference+' · '+flatLine+' · NO CNC';
+  const status='GEOMETRÍA NOMINAL DE EJES · '+reference+' · '+flatLine+' · NO CNC';
   const common=`<text x="30" y="518" fill="#214965" font-size="14">Material: ${esc(p.material)} · Espesor: ${fmt(p.thickness)} mm · ${p.angles.length} pliegues</text><text x="30" y="545" fill="#8b3f1d" font-size="12">${esc(status)}</text><text x="30" y="572" fill="#46687c" font-size="12">Orden: ${p.sequence.map(id=>'B'+id).join(' → ')}</text>`;
   const svg2d=XML+header(p.name,'PLANO 2D')+`<polyline points="${line}" stroke="#1f719a" stroke-width="${Math.max(3,Math.min(13,p.thickness*scale))}" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`+labels+bends+common+'</svg>';
   const mesh=meshFromProfile(pts,p.thickness,width);

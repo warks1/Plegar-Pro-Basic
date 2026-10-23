@@ -88,6 +88,22 @@
    $('#np-estimate',dialog).textContent='Pendiente: '+ex.message;
   }
  }
+ function syncFormValues(){
+  // En iOS y en navegadores embebidos, el último cambio puede no emitir "change"
+  // antes de tocar Crear. Leer el DOM actual evita perder medidas y ancho.
+  for(const el of dialog.querySelectorAll('[data-np-field]')){
+   const key=el.dataset.npField,value=el.value;
+   const val=el.type==='number'?(value.trim()===''?null:Number(value)):value;
+   if(key.startsWith('setup.'))draft.setup[key.slice(6)]=val;
+   else draft[key]=val;
+  }
+  for(const el of dialog.querySelectorAll('[data-np-length]'))
+   draft.segments[Number(el.dataset.npLength)]=Number(el.value);
+  for(const el of dialog.querySelectorAll('[data-np-angle]')){
+   const i=Number(el.dataset.npAngle),direction=dialog.querySelector('[data-np-direction="'+i+'"]')?.value;
+   draft.angles[i]=(direction==='down'?-1:1)*Math.abs(Number(el.value));
+  }
+ }
  function close(){if(dialog?.open)dialog.close();}
  function construct(){
   if(dialog)return;
@@ -106,6 +122,7 @@
    if(action==='reset'){draft.sequence=draft.angles.map((_,i)=>i+1);picked=[];paint();error();return;}
    if(action==='create'){
     try{
+     syncFormValues();
      const {profile,width}=Core.build(draft);
      window.PlegarEditor2D.loadProfile(profile,{width});
      close();

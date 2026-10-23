@@ -112,7 +112,10 @@ with sync_playwright() as pw:
   img=page.locator('.machine-photo-reference img')
   assert img.is_visible()
   assert img.get_attribute('src')=='assets/bystronic-frontal-referencia.svg'
-  assert img.evaluate('(el)=>el.complete&&el.naturalWidth>0')
+  page.wait_for_function("""() => {
+   const img=document.querySelector('.machine-photo-reference img');
+   return img&&img.complete&&img.naturalWidth>0;
+  }""",timeout=9000)
   assert 'No equivale a plano oficial' in page.locator('.machine-photo-reference figcaption').inner_text()
   assert '925 mm' in page.locator('.machine-reference').inner_text()
   assert '200 mm' in page.locator('.machine-reference').inner_text()

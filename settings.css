@@ -42,3 +42,18 @@ html[data-pp-theme="light"] .pp-settings-section,html[data-pp-theme="light"] .pp
 html[data-pp-theme="light"] .pp-setting-field span,html[data-pp-theme="light"] .pp-setting-switch strong{color:#15344b}
 html[data-pp-theme="light"] .pp-setting-field small,html[data-pp-theme="light"] .pp-setting-switch small,html[data-pp-theme="light"] .pp-settings-shortcuts small,html[data-pp-theme="light"] .pp-settings-actions small{color:#345773}
 html[data-pp-theme="light"] .pp-settings-section h2{color:#00598f}
+
+
+/* Realzar el acento seleccionado en los controles de navegación y acción existentes. */
+html[data-pp-accent="amber"] .nav-item.active,
+html[data-pp-accent="amber"] .player-icon.play,
+html[data-pp-accent="amber"] .small-button.selected,
+html[data-pp-accent="amber"] .tab.selected,
+html[data-pp-accent="amber"] .pp-settings-links button,
+html[data-pp-accent="amber"] .pp-settings-actions button{background:#9a5310!important;border-color:#ffc16c!important;color:#fff!important}
+html[data-pp-accent="cyan"] .nav-item.active,
+html[data-pp-accent="cyan"] .player-icon.play,
+html[data-pp-accent="cyan"] .small-button.selected,
+html[data-pp-accent="cyan"] .tab.selected,
+html[data-pp-accent="cyan"] .pp-settings-links button,
+html[data-pp-accent="cyan"] .pp-settings-actions button{background:#006f89!important;border-color:#72dfff!important;color:#fff!important}

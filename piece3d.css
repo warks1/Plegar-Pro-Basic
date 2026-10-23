@@ -48,3 +48,24 @@
 .p3-sweep-actions{display:flex;padding:10px 14px;border-bottom:1px solid #315d72}
 .p3-sweep-actions button{font:inherit;font-size:12px;min-height:40px;padding:9px 13px;color:#edf8ff;border-radius:6px;background:#164665;border:1px solid #4b95c0;cursor:pointer}
 @media(max-width:700px){.p3-sweep-actions button{width:100%}}
+
+/* v0.39 · tarjetas con miniaturas SVG 3D derivadas del perfil, y editor de orden */
+.example-gallery-wrap{min-width:0;padding:12px;border:1px solid #376783;border-radius:10px;background:#102b41;margin:12px 0}
+.example-gallery-title{display:flex;gap:6px;flex-wrap:wrap;align-items:baseline;margin-bottom:10px;font-size:12px;color:#e1f5ff}
+.example-gallery-title small{font-size:11px;color:#abcce1}
+.example-gallery{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px;min-width:0}
+.example-gadget{min-width:0;border:1px solid #477d9d;border-radius:9px;background:#0c2235;color:#e9f7ff;display:flex;flex-direction:column;align-items:stretch;padding:5px;gap:3px;text-align:left;cursor:pointer;font:inherit}
+.example-gadget:hover,.example-gadget:focus-visible{border-color:#78d8fc;outline-offset:2px;background:#164361}
+.example-gadget.selected{border-color:#81dafa;box-shadow:0 0 0 1px #81dafa}
+.example-gadget-visual{display:block;width:100%;overflow:hidden;border-radius:5px;background:#10283c}
+.example-gadget-visual svg{display:block;width:100%;height:auto;aspect-ratio:900/480}
+.example-gadget-name{display:block;font-size:12px;font-weight:700;padding:2px 6px;white-space:normal}
+.example-gadget small{display:block;color:#adcfe2;font-size:10px;padding:0 6px 6px;white-space:normal}
+.p3-order-controls{padding:11px 14px;border-top:1px solid #315b70;background:#102b42}
+.p3-order-controls strong{font-size:12px;color:#d2edff}
+.p3-order-controls p{font-size:11px;color:#add0e6;margin:6px 0}
+.p3-order-list{display:flex;align-items:flex-start;gap:8px;flex-wrap:wrap}
+.p3-order-slot{min-width:85px;flex:1 1 105px;font-size:11px;color:#d7edfa}
+.p3-order-slot select{display:block;margin-top:4px;max-width:100%;width:100%;min-height:36px;background:#113653;color:#f3fbff;border:1px solid #518ab1;border-radius:6px}
+@media(max-width:720px){.example-gallery{grid-template-columns:repeat(2,minmax(0,1fr))}.example-gallery-wrap{padding:8px}}
+@media(max-width:350px){.example-gadget-name{font-size:11px}.example-gadget small{font-size:9px}}

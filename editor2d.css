@@ -141,3 +141,10 @@
 .ed-plan-export-width{display:inline-flex;align-items:center;gap:5px;font-size:11px;color:#d7eafa;min-width:0;flex-wrap:wrap}
 .ed-plan-export-width input{max-width:86px;min-width:65px;padding:7px;border:1px solid #5887ad;border-radius:6px;background:#113451;color:#fff;font:inherit}
 #ed-save-plan{white-space:normal;max-width:100%;min-height:40px}
+
+/* v0.39 · selección directa del orden con pantalla táctil */
+.ed-order-slot{display:flex;align-items:center;flex-wrap:wrap;gap:6px;padding:5px;background:#0b2941;border:1px solid #365c76;border-radius:7px;min-width:0}
+.ed-order-position{font-size:11px;color:#d6edff;display:flex;gap:5px;align-items:center}
+.ed-order-position select{background:#123b59;color:#fff;border:1px solid #4c92c1;border-radius:6px;min-height:35px;min-width:49px}
+#ed-order-pick[aria-pressed="true"]{background:#177c9e;border-color:#76d8f1}
+.ed-bend-point{cursor:pointer;touch-action:manipulation}

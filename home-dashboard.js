@@ -3,7 +3,7 @@
 'use strict';
 const H=()=>window.PlegarHome3D,E=()=>window.PlegarExamples3D,Editor=()=>window.PlegarEditor2D,TL=()=>window.PlegarSequenceTimeline;
 const $=s=>document.querySelector(s),state={step:1,cycle:0,width:100,zoom:1,yaw:38,previewZoom:1,previewYaw:38,raf:null,last:null,paint:null,cameraKey:'',camera:null,profileKey:'',maximized:false};
-const rawDefaults=['u','z','omega','l'];
+const Sample=()=>window.PlegarSampleLibrary;
 function program(){return Editor()?.getData();}
 function projectProfile(p,i){
  if(p.profile){
@@ -12,16 +12,16 @@ function projectProfile(p,i){
    return {...valid,setup:p.profile.setup};
   }catch{return null;}
  }
- return E()?.get(p.demoId||rawDefaults[i%4])?.profile||null;
+ return Sample()?.get(p.sampleId)?.profile||Sample()?.byName(p.name)?.profile||null;
 }
 function projectThumb(p,i){
  const model=projectProfile(p,i);
  if(!model)return '<span class="home-no-profile">Sin plano</span>';
- try{return H().thumb(model,{width:p.width||100});}catch{return '<span class="home-no-profile">Geometría inválida</span>';}
+ try{return Sample().paired(model,p.width||Sample().get(p.sampleId)?.width||Sample().byName(p.name)?.width||100);}catch{return '<span class="home-no-profile">Geometría inválida</span>';}
 }
 function projectRows(items){
  return items.slice(0,4).map((p,i)=>{
-  const model=projectProfile(p,i),detail=model?model.angles.length+' pliegues · '+model.thickness.toFixed(2)+' mm · '+(p.profile?'PLANO VINCULADO':'FORMA DE DEMOSTRACIÓN'):'SIN PLANO';
+  const model=projectProfile(p,i),detail=model?model.angles.length+' pliegues · '+model.thickness.toFixed(2)+' mm · '+(p.profile?'PROGRAMA VINCULADO':'EJEMPLO CON PLANO 2D/3D'):'SIN PLANO';
   return '<button class="project-row" type="button" data-project="'+i+'"><span class="home-project-thumb">'+projectThumb(p,i)+'</span><span class="ptext"><strong>'+escape(p.name)+'</strong><small>'+escape(detail)+'</small></span><time>'+escape(String(p.time||'').slice(0,10))+'</time></button>';
  }).join('');
 }
@@ -105,8 +105,8 @@ function selectProject(i){
  stop();
  try{
   Editor().loadProfile({...model,name:p.name});
-  state.width=p.width||100;state.profileKey='';state.cameraKey='';sync();
-  if(!p.profile)document.querySelector('#toast').textContent='Forma de EJEMPLO, no el plano de este proyecto. Vincula su programa 2D para corregirla.';
+  state.width=p.width||Sample()?.get(p.sampleId)?.width||Sample()?.byName(p.name)?.width||100;state.profileKey='';state.cameraKey='';sync();
+  if(!p.profile)document.querySelector('#toast').textContent='Modelo de EJEMPLO con cotas propias, no el plano real de un cliente.';
  }catch(err){alert('No es posible cargar la pieza: '+err.message);}
 }
 function cloneControl(id,handler,event='click'){

@@ -148,3 +148,16 @@
 .ed-order-position select{background:#123b59;color:#fff;border:1px solid #4c92c1;border-radius:6px;min-height:35px;min-width:49px}
 #ed-order-pick[aria-pressed="true"]{background:#177c9e;border-color:#76d8f1}
 .ed-bend-point{cursor:pointer;touch-action:manipulation}
+
+/* v0.41 · controles de programación al inicio: visibles en móvil y tablet */
+.ed-quick-setup{margin:0 0 12px;background:linear-gradient(125deg,#112f45,#071d31);border:1px solid #4283a6;border-radius:10px;padding:13px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.ed-quick-setup .ed-quick-intro{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between;color:#cdeaff}
+.ed-quick-setup .ed-quick-intro strong{font-size:14px;color:#42bcff}
+.ed-quick-setup label{display:grid;gap:5px;min-width:0;color:#d8ecfa;font-size:12px}
+.ed-quick-setup select,.ed-quick-setup input{width:100%;max-width:100%;min-height:40px;padding:7px;background:#081d2d;border:1px solid #4e819f;color:#fff;border-radius:6px}
+.ed-quick-setup .ed-quick-buttons{display:flex;gap:8px;grid-column:1/-1;flex-wrap:wrap}
+.ed-quick-setup .ed-quick-buttons button{background:#126aa0;border:1px solid #72d2ff;color:white;padding:10px 12px;min-height:42px;border-radius:7px;white-space:normal}
+.ed-quick-info{grid-column:1/-1;color:#e8f6ff;font-size:12px;line-height:1.55;border-top:1px solid #34566e;padding-top:8px}
+.ed-quick-warning{color:#ffc48f}
+@media(max-width:720px){.ed-quick-setup{grid-template-columns:repeat(2,minmax(0,1fr));padding:10px}}
+@media(max-width:360px){.ed-quick-setup{grid-template-columns:1fr}}

@@ -36,3 +36,13 @@
  .home-preview-caption{font-size:9px}
  .home-active-thumb{flex-basis:70px;width:70px;height:52px}
 }
+
+/* v0.41 · Dos vistas por tarjeta: plano original del programa y su modelo 3D. */
+.sample-plan-pair{display:grid;grid-template-columns:1fr 1fr;width:100%;height:100%;min-width:0;gap:3px}
+.sample-plan-view,.sample-part-view{min-width:0;min-height:0;display:block;overflow:hidden;background:#f7fafc;border-radius:3px}
+.sample-part-view{background:#102738}
+.sample-plan-pair svg{width:100%;height:100%;display:block}
+.home-project-thumb{flex-basis:76px;width:76px;height:42px}
+.home-project-big-thumb{max-width:320px}
+.home-project-big-thumb .sample-plan-pair{min-height:140px}
+@media(max-width:650px){.home-project-thumb{flex-basis:65px;width:65px;height:38px}.home-project-big-thumb .sample-plan-pair{min-height:110px}}

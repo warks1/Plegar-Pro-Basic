@@ -10,12 +10,10 @@ const navGroups = [
   {title:'HERRAMIENTAS',items:[['Calculadora de plegado','calc','#536786'],['Curva perfecta','wrench','#1275a2'],['Comparador de V','box','#7d2bd8']]},
   {title:'CONFIGURACIÓN',items:[['Ajustes','gear','#496b91'],['Acerca de','help','#476482']]}
 ];
-const initialProjects = [
-  {name:'Soporte motor S235', detail:'6 pliegues · 2.00 mm', time:'01/08/2026 11:24'},
-  {name:'Cubierta lateral Inox 304', detail:'5 pliegues · 1.50 mm', time:'31/07/2026 17:45'},
-  {name:'Bandeja eléctrica', detail:'4 pliegues · 2.10 mm', time:'30/07/2026 09:33'},
-  {name:'Caja protección',detail:'3 pliegues · 2.55 mm',time:'29/07/2026 16:21'}
-];
+const initialProjects=window.PlegarSampleLibrary.list().map((s,i)=>({
+ name:s.name,detail:s.profile.angles.length+' pliegues · '+s.thickness.toFixed(2)+' mm · EJEMPLO',
+ time:new Date(Date.UTC(2026,9,1,12,0)+i*60000).toISOString(),sampleId:s.id,kind:'example'
+}));
 const materials = [
   ['Acero S235JR','2.00 mm'],['Acero Inox 304','1.50 mm'],['Aluminio 5754','2.50 mm'],['Acero S355JR','3.00 mm'],['Galvanizado DX51D','1.20 mm']
 ];
@@ -40,6 +38,9 @@ const descriptions = {
 let projects;
 try { projects = JSON.parse(localStorage.getItem('plegarpro-demo-projects') || 'null') || initialProjects.slice(); }
 catch { projects=initialProjects.slice(); }
+// Agregar piezas de muestra nuevas sin reemplazar ni eliminar los proyectos locales del usuario.
+if(!Array.isArray(projects))projects=initialProjects.slice();
+for(const example of initialProjects){if(!projects.some(p=>p.sampleId===example.sampleId||p.name===example.name))projects.push(example);}
 let activeScreen='Inicio', currentStep=3, playerTimer=null, machineZoom=1, previewZoom=1, previewRotation=0, toastTimeout;
 
 const steps=['Posicionar chapa','Plegado 1','Plegado 2','Plegado 3','Plegado 4','Pieza terminada'];
@@ -122,7 +123,7 @@ function renderModule(name){
    window.PlegarPiece3DView.mount($('#module-sample'),window.PlegarEditor2D.getData,window.PlegarEditor2D.getSelection,window.PlegarEditor2D.selectBend);
    return;
  }else if(name==='Proyectos'){
- content=projects.map((p,i)=>`<div class="module-tile"><div class="home-project-big-thumb">${window.PlegarHomeDashboard?.projectThumb(p,i)||'Sin plano'}</div><strong>${escapeHtml(p.name)}</strong><p>${p.profile?'Plano/programa vinculado':'FORMA DE EJEMPLO · Aún no vinculada al plano de esta pieza'}</p><button type="button" data-project="${i}">Abrir perfil 3D</button><button type="button" data-attach-project="${i}">Vincular programa 2D actual</button></div>`).join('')+`<div class="module-tile"><strong>Nuevo proyecto</strong><p>Crea un proyecto de muestra almacenado en este navegador.</p><button type="button" id="new-project">Crear proyecto</button></div>`;
+ content=projects.map((p,i)=>`<div class="module-tile"><div class="home-project-big-thumb">${window.PlegarHomeDashboard?.projectThumb(p,i)||'Sin plano vinculado'}</div><strong>${escapeHtml(p.name)}</strong><p>${p.profile?'Plano del programa vinculado':p.sampleId||window.PlegarSampleLibrary.byName(p.name)?'Plano 2D + vista 3D de ejemplo, no original de cliente':'Sin geometría asociada; vincula el programa real'}</p><button type="button" data-project="${i}">Abrir pieza</button><button type="button" data-attach-project="${i}">Vincular programa actual</button></div>`).join('')+`<div class="module-tile"><strong>Nuevo proyecto</strong><p>Crea un proyecto de muestra almacenado en este navegador.</p><button type="button" id="new-project">Crear proyecto</button></div>`;
  }else if(name==='Materiales'){
  content=materials.map(([title,thick],i)=>`<div class="module-tile"><img src="assets/chapa-mini.webp" alt="Muestra de chapa"/><strong>${title}</strong><p>Espesor de demostración: ${thick}</p><button type="button" data-material="${i}">Seleccionar material</button></div>`).join('');
  }else if(name==='Simulación 3D'||name==='Simulación 2D'){

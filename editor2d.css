@@ -227,3 +227,18 @@
  .ed-dimensions-scroll{margin:0}
  .ed-dimensions-actions button{flex:1 1 100%;text-align:center}
 }
+
+/* v0.49 · En smartphones cada tramo se edita como ficha, sin tabla desbordada. */
+@media(max-width:700px){
+ .ed-dimensions-scroll{overflow:visible;border:0}
+ .ed-dimensions-table{min-width:0;width:100%;display:block}
+ .ed-dimensions-table thead{display:none}
+ .ed-dimensions-table tbody{display:grid;gap:9px}
+ .ed-dimensions-table tr{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;padding:10px;background:#0b2a40;border:1px solid #386c8b;border-radius:8px}
+ .ed-dimensions-table tr.ed-dim-selected{background:#164363;border-color:#6cbceb}
+ .ed-dimensions-table tbody th{display:flex;align-items:center;grid-column:1/-1;padding:0 0 5px;border-bottom:1px solid #3b6580;font-size:14px}
+ .ed-dimensions-table tbody td{display:flex;flex-direction:column;gap:5px;min-width:0;padding:0;border:0;font-size:12px}
+ .ed-dimensions-table tbody td::before{content:attr(data-label);font-size:11px;font-weight:600;color:#b9d7e9}
+ .ed-dimensions-table input,.ed-dimensions-table select{min-width:0;min-height:46px;width:100%}
+ .ed-dimensions-table .ed-dim-sum{justify-content:end;color:#c6e5f7}
+}

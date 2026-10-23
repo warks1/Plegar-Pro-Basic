@@ -165,3 +165,18 @@
  .machine-panel .panel-heading{z-index:22}
  .machine-panel #home-view-menu{top:calc(100% + 5px)}
 }
+
+
+/* v0.55 · Repetición continua controlable en pantallas táctiles. */
+.home-loop-control,.p3-loop-control{display:inline-flex;align-items:center;gap:6px;white-space:nowrap;color:#d6eafb;font-size:11px}
+.home-loop-control input,.p3-loop-control input{width:16px;height:16px;accent-color:#158cf4;margin:0;cursor:pointer}
+@media(max-width:800px){
+ .machine-panel .player{min-height:45px;height:auto;flex-wrap:wrap;align-content:center;gap:6px}
+ .machine-panel .player .timeline-wrap{flex:1 1 100px}
+ .machine-panel .player .home-loop-control{font-size:10px;flex:0 0 auto}
+}
+@media(max-width:450px){
+ .machine-panel .player .home-loop-control{order:2}
+ .machine-panel .player .speed{order:2;margin-left:auto}
+ .machine-panel .player .timeline-wrap{flex:1 1 85px}
+}

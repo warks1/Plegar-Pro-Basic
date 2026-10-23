@@ -37,11 +37,24 @@
    minY:Math.min(...boxes.map(b=>b.minY)),maxY:Math.max(...boxes.map(b=>b.maxY))};
  }
  function polys(mesh,yaw,elevation,zoom,bounds){
-  return M.project(mesh,yaw,elevation,zoom,bounds).faces.map(f=>{
-   const group=f.group||'sheet',colors=palette[group]||palette.sheet;
-   const status=group==='sheet'?f.status||'':'';
-   const fill=colors[f.kind]||colors.side||colors.upper;
-   return '<polygon data-group="'+group+'" data-status="'+status+'" points="'+f.points.map(v=>v.x.toFixed(2)+','+v.y.toFixed(2)).join(' ')+'" fill="'+fill+'" stroke="'+(group==='sheet'?'#d4f5ff':'#183449')+'" stroke-width="1.1" stroke-linejoin="round"/>';
+  const projected=M.project(mesh,yaw,elevation,zoom,bounds);
+  const light={x:.3,y:-.58,z:.75};
+  return projected.faces.map(f=>{
+   const face=mesh.faces[f.index],a=mesh.vertices[face.ids[0]],b=mesh.vertices[face.ids[1]],c=mesh.vertices[face.ids[2]];
+   const u={x:b.x-a.x,y:b.y-a.y,z:b.z-a.z},v={x:c.x-a.x,y:c.y-a.y,z:c.z-a.z};
+   const n={x:u.y*v.z-u.z*v.y,y:u.z*v.x-u.x*v.z,z:u.x*v.y-u.y*v.x};
+   const norm=Math.hypot(n.x,n.y,n.z)||1;
+   const diffuse=Math.abs((n.x*light.x+n.y*light.y+n.z*light.z)/norm);
+   const group=f.group||'sheet',kind=f.kind;
+   const base=group==='sheet'?(kind==='edge'?[117,177,203]:kind==='lower'?[74,129,155]:[148,199,222])
+    :group==='punch'?[162,173,187]:group==='die'?[103,119,137]:[203,165,105];
+   const factor=.62+.48*diffuse;
+   const fill='rgb('+base.map(n=>Math.min(255,Math.round(n*factor))).join(',')+')';
+   const edge=group==='sheet'?'#dcf4ff':'#344657';
+   return '<polygon data-group="'+group+'" data-status="'+(group==='sheet'?f.status||'':'')+
+    '" points="'+f.points.map(v=>v.x.toFixed(2)+','+v.y.toFixed(2)).join(' ')+
+    '" fill="'+fill+'" stroke="'+edge+'" stroke-width="'+(group==='sheet'?'1.35':'.8')+
+    '" stroke-opacity=".88" stroke-linejoin="round"/>';
   }).join('');
  }
  function machine(profile,{stage=1,progress=0,width=100,yaw=30,elevation=22,zoom=1,bounds=null}={}){
@@ -62,7 +75,7 @@
  function preview(profile,{width=100,yaw=38,elevation=25,zoom=1}={}){
   const mesh=finishedMesh(profile,width);
   return '<svg class="home-preview-svg" viewBox="0 0 900 480" role="img" aria-label="Vista previa 3D de la pieza programada">'+
-   '<rect width="900" height="480" fill="#091c2e"/>'+
+   '<defs><radialGradient id="pp-preview-bg"><stop stop-color="#17384b"/><stop offset=".78" stop-color="#091a28"/><stop offset="1" stop-color="#05111d"/></radialGradient><radialGradient id="pp-preview-shadow"><stop stop-color="#000" stop-opacity=".35"/><stop offset="1" stop-color="#000" stop-opacity="0"/></radialGradient></defs><rect width="900" height="480" fill="url(#pp-preview-bg)"/><ellipse cx="455" cy="386" rx="330" ry="62" fill="url(#pp-preview-shadow)"/>'+
    '<path d="M0 420 H900 M60 0 V480" stroke="#193b53" stroke-width="1"/>'+
    polys(mesh,yaw,elevation,zoom)+
    '<text x="22" y="34" fill="#8ccff5" font-size="15">PIEZA PROGRAMADA · '+esc(profile.name||'Sin nombre')+'</text>'+

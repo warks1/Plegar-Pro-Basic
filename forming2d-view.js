@@ -167,11 +167,15 @@ function stepArt(data,index,progress){
  const cx=(x1+x2)/2,cy=(y1+y2)/2;
  const path=pts=>pts.map((p,i)=>(i?'L':'M')+p.x+' '+p.y).join(' ');
  const punch=path(m.toolProfiles.punch.outline)+' Z',die=path(m.toolProfiles.die.outline)+' Z';
+ const parts=machineOutlines(m),ram=path(parts.ram)+' Z',table=path(parts.table)+' Z';
  const sheet=path(m.assembly.contour);
  return '<svg viewBox="0 0 222 96" aria-hidden="true"><rect width="222" height="96" fill="#061929"/>'+
   '<g transform="translate(111 44) scale('+scale.toFixed(4)+') translate('+(-cx).toFixed(3)+' '+(-cy).toFixed(3)+')">'+
+  '<path d="'+table+'" fill="#716985" stroke="#baa6d1" stroke-width=".8"/>'+
+  '<path d="'+ram+'" fill="#5d7186" stroke="#c3d4e3" stroke-width=".8"/>'+
   '<path d="'+die+'" fill="#744346" stroke="#c67572" stroke-width=".8"/>'+
   '<path d="'+punch+'" fill="#b2c6d8" stroke="#ebf8ff" stroke-width=".8"/>'+
+  '<rect x="'+m.stop.x+'" y="'+m.stop.top+'" width="'+m.stop.width+'" height="'+(m.stop.bottom-m.stop.top)+'" fill="#4ac587"/>'+
   '<path d="'+sheet+'" fill="none" stroke="#69ccff" stroke-width="'+Math.max(1.4,m.thickness)+'" stroke-linejoin="round"/></g></svg>';
 }
 function gallery(data,order){

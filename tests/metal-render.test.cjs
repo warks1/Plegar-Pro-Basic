@@ -34,3 +34,15 @@ test('Metal: no modifica estados físicos ni identifica el render como verificac
  const normal=Metal.normal({vertices:[{x:0,y:0,z:0},{x:2,y:0,z:0},{x:0,y:2,z:0}]},{ids:[0,1,2]});
  assert.ok(Math.abs(normal.z-1)<1e-8);
 });
+
+test('La chapa, punzón, matriz y topes usan acabados industriales claramente diferenciados',()=>{
+ const svg=Home.machine(shape,{stage:2,progress:.4}).svg;
+ for(const group of ['punch','die','gauge','table','ram']){
+  assert.match(svg,new RegExp('id="pp-machine-metal-'+group+'"'));
+  assert.match(svg,new RegExp('data-group="'+group+'"'));
+  assert.match(svg,new RegExp('url\\(#pp-machine-metal-'+group+'\\)'));
+ }
+ assert.match(svg,/url\(#pp-machine-metal-metal\)/,'la chapa sigue usando su acabado acero');
+ assert.match(svg,/data-group="sheet"/);
+ assert.match(svg,/role="img"/);
+});

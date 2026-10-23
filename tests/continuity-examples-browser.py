@@ -170,6 +170,26 @@ with sync_playwright() as pw:
   assert page.evaluate("JSON.parse(localStorage.getItem('plegarpro-tool-dxf-v1'))[0].collisionApproved")==False
   page.locator('[data-dxf-remove]').click()
   assert page.locator('.tool-dxf-card').count()==0
+  # DXF clásico VERTEX/SEQEND (común en controles y CAD anteriores).
+  classic_rows=['0','SECTION','2','HEADER','9','$INSUNITS','70','4','0','ENDSEC',
+   '0','SECTION','2','ENTITIES','0','POLYLINE','66','1','70','1',
+   '10','0','20','0','30','0']
+  for x,y in [(0,0),(25,0),(25,90),(0,90)]:
+   classic_rows+=['0','VERTEX','10',str(x),'20',str(y),'30','0']
+  classic_rows+=['0','SEQEND','0','ENDSEC','0','EOF']
+  page.locator('.tool-dxf-form [name="brand"]').select_option('Bystronic')
+  page.locator('.tool-dxf-form [name="kind"]').select_option('punch')
+  page.locator('.tool-dxf-form [name="code"]').fill('P-CLASICO-R12')
+  page.locator('.tool-dxf-form [name="description"]').fill('Perfil clásico DXF en mm')
+  page.locator('.tool-dxf-form [name="file"]').set_input_files({
+   "name":"punzon-r12.dxf","mimeType":"text/plain","buffer":('\n'.join(classic_rows)+'\n').encode('utf-8')})
+  page.locator('.tool-dxf-form button[type="submit"]').click()
+  page.wait_for_function("() => document.querySelectorAll('.tool-dxf-card').length===1",timeout=8000)
+  assert '25 × 90 mm' in page.locator('.tool-dxf-card').inner_text()
+  assert 'DXF ASCII POLYLINE' in page.locator('.tool-dxf-card').inner_text()
+  assert page.locator('.tool-dxf-art').count()==2
+  page.locator('[data-dxf-remove]').click()
+  assert page.locator('.tool-dxf-card').count()==0
   assert page.locator('.mfg-card').count()>=20
   assert page.locator('.mfg-card .mfg-art').count()>=80
   assert page.locator('.mfg-card').count()>=40

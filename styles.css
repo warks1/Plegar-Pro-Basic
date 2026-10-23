@@ -154,3 +154,14 @@
 .home-part-legend i{display:inline-block;width:10px;height:10px;border-radius:2px;border:1px solid #ffffff80}
 .legend-sheet{background:#d9e1e6}.legend-punch{background:#237dc0}.legend-die{background:#415360}.legend-gauge{background:#29966b}
 @media(max-width:700px){.home-part-legend{font-size:9px;gap:5px;bottom:27px;left:6px;padding:4px 6px}}
+
+/* En móvil, el selector de cámara debe quedar por encima del canvas táctil,
+   incluso después de hacer scroll bajo el encabezado sticky. */
+.machine-panel .panel-heading{position:relative;z-index:11;overflow:visible}
+.machine-panel .machine-stage{z-index:1}
+.machine-panel #home-view-menu{z-index:90;isolation:auto}
+@media(max-width:700px){
+ .machine-panel .heading-actions{isolation:auto}
+ .machine-panel .panel-heading{z-index:22}
+ .machine-panel #home-view-menu{top:calc(100% + 5px)}
+}

@@ -83,6 +83,20 @@ with sync_playwright() as pw:
   page.locator('[data-project-action="program2d"]').first.click()
   assert page.locator('#ed-workplan table').count()==1
   assert page.locator('#ed-export-workplan').count()==1
+  # Los módulos de cálculo ya no deben ser pantallas provisionales.
+  if w<=1120:page.locator('#open-menu').click()
+  page.locator('button.nav-item[data-screen="Calculadora de plegado"]').click()
+  assert page.locator('.development-tools .development-kpi').count()==1
+  assert page.locator('.development-tools .ed-flat-svg').count()==1
+  assert page.locator('.development-tools [data-dev-open-editor]').is_visible()
+  if w<=1120:page.locator('#open-menu').click()
+  page.locator('button.nav-item[data-screen="Comparador de V"]').click()
+  assert page.locator('.development-tools [data-dev-die]').count()>=10
+  ratio=page.locator('.development-table-scroll tr').count()
+  assert ratio>=11
+  page.locator('.development-tools [data-dev-die]').first.click()
+  assert page.locator('#ed-die').count()==1
+  assert page.evaluate('PlegarEditor2D.getData().setup.die') is not None
   assert page.locator('#ed-basis').count()==1 and page.locator('#ed-quick-basis').count()==1
   assert page.locator('#ed-flat-pattern .ed-flat-svg').count()==1
   outside=page.evaluate('PlegarBendCalc.estimate(PlegarEditor2D.getData(),PlegarEditor2D.getData().setup).flat')

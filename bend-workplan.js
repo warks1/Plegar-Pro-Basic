@@ -27,7 +27,7 @@
   return {name:p.name,material:p.material,thickness:p.thickness,width,
    setup,rows,nominalLength:calc.nominal,flat:calc.flat,estimatedForceKN:review.forceKN,
    issues:[...calc.problems,...review.warnings],intersections:review.intersections,
-   warning:'Ficha geométrica orientativa. Sin máquina calibrada, radios reales, colisiones ni CNC.'};
+   warning:'Ficha geométrica orientativa. NO CNC / NO APTO PARA FABRICACIÓN. Sin máquina calibrada, radios, colisiones o utillaje real validado.'};
  }
  const esc=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
  function html(plan){

@@ -99,7 +99,7 @@ function sync(){
  preview();paint();
 }
 function selectProject(i){
- const p=globalThis.projects?.[i]||(typeof projects!=='undefined'?projects[i]:null);
+ const p=window.PlegarApp?.getProjects()?.[i];
  if(!p)return;
  const model=projectProfile(p,i);if(!model){alert('Este proyecto no contiene un plano geométrico vinculado.');return;}
  stop();

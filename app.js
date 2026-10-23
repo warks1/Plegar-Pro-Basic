@@ -32,7 +32,7 @@ const descriptions = {
  'Calculadora de plegado':'Formulario de cálculo listo visualmente. No genera desarrollos hasta validar el motor.',
  'Curva perfecta':'Módulo de curvado progresivo. Requiere algoritmos y parámetros reales de máquina.',
  'Comparador de V':'Comparación de matrices según espesor y geometría. Motor pendiente.',
- 'Ajustes':'Preferencias visuales y configuración de la futura aplicación multiplataforma.',
+ 'Ajustes':'Preferencias funcionales, accesibilidad, simulación, navegación y copias locales.',
  'Acerca de':'Plegar Pro — nueva base de interfaz para AMS Engineering.'
 };
 let projects;
@@ -41,7 +41,7 @@ catch { projects=initialProjects.slice(); }
 // Agregar piezas de muestra nuevas sin reemplazar ni eliminar los proyectos locales del usuario.
 if(!Array.isArray(projects))projects=initialProjects.slice();
 for(const example of initialProjects){if(!projects.some(p=>p.sampleId===example.sampleId||p.name===example.name))projects.push(example);}
-let activeScreen='Inicio', currentStep=3, playerTimer=null, machineZoom=1, previewZoom=1, previewRotation=0, toastTimeout;
+let previousScreen='Inicio', activeScreen='Inicio', currentStep=3, playerTimer=null, machineZoom=1, previewZoom=1, previewRotation=0, toastTimeout;
 
 const steps=['Posicionar chapa','Plegado 1','Plegado 2','Plegado 3','Plegado 4','Pieza terminada'];
 function buildNav(){
@@ -91,11 +91,12 @@ function switchScreen(name){
  window.PlegarPlans?.destroy();
  window.PlegarForming2D?.destroy();
  window.PlegarPiece3DView?.destroy();
- stopPlayer();activeScreen=name;buildNav();closeMenu();
+ stopPlayer();if(name!==activeScreen)previousScreen=activeScreen;activeScreen=name;buildNav();closeMenu();
  $$('.mobile-bottom [data-screen]').forEach(b=>b.classList.toggle('active',b.dataset.screen===name));
  $('#summary-cards').hidden=name!=='Inicio';$('#module-view').hidden=name==='Inicio';
  $$('.main-panels,.bottom-panels').forEach(el=>el.hidden=name!=='Inicio');
  if(name!=='Inicio')renderModule(name);
+ else window.PlegarHomeDashboard?.applySettings?.();
  window.scrollTo({top:0,behavior:'instant'});
 }
 function renderModule(name){
@@ -131,7 +132,18 @@ function renderModule(name){
  }else if(name==='Máquinas'){
  content=window.PlegarMachineReferences?.html(window.PlegarEditor2D?.getData()?.setup)||'<div class="module-tile">Ficha técnica de máquinas no disponible.</div>';
  }else if(name==='Utillaje'){
- content='<div class="module-tile"><img src="assets/utillaje.webp" alt="Utillaje de referencia"/><strong>Punzón y matriz del boceto</strong><p>Imagen ilustrativa. Datos dimensionales por verificar con fabricante.</p></div>';
+  const lib=window.PlegarToolLibrary;
+  content='<p>Utillajes paramétricos internos. No son fichas ni límites de fabricantes verificados; seleccionarlos modifica el programa actual.</p>'+
+   '<div class="module-tiles">'+[...lib.PUNCHES,...lib.DIES].map(tool=>
+   '<div class="module-tile"><strong>'+escapeHtml(tool.name)+'</strong><p>'+escapeHtml(lib.details(tool))+
+   '</p><button type="button" data-tool-set="'+tool.kind+':'+tool.id+'">Seleccionar '+(tool.kind==='die'?'matriz':'punzón')+'</button></div>').join('')+'</div>';
+ }else if(name==='Ajustes'){
+  $('#module-sample').classList.remove('module-editor','module-forming','module-piece3d');
+  window.PlegarSettings.mount($('#module-sample'));return;
+ }else if(name==='Acerca de'){
+  content='<div class="module-tile"><h2>Plegar Pro Basic</h2><p>Geometría, cálculo orientativo y simulación de plegado. Sin control CNC ni certificación de colisiones.</p>'+
+   '<p>Preferencias guardadas en este navegador. Las cotas de la Bystronic de 2006 son de una unidad anunciada, sin confirmar la identidad de la tuya.</p>'+
+   '<button data-screen="Ajustes">Abrir preferencias</button> <button data-screen="Máquinas">Ver máquinas</button></div>';
  }else if(name==='Calculadora de plegado'||name==='Comparador de V'){
   const profile=window.PlegarEditor2D?.getData();
   try{content=window.PlegarDevelopmentTools.html(name==='Comparador de V'?'comparison':'calculator',profile,{width:window.PlegarEditor2D.getWidth()});}
@@ -177,6 +189,23 @@ function projectAction(i,action){
  toast('Proyecto '+record.name+' cargado · '+item.kind+'.');
 }
 
+function updateToolCard(kind,id){
+ const tool=window.PlegarToolLibrary?.get(kind,id);
+ if(!tool)return;
+ const rows=[...document.querySelectorAll('.tool-specs > div')];
+ if(rows.length<7)return;
+ const values=[
+  id,
+  kind==='die'?tool.opening.toFixed(2)+' mm':'No aplica · punzón',
+  tool.angle+'°',
+  tool.height===null?'No documentada':tool.height.toFixed(2)+' mm',
+  'No documentado',
+  kind==='punch'?'R'+tool.nose+' mm':'No documentado',
+  'No validada'
+ ];
+ rows.forEach((row,i)=>{const dd=row.querySelector('dd');if(dd)dd.textContent=values[i]||'—';});
+}
+
 // Delegación: navegación y selecciones. Todas las superficies que actúan son botones reales.
 document.addEventListener('click',event=>{
  if(event.target.closest('[data-machine-save]')){
@@ -194,7 +223,21 @@ document.addEventListener('click',event=>{
   }catch(error){toast('Medida no guardada: '+error.message);}
   return;
  }
+ if(event.target.closest('[data-app-back]')){switchScreen(previousScreen||'Inicio');return;}
  const screen=event.target.closest('[data-screen]');if(screen){switchScreen(screen.dataset.screen);return;}
+ const chosenTool=event.target.closest('[data-tool-set]');
+ if(chosenTool){
+  const [kind,id]=String(chosenTool.dataset.toolSet).split(':');
+  const tool=window.PlegarToolLibrary?.get(kind,id);
+  if(!tool){toast('Herramienta desconocida.');return;}
+  try{
+   const done=kind==='die'?window.PlegarEditor2D.setDie(id):window.PlegarEditor2D.setPunch(id);
+   if(!done)throw Error('No fue posible actualizar el programa.');
+   switchScreen('Programación 2D');
+   toast('Herramienta paramétrica '+tool.name+' aplicada; verificación física pendiente.');
+  }catch(error){toast(error.message);}
+  return;
+ }
  const step=event.target.closest('[data-step]');if(step){stopPlayer();setStep(Number(step.dataset.step));return;}
  const chosenDie=event.target.closest('[data-dev-die]');if(chosenDie){
    try{window.PlegarEditor2D.setDie(chosenDie.dataset.devDie);switchScreen('Programación 2D');toast('Matriz nominal aplicada. Revisa radio interior y compatibilidad real.');}
@@ -214,7 +257,18 @@ document.addEventListener('click',event=>{
  }
  const project=event.target.closest('[data-project]');if(project){chooseProject(Number(project.dataset.project));return;}
  const material=event.target.closest('[data-material]');if(material){setMaterial(Number(material.dataset.material));return;}
- const tool=event.target.closest('[data-tab]');if(tool){$$('#tool-tabs [data-tab]').forEach(b=>b.classList.toggle('selected',b===tool));$('#tool-code').textContent=tool.dataset.tab==='Punzones'?'P-88-R1':tool.dataset.tab==='Matrices'?'M-V16-88':'ADAPTADOR';toast(`Ficha visual: ${tool.dataset.tab}. Dimensiones por verificar.`);return;}
+ const tool=event.target.closest('#tool-tabs [data-tab]');
+ if(tool){
+  $$('#tool-tabs [data-tab]').forEach(b=>b.classList.toggle('selected',b===tool));
+  const kind=tool.dataset.tab==='Punzones'?'punch':tool.dataset.tab==='Matrices'?'die':null;
+  const sel=$('#tool-select');
+  if(!kind){sel.innerHTML='<option value="">Sin catálogo de adaptadores verificado</option>';sel.disabled=true;$('#tool-code').textContent='SIN REFERENCIA';return;}
+  sel.disabled=false;
+  sel.innerHTML=(kind==='punch'?window.PlegarToolLibrary.PUNCHES:window.PlegarToolLibrary.DIES)
+   .map(x=>'<option value="'+x.kind+':'+x.id+'">'+escapeHtml(x.name)+'</option>').join('');
+  updateToolCard(kind,sel.value.split(':')[1]);
+  return;
+ }
  const calc=event.target.closest('[data-calc]');if(calc){
   $('#calc-tabs [data-calc]').forEach(b=>b.classList.toggle('selected',b===calc));
   switchScreen(calc.dataset.calc==='Curva perfecta'?'Curva perfecta':'Calculadora de plegado');
@@ -229,6 +283,7 @@ document.addEventListener('click',event=>{
  }
 });
 $('#brand-home').addEventListener('click',()=>switchScreen('Inicio'));
+ $('#avatar')?.addEventListener('click',()=>switchScreen('Ajustes'));
 $('#open-menu').addEventListener('click',toggleMenu);
 $('#bottom-more').addEventListener('click',toggleMenu);
 $('#sidebar-curtain').addEventListener('click',closeMenu);
@@ -243,8 +298,21 @@ $('#realistic-option').addEventListener('click',()=>toast('Modo visual realista:
 $('#views').addEventListener('click',()=>toast('Otras vistas 3D pendientes del futuro motor geométrico.'));
 $('#section-switch').addEventListener('click',()=>switchScreen('Simulación 2D'));
 $('#calc-action').addEventListener('click',()=>switchScreen('Calculadora de plegado'));
-$('#calc-close').addEventListener('click',()=>toast('Calculadora visible en el panel del boceto aprobado.'));
-$('#tool-select').addEventListener('change',event=>toast(`Seleccionado: ${event.target.value}. Imagen ilustrativa.`));
+$('#calc-close').addEventListener('click',()=>{
+  const hidden=$('.calculator-panel').classList.toggle('calculator-collapsed');
+  $('#calc-close').setAttribute('aria-label',hidden?'Restaurar calculadora':'Minimizar calculadora');
+  $('#calc-close').setAttribute('aria-expanded',String(!hidden));
+  $('#calc-close').textContent=hidden?'＋':'×';
+ });
+$('#tool-select').addEventListener('change',event=>{
+  const [kind,id]=event.target.value.split(':');
+  const item=window.PlegarToolLibrary?.get(kind,id);if(!item)return;
+  try{
+   const done=kind==='die'?window.PlegarEditor2D.setDie(id):window.PlegarEditor2D.setPunch(id);
+   if(!done)throw Error('No se pudo guardar.');
+   updateToolCard(kind,id);toast('Herramienta nominal '+item.name+' aplicada al programa.');
+  }catch(e){toast(e.message);}
+ });
 $('#open-menu').setAttribute('aria-expanded','false');
 $('#zoom-in').addEventListener('click',()=>setMachineZoom(machineZoom+.10));
 $('#zoom-out').addEventListener('click',()=>setMachineZoom(machineZoom-.10));
@@ -273,7 +341,8 @@ document.addEventListener('keydown',e=>{
 });
 $('#dialog-close').addEventListener('click',()=>$('#dialog').close());
 $('#dialog').addEventListener('click',event=>{if(event.target===$('#dialog'))$('#dialog').close();});
-buildNav();renderProjects();renderMaterials();renderSteps();switchScreen('Inicio');
+buildNav();renderProjects();renderMaterials();renderSteps();
+ switchScreen(window.PlegarSettings?.get()?.startupScreen||'Inicio');
 if('serviceWorker' in navigator&&location.protocol.startsWith('http')){
   navigator.serviceWorker.register('sw.js',{updateViaCache:'none'})
     .then(reg=>reg.update().catch(()=>{})).catch(()=>{});

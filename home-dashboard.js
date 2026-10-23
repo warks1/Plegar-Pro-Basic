@@ -34,6 +34,20 @@ function bounds(p){
  return state.camera;
 }
 function count(){const p=program();return p?H().steps(p):2;}
+function preferences(){return window.PlegarSettings?.get?.()||{};}
+function applySettings(){
+ const prefs=preferences(),cameras={iso:[38,24],profile:[0,0],front:[90,0],top:[0,90]};
+ state.loop=prefs.repeat!==false;
+ const check=$('#home-loop');if(check)check.checked=state.loop;
+ if(['0.5','1','2'].includes(String(prefs.speed))){
+  const speedInput=$('#speed');if(speedInput)speedInput.value=({'0.5':'2000','1':'1100','2':'550'})[prefs.speed];
+ }
+ if(cameras[prefs.camera]){
+  [state.yaw,state.elevation]=cameras[prefs.camera];state.cameraKey='';
+ }
+ setMode(prefs.homeView==='cad'?'cad':'photo');
+ draw();
+}
 function stop(){
  if(state.raf!==null){cancelAnimationFrame(state.raf);state.raf=null;}
  state.last=null;state.paint=null;state.holdUntil=null;
@@ -166,18 +180,22 @@ function exportUhd(){
  if(!svg)throw Error('Abre primero Cinemática 3D.');
  // Render SVG escalable: PNG UHD 3840×2160 con márgenes, sin deformar la geometría.
  const clone=svg.cloneNode(true);clone.setAttribute('xmlns','http://www.w3.org/2000/svg');
+ const resolution=Number(preferences().exportResolution)||2160;
+ const size={1080:[1920,1080],1440:[2560,1440],2160:[3840,2160]}[resolution]||[3840,2160];
+ const [width,height]=size;
  const source=new Blob([new XMLSerializer().serializeToString(clone)],{type:'image/svg+xml;charset=utf-8'});
  const sourceUrl=URL.createObjectURL(source),img=new Image();
  img.onload=()=>{
   try{
-   const canvas=document.createElement('canvas');canvas.width=3840;canvas.height=2160;
+   const canvas=document.createElement('canvas');canvas.width=width;canvas.height=height;
    const ctx=canvas.getContext('2d');if(!ctx)throw Error('Canvas UHD no disponible en este dispositivo.');
-   ctx.fillStyle='#071726';ctx.fillRect(0,0,3840,2160);
-   const height=Math.round(3840*480/900);ctx.drawImage(img,0,Math.floor((2160-height)/2),3840,height);
+   ctx.fillStyle='#071726';ctx.fillRect(0,0,width,height);
+   const imageHeight=Math.round(width*480/900);
+   ctx.drawImage(img,0,Math.floor((height-imageHeight)/2),width,imageHeight);
    canvas.toBlob(blob=>{
     if(!blob){window.alert('El dispositivo no ha podido generar la imagen UHD.');return;}
     const url=URL.createObjectURL(blob),a=document.createElement('a');
-    a.href=url;a.download='Plegar-Pro-Simulacion-3D-UHD-3840x2160.png';
+    a.href=url;a.download='Plegar-Pro-Simulacion-3D-'+width+'x'+height+'.png';
     document.body.appendChild(a);a.click();a.remove();
     setTimeout(()=>URL.revokeObjectURL(url),3000);
    },'image/png');
@@ -212,6 +230,7 @@ function init(){
  for(const id of ['step-back','step-next','play','timeline','speed','zoom-in','zoom-out','center-view','reset-view','rotate-prev','rotate-next','preview-zoom','preview-reset','preview-open','machine-info','view-option','views','realistic-option','home-view-model']){
   const handlers={
    'step-back':()=>seek(state.step-1),'step-next':()=>seek(state.step+1),'play':toggle,
+   'speed':()=>{const key={'2000':'0.5','1100':'1','550':'2'}[$('#speed')?.value];if(key)try{window.PlegarSettings?.set?.('speed',key);}catch{}},
    'zoom-in':()=>machineGestures?.zoomBy(1.2),'zoom-out':()=>machineGestures?.zoomBy(1/1.2),
    'center-view':()=>machineGestures?.reset(),'reset-view':()=>machineGestures?.reset(),
    'rotate-prev':()=>{state.previewYaw-=12;preview();},'rotate-next':()=>{state.previewYaw+=12;preview();},
@@ -243,6 +262,7 @@ function init(){
  });
  $('#home-loop')?.addEventListener('change',e=>{
   state.loop=!!e.target.checked;
+  try{window.PlegarSettings?.set?.('repeat',state.loop);}catch{}
   if(!state.loop&&state.step>=count()&&state.raf!==null){stop();paint();}
  });
  $('#timeline').addEventListener('input',e=>seek(e.target.value));
@@ -250,13 +270,13 @@ function init(){
  const list=$('#projects');list.addEventListener('click',e=>{const b=e.target.closest('[data-project]');if(b){e.stopPropagation();selectProject(Number(b.dataset.project));}});
  machineGestures=window.PlegarTouchView.attach($('#home-machine-3d'),$('#home-machine-camera'));
  previewGestures=window.PlegarTouchView.attach($('#home-preview-3d'),$('#home-preview-camera'));
- setMode('photo');
+ applySettings();
  const obs=new MutationObserver(()=>{if(visible())sync();else stop();});obs.observe($('#summary-cards'),{attributes:true,attributeFilter:['hidden']});
  sync();
  // Sustituir las miniaturas provisionales del arranque por plano 2D + pieza 3D de cada proyecto.
  const rows=window.PlegarApp?.getProjects?.();if(rows)$('#projects').innerHTML=projectRows(rows);
  connectSavedDrawings();
 }
-window.PlegarHomeDashboard={init,sync,stop,projectRows,projectThumb,selectProject};
+window.PlegarHomeDashboard={init,sync,stop,applySettings,projectRows,projectThumb,selectProject};
 init();
 })();

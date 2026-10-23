@@ -1,0 +1,59 @@
+/* Preferencias de Plegar Pro: tema, accesibilidad, navegación y copia local. */
+:root{--pp-zoom:1}
+body{zoom:var(--pp-zoom)}
+html[data-pp-theme="light"]{color-scheme:light;--text:#132c40;--muted:#46627a;--soft:#203d57;--cyan:#005da5;--back:#e8f0f7;--nav:#dce9f3;--panel:#f6fbff;--panel2:#e9f2fa;--line:#8da7bb}
+html[data-pp-theme="light"] body{background:linear-gradient(130deg,#f7fbff,#d5e5f0);color:#12344d}
+html[data-pp-theme="light"] .topbar,html[data-pp-theme="light"] .sidebar{background:#daeaf5;color:#143b55;border-color:#8caac4}
+html[data-pp-theme="light"] .panel,html[data-pp-theme="light"] .summary-card,html[data-pp-theme="light"] .module-view,html[data-pp-theme="light"] .module-sample{background:#edf5fc;color:#183a50;border-color:#97b2ca}
+html[data-pp-theme="light"] .panel-heading h2{color:#005791}
+html[data-pp-theme="light"] .nav-item,html[data-pp-theme="light"] .brand,html[data-pp-theme="light"] .nav-heading{color:#163d59}
+html[data-pp-theme="light"] .panel p,html[data-pp-theme="light"] .module-sample p,html[data-pp-theme="light"] .module-main p{color:#26485e}
+html[data-pp-theme="contrast"]{color-scheme:dark;--text:#ffffff;--muted:#e7e7e7;--cyan:#74dfff;--line:#fcfae5;--panel:#06090c}
+html[data-pp-theme="contrast"] body{background:#020507;color:#fff}
+html[data-pp-theme="contrast"] .topbar,html[data-pp-theme="contrast"] .sidebar,html[data-pp-theme="contrast"] .panel,html[data-pp-theme="contrast"] .summary-card{background:#060a0e;color:#fff;border-color:#b6dfff}
+html[data-pp-theme="contrast"] button:focus-visible,html[data-pp-theme="contrast"] input:focus-visible{outline:3px solid #ffe075}
+html[data-pp-accent="cyan"]{--cyan:#55d9ec;--blue:#008ea3}
+html[data-pp-accent="amber"]{--cyan:#ffcb66;--blue:#b76a13}
+html[data-pp-density="compact"] .nav-item{min-height:29px;padding-top:3px;padding-bottom:3px}
+html[data-pp-density="compact"] .module-main{padding:10px}
+html[data-pp-density="compact"] .panel-heading{min-height:35px;padding-top:5px;padding-bottom:5px}
+html[data-pp-motion="reduced"] *,html[data-pp-motion="reduced"] *::before,html[data-pp-motion="reduced"] *::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}
+.pp-settings{max-width:100%;color:#e7f4ff;display:grid;gap:13px}
+.pp-settings-intro{padding:12px 14px;border-left:3px solid #5fb5eb;background:#123449;border-radius:5px;font-size:12px}
+.pp-settings-section{padding:15px;border:1px solid #3b6681;background:#0c273c;border-radius:10px;min-width:0}
+.pp-settings-section h2{font-size:17px;color:#6acaff;margin:0 0 13px}
+.pp-settings-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.pp-setting-field,.pp-setting-switch{display:flex;flex-direction:column;gap:7px;padding:12px;background:#133349;border:1px solid #375f7d;border-radius:8px;min-width:0;color:#fff}
+.pp-setting-field span{font-weight:700;font-size:13px}
+.pp-setting-field small,.pp-setting-switch small,.pp-settings-shortcuts small,.pp-settings-actions small{display:block;font-size:11px;line-height:1.45;color:#bfd2e1}
+.pp-setting-field select{min-height:43px;max-width:100%;width:100%;color:#fff;background:#082236;border:1px solid #739bb8;border-radius:6px;padding:8px;font-size:14px}
+.pp-setting-switch{flex-direction:row;align-items:center;gap:12px}
+.pp-setting-switch input{width:23px;height:23px;flex:0 0 23px;accent-color:var(--cyan)}
+.pp-setting-switch strong{display:block;font-size:13px;margin-bottom:5px}
+.pp-settings-shortcuts,.pp-settings-actions{padding:12px;border:1px solid #375f7d;border-radius:8px;background:#123349;display:grid;gap:12px;grid-column:1/-1}
+.pp-settings-links{display:flex;flex-wrap:wrap;gap:7px}
+.pp-settings-links button,.pp-settings-actions button,.pp-settings-import{min-height:42px;display:inline-flex;justify-content:center;align-items:center;padding:9px 12px;border:1px solid #5ea1cd;border-radius:7px;background:#075184;color:#fff;font-size:12px;font-weight:600}
+.pp-settings-import{max-width:100%;position:relative;overflow:hidden}
+.pp-settings-import input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.pp-settings-message{padding:11px;background:#15354c;color:#bceaff;border:1px solid #3f779c;border-radius:7px;font-size:12px}
+@media(max-width:710px){.pp-settings-grid{grid-template-columns:1fr}.pp-settings-section{padding:10px}.pp-settings-links button{flex:1 0 42%}.pp-settings-actions{grid-column:1}.pp-settings{gap:10px}}
+/* Never place a light theme on a chart/3D background: preserve engineering contrast. */
+html[data-pp-theme="light"] .pp-settings-section,html[data-pp-theme="light"] .pp-setting-field,html[data-pp-theme="light"] .pp-setting-switch,html[data-pp-theme="light"] .pp-settings-actions,html[data-pp-theme="light"] .pp-settings-shortcuts{background:#d5e8f7;color:#173c55;border-color:#799bb6}
+html[data-pp-theme="light"] .pp-setting-field span,html[data-pp-theme="light"] .pp-setting-switch strong{color:#15344b}
+html[data-pp-theme="light"] .pp-setting-field small,html[data-pp-theme="light"] .pp-setting-switch small,html[data-pp-theme="light"] .pp-settings-shortcuts small,html[data-pp-theme="light"] .pp-settings-actions small{color:#345773}
+html[data-pp-theme="light"] .pp-settings-section h2{color:#00598f}
+
+
+/* Realzar el acento seleccionado en los controles de navegación y acción existentes. */
+html[data-pp-accent="amber"] .nav-item.active,
+html[data-pp-accent="amber"] .player-icon.play,
+html[data-pp-accent="amber"] .small-button.selected,
+html[data-pp-accent="amber"] .tab.selected,
+html[data-pp-accent="amber"] .pp-settings-links button,
+html[data-pp-accent="amber"] .pp-settings-actions button{background:#9a5310!important;border-color:#ffc16c!important;color:#fff!important}
+html[data-pp-accent="cyan"] .nav-item.active,
+html[data-pp-accent="cyan"] .player-icon.play,
+html[data-pp-accent="cyan"] .small-button.selected,
+html[data-pp-accent="cyan"] .tab.selected,
+html[data-pp-accent="cyan"] .pp-settings-links button,
+html[data-pp-accent="cyan"] .pp-settings-actions button{background:#006f89!important;border-color:#72dfff!important;color:#fff!important}

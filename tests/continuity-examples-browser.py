@@ -85,6 +85,44 @@ with sync_playwright() as pw:
   page.locator('[data-project-action="program2d"]').first.click()
   assert page.locator('#ed-workplan table').count()==1
   assert page.locator('#ed-export-workplan').count()==1
+  # Crear desde Programación 2D: cancelar no altera el perfil anterior.
+  old=page.evaluate('JSON.stringify(PlegarEditor2D.getData())')
+  page.locator('#ed-create-piece').click()
+  assert page.locator('#new-piece-dialog').is_visible()
+  page.locator('[data-np-field="name"]').fill('Borrador cancelado')
+  page.locator('[data-np-action="cancel"]').last.click()
+  assert page.evaluate('JSON.stringify(PlegarEditor2D.getData())')==old
+  # Alta completa de una pieza nueva desde 2D.
+  page.locator('#ed-create-piece').click()
+  page.locator('[data-np-field="name"]').fill('Soporte nuevo desde 2D')
+  page.locator('[data-np-field="name"]').dispatch_event('change')
+  page.locator('[data-np-field="width"]').fill('250')
+  page.locator('[data-np-field="width"]').dispatch_event('change')
+  page.locator('[data-np-field="thickness"]').fill('1.5')
+  page.locator('[data-np-field="thickness"]').dispatch_event('change')
+  page.locator('[data-np-action="add"]').click()
+  assert page.locator('#np-rows .np-row').count()==3
+  for i,measure in enumerate(['40','85','60']):
+   row=page.locator(f'[data-np-length="{i}"]')
+   row.fill(measure)
+   row.dispatch_event('change')
+  page.locator('[data-np-angle="0"]').fill('90')
+  page.locator('[data-np-angle="0"]').dispatch_event('change')
+  page.locator('[data-np-direction="0"]').select_option('down')
+  page.locator('[data-np-angle="1"]').fill('90')
+  page.locator('[data-np-angle="1"]').dispatch_event('change')
+  page.locator('[data-np-touch="2"]').click()
+  page.locator('[data-np-touch="1"]').click()
+  assert 'B2 → B1' in page.locator('#np-sequence').inner_text()
+  assert page.locator('#np-volume svg').count()==1
+  page.locator('[data-np-action="create"]').click()
+  assert page.locator('#new-piece-dialog').is_hidden()
+  assert page.evaluate('PlegarEditor2D.getData().name')=='Soporte nuevo desde 2D'
+  assert page.evaluate('PlegarEditor2D.getData().segments')==[40,85,60]
+  assert page.evaluate('PlegarEditor2D.getData().angles')==[-90,90]
+  assert page.evaluate('PlegarEditor2D.getData().sequence')==[2,1]
+  assert page.evaluate('PlegarEditor2D.getWidth()')==250
+  assert page.locator('#ed-dimensions-body tr').count()==3
   # Los módulos de cálculo ya no deben ser pantallas provisionales.
   if w<=1120:page.locator('#open-menu').click()
   page.locator('button.nav-item[data-screen="Calculadora de plegado"]').click()
@@ -194,6 +232,28 @@ with sync_playwright() as pw:
    document.querySelector('.p3-progress')?.value==='100'""",timeout=12000)
   page.locator('.p3-example-gallery [data-example-id="omega"]').click()
   assert len(page.evaluate('PlegarEditor2D.getData().segments'))==5
+  assert page.locator('.p3-svg polygon[data-group="sheet"]').count()>0
+  # Crear desde Programación 3D con el mismo formulario, conservando la geometría real.
+  assert page.locator('.p3-new-piece').is_visible()
+  page.locator('.p3-new-piece').click()
+  assert 'PROGRAMACIÓN 3D' in page.locator('#np-title').inner_text()
+  page.locator('[data-np-field="name"]').fill('Perfil creado desde 3D')
+  page.locator('[data-np-field="name"]').dispatch_event('change')
+  page.locator('[data-np-field="width"]').fill('220')
+  page.locator('[data-np-field="width"]').dispatch_event('change')
+  page.locator('[data-np-length="0"]').fill('35')
+  page.locator('[data-np-length="0"]').dispatch_event('change')
+  page.locator('[data-np-length="1"]').fill('75')
+  page.locator('[data-np-length="1"]').dispatch_event('change')
+  page.locator('[data-np-angle="0"]').fill('120')
+  page.locator('[data-np-angle="0"]').dispatch_event('change')
+  page.locator('[data-np-direction="0"]').select_option('down')
+  page.locator('[data-np-action="create"]').click()
+  assert page.locator('#module-title').inner_text()=='Programación 3D'
+  assert page.evaluate('PlegarEditor2D.getData().name')=='Perfil creado desde 3D'
+  assert page.evaluate('PlegarEditor2D.getData().segments')==[35,75]
+  assert page.evaluate('PlegarEditor2D.getData().angles')==[-120]
+  assert page.evaluate('PlegarEditor2D.getWidth()')==220
   assert page.locator('.p3-svg polygon[data-group="sheet"]').count()>0
   assert page.evaluate('document.documentElement.scrollWidth <= innerWidth+2'),"Desbordamiento horizontal"
   assert not errors,(w,errors)

@@ -157,7 +157,7 @@ with sync_playwright() as pw:
   assert page.locator('.mfg-card').count()==1
   assert page.locator('.mfg-card [data-profile="cuello-cisne"]').count()==2
   assert 'H 120 mm' in page.locator('.mfg-card').inner_text()
-  assert 'R0,6 mm' in page.locator('.mfg-card').inner_text()
+  assert 'Radio R0.6 mm' in page.locator('.mfg-card').inner_text()
   assert page.locator('.mfg-card [data-tool-set]').count()==0
   page.locator('[data-mfg-filter="q"]').fill('')
   page.locator('[data-mfg-filter="brand"]').select_option('EUROSTAMP')

@@ -47,6 +47,42 @@
   if(maxX-minX<.001||maxY-minY<.001)throw Error('Dimensión de perfil inferior a 0,001 mm.');
   return {points:p,bounds:{minX,maxX,minY,maxY,width:maxX-minX,height:maxY-minY},areaMm2:Math.abs(area(p))};
  }
+ // Los bulges DXF describen arcos circulares firmados. Aproximamos
+ // únicamente la representación, con desviación de cuerda máxima de 0,05 mm.
+ // No se pierde el dato de que hubo curvas y nunca se certifica su geometría.
+ const CHORD_ERROR_MM=.05;
+ function sampleBulges(raw){
+  const points=[],endpoints=raw.slice();
+  if(endpoints.length>3&&dist2(endpoints[0],endpoints[endpoints.length-1])<1e-10){
+   if(Math.abs(endpoints[endpoints.length-1].bulge||0)>1e-10)throw Error('Último vértice de cierre con bulge ambiguo.');
+   endpoints.pop();
+  }
+  let arcCount=0;
+  for(let i=0;i<endpoints.length;i++){
+   const a=endpoints[i],b=endpoints[(i+1)%endpoints.length],bulge=a.bulge||0;
+   if(!finite(bulge)||Math.abs(bulge)>1000)throw Error('Bulge DXF no válido.');
+   points.push({x:a.x,y:a.y});
+   if(Math.abs(bulge)<1e-10)continue;
+   const chord=Math.hypot(b.x-a.x,b.y-a.y);
+   if(chord<1e-9)throw Error('Arco DXF con extremos coincidentes.');
+   const theta=4*Math.atan(bulge);
+   if(Math.abs(theta)>=2*Math.PI-1e-6)throw Error('Arco de vuelta completa no compatible con una sola cuerda.');
+   const radius=chord*(1+bulge*bulge)/(4*Math.abs(bulge));
+   const offset=chord*(1-bulge*bulge)/(4*bulge);
+   const cx=(a.x+b.x)/2+(-(b.y-a.y)/chord)*offset;
+   const cy=(a.y+b.y)/2+((b.x-a.x)/chord)*offset;
+   const start=Math.atan2(a.y-cy,a.x-cx);
+   const step=2*Math.acos(Math.max(-1,Math.min(1,1-CHORD_ERROR_MM/radius)));
+   const n=Math.max(2,Math.ceil(Math.abs(theta)/Math.max(step,.000001)));
+   if(n>MAX_POINTS||points.length+n-1>MAX_POINTS)throw Error('Perfil curvo demasiado complejo. Simplifica el DXF sin superar error de 0,05 mm.');
+   for(let k=1;k<n;k++){
+    const angle=start+theta*k/n;
+    points.push({x:cx+radius*Math.cos(angle),y:cy+radius*Math.sin(angle)});
+   }
+   arcCount++;
+  }
+  return {points,arcCount,chordErrorMm:arcCount?CHORD_ERROR_MM:0};
+ }
  function parseDXF(input,{confirmUnitlessMm=false}={}){
   if(typeof input!=='string'||input.length>MAX_SIZE||input.length<30)throw Error('DXF ASCII demasiado grande, vacío o inválido (máximo 750 KB).');
   if(input.includes('\0'))throw Error('DXF binario no admitido. Exporta en ASCII.');
@@ -81,30 +117,33 @@
     for(i++;i<pairs.length&&pairs[i].code!==0;i++)row.push(pairs[i]);
     i--;
     const flags=Number(row.find(a=>a.code===70)?.value||0);
-    const points=[];let bulge=false,variableWidth=false;
+    const points=[];let variableWidth=false;
     for(const c of row){
-     if(c.code===10)points.push({x:Number(c.value),y:null});
+     if(c.code===10)points.push({x:Number(c.value),y:null,bulge:0});
      if(c.code===20){if(!points.length||points[points.length-1].y!==null)throw Error('Vértices DXF sin pareja X/Y.');points[points.length-1].y=Number(c.value);}
-     if(c.code===42&&Math.abs(Number(c.value))>1e-10)bulge=true;
+     if(c.code===42){
+      if(!points.length)throw Error('Bulge sin vértice DXF.');
+      points[points.length-1].bulge=Number(c.value);
+     }
      if([40,41,43].includes(c.code)&&Math.abs(Number(c.value))>1e-10)variableWidth=true;
      if([210,220,230].includes(c.code)&&c.code!==230&&Math.abs(Number(c.value))>1e-10)throw Error('Plano DXF inclinado: convertir a vista XY.');
     }
-    if(bulge)throw Error('DXF con arcos/bulges: no se admiten como rectas. Convierte los arcos en contorno CAD validado.');
     if(variableWidth)throw Error('DXF con anchura de polilínea variable no admitida.');
     if(points.some(p=>p.y===null))throw Error('Vértice sin Y.');
     if(!(flags&1)&&!(points.length>2&&dist2(points[0],points[points.length-1])<1e-10))
      throw Error('La polilínea debe estar cerrada.');
     const count=row.find(c=>c.code===90);
     if(count&&Number(count.value)!==points.length)throw Error('Conteo de vértices DXF inconsistente.');
-    polys.push(points);
+    polys.push(sampleBulges(points));
    }else if(['LINE','ARC','CIRCLE','SPLINE','ELLIPSE','POLYLINE','VERTEX','INSERT','HATCH','REGION','3DSOLID'].includes(q.value)){
     unsupported.push(q.value);
    }
   }
   if(!entities||!polys.length)throw Error('Se requiere DXF ASCII con una LWPOLYLINE cerrada en ENTITIES.');
   if(polys.length!==1||unsupported.length)throw Error('El archivo contiene varios perfiles o entidades geométricas no soportadas ('+unsupported.slice(0,4).join(', ')+'). Exporta únicamente una sección exterior cerrada.');
-  const result=validatePoints(polys[0]);
-  return {...result,unit:'mm',unitsDeclared:units===4,sourceFormat:'DXF ASCII LWPOLYLINE',geometryCertified:false,collisionApproved:false};
+  const result=validatePoints(polys[0].points);
+  return {...result,arcCount:polys[0].arcCount,chordErrorMm:polys[0].chordErrorMm,
+   unit:'mm',unitsDeclared:units===4,sourceFormat:'DXF ASCII LWPOLYLINE',geometryCertified:false,collisionApproved:false};
  }
  function normalizeRecord(r){
   if(!r||typeof r!=='object')throw Error('Registro no válido.');
@@ -120,7 +159,8 @@
   return {id,brand:r.brand,kind:r.kind,code,name,
    lengthMm,points:geometry.points,bounds:geometry.bounds,areaMm2:geometry.areaMm2,
    sourceFile:String(r.sourceFile||'').slice(0,140),importedAt:String(r.importedAt||''),
-   unitsDeclared:r.unitsDeclared===true,sourceFormat:'DXF ASCII LWPOLYLINE',
+   unitsDeclared:r.unitsDeclared===true,arcCount:Number.isInteger(r.arcCount)&&r.arcCount>0?r.arcCount:0,
+   chordErrorMm:r.arcCount>0?CHORD_ERROR_MM:0,sourceFormat:'DXF ASCII LWPOLYLINE',
    geometryCertified:false,collisionApproved:false,simulatable:false};
  }
  function read(){
@@ -138,7 +178,8 @@
   const parsed=parseDXF(dxfText,opts),list=read();
   if(list.length>=MAX_FILES)throw Error('Máximo de '+MAX_FILES+' perfiles locales. Exporta y elimina uno antes de añadir.');
   const uid='local-'+(Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,10));
-  const r=normalizeRecord({...metadata,id:uid,points:parsed.points,unitsDeclared:parsed.unitsDeclared,importedAt:new Date().toISOString()});
+  const r=normalizeRecord({...metadata,id:uid,points:parsed.points,unitsDeclared:parsed.unitsDeclared,
+    arcCount:parsed.arcCount,importedAt:new Date().toISOString()});
   store([r,...list]);return r;
  }
  function remove(id){const list=read();store(list.filter(r=>r.id!==id));return list.length!==read().length;}
@@ -168,15 +209,16 @@
   '<div class="mfg-dual">'+render(r,'2d')+render(r,'3d')+'</div>'+
   '<strong>'+esc(r.brand)+' · '+esc(r.code)+'</strong><p>'+esc(r.name)+'</p>'+
   '<small>Perfil de sección importado: '+num(r.bounds.width)+' × '+num(r.bounds.height)+' mm'+
-   (r.lengthMm!==null?' · Largo declarado '+num(r.lengthMm)+' mm':' · Longitud axial desconocida')+'</small>'+
+   (r.lengthMm!==null?' · Largo declarado '+num(r.lengthMm)+' mm':' · Longitud axial desconocida')+
+   (r.arcCount?' · '+r.arcCount+' arco(s) discretizados; error de cuerda ≤0,05 mm':'')+'</small>'+
   '<small>Origen: archivo local '+esc(r.sourceFile||'sin nombre')+(r.unitsDeclared?' · mm en DXF':' · mm confirmados manualmente')+'</small>'+
   '<span class="mfg-warning">PERFIL IMPORTADO · amarre/capacidad sin certificar · NO COLISIONES/CNC</span>'+
   '<button type="button" data-dxf-remove="'+esc(r.id)+'">Eliminar esta copia local</button></article>';
  function html(){
   return '<section class="tool-dxf-importer" aria-label="Importar perfiles CAD DXF en milímetros">'+
    '<details><summary>Importar perfil DXF de punzón o matriz · ver sección 2D y volumen 3D</summary>'+
-   '<p>Importa un <strong>DXF ASCII con una sola polilínea LWPOLYLINE cerrada</strong>, sección de contorno exterior, sin arcos, bloques ni huecos. '+
-   'Los puntos se leen en milímetros, sin reescalar. DXF 3D, STEP, SPLINE, radios bulge, varios perfiles y unidades diferentes deben convertirse externamente sin perder geometría. '+
+   '<p>Importa un <strong>DXF ASCII con una sola polilínea LWPOLYLINE cerrada</strong>, sección de contorno exterior, con segmentos rectos o arcos circulares DXF (bulge) aproximados con error de cuerda máximo 0,05 mm; sin bloques ni huecos. '+
+   'Los puntos se leen en milímetros, sin reescalar. DXF 3D, STEP, SPLINE, varios perfiles y unidades diferentes deben convertirse externamente sin perder geometría. '+
    'No se publica el archivo: queda únicamente en este navegador.</p>'+
    '<form class="tool-dxf-form"><label>Marca<select name="brand">'+BRANDS.map(x=>'<option>'+esc(x)+'</option>').join('')+'</select></label>'+
    '<label>Tipo<select name="kind"><option value="punch">Punzón</option><option value="die">Matriz</option></select></label>'+

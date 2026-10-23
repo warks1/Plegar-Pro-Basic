@@ -30,17 +30,17 @@ test('v0.23: un codo o contorno cerrado correcto no genera falsos solapes',()=>{
  const r=Core.inspect(doc);assert.equal(r.summary.overlaps,0);assert.equal(r.summary.crossings,0);assert.equal(r.summary.nearGaps,0);
 });
 test('v0.23: localiza coordenadas de un cruce entre dos líneas y deja informe bloqueado',()=>{
- const r=check(line('A',[0,0],[10,10])+line('A',[0,10],[10,0]));
+ const r=inspect(line('A',[0,0],[10,10])+line('A',[0,10],[10,0]));
  assert.equal(r.version,'0.23');assert.deepEqual(r.examples[0].point_mm,{x:5,y:5});
  assert.equal(r.readiness.canGenerateSolid,false);
 });
 test('v0.23: calcula un punto aproximado de la distancia mínima sin confundir proximidad y contacto',()=>{
- const r=check(line('A',[0,0],[10,0])+line('A',[5,0.04],[5,3]),{joinTolerance:0.1});
+ const r=inspect(line('A',[0,0],[10,0])+line('A',[5,0.04],[5,3]),{joinTolerance:0.1});
  assert.equal(r.summary.nearGaps,1);
  assert.equal(r.examples[0].gap_mm,0.04);
  assert.deepEqual(r.examples[0].point_mm,{x:5,y:0.02});
 });
 test('v0.23: la unión en T registra la ubicación del contacto',()=>{
- const r=check(line('A',[0,0],[10,0])+line('A',[4,-3],[4,0]));
+ const r=inspect(line('A',[0,0],[10,0])+line('A',[4,-3],[4,0]));
  assert.equal(r.summary.tJunctions,1);assert.deepEqual(r.examples[0].point_mm,{x:4,y:0});
 });

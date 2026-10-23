@@ -249,7 +249,7 @@ with sync_playwright() as pw:
   page.locator('[data-np-angle="0"]').dispatch_event('change')
   page.locator('[data-np-direction="0"]').select_option('down')
   page.locator('[data-np-action="create"]').click()
-  assert page.locator('#module-title').inner_text()=='Programación 3D'
+  assert page.locator('#module-title').inner_text()=='Programación 3D', {'actual':page.locator('#module-title').inner_text(),'dialogOpen':page.locator('#new-piece-dialog').evaluate('(e)=>e.open'),'wizardStatus':page.locator('#np-status').inner_text(),'name':page.evaluate('PlegarEditor2D.getData().name')}
   assert page.evaluate('PlegarEditor2D.getData().name')=='Perfil creado desde 3D'
   assert page.evaluate('PlegarEditor2D.getData().segments')==[35,75]
   assert page.evaluate('PlegarEditor2D.getData().angles')==[-120]

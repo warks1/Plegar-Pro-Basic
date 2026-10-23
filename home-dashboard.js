@@ -59,6 +59,7 @@ function setMode(mode){
  if(photo)photo.hidden=state.mode!=='photo';
  if(cad)cad.hidden=state.mode!=='cad';
  const readout=$('#home-stage-readout');if(readout)readout.hidden=state.mode!=='cad';
+ const legend=$('#home-part-legend');if(legend)legend.hidden=state.mode!=='cad';
  const imgButton=$('#realistic-option'),modelButton=$('#home-view-model');
  for(const [button,pressed] of [[imgButton,state.mode==='photo'],[modelButton,state.mode==='cad']]){
   if(button){button.setAttribute('aria-pressed',String(pressed));button.classList.toggle('selected',pressed);}

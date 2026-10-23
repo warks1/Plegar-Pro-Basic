@@ -259,8 +259,20 @@ with sync_playwright() as pw:
    assert 'BLOQUEADA' in page.locator('#ed-auto-plan').inner_text()
    assert sorted(page.evaluate('PlegarEditor2D.getData().sequence'))==[1,2,3,4]
   assert 'NO CNC' in page.locator('#ed-auto-plan').inner_text()
+  page.evaluate("""() => {
+   window.__ppClicks=[];
+   const gallery=document.querySelector('#ed-example-gallery');
+   window.__ppGalleryStatus={gallery:!!gallery,parent:gallery?.parentElement?.id,
+    targetConnected:!!document.querySelector('[data-example-id="u"]')?.isConnected,
+    handler:typeof document.querySelector('#module-sample')?.onclick,
+    example:!!window.PlegarExamples3D?.get('u')};
+   document.addEventListener('click',e=>{
+    window.__ppClicks.push({tag:e.target.tagName,button:e.target.closest?.('[data-example-id]')?.dataset.exampleId,
+     path:e.composedPath().slice(0,5).map(el=>el.id||el.tagName)});
+   },true);
+  }""")
   page.locator('#ed-example-gallery [data-example-id="u"]').click()
-  assert page.evaluate('PlegarEditor2D.getData().segments')==[55,100,55], f"Canal U no se cargó: {page.evaluate('PlegarEditor2D.getData()')} errores={errors[-3:]}"
+  assert page.evaluate('PlegarEditor2D.getData().segments')==[55,100,55], f"Canal U no se cargó: {page.evaluate('PlegarEditor2D.getData()')} errores={errors[-3:]} clicks={page.evaluate('window.__ppClicks')} gallery={page.evaluate('window.__ppGalleryStatus')}"
   page.locator('[data-ed-position="2"]').select_option('1')
   assert page.evaluate('PlegarEditor2D.getData().sequence')==[2,1]
   page.locator('#ed-order-reset').click()

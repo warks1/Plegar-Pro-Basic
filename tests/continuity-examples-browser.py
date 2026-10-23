@@ -241,6 +241,18 @@ with sync_playwright() as pw:
   assert 'zoom 1.20×' in page.locator('.tool-dxf-3d-canvas').text_content()
   page.locator('[data-dxf-3d-action="close"]').click()
   assert page.locator('.tool-dxf-3d-viewer').is_hidden()
+  # El usuario puede añadir o corregir el largo más tarde; no altera la sección.
+  before_section=page.evaluate("JSON.stringify(PlegarToolDXF.read()[0].points)")
+  page.locator('.tool-dxf-card [data-dxf-length-input]').fill('835')
+  page.locator('.tool-dxf-card [data-dxf-length-save]').click()
+  assert page.evaluate('PlegarToolDXF.read()[0].lengthMm')==835
+  assert page.evaluate("JSON.stringify(PlegarToolDXF.read()[0].points)")==before_section
+  page.locator('.tool-dxf-card [data-dxf-3d-open]').click()
+  assert 'L axial 835 mm' in page.locator('.tool-dxf-3d-canvas').text_content()
+  page.locator('[data-dxf-3d-action="close"]').click()
+  page.locator('.tool-dxf-card [data-dxf-length-input]').fill('')
+  page.locator('.tool-dxf-card [data-dxf-length-save]').click()
+  assert page.evaluate('PlegarToolDXF.read()[0].lengthMm') is None
   # Exportación CAD de la sección importada: los huecos siguen siendo vacíos en DXF y SVG.
   assert page.locator('[data-dxf-section]').count()==2
   result=page.evaluate("""() => {

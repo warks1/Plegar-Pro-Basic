@@ -334,3 +334,31 @@ test('DXF incompleto, EOF ausente o código de grupo sin valor se rechaza',()=>{
  assert.throws(()=>D.parseDXF(text+'10'),/truncado/);
  assert.throws(()=>D.parseDXF(text.replace('0\nLWPOLYLINE\n','0\nLWPOLYLINE\n38\nno-es-numero\n')),/elevada/);
 });
+
+
+test('La longitud axial puede modificarse o borrarse sin alterar los puntos de la sección DXF',()=>{
+ const r=D.add({brand:'MECOS',kind:'punch',code:'P-R1',name:'Perfil importado',lengthMm:835},dxf());
+ const points=structuredClone(D.read()[0].points);
+ const edited=D.updateLength(r.id,'1200');
+ assert.equal(edited.lengthMm,1200);
+ assert.equal(D.read()[0].lengthMm,1200);
+ assert.deepEqual(D.read()[0].points,points);
+ const backup=JSON.parse(D.exportBackup());
+ assert.equal(backup.profiles[0].lengthMm,1200);
+ const unknown=D.updateLength(r.id,'');
+ assert.equal(unknown.lengthMm,null);
+ assert.equal(D.read()[0].lengthMm,null);
+ assert.deepEqual(D.read()[0].points,points);
+ D.remove(r.id);
+});
+test('La edición axial rechaza valores imposibles o inexistentes sin perder los anteriores',()=>{
+ const r=D.add({brand:'Bystronic',kind:'die',code:'V20',name:'Matriz prueba',lengthMm:400},dxf());
+ const original=JSON.stringify(D.read());
+ for(const invalid of ['-1','99999','no-es-numero','Infinity',{},true]){
+  assert.throws(()=>D.updateLength(r.id,invalid),/Longitud/);
+  assert.equal(JSON.stringify(D.read()),original);
+ }
+ assert.throws(()=>D.updateLength('local-id-inexistente','500'),/no encontrado/);
+ assert.equal(JSON.stringify(D.read()),original);
+ D.remove(r.id);
+});

@@ -324,6 +324,16 @@
     arcCount:parsed.arcCount,sourceFormat:parsed.sourceFormat,importedAt:new Date().toISOString()});
   store([r,...list]);return r;
  }
+ function updateLength(id,value){
+  const arr=read(),i=arr.findIndex(r=>r.id===id);
+  if(i<0)throw Error('Perfil local no encontrado.');
+  if(!(value===null||value===''||value===undefined||typeof value==='number'||typeof value==='string'))
+   throw Error('Longitud axial introducida no válida.');
+  const changed=normalizeRecord({...arr[i],lengthMm:value});
+  arr[i]=changed;
+  store(arr);
+  return changed;
+ }
  function remove(id){const list=read();store(list.filter(r=>r.id!==id));return list.length!==read().length;}
  // Exportación vectorial sólo de secciones verificadas por el parser:
  // perfil exterior + huecos. Nunca exporta un volumen CAD ni NC.
@@ -415,6 +425,12 @@
    ' · '+r.holeCount+' hueco(s) · sección neta '+num(r.areaMm2)+' mm²</small>'+
   '<small>Origen: archivo local '+esc(r.sourceFile||'sin nombre')+' · '+esc(r.sourceFormat)+(r.unitsDeclared?' · mm en DXF':' · mm confirmados manualmente')+'</small>'+
   '<span class="mfg-warning">PERFIL IMPORTADO · amarre/capacidad sin certificar · NO COLISIONES/CNC</span>'+
+  '<div class="tool-dxf-length-editor" role="group" aria-label="Longitud axial declarada">'+
+  '<label>Largo axial nominal (mm, solo si se conoce)'+
+  '<input type="number" data-dxf-length-input="'+esc(r.id)+'" step="0.01" min="0.01" max="10000" '+
+  'inputmode="decimal" placeholder="Sin medir" value="'+(r.lengthMm===null?'':r.lengthMm)+'"></label>'+
+  '<button type="button" data-dxf-length-save="'+esc(r.id)+'">Guardar largo / dejar desconocido</button>'+
+  '<small>Dato introducido por el usuario; no certificado por el fabricante. No modifica los puntos DXF.</small></div>'+
   '<div class="tool-dxf-file-actions">'+
   '<button type="button" data-dxf-3d-open="'+esc(r.id)+'">Inspeccionar 3D · girar y ampliar</button>'+
   '<button type="button" data-dxf-section="dxf" data-dxf-id="'+esc(r.id)+'">Exportar sección DXF (mm)</button>'+
@@ -560,6 +576,20 @@
    finally{target.value='';}
   };
   host.onclick=e=>{
+   const saveLength=e.target.closest('[data-dxf-length-save]');
+   if(saveLength){
+    const id=saveLength.getAttribute('data-dxf-length-save'),input=[...host.querySelectorAll('[data-dxf-length-input]')]
+     .find(x=>x.getAttribute('data-dxf-length-input')===id);
+    try{
+     if(!input)throw Error('Campo de longitud no disponible.');
+     const result=updateLength(id,input.value.trim());
+     paint();
+     feedback().textContent=result.lengthMm===null?
+      'Longitud axial borrada; el visor señala dato desconocido.':
+      'Largo axial guardado: '+number(result.lengthMm)+' mm, dato manual NO verificado.';
+    }catch(err){feedback().textContent='No se guardó la longitud: '+err.message;}
+    return;
+   }
    const open=e.target.closest('[data-dxf-3d-open]');
    if(open){
     selected3D=open.getAttribute('data-dxf-3d-open');
@@ -596,5 +626,5 @@
   };
   paint();
  }
- return {KEY,BRANDS,parseDXF,validatePoints,validateGeometry,normalizeRecord,add,read,remove,store,exportBackup,importBackup,exportSectionDXF,exportSectionSVG,render,html,mount};
+ return {KEY,BRANDS,parseDXF,validatePoints,validateGeometry,normalizeRecord,add,updateLength,read,remove,store,exportBackup,importBackup,exportSectionDXF,exportSectionSVG,render,html,mount};
 });

@@ -1,0 +1,72 @@
+/* v0.47: explorador acotado de secuencias con cribado geométrico CONSERVADOR.
+ * No declarar secuencias viables ni aprobar fabricación sin CAD de máquina/útiles.
+ */
+(function(root,factory){
+ const api=factory(
+  typeof module==='object'&&module.exports?require('./geometry2d.js'):root.PlegarGeometry2D,
+  typeof module==='object'&&module.exports?require('./bendcalc.js'):root.PlegarBendCalc,
+  typeof module==='object'&&module.exports?require('./forming2d.js'):root.PlegarFormingGeometry,
+  typeof module==='object'&&module.exports?require('./machine-clearance.js'):root.PlegarMachineClearance);
+ if(typeof module==='object'&&module.exports)module.exports=api;else root.PlegarSequencePlanner=api;
+})(typeof globalThis!=='undefined'?globalThis:this,function(G,C,F,Clearance){
+ 'use strict';
+ function hasOmega(profile){return Clearance.omegaPocket(profile)!==null;}
+ function step(profile,chosen,id){
+  const n=profile.angles.length,sequence=[...chosen,id,...Array.from({length:n},(_,i)=>i+1).filter(v=>v!==id&&!chosen.includes(v))];
+  const candidate={...profile,sequence},idx=chosen.length;
+  const scene=F.scene(candidate,idx,1),scan=Clearance.inspect(candidate,scene);
+  const die=C.DIES.find(d=>d.id===candidate.setup.die),angle=Math.abs(candidate.angles[id-1]),interior=180-angle;
+  const left=candidate.segments[id-1],right=candidate.segments[id],v=die.opening;
+  const issues=[];
+  let cost=1;
+  if(interior<die.angle||interior<C.PUNCHES.find(p=>p.id===candidate.setup.punch).angle){
+   cost+=120;issues.push('Ángulo interior menor que el ángulo de herramienta.');
+  }
+  if(Math.min(left,right)<.7*v){cost+=45;issues.push('Ala bajo 0,7×V; apoyo por revisar.');}
+  if(scan.possibleTableContact){cost+=100;issues.push('Posible choque con mesa en perfil nominal.');}
+  if(scene.interferences?.problems?.some(p=>p.code==='PRIOR_FLANGE_NEAR_TOOL')){cost+=60;issues.push('Posible choque con punzón, matriz o tope.');}
+  // Un perfil con retorno se cierra prematuramente si ejecuta primero los bordes.
+  // Se usa para priorizar pruebas, nunca para declarar una secuencia apta.
+  if(hasOmega(profile)){
+   const n2=n-1;
+   if((id===1||id===n)&&!(chosen.includes(2)&&chosen.includes(n2)))cost+=35;
+   if((id===2||id===n2)&&chosen.length===0)cost-=.15;
+  }
+  // Prefiere estados que todavía permiten acceder a las líneas centrales.
+  if(chosen.length===0&&n>2)cost+=Math.abs(id-(n+1)/2)*.2;
+  return {bend:id,score:cost,issues,scan};
+ }
+ function evaluate(profile,sequence){
+  let score=0;const rows=[],issues=[];
+  for(let i=0;i<sequence.length;i++){
+   const r=step(profile,sequence.slice(0,i),sequence[i]);
+   score+=r.score;
+   rows.push({position:i+1,bend:r.bend,score:r.score,issues:r.issues,tableGap:r.scan.tableGap});
+   for(const msg of [...r.issues,...r.scan.alerts])if(!issues.includes(msg))issues.push(msg);
+  }
+  return {sequence:[...sequence],score:Math.round(score*100)/100,rows,issues,
+   status:'CRIBADO NOMINAL · NO VERIFICADO',physicallyValidated:false,cncApproved:false};
+ }
+ function suggest(source,{beamWidth=18,limit=4}={}){
+  const profile={...G.validate(source),setup:C.validateSetup(source.setup)},n=profile.angles.length;
+  if(!Number.isInteger(beamWidth)||beamWidth<1||beamWidth>60||!Number.isInteger(limit)||limit<1||limit>10)throw Error('Límites de búsqueda inválidos.');
+  const current=evaluate(profile,profile.sequence);
+  if(n>12)return {current,best:null,alternatives:[],searched:0,note:'Más de 12 pliegues: cálculo acotado no ejecutado. Revisar secuencia manualmente. NO CNC.'};
+  let beam=[{sequence:[],score:0}],searched=0;
+  for(let depth=0;depth<n;depth++){
+   const next=[];
+   for(const item of beam)for(let id=1;id<=n;id++){
+    if(item.sequence.includes(id))continue;
+    const partial=step(profile,item.sequence,id);
+    next.push({sequence:[...item.sequence,id],score:item.score+partial.score});
+    searched++;
+   }
+   next.sort((a,b)=>a.score-b.score||a.sequence.join(',').localeCompare(b.sequence.join(',')));
+   beam=next.slice(0,beamWidth);
+  }
+  const alternatives=beam.slice(0,limit).map(item=>evaluate(profile,item.sequence));
+  return {current,best:alternatives[0]||null,alternatives,searched,
+   note:'Orden sugerido por cribado discreto y reglas orientativas. La mesa y la trancha no están modeladas con CAD real; tampoco se comprueban todos los volteos ni los movimientos de extracción. NINGÚN orden está validado para CNC.'};
+ }
+ return {step,evaluate,suggest};
+});

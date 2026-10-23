@@ -69,9 +69,9 @@
  function error(message=''){
   const el=$('#np-status',dialog);if(el){el.textContent=message;el.setAttribute('data-error',String(Boolean(message)));}
  }
- function paint(){
+ function paint(rebuildRows=true){
   const host=$('#np-rows',dialog);if(!host)return;
-  host.innerHTML=rows();
+  if(rebuildRows)host.innerHTML=rows();
   const readout=$('#np-sequence',dialog);
   readout.textContent='Orden: '+draft.sequence.map(n=>'B'+n).join(' → ')+(picked.length?' · seleccionando paso '+(picked.length+1):'');
   $('#np-count',dialog).textContent=draft.segments.length+' tramos · '+draft.angles.length+' pliegues';
@@ -162,7 +162,7 @@
      if(key.startsWith('setup.'))draft.setup[key.slice(6)]=normalized;
      else draft[key]=normalized;
     }else{return;}
-    error();paint();
+    error();paint(target.matches('[data-np-position]'));
    }catch(ex){error(ex.message);}
   });
  }

@@ -12,7 +12,7 @@
  'use strict';
  const palette={sheet:{upper:'#57c7f1',lower:'#196b9c',edge:'#9cecff'},
  punch:{cap:'#d8e8f4',side:'#8da7ba'},die:{cap:'#9aaec1',side:'#526f86'},
- gauge:{cap:'#ffcd83',side:'#ae7a42'}};
+ gauge:{cap:'#ffcd83',side:'#ae7a42'},table:{cap:'#8193a2',side:'#4a5968'},ram:{cap:'#bec6d1',side:'#6c7889'}};
  const esc=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
  function steps(profile){return G.validate(profile).angles.length+2;}
  function frame(profile,stage,progress=0){
@@ -47,7 +47,7 @@
    const diffuse=Math.abs((n.x*light.x+n.y*light.y+n.z*light.z)/norm);
    const group=f.group||'sheet',kind=f.kind;
    const base=group==='sheet'?(kind==='edge'?[117,177,203]:kind==='lower'?[74,129,155]:[148,199,222])
-    :group==='punch'?[162,173,187]:group==='die'?[103,119,137]:[203,165,105];
+    :group==='punch'?[162,173,187]:group==='die'?[103,119,137]:group==='table'?[85,103,120]:group==='ram'?[147,158,171]:[203,165,105];
    const factor=.62+.48*diffuse;
    const fill='rgb('+base.map(n=>Math.min(255,Math.round(n*factor))).join(',')+')';
    const edge=group==='sheet'?'#dcf4ff':'#344657';

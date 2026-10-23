@@ -118,6 +118,25 @@ with sync_playwright() as pw:
   assert len(svg_views)==8 and len(set(svg_views))==8,'Cada tarjeta debe mostrar un plano 2D y una geometría 3D propios'
   assert page.locator('#ed-quick-material').count()==1 and page.locator('#ed-quick-punch').count()==1
   assert page.locator('#ed-quick-die').count()==1
+  # Tabla de programación prioritaria con cotas editables y sincronizadas.
+  assert page.locator('#ed-dimensions-body tr').count()==page.evaluate('PlegarEditor2D.getData().segments.length')
+  assert page.locator('.ed-dimensions-panel').is_visible()
+  assert page.locator('.ed-dimensions-panel').evaluate('(el)=>el.compareDocumentPosition(document.querySelector(".ed-quick-setup")) & Node.DOCUMENT_POSITION_FOLLOWING')!=0
+  first=page.locator('#ed-dimensions-body [data-ed-segment="0"]')
+  original=first.input_value()
+  first.fill('72')
+  first.dispatch_event('change')
+  assert page.evaluate('PlegarEditor2D.getData().segments[0]')==72
+  assert '72 mm' in page.locator('#ed-dimensions-total').inner_text() or '72' in page.locator('#ed-dimensions-body tr').first.inner_text()
+  page.locator('#ed-dimensions-body [data-ed-angle="0"]').fill('-83')
+  page.locator('#ed-dimensions-body [data-ed-angle="0"]').dispatch_event('change')
+  assert page.evaluate('PlegarEditor2D.getData().angles[0]')==-83
+  assert page.locator('#ed-svg .ed-bend-point').count()==page.evaluate('PlegarEditor2D.getData().angles.length')
+  page.locator('#ed-dimensions-body [data-ed-segment="0"]').fill(original)
+  page.locator('#ed-dimensions-body [data-ed-segment="0"]').dispatch_event('change')
+  # El aviso vacío no debe ocultar los botones inferiores.
+  assert page.locator('#toast').evaluate('(el)=>getComputedStyle(el).visibility')=='hidden'
+  assert page.locator('#toast').evaluate('(el)=>getComputedStyle(el).pointerEvents')=='none'
   page.locator('#ed-quick-material').select_option('Inox 304')
   assert page.evaluate('PlegarEditor2D.getData().material')=='Inox 304'
   page.locator('#ed-quick-thickness').fill('1.5')

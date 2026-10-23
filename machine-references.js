@@ -32,7 +32,25 @@
     throw new Error('No utilizar dimensiones de mesa/trancha no medidas.');
   return x;
  }
- function html(){
+ function inputRows(setup={}){
+  // Sólo se muestran medidas aportadas al programa; nunca se precargan desde la ficha de venta.
+  const fields=[
+   ['dieHeight','Altura H de matriz','Desde apoyo inferior de matriz hasta hombros de la V',5,400],
+   ['tableLeft','Mesa hacia X−','Desde el eje de la V hasta el borde del volumen de mesa en el perfil (lado X−)',20,2000],
+   ['tableRight','Mesa hacia X+','Desde el eje de la V hasta el borde del volumen de mesa en el perfil (lado X+)',20,2000],
+   ['ramWidth','Anchura local de trancha','Anchura de la parte inferior de trancha que pueda interferir con la chapa',20,2000],
+   ['ramBottomOffset','Separación punta-trancha','Distancia vertical desde punta de punzón a cara inferior de trancha',10,500]
+  ];
+  return fields.map(([id,label,detail,min,max])=>{
+   const val=setup?.[id],value=val===null||val===undefined||val===''?'':Number(val);
+   const printable=value===''||!Number.isFinite(value)?'':String(value);
+   return '<label class="machine-measurement-field"><span>'+label+' (mm)</span>'+
+    '<small>'+detail+'</small>'+
+    '<input type="number" step="0.1" inputmode="decimal" min="'+min+'" max="'+max+'" '+
+    'data-machine-measure="'+id+'" value="'+printable+'" placeholder="Sin medir" aria-label="'+label+' (mm)"></label>';
+  }).join('');
+ }
+ function html(setup={}){
   const r=validateMachineRef(reference);
   return '<section class="machine-reference" aria-label="Datos de plegadora Bystronic de 2006">'+
    '<h2>Bystronic EP II 31-100 · Año 2006</h2>'+
@@ -47,9 +65,16 @@
    '<p><b>Mesa:</b> anchura de sección transversal, extensión real delante/detrás de la V y altura de soporte de matriz no localizadas en la ficha.</p>'+
    '<p><b>Trancha:</b> anchura/espesor inferior, perfil real y distancia desde punta del punzón a la cara inferior de la trancha no publicados. Los <strong>200 mm son carrera</strong>, no anchura ni altura de la trancha.</p>'+
    '<p>Los 925 mm NO son la altura de matriz y los 400 mm NO son el ancho de mesa ni de trancha. No se aplican como cotas de colisión.</p>'+
+   '<div class="machine-measurement-editor" role="group" aria-label="Introducir medidas reales de máquina y utillaje">'+
+   '<h3>Medidas locales para simular colisiones (introducción manual)</h3>'+
+   '<p>Introduce únicamente cotas medidas en tu máquina o copiadas de un plano oficial de la unidad. Estas cifras pertenecen al programa activo y se muestran en Programación 2D y Simulación 3D. Deja vacíos los campos desconocidos.</p>'+
+   '<div class="machine-measurement-fields">'+inputRows(setup)+'</div>'+
+   '<button type="button" data-machine-save>Guardar medidas en el programa activo</button>'+
+   '<p class="machine-reference-warning">Estos datos permiten un cribado geométrico nominal, pero NO prueban que una trayectoria sea segura. No utilizar altura de mesa 925 mm ni carrera 200 mm para rellenar esta sección.</p>'+
+   '</div>'+
    '<p><a href="'+r.source.url+'" target="_blank" rel="noopener noreferrer">Consultar fuente del anuncio de 2006 ↗</a> · Revisado el '+r.source.checkedOn+'.</p>'+
    '<p class="machine-reference-warning">No utilizar esta ficha para autorizar pliegues, calcular trayectorias CNC ni garantizar ausencia de choques. Faltan planos y cotas calibradas de tu unidad.</p>'+
    '</section>';
  }
- return {reference,validateMachineRef,html};
+ return {reference,validateMachineRef,html,inputRows};
 });

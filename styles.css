@@ -180,3 +180,16 @@
  .machine-panel .player .speed{order:2;margin-left:auto}
  .machine-panel .player .timeline-wrap{flex:1 1 85px}
 }
+
+
+/* v0.56 · Medición manual de mesa y trancha: no se autocompleta desde ficha comercial. */
+.machine-measurement-editor{margin:18px 0 10px;padding:12px;border:1px solid #4c7795;border-radius:9px;background:#092035}
+.machine-measurement-editor h3{margin:0 0 9px;color:#8ad9ff;font-size:15px}
+.machine-measurement-editor>p{font-size:12px;line-height:1.5}
+.machine-measurement-fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:12px 0}
+.machine-measurement-field{border:1px solid #345a75;border-radius:7px;background:#102d44;padding:10px;display:flex;flex-direction:column;gap:6px;min-width:0}
+.machine-measurement-field>span{color:#f4faff;font-size:12px;font-weight:650}
+.machine-measurement-field small{color:#c0d5e4;font-size:11px;line-height:1.35;min-height:2.7em}
+.machine-measurement-field input{max-width:100%;width:100%;min-height:43px;background:#061927;border-radius:6px;border:1px solid #5b879f;color:#fff;padding:8px;font-size:15px}
+.machine-measurement-editor [data-machine-save]{border:1px solid #49a9ee;background:#0761a8;color:#fff;padding:11px 14px;font-weight:700;border-radius:7px;min-height:44px;max-width:100%}
+@media(max-width:620px){.machine-measurement-fields{grid-template-columns:minmax(0,1fr)}.machine-measurement-editor{padding:9px}}

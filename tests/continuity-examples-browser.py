@@ -113,6 +113,20 @@ with sync_playwright() as pw:
   assert '200 mm' in page.locator('.machine-reference').inner_text()
   assert page.locator('.machine-reference').locator('a[href*="bystronic-ep-ii-31-100"]').count()==1
   assert 'pendientes' in page.locator('.machine-reference').inner_text()
+  # Introducir cotas manuales NO convierte los 925/200 mm del anuncio en geometría.
+  for key,value in [('dieHeight','60'),('tableLeft','180'),('tableRight','160'),('ramWidth','95'),('ramBottomOffset','110')]:
+   page.locator(f'[data-machine-measure="{key}"]').fill(value)
+  page.locator('[data-machine-save]').click()
+  assert page.evaluate('PlegarEditor2D.getData().setup.dieHeight')==60
+  assert page.evaluate('PlegarEditor2D.getData().setup.ramWidth')==95
+  assert page.evaluate('PlegarEditor2D.getData().setup.tableRight')==160
+  assert page.locator('[data-machine-measure="tableLeft"]').input_value()=='180'
+  for key in ['dieHeight','tableLeft','tableRight','ramWidth','ramBottomOffset']:
+   page.locator(f'[data-machine-measure="{key}"]').fill('')
+  page.locator('[data-machine-save]').click()
+  assert page.evaluate('PlegarEditor2D.getData().setup.ramWidth') is None
+  assert page.evaluate('PlegarEditor2D.getData().setup.tableLeft') is None
+  assert page.evaluate('PlegarEditor2D.getData().setup.dieHeight') is None
   if w<=1120:page.locator('#open-menu').click()
   page.locator('button.nav-item[data-screen="Proyectos"]').click()
   assert page.locator('.project-work-buttons').count()>=12

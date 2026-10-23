@@ -129,7 +129,7 @@ function renderModule(name){
  }else if(name==='Simulación 3D'||name==='Simulación 2D'){
  content=`<div class="module-tile"><img src="assets/${name==='Simulación 3D'?'maquina':'seccion-2d'}.webp" alt="Referencia aprobada"/><strong>Imagen del boceto original</strong><p>Reproduce la identidad visual aprobada. No realiza simulación geométrica.</p><button type="button" data-screen="Inicio">Abrir panel principal</button></div><div class="module-tile"><strong>Controles de secuencia</strong><p>En Inicio puedes avanzar, retroceder o reproducir automáticamente los seis pasos ilustrativos.</p></div>`;
  }else if(name==='Máquinas'){
- content=window.PlegarMachineReferences?.html()||'<div class="module-tile">Ficha técnica de máquinas no disponible.</div>';
+ content=window.PlegarMachineReferences?.html(window.PlegarEditor2D?.getData()?.setup)||'<div class="module-tile">Ficha técnica de máquinas no disponible.</div>';
  }else if(name==='Utillaje'){
  content='<div class="module-tile"><img src="assets/utillaje.webp" alt="Utillaje de referencia"/><strong>Punzón y matriz del boceto</strong><p>Imagen ilustrativa. Datos dimensionales por verificar con fabricante.</p></div>';
  }else if(name==='Calculadora de plegado'||name==='Comparador de V'){
@@ -179,6 +179,21 @@ function projectAction(i,action){
 
 // Delegación: navegación y selecciones. Todas las superficies que actúan son botones reales.
 document.addEventListener('click',event=>{
+ if(event.target.closest('[data-machine-save]')){
+  const fields=[...document.querySelectorAll('.machine-measurement-editor [data-machine-measure]')],values={};
+  if(fields.length!==5){toast('Faltan campos de medida de máquina.');return;}
+  for(const field of fields)values[field.dataset.machineMeasure]=field.value.trim()===''?null:Number(field.value);
+  try{
+   if(!window.PlegarEditor2D?.setMachineEnvelope(values))throw Error('No se pudo guardar el programa activo.');
+   try{localStorage.setItem('plegarpro-machine-measurements-v1',JSON.stringify({
+    recordedAt:new Date().toISOString(),source:'Cotas introducidas manualmente; no verificadas por fabricante',
+    supplied:Object.keys(values).filter(key=>values[key]!==null)
+   }));}catch{/* La configuración de plegado ya queda en el programa activo. */}
+   renderModule('Máquinas');
+   toast('Cotas locales guardadas en el programa activo. Cribado NOMINAL: no se validan colisiones reales ni CNC.');
+  }catch(error){toast('Medida no guardada: '+error.message);}
+  return;
+ }
  const screen=event.target.closest('[data-screen]');if(screen){switchScreen(screen.dataset.screen);return;}
  const step=event.target.closest('[data-step]');if(step){stopPlayer();setStep(Number(step.dataset.step));return;}
  const chosenDie=event.target.closest('[data-dev-die]');if(chosenDie){

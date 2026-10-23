@@ -47,7 +47,7 @@ function buildNav(){
  $('#menu-nav').innerHTML=navGroups.map(group=>`<div class="nav-group"><div class="nav-heading">${group.title}</div>${group.items.map(([title,i,bg])=>`<button class="nav-item ${title===activeScreen?'active':''}" data-screen="${title}" type="button"><span class="nav-icon" style="--icon-bg:${bg}">${icon(i)}</span>${title}</button>`).join('')}</div>`).join('');
 }
 function renderProjects(){
- $('#projects').innerHTML=projects.slice(0,4).map((p,i)=>`<button class="project-row" type="button" data-project="${i}"><img src="assets/pieza-mini.webp" alt=""/><span class="ptext"><strong>${escapeHtml(p.name)}</strong><small>${escapeHtml(p.detail)}</small></span><time>${escapeHtml(p.time.slice(0,10))}</time></button>`).join('');
+ $('#projects').innerHTML=window.PlegarHomeDashboard?window.PlegarHomeDashboard.projectRows(projects):projects.slice(0,4).map((p,i)=>`<button class="project-row" type="button" data-project="${i}"><span class="home-project-thumb">${window.PlegarHome3D?.thumb(window.PlegarExamples3D.get(['u','z','omega','l'][i]).profile)||'Sin plano'}</span><span class="ptext"><strong>${escapeHtml(p.name)}</strong><small>Ejemplo 3D · pendiente de vincular plano</small></span></button>`).join('');
 }
 function renderMaterials(){
  $('#materials').innerHTML=materials.map(([title,thick],i)=>`<button type="button" class="material-row ${i===activeMaterial?'selected':''}" data-material="${i}"><img src="assets/chapa-mini.webp" alt=""/><strong>${title}</strong><small>${thick}</small></button>`).join('');
@@ -61,6 +61,7 @@ function setMaterial(index){
 }
 function chooseProject(i){
  const p=projects[i];if(!p)return;
+ if(window.PlegarHomeDashboard){window.PlegarHomeDashboard.selectProject(i);return;}
  $('#project-name').textContent=p.name;
  toast(`Proyecto activo: ${p.name}`);
 }
@@ -121,7 +122,7 @@ function renderModule(name){
    window.PlegarPiece3DView.mount($('#module-sample'),window.PlegarEditor2D.getData,window.PlegarEditor2D.getSelection,window.PlegarEditor2D.selectBend);
    return;
  }else if(name==='Proyectos'){
- content=projects.map((p,i)=>`<div class="module-tile"><img src="assets/pieza-mini.webp" alt="Soporte de chapa"/><strong>${escapeHtml(p.name)}</strong><p>${escapeHtml(p.detail)}<br>Registro local de ejemplo</p><button type="button" data-project="${i}">Seleccionar proyecto</button></div>`).join('')+`<div class="module-tile"><strong>Nuevo proyecto</strong><p>Crea un proyecto de muestra almacenado en este navegador.</p><button type="button" id="new-project">Crear proyecto</button></div>`;
+ content=projects.map((p,i)=>`<div class="module-tile"><div class="home-project-big-thumb">${window.PlegarHomeDashboard?.projectThumb(p,i)||'Sin plano'}</div><strong>${escapeHtml(p.name)}</strong><p>${p.profile?'Plano/programa vinculado':'FORMA DE EJEMPLO · Aún no vinculada al plano de esta pieza'}</p><button type="button" data-project="${i}">Abrir perfil 3D</button><button type="button" data-attach-project="${i}">Vincular programa 2D actual</button></div>`).join('')+`<div class="module-tile"><strong>Nuevo proyecto</strong><p>Crea un proyecto de muestra almacenado en este navegador.</p><button type="button" id="new-project">Crear proyecto</button></div>`;
  }else if(name==='Materiales'){
  content=materials.map(([title,thick],i)=>`<div class="module-tile"><img src="assets/chapa-mini.webp" alt="Muestra de chapa"/><strong>${title}</strong><p>Espesor de demostración: ${thick}</p><button type="button" data-material="${i}">Seleccionar material</button></div>`).join('');
  }else if(name==='Simulación 3D'||name==='Simulación 2D'){
@@ -141,6 +142,15 @@ function renderModule(name){
 document.addEventListener('click',event=>{
  const screen=event.target.closest('[data-screen]');if(screen){switchScreen(screen.dataset.screen);return;}
  const step=event.target.closest('[data-step]');if(step){stopPlayer();setStep(Number(step.dataset.step));return;}
+ const attach=event.target.closest('[data-attach-project]');if(attach){
+  const i=Number(attach.dataset.attachProject),data=window.PlegarEditor2D?.getData();
+  if(!projects[i]||!data)return;
+  const previous=projects[i].profile;
+  projects[i].profile=JSON.parse(JSON.stringify(data));
+  try{localStorage.setItem('plegarpro-demo-projects',JSON.stringify(projects));}
+  catch{projects[i].profile=previous;toast('No se pudo guardar el programa del proyecto.');return;}
+  renderProjects();renderModule('Proyectos');toast('Programa vinculado. La miniatura ahora utiliza las medidas introducidas en el editor.');return;
+ }
  const project=event.target.closest('[data-project]');if(project){chooseProject(Number(project.dataset.project));return;}
  const material=event.target.closest('[data-material]');if(material){setMaterial(Number(material.dataset.material));return;}
  const tool=event.target.closest('[data-tab]');if(tool){$$('#tool-tabs [data-tab]').forEach(b=>b.classList.toggle('selected',b===tool));$('#tool-code').textContent=tool.dataset.tab==='Punzones'?'P-88-R1':tool.dataset.tab==='Matrices'?'M-V16-88':'ADAPTADOR';toast(`Ficha visual: ${tool.dataset.tab}. Dimensiones por verificar.`);return;}
@@ -150,7 +160,7 @@ document.addEventListener('click',event=>{
  }
  if(event.target.closest('#confirm-project')){
   const value=$('#new-project-name')?.value.trim();if(!value){toast('Introduce un nombre de proyecto.');return;}
-  projects.unshift({name:value,detail:'Proyecto nuevo · sin pliegues',time:new Date().toLocaleString('es-ES')});localStorage.setItem('plegarpro-demo-projects',JSON.stringify(projects));$('#dialog').close();renderProjects();renderModule('Proyectos');toast('Proyecto de muestra guardado en este navegador.');return;
+  projects.unshift({name:value,detail:'Nuevo proyecto · sin plano',time:new Date().toLocaleString('es-ES'),profile:null});localStorage.setItem('plegarpro-demo-projects',JSON.stringify(projects));$('#dialog').close();renderProjects();renderModule('Proyectos');toast('Proyecto de muestra guardado en este navegador.');return;
  }
 });
 $('#brand-home').addEventListener('click',()=>switchScreen('Inicio'));

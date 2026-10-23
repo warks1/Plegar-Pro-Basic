@@ -96,6 +96,7 @@ function switchScreen(name){
  $('#summary-cards').hidden=name!=='Inicio';$('#module-view').hidden=name==='Inicio';
  $$('.main-panels,.bottom-panels').forEach(el=>el.hidden=name!=='Inicio');
  if(name!=='Inicio')renderModule(name);
+ else window.PlegarHomeDashboard?.applySettings?.();
  window.scrollTo({top:0,behavior:'instant'});
 }
 function renderModule(name){

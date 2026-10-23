@@ -38,12 +38,28 @@
   ['eurostamp-d-v60','EUROSTAMP','die','Bystronic style · matriz 1V',60,60,65,null,'V60 H65 C45','forge','variante'],
   ['eurostamp-d-v12','EUROSTAMP','die','AMADA style · matriz T 1V',88,12,120,null,'V12 H120','forge','variante'],
   ['eurostamp-p-trumpf','EUROSTAMP','punch','Punzones compatibles con Trumpf',null,null,null,null,'Trumpf style','eurostamp','familia'],
-  ['eurostamp-d-trumpf','EUROSTAMP','die','Matrices compatibles con Trumpf',null,null,null,null,'Trumpf style','eurostamp','familia']
+  ['eurostamp-d-trumpf','EUROSTAMP','die','Matrices compatibles con Trumpf',null,null,null,null,'Trumpf style','eurostamp','familia'],
+  // Códigos que figuran en el esquema de segmentación EUROSTAMP (PDF, página impresa 94).
+  // No se han leído sus siluetas ni las dimensiones completas. NO se interpolan.
+  ...['1233','1234','1235','1236','1237','1238','1295','1302','1308','1313','1314','1316','1317','1318']
+    .map(code=>['eurostamp-p'+code,'EUROSTAMP','punch','Código de punzón (esquema de segmentación)',null,null,null,null,code,'eurostamp','modelo']),
+  ['bystronic-rfac-punch','Bystronic','punch','Sistema RF-AC · familia',null,null,null,null,'RF-AC','bystronic','familia']
  ];
  // angle in degrees; V-opening and H in millimetres. No dimensions extrapolated.
- const ENTRIES=Object.freeze(base.map(([id,brand,kind,name,angle,opening,height,radius,code,source,fidelity])=>
+ // Las cinco fichas dimensionales AMADA ya están en manufacturer-references.js.
+ // Compartir esos datos evita inventar alturas/radios de una referencia distinta.
+ const refs=(typeof require==='function'?require('./manufacturer-references.js'):window.PlegarManufacturerReferences);
+ const measured=(refs?.RECORDS||[]).map(r=>Object.freeze({
+  id:r.id,brand:r.manufacturer,kind:r.kind,name:r.model,angle:r.angle,
+  opening:r.kind==='die'?r.opening:null,height:r.height,
+  radius:r.kind==='punch'?r.nose:r.shoulderRadius,nose:r.kind==='punch'?r.nose:null,
+  width:r.width??null,length:r.length,capacity:r.capacity,orderNumber:r.orderNumber,mounting:r.mounting,
+  code:r.orderNumber,source:Object.freeze({name:r.source.title,url:r.source.url,level:'documentación declarada del fabricante'}),
+  fidelity:'referencia dimensional',geometryCertified:false,simulatable:false,checkedOn:'2026-10-23'
+ }));
+ const ENTRIES=Object.freeze([...base.map(([id,brand,kind,name,angle,opening,height,radius,code,source,fidelity])=>
   Object.freeze({id,brand,kind,name,angle,opening,height,radius,code,source:SOURCE[source],
-   fidelity,geometryCertified:false,simulatable:false,checkedOn:'2026-10-23'})));
+   fidelity,geometryCertified:false,simulatable:false,checkedOn:'2026-10-23'})),...measured]);
  const brandNames=['MECOS','Bystronic','AMADA','EUROSTAMP'];
  const escape=s=>String(s).replace(/[&<>"']/g,x=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','"':'&quot;'}[x]));
  function find(id){return ENTRIES.find(e=>e.id===id)||null;}
@@ -58,55 +74,36 @@
   if(item.opening!==null)fields.push('V '+item.opening+' mm');
   if(item.height!==null)fields.push('H '+item.height+' mm');
   if(item.radius!==null)fields.push('Radio R'+item.radius+' mm');
-  return fields.length?fields.join(' · '):'Ángulo, radio, V y altura: no documentados en esta ficha';
+  if(item.length!==undefined)fields.push('L '+item.length+' mm');
+  if(item.width!==undefined&&item.width!==null)fields.push('Ancho '+item.width+' mm');
+  if(item.capacity!==undefined)fields.push('Capacidad publicada '+item.capacity+' kN/m');
+  return fields.length?fields.join(' · '):'Perfil y dimensiones completos no publicados para esta referencia';
  }
  function art(item,view='2d'){
-  // Geometría ilustrativa procedente del tipo; jamás de un supuesto CAD real.
-  const punch=item.kind==='punch';
-  const angle=item.angle===null?'?':String(item.angle);
-  const dim=item.opening===null?'V ?':'V '+item.opening;
-  const grad='mfg-'+item.id+'-'+view;
-  const offset=view==='3d'?-17:0;
-  const shape=punch?
-   'M85 18 L157 18 L157 51 L137 51 L137 76 L121 114 L105 76 L105 51 L85 51 Z':
-   'M40 124 L40 48 L91 48 L121 76 L151 48 L203 48 L203 124 Z';
-  const back=view==='3d'?
-   '<path d="'+shape+'" transform="translate(16,-15)" fill="#344b5b" stroke="#8baac4" stroke-width="1.5"/>':
-   '';
-  const fill=punch?'url(#'+grad+')':'url(#'+grad+')';
-  const g='<linearGradient id="'+grad+'" x1="0" y1="0" x2="1" y2="1"><stop stop-color="'+(punch?'#bddff8':'#a7b8cb')+'"/><stop offset=".5" stop-color="'+(punch?'#4c8ec0':'#556c83')+'"/><stop offset="1" stop-color="'+(punch?'#205d90':'#22344b')+'"/></linearGradient>';
-  const tool='<path d="'+shape+'" fill="'+fill+'" stroke="'+(punch?'#a6dcff':'#b2c1d1')+'" stroke-width="2" stroke-linejoin="round"/>';
-  const detail=punch?
-   '<path d="M121 114 L121 139" stroke="#57c6fb" stroke-dasharray="3 4" stroke-width="1.3"/>':
-   '<path d="M91 48 L121 76 L151 48" fill="none" stroke="#eb9a7f" stroke-width="2"/>';
-  const texts='<text x="7" y="17" fill="#a7ddfa" font-size="10">'+(punch?'PUNZÓN':'MATRIZ')+' · '+view.toUpperCase()+'</text>'+
-   '<text x="7" y="151" fill="#e8f5ff" font-size="11">α '+angle+'° · '+(punch?'R no verificado':dim)+'</text>'+
-   '<text x="235" y="44" fill="#d0e7f6" font-size="9" text-anchor="end">'+(item.height!==null?'H '+item.height+' mm':'H ?')+'</text>'+
-   '<text x="235" y="164" fill="#ffe0aa" font-size="9" text-anchor="end">ESQUEMA</text>';
-  return '<svg class="mfg-art" viewBox="0 0 242 174" role="img" aria-label="Esquema '+view+' no acotado de '+escape(item.name)+'">'+
-   '<defs>'+g+'</defs><rect width="242" height="174" rx="9" fill="#061727"/>'+
-   '<path d="M20 146 H224 M121 28 V145" stroke="#183c50" stroke-dasharray="3 4"/>'+
-   '<g transform="translate(0,'+offset+')">'+back+tool+detail+'</g>'+texts+'</svg>';
+  const painter=(typeof require==='function'?require('./manufacturer-drawings.js'):window.PlegarManufacturerDrawings);
+  if(!painter)throw Error('Motor de dibujos de utillaje no disponible.');
+  return painter.outlineSVG(item,view);
  }
  function card(e){
   return '<article class="mfg-card" data-mfg-id="'+e.id+'"><div class="mfg-dual">'+art(e,'2d')+art(e,'3d')+'</div>'+
    '<strong>'+escape(e.brand)+' · '+escape(e.code)+'</strong>'+
    '<p>'+escape(e.name)+'</p><small>'+escape(pointText(e))+'</small>'+
    '<small class="mfg-provenance">Fuente: '+escape(e.source.name)+' · '+escape(e.source.level)+'</small>'+
+   (e.mounting?'<small class="mfg-provenance">Amarre: '+escape(e.mounting)+'</small>':'')+
    '<span class="mfg-warning">Perfil ilustrativo · NO VÁLIDO PARA COLISIONES</span>'+
    '<a href="'+e.source.url+'" target="_blank" rel="noopener noreferrer">Consultar catálogo / referencia original ↗</a></article>';
  }
  function html(){
   return '<section class="mfg-catalog" aria-label="Catálogo documental de punzones y matrices">'+
    '<h2>Biblioteca de fabricantes · fichas documentadas</h2>'+
-   '<p>Referencias comerciales encontradas en catálogos. Cada tarjeta tiene un <b>esquema 2D y una vista 3D conceptual</b>; NO es la silueta CAD del fabricante. '+
+   '<p>Referencias y familias de las cuatro marcas. Cada tarjeta dibuja <b>la categoría, el ángulo y la V documentados</b> en un esquema 2D y volumen conceptual 3D; no es una copia del perfil CAD del fabricante. '+
    'Los perfiles incompletos no se ofrecen para simulación ni validación de colisiones.</p>'+
    '<div class="mfg-controls"><label>Marca<select data-mfg-filter="brand"><option value="all">Todas</option>'+
     brandNames.map(n=>'<option value="'+escape(n)+'">'+escape(n)+'</option>').join('')+'</select></label>'+
    '<label>Tipo<select data-mfg-filter="kind"><option value="all">Punzones y matrices</option><option value="punch">Punzones</option><option value="die">Matrices</option></select></label>'+
    '<label>Referencia<input type="search" data-mfg-filter="q" placeholder="Código, V, marca..." autocomplete="off"></label></div>'+
    '<p class="mfg-count" role="status"></p><div class="mfg-grid" data-mfg-results></div>'+
-   '<p class="mfg-legend"><strong>Verificación:</strong> las cotas rotuladas proceden de la fuente enlazada, pero faltan perfiles detallados, radios, geometría de amarre, tolerancias y capacidades de carga. Los gráficos NO están a escala métrica ni sirven como plano de fabricación.</p></section>';
+   '<p class="mfg-legend"><strong>Verificación:</strong> las cotas numéricas solo se muestran cuando están registradas para esa referencia. Los dibujos son modelos esquemáticos: NO son dibujos del fabricante, NO permiten comprobar colisiones y NO sustituyen CAD, amarre, tolerancias ni capacidad de máquina.</p></section>';
  }
  function mount(host){
   if(!host)return;

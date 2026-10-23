@@ -1,0 +1,53 @@
+'use strict';
+const {test}=require('node:test'),assert=require('node:assert/strict');
+const C=require('../manufacturer-catalog.js'),D=require('../manufacturer-drawings.js');
+test('Ampliación de catálogo combina fichas dimensionales con referencias sin CAD',()=>{
+ const stats=C.validate();
+ assert.ok(stats.total>=40);
+ assert.equal(stats.brands,4);
+ assert.equal(stats.exactProfiles,0);
+ const p=C.find('amada-846-p88-r06-835'),d=C.find('amada-mt508-v8-30-415');
+ assert.equal(p.orderNumber,'ES8467061');assert.equal(p.radius,.6);assert.equal(p.height,120);
+ assert.equal(p.capacity,450);assert.equal(p.simulatable,false);
+ assert.equal(d.opening,8);assert.equal(d.angle,30);assert.equal(d.height,116);
+ assert.equal(d.width,18);assert.equal(d.geometryCertified,false);
+ assert.equal(C.find('eurostamp-p1233').source.level,'copia de catálogo del fabricante');
+ assert.equal(C.find('eurostamp-p1233').angle,null);
+});
+test('No reutilizar exactamente la misma silueta para punzón agudo, recto y cuello cisne',()=>{
+ const straight=D.outline(C.find('amada-202-p88-r06-835'));
+ const neck=D.outline(C.find('amada-846-p88-r06-835'));
+ const acute=D.outline(C.find('amada-a13-p30-r06-835'));
+ assert.equal(straight.family,'recto');
+ assert.equal(neck.family,'cuello-cisne');
+ assert.equal(acute.family,'agudo');
+ assert.notDeepEqual(straight.points,neck.points);
+ assert.notDeepEqual(straight.points,acute.points);
+ assert.notDeepEqual(neck.points,acute.points);
+ const d8=D.outline(C.find('amada-mt508-v8-30-415'));
+ const d24=D.outline(C.find('eurostamp-d-v24'));
+ assert.notDeepEqual(d8.points,d24.points);
+});
+test('Cada tarjeta muestra dos vistas, cotas existentes y no inventa medidas desconocidas',()=>{
+ const punch=C.find('amada-846-p88-r06-835');
+ const drawing=D.outlineSVG(punch,'2d'),volume=D.outlineSVG(punch,'3d');
+ assert.match(drawing,/H 120 mm/);
+ assert.match(drawing,/R0,6 mm/);
+ assert.match(drawing,/α 88°/);
+ assert.match(volume,/translate\(18,-13\)/);
+ assert.match(drawing,/NO CAD · ESQUEMA/);
+ assert.notEqual(volume,drawing);
+ const missing=C.find('mecos-punch-gold');
+ const sparse=D.outlineSVG(missing,'2d');
+ assert.doesNotMatch(sparse,/H (?:100|120|150) mm/);
+ assert.doesNotMatch(sparse,/R0,6 mm/);
+ assert.match(sparse,/NO CAD/);
+ assert.equal(C.find('eurostamp-d-v24').simulatable,false);
+});
+test('Las etiquetas SVG escapan códigos y no transforman catálogo en CAD para colisiones',()=>{
+ const fake={id:'probe',kind:'punch',name:'<unsafe>',brand:'Prueba',code:'<script>',angle:30,nose:1,geometryCertified:false};
+ assert.doesNotMatch(D.outlineSVG(fake,'2d'),/<script>/);
+ assert.throws(()=>D.outline({kind:'adapter'}));
+ assert.throws(()=>D.outlineSVG(fake,'4d'));
+ assert.ok(C.ENTRIES.every(e=>!e.simulatable&&!e.geometryCertified));
+});

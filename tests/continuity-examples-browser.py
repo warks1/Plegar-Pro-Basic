@@ -347,6 +347,16 @@ with sync_playwright() as pw:
   assert page.locator('.f2-data-panel').is_visible()
   assert 'Ángulo' in page.locator('.f2-data-panel').inner_text()
   assert 'NO CALCULADA' in page.locator('.f2-data-panel').inner_text()
+  # La vista de perfil debe mostrar las seis piezas con colores y movimiento real del carro nominal.
+  for component in ['trancha','punzon','chapa','matriz','mesa','topes']:
+   assert page.locator('.f2d-svg [data-component="'+component+'"]').count()==1,component
+  mesa_antes=page.locator('.f2d-svg [data-component="mesa"]').get_attribute('d')
+  trancha_antes=page.locator('.f2d-svg [data-component="trancha"]').get_attribute('d')
+  page.locator('.f2-range').evaluate("(el)=>{el.value='60';el.dispatchEvent(new Event('input',{bubbles:true}));}")
+  assert page.locator('.f2d-svg [data-component="mesa"]').get_attribute('d')==mesa_antes
+  assert page.locator('.f2d-svg [data-component="trancha"]').get_attribute('d')!=trancha_antes
+  assert 'PARCIALMENTE SIN COTAS' in page.locator('.f2d-svg').text_content()
+  page.locator('[data-f2-action="reset"]').click()
   assert page.locator('.f2-tile svg').count()==4
   assert page.locator('.f2-tile[data-f2-step="start"]').count()==1
   assert page.locator('.f2-tile[data-f2-step="final"]').count()==1

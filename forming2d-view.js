@@ -5,8 +5,29 @@
 const Model=window.PlegarFormingGeometry,K=()=>window.PlegarFoldKinematics,TL=()=>window.PlegarSequenceTimeline;
 const as2=n=>Number(n).toLocaleString('es-ES',{maximumFractionDigits:2});
 let active=null;
+const finite=n=>typeof n==='number'&&Number.isFinite(n)&&n>0;
+const rect=(x1,y1,x2,y2)=>[{x:x1,y:y1},{x:x2,y:y1},{x:x2,y:y2},{x:x1,y:y2}];
+const path=pts=>pts.map((p,i)=>(i?'L':'M')+p.x.toFixed(3)+' '+p.y.toFixed(3)).join(' ')+' Z';
+function machineOutlines(m){
+ const cfg=m.machineSetup||{},die=m.toolProfiles.die.outline,punch=m.toolProfiles.punch.outline;
+ const dieBottom=Math.max(...die.map(p=>p.y)),outside=Math.max(...die.map(p=>Math.abs(p.x)));
+ const punchTop=Math.min(...punch.map(p=>p.y));
+ // Si falta una medida, el cuerpo se muestra únicamente como silhouette didáctica.
+ // La presencia gráfica jamás hace pasar un valor de representación por cota de colisión.
+ const tableLeft=finite(cfg.tableLeft)?cfg.tableLeft:outside+Math.max(12,m.dieOpening);
+ const tableRight=finite(cfg.tableRight)?cfg.tableRight:outside+Math.max(12,m.dieOpening);
+ const tableY=dieBottom+1.5,tableDepth=Math.max(12,m.dieOpening*.55);
+ const table=rect(-Math.max(outside,tableLeft),tableY,Math.max(outside,tableRight),tableY+tableDepth);
+ const ramHalf=finite(cfg.ramWidth)?cfg.ramWidth/2:Math.max(12,m.dieOpening*1.2);
+ const ramBottom=finite(cfg.ramBottomOffset)?m.punchTipY-cfg.ramBottomOffset:punchTop-1.5;
+ const ram=rect(-ramHalf,ramBottom-Math.max(14,m.dieOpening*.8),ramHalf,ramBottom);
+ return {table,ram,tableMeasured:finite(cfg.dieHeight)&&finite(cfg.tableLeft)&&finite(cfg.tableRight),
+  ramMeasured:finite(cfg.ramWidth)&&finite(cfg.ramBottomOffset)};
+}
 function extents(m){
+ const bodies=machineOutlines(m);
  const pts=[...m.assembly.contour,...m.toolProfiles.die.outline,...m.toolProfiles.punch.outline,
+ ...bodies.ram,...bodies.table,
  {x:m.stop.x,y:m.stop.top},{x:m.stop.x+m.stop.width,y:m.stop.bottom}];
  return [Math.min(...pts.map(v=>v.x)),Math.max(...pts.map(v=>v.x)),Math.min(...pts.map(v=>v.y)),Math.max(...pts.map(v=>v.y))];
 }
@@ -27,22 +48,25 @@ function svg(m,zoom,bounds){
  const punchOutline=m.toolProfiles.punch.outline.map((p,i)=>`${i?'L':'M'}${p.x.toFixed(3)} ${p.y.toFixed(3)}`).join(' ')+' Z';
  const wholePaths=[...m.assembly.left.items,...m.assembly.right.items].map(v=>`<line x1="${v.from.x}" y1="${v.from.y}" x2="${v.to.x}" y2="${v.to.y}" stroke="${v.status==='realizado'?'#fea478':'#71b5ed'}" stroke-width="${m.thickness}" stroke-dasharray="${v.status==='realizado'?'2 1.4':'none'}" stroke-linecap="round"/>`).join('');
  const hingeLabels=m.assembly.hinges.map(v=>`<circle cx="${v.point.x}" cy="${v.point.y}" r="1.1" fill="${v.status==='realizado'?'#ffc37f':'#a1cceb'}"/>`).join('');
+ const bodies=machineOutlines(m);
  const overlap=m.interferences.problems.length>0;
  const warn=m.warnings.length?'#efb06e':'#59ceff';
  return `<svg class="f2d-svg" viewBox="0 0 900 480" role="img" aria-label="Vista lateral esquemática de punzón, matriz y chapa con zona curva tangente. No es una simulación física ni una verificación de colisiones.">
  <defs><pattern id="f2d-grid" width="20" height="20" patternUnits="userSpaceOnUse"><path d="M20 0V20H0" fill="none" stroke="#193a55" stroke-width=".7"/></pattern><linearGradient id="f2d-metal" x1="0" y1="0" x2="1" y2="0"><stop stop-color="#435970"/><stop offset=".48" stop-color="#b8d2e9"/><stop offset="1" stop-color="#364a60"/></linearGradient><linearGradient id="f2d-sheet" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#e0f5ff"/><stop offset="1" stop-color="#38b6ed"/></linearGradient></defs>
  <rect width="900" height="480" fill="#071a29"/><rect width="900" height="480" fill="url(#f2d-grid)"/>
  <g transform="translate(440 250) scale(${s.toFixed(5)}) translate(${-centreX.toFixed(5)} ${-centreY.toFixed(5)})">
- <path d="${dieOutline}" fill="#744047" stroke="#d2767b" stroke-width=".7"/>
+ <path data-component="mesa" d="${path(bodies.table)}" fill="#716985" fill-opacity="${bodies.tableMeasured?'1':'.52'}" stroke="#baa6d1" stroke-width=".8"/>
+ <path data-component="trancha" d="${path(bodies.ram)}" fill="#5d7186" fill-opacity="${bodies.ramMeasured?'1':'.6'}" stroke="#c3d4e3" stroke-width=".8"/>
+ <path data-component="matriz" d="${dieOutline}" fill="#744047" stroke="#d2767b" stroke-width=".7"/>
  <path d="M ${-half} 0 L 0 ${m.dieDepth} L ${half} 0" stroke="#b7d8ee" stroke-width=".9" fill="none"/>
- <path d="${punchOutline}" fill="url(#f2d-metal)" stroke="#d0e5f4" stroke-width=".9"/>
+ <path data-component="punzon" d="${punchOutline}" fill="url(#f2d-metal)" stroke="#d0e5f4" stroke-width=".9"/>
  ${wholePaths}
  ${hingeLabels}
  <path d="${line}" stroke="#081526" stroke-width="${m.thickness+1.6}" fill="none" stroke-linejoin="round" stroke-linecap="round"/>
- <path d="${line}" stroke="url(#f2d-sheet)" stroke-width="${m.thickness}" fill="none" stroke-linejoin="round" stroke-linecap="round"/>
+ <path data-component="chapa" d="${line}" stroke="url(#f2d-sheet)" stroke-width="${m.thickness}" fill="none" stroke-linejoin="round" stroke-linecap="round"/>
  <g stroke="#f8bf56" stroke-width=".6" fill="#f8bf56"><circle cx="${-half}" cy="0" r=".9"/><circle cx="${half}" cy="0" r=".9"/></g>
  <circle cx="0" cy="${m.center.y}" r="1.1" fill="#ffb754"/>
- <rect x="${m.stop.x}" y="${m.stop.top}" width="${m.stop.width}" height="${m.stop.bottom-m.stop.top}" rx="1" fill="${overlap?'#dc7770':'#53ae81'}" stroke="#afe7c1" stroke-width=".4"/>
+ <rect data-component="topes" x="${m.stop.x}" y="${m.stop.top}" width="${m.stop.width}" height="${m.stop.bottom-m.stop.top}" rx="1" fill="${overlap?'#dc7770':'#53ae81'}" stroke="#afe7c1" stroke-width=".4"/>
  <path d="M ${m.stop.x+m.stop.width/2} ${m.stop.top} v -15 h ${Math.max(5,m.dieOpening/3)}" stroke="#ddab4b" stroke-width="1.4" fill="none"/>
  <path d="M ${-half} ${dimension} V ${dimension-3} M ${half} ${dimension} V ${dimension-3} M ${-half} ${dimension-1.5} H ${half}" stroke="#67bce9" stroke-width=".6" fill="none" stroke-dasharray="1.5 1"/>
  </g>
@@ -54,7 +78,8 @@ function svg(m,zoom,bounds){
  <text x="885" y="28" text-anchor="end" font-size="11" fill="#eac187">PERFIL CON RADIO · APROXIMACIÓN</text>
  <text x="885" y="434" text-anchor="end" font-size="11" fill="${overlap?'#ff927b':warn}">Cribado 2D: ${html(m.interferences.status)}</text>
  <text x="885" y="450" text-anchor="end" font-size="11" fill="${warn}">Descenso estimado del eje: ${as2(m.depth)} mm</text>
- <text x="15" y="455" font-size="11" fill="#c8d5df">Punzón gris · Matriz rojo oscuro · Chapa azul · Tope verde. Sin validación física.</text>
+ <text x="15" y="455" font-size="11" fill="#c8d5df">Trancha gris · Punzón acero · Chapa azul · Matriz granate · Mesa violeta · Topes verdes.</text>
+ <text x="15" y="471" font-size="10" fill="#ffd49e">Mesa / trancha ${bodies.tableMeasured&&bodies.ramMeasured?'con cotas introducidas':'PARCIALMENTE SIN COTAS · esquemas'} · NO CNC</text>
  </svg>`;
 }
 function halt(){
@@ -142,11 +167,15 @@ function stepArt(data,index,progress){
  const cx=(x1+x2)/2,cy=(y1+y2)/2;
  const path=pts=>pts.map((p,i)=>(i?'L':'M')+p.x+' '+p.y).join(' ');
  const punch=path(m.toolProfiles.punch.outline)+' Z',die=path(m.toolProfiles.die.outline)+' Z';
+ const parts=machineOutlines(m),ram=path(parts.ram)+' Z',table=path(parts.table)+' Z';
  const sheet=path(m.assembly.contour);
  return '<svg viewBox="0 0 222 96" aria-hidden="true"><rect width="222" height="96" fill="#061929"/>'+
   '<g transform="translate(111 44) scale('+scale.toFixed(4)+') translate('+(-cx).toFixed(3)+' '+(-cy).toFixed(3)+')">'+
+  '<path d="'+table+'" fill="#716985" stroke="#baa6d1" stroke-width=".8"/>'+
+  '<path d="'+ram+'" fill="#5d7186" stroke="#c3d4e3" stroke-width=".8"/>'+
   '<path d="'+die+'" fill="#744346" stroke="#c67572" stroke-width=".8"/>'+
   '<path d="'+punch+'" fill="#b2c6d8" stroke="#ebf8ff" stroke-width=".8"/>'+
+  '<rect x="'+m.stop.x+'" y="'+m.stop.top+'" width="'+m.stop.width+'" height="'+(m.stop.bottom-m.stop.top)+'" fill="#4ac587"/>'+
   '<path d="'+sheet+'" fill="none" stroke="#69ccff" stroke-width="'+Math.max(1.4,m.thickness)+'" stroke-linejoin="round"/></g></svg>';
 }
 function gallery(data,order){

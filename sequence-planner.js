@@ -17,15 +17,19 @@
   const scene=F.scene(candidate,idx,1),scan=Clearance.sweep(candidate,idx,{intervals:n<=6?4:2});
   const die=C.DIES.find(d=>d.id===candidate.setup.die),angle=Math.abs(candidate.angles[id-1]),interior=180-angle;
   const left=candidate.segments[id-1],right=candidate.segments[id],v=die.opening;
-  const issues=[];
+  const issues=[],riskCodes=[];
+  const risk=(code,message)=>{if(!riskCodes.includes(code))riskCodes.push(code);issues.push(message);};
   let cost=1;
   if(interior<die.angle||interior<C.PUNCHES.find(p=>p.id===candidate.setup.punch).angle){
-   cost+=120;issues.push('Ángulo interior menor que el ángulo de herramienta.');
+   cost+=120;risk('TOOL_ANGLE','Ángulo interior menor que el ángulo de herramienta.');
   }
-  if(Math.min(left,right)<.7*v){cost+=45;issues.push('Ala bajo 0,7×V; apoyo por revisar.');}
-  if(scan.possibleTableContact){cost+=200;issues.push('Posible choque con MESA durante ciclo nominal.');}
-  if(scan.possibleRamContact){cost+=200;issues.push('Posible choque con TRANCHA durante ciclo nominal.');}
-  if(scene.interferences?.problems?.some(p=>p.code==='PRIOR_FLANGE_NEAR_TOOL')){cost+=60;issues.push('Posible choque con punzón, matriz o tope.');}
+  if(Math.min(left,right)<.7*v){cost+=45;risk('SHORT_FLANGE','Ala bajo 0,7×V; apoyo por revisar.');}
+  if(scan.possibleTableContact){cost+=200;risk('TABLE','Posible choque con MESA durante ciclo nominal.');}
+  if(scan.possibleRamContact){cost+=200;risk('RAM','Posible choque con TRANCHA durante ciclo nominal.');}
+  if(scene.interferences?.problems?.some(p=>p.code==='PRIOR_FLANGE_NEAR_TOOL')){cost+=60;risk('PRIOR_FLANGE','Posible choque con punzón, matriz o ala plegada.');}
+  if(scene.interferences?.problems?.some(p=>p.code==='BACKGAUGE_OVERLAP')){cost+=120;risk('GAUGE','Posible solape con el tope.');}
+  // No confundir la ausencia de una geometría aportada con holgura verificada.
+  if(scan.unknown.length)issues.push('Envolvente de máquina incompleta: '+scan.unknown.join(', ')+'.');
   // Un perfil con retorno se cierra prematuramente si ejecuta primero los bordes.
   // Se usa para priorizar pruebas, nunca para declarar una secuencia apta.
   if(hasOmega(profile)){
@@ -35,18 +39,21 @@
   }
   // Prefiere estados que todavía permiten acceder a las líneas centrales.
   if(chosen.length===0&&n>2)cost+=Math.abs(id-(n+1)/2)*.2;
-  return {bend:id,score:cost,issues,scan};
+  return {bend:id,score:cost,issues,riskCodes,possibleCollision:riskCodes.length>0,scan};
  }
  function evaluate(profile,sequence){
-  let score=0;const rows=[],issues=[];
+  let score=0;const rows=[],issues=[],riskCodes=[];
   for(let i=0;i<sequence.length;i++){
    const r=step(profile,sequence.slice(0,i),sequence[i]);
    score+=r.score;
-   rows.push({position:i+1,bend:r.bend,score:r.score,issues:r.issues,tableGap:r.scan.tableGap,possibleRamContact:r.scan.possibleRamContact,possibleTableContact:r.scan.possibleTableContact,sampledFrames:r.scan.frames});
+   rows.push({position:i+1,bend:r.bend,score:r.score,issues:r.issues,riskCodes:r.riskCodes,possibleCollision:r.possibleCollision,tableGap:r.scan.tableGap,possibleRamContact:r.scan.possibleRamContact,possibleTableContact:r.scan.possibleTableContact,sampledFrames:r.scan.frames});
+   for(const code of r.riskCodes)if(!riskCodes.includes(code))riskCodes.push(code);
    for(const msg of [...r.issues,...r.scan.alerts])if(!issues.includes(msg))issues.push(msg);
   }
   return {sequence:[...sequence],score:Math.round(score*100)/100,rows,issues,
-   status:'CRIBADO NOMINAL · NO VERIFICADO',physicallyValidated:false,cncApproved:false};
+   riskCodes,riskCount:rows.reduce((n,r)=>n+r.riskCodes.length,0),
+   status:riskCodes.length?'POSIBLES INTERFERENCIAS · REVISAR':'CRIBADO NOMINAL · NO VERIFICADO',
+   physicallyValidated:false,cncApproved:false};
  }
  function suggest(source,{beamWidth=18,limit=4}={}){
   const profile={...G.validate(source),setup:C.validateSetup(source.setup)},n=profile.angles.length;
@@ -59,15 +66,18 @@
    for(const item of beam)for(let id=1;id<=n;id++){
     if(item.sequence.includes(id))continue;
     const partial=step(profile,item.sequence,id);
-    next.push({sequence:[...item.sequence,id],score:item.score+partial.score});
+    next.push({sequence:[...item.sequence,id],score:item.score+partial.score,
+      riskCount:(item.riskCount||0)+partial.riskCodes.length});
     searched++;
    }
-   next.sort((a,b)=>a.score-b.score||a.sequence.join(',').localeCompare(b.sequence.join(',')));
+   // Minimizar primero alertas de interferencia; sólo después, preferencias geométricas.
+   next.sort((a,b)=>a.riskCount-b.riskCount||a.score-b.score||a.sequence.join(',').localeCompare(b.sequence.join(',')));
    beam=next.slice(0,beamWidth);
   }
   const alternatives=beam.slice(0,limit).map(item=>evaluate(profile,item.sequence));
-  return {current,best:alternatives[0]||null,alternatives,searched,
-   note:'Orden sugerido por cribado discreto y reglas orientativas. La mesa y la trancha se criban como envolventes introducidas cuando hay cotas; no hay CAD real; tampoco se comprueban todos los volteos ni los movimientos de extracción. NINGÚN orden está validado para CNC.'};
+  const recommended=alternatives.find(candidate=>candidate.riskCount===0)||null;
+  return {current,best:alternatives[0]||null,recommended,alternatives,searched,
+   note:'Ordenes candidatos por cribado discreto: se descartan de la aplicación automática los que presentan posibles interferencias modeladas. Datos de mesa, trancha y herramientas incompletos, volteos y retirada no validados. NINGÚN orden está validado para CNC.'};
  }
  return {step,evaluate,suggest};
 });

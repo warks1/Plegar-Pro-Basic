@@ -71,3 +71,29 @@ test('Validaciones previenen medidas imposibles antes de guardar',()=>{
  assert.throws(()=>New.build({...base,material:'Material desconocido'}),/Material/);
  assert.throws(()=>New.build({...base,setup:{...base.setup,die:'inventado'}}),/Matriz/);
 });
+
+test('Ri/K por pliegue se conservan al añadir y eliminar alas en el asistente 2D/3D',()=>{
+ const original={...source,width:240,bendOverrides:[
+  {radius:3.2,kFactor:0.42},{radius:null,kFactor:0.35},
+  {radius:4,kFactor:null},{radius:null,kFactor:null}
+ ]};
+ const draft=New.clone(original);
+ assert.notStrictEqual(draft.bendOverrides,original.bendOverrides);
+ assert.notStrictEqual(draft.bendOverrides[0],original.bendOverrides[0]);
+ draft.bendOverrides[0].radius=5;
+ assert.equal(original.bendOverrides[0].radius,3.2,'editar el borrador no altera el perfil original');
+ const extended=New.add(draft);
+ assert.equal(extended.bendOverrides.length,extended.angles.length);
+ assert.deepEqual(extended.bendOverrides.at(-1),{radius:null,kFactor:null});
+ assert.equal(extended.bendOverrides[0].radius,5);
+ assert.equal(original.bendOverrides.length,4);
+ assert.equal(New.build(extended).profile.bendOverrides[0].radius,5);
+ const restored=New.remove(extended);
+ assert.equal(restored.bendOverrides.length,restored.angles.length);
+ assert.equal(restored.bendOverrides[0].radius,5);
+ assert.equal(restored.bendOverrides[1].kFactor,0.35);
+ assert.deepEqual(New.build(restored).profile.sequence,original.sequence);
+ const withoutOverrides=New.add(New.create(source));
+ assert.equal(withoutOverrides.bendOverrides,undefined,'perfiles antiguos siguen siendo compatibles');
+ assert.equal(New.build(withoutOverrides).profile.bendOverrides,undefined);
+});

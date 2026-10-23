@@ -420,7 +420,7 @@ function mount(){
  target.onclick=actions;
  // Capturar el toque sobre la tarjeta para que siga funcionando tras re-renderizar.
  if(!target.dataset.examplePickerBound){
-  target.addEventListener('click',event=>{
+  const openExample=event=>{
    const button=event.target.closest?.('#ed-example-gallery [data-example-id]');
    if(!button)return;
    const record=window.PlegarExamples3D?.get(button.dataset.exampleId);
@@ -429,7 +429,15 @@ function mount(){
    orderPick=0;orderUsed.clear();
    loadProfile(record.profile,{width:record.width});
    inform('Pieza '+record.label+' cargada. Cambia el orden o reproduce sus pliegues.');
+  };
+  // El botón puede ser reconstruido durante la pulsación: resolver en pointerdown
+  // conserva la pulsación táctil / ratón aun si un render elimina el nodo antes de mouseup.
+  target.addEventListener('pointerdown',event=>{
+   if(event.button!==0||!event.target.closest?.('#ed-example-gallery [data-example-id]'))return;
+   openExample(event);
   },true);
+  // Los lectores y controles de teclado activan click sin pointerdown.
+  target.addEventListener('click',openExample,true);
   target.dataset.examplePickerBound='true';
  }
  target.onkeydown=event=>{if((event.key==='Enter'||event.key===' ')&&event.target.matches('[data-ed-bend]')){event.preventDefault();event.target.dispatchEvent(new MouseEvent('click',{bubbles:true}));}};

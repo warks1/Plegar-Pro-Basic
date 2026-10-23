@@ -26,7 +26,11 @@ test('Rechaza cotas no declaradas, pulgadas y curvas sin linealización',()=>{
  assert.throws(()=>D.parseDXF(dxf({units:0})),/sin unidades/i);
  assert.equal(D.parseDXF(dxf({units:0}),{confirmUnitlessMm:true}).unitsDeclared,false);
  assert.throws(()=>D.parseDXF(dxf({units:1})),/milímetros/);
- assert.throws(()=>D.parseDXF(dxf({bulge:true})),/arcos\/bulges/);
+ const rounded=D.parseDXF(dxf({bulge:true}));
+ assert.equal(rounded.arcCount,4);
+ assert.equal(rounded.chordErrorMm,.05);
+ assert.ok(rounded.points.length>4,'Los arcos DXF generan vértices de precisión controlada');
+ assert.equal(rounded.collisionApproved,false);
  assert.throws(()=>D.parseDXF(dxf({closed:false})),/cerrada/);
  assert.throws(()=>D.parseDXF(dxf({extra:[[0,'CIRCLE'],[10,0],[20,0],[40,2]]})),/varios perfiles o entidades/);
  assert.throws(()=>D.parseDXF(dxf({points:[[0,0],[10,10],[0,10],[10,0]]})),/autointersecado/);
@@ -56,4 +60,24 @@ test('No permite inyectar HTML ni registrar marcas ajenas, datos corruptos o car
  assert.doesNotMatch(D.render(r,'2d'),/<script>/);
  assert.throws(()=>D.render(r,'interactive'),/Vista incorrecta/);
  assert.ok(D.remove(r.id));
+});
+
+test('Importa un semicírculo DXF con bulge=1 sin convertirlo en una recta',()=>{
+ const outline=dxf({points:[[0,0],[40,0],[40,40],[0,40]]});
+ // Añadir el bulge al primer vértice justo después del par (10,20).
+ const needle='10\n0\n20\n0\n10\n40';
+ assert.ok(outline.includes(needle));
+ const curved=outline.replace(needle,'10\n0\n20\n0\n42\n1\n10\n40');
+ const model=D.parseDXF(curved);
+ assert.equal(model.arcCount,1);
+ assert.equal(model.bounds.width,40);
+ assert.ok(Math.abs(model.bounds.height-60)<.1,'Semicírculo aporta profundidad de 20 mm en lugar de lado recto');
+ assert.ok(model.points.length>15);
+ assert.ok(model.points.length<=400);
+ assert.equal(model.geometryCertified,false);
+});
+test('Se detiene ante bulges no finitos y curvas desmesuradas, sin dibujar geometría incorrecta',()=>{
+ const d=dxf({points:[[0,0],[40,0],[40,40],[0,40]]});
+ assert.throws(()=>D.parseDXF(d.replace('10\n0\n20\n0','10\n0\n20\n0\n42\nno-es-numero')),/Bulge DXF no válido/);
+ assert.throws(()=>D.parseDXF(d.replace('10\n0\n20\n0','10\n0\n20\n0\n42\n999999')),/Bulge DXF no válido/);
 });

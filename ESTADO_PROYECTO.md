@@ -135,3 +135,10 @@ Ajuste de presentación a pantalla completa sin franjas de imagen no ocupadas. S
 - Encuadre estable en vista lateral durante la reproducción, sin aparente movimiento de matriz o tope por reescalado de cámara.
 - Visor 3D: cámaras lateral e isométrica; pausa visible de 500 ms al acabar cada pliegue antes del siguiente. La recolocación física entre pasos NO está modelada.
 - Caché offline actualizada v37; pruebas de navegación ampliadas. No se valida CNC ni seguridad.
+
+## Continuidad v0.38 — 23 octubre 2026
+- Planos: nuevo motor `plan-drawing.js`, ficha PDF combinada 2D+3D, SVG individuales, perfil JSON editable, miniatura y persistencia IndexedDB. Importación «captura» como documento de referencia y conexión con Programación 2D.
+- El ancho 3D es un dato explícito, no deducido de una imagen. El plano 2D cotado está basado en longitudes entre vértices teóricos, no en cotas exteriores verificadas.
+- Pantalla aprobada conservada. Simulación 3D con cámaras frontal/superior y recálculo de encuadre al cambiar tramos. Caché v38.
+- Las pruebas automáticas del motor (GitHub Actions 39944417736) finalizaron correctamente; el navegador real iOS/Android está pendiente.
+- Sigue sin haber extracción automática de CAD desde imágenes, modelos sólidos certificados, simulación física o aprobación CNC/seguridad.

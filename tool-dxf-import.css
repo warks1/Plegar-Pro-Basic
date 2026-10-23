@@ -36,3 +36,22 @@
 .tool-dxf-file-actions [data-dxf-section]{background:#075b83;border-color:#5da7cc}
 .tool-dxf-file-actions [data-dxf-remove]{background:#513642;border-color:#ad7284}
 @media(max-width:610px){.tool-dxf-file-actions button{flex:1 0 100%;min-height:44px}}
+
+
+/* Visor geométrico 3D interactivo del utillaje importado (sin CNC). */
+.tool-dxf-file-actions [data-dxf-3d-open]{background:#076f86;border-color:#6ddae6;font-weight:750}
+.tool-dxf-3d-viewer[hidden]{display:none!important}
+.tool-dxf-3d-viewer{display:grid;gap:10px;max-width:100%;min-width:0;border:1px solid #4b9aab;background:#0a2437;padding:11px;border-radius:11px;margin:9px 0 12px}
+.tool-dxf-3d-heading{display:flex;align-items:center;gap:12px;justify-content:space-between;flex-wrap:wrap}
+.tool-dxf-3d-heading strong{color:#d5f5ff;font-size:15px;line-height:1.35}
+.tool-dxf-3d-heading button,.tool-dxf-3d-controls button{min-height:44px;background:#0f5d8c;color:#fff;border:1px solid #6aaacf;border-radius:7px;padding:9px 12px;font-size:12px;font-weight:650;cursor:pointer}
+.tool-dxf-3d-heading [data-dxf-3d-action="close"]{background:#5a3942;border-color:#ba8b99}
+.tool-dxf-3d-stage{max-width:100%;min-width:0;overflow:hidden;border-radius:9px;border:1px solid #4d738a;background:#081c2e;touch-action:none;cursor:grab;user-select:none}
+.tool-dxf-3d-stage:active{cursor:grabbing}
+.tool-dxf-3d-stage:focus-visible{outline:3px solid #ffcf68;outline-offset:3px}
+.tool-dxf-3d-canvas{width:100%;height:auto;display:block;aspect-ratio:760/425;pointer-events:none}
+.tool-dxf-3d-controls{display:flex;align-items:center;flex-wrap:wrap;gap:7px}
+.tool-dxf-3d-controls button{flex:1 0 95px}
+.tool-dxf-3d-controls button:focus-visible{outline:3px solid #ffdb86}
+.tool-dxf-3d-note{font-size:12px;color:#ffe0a8;line-height:1.55;margin:0}
+@media(max-width:620px){.tool-dxf-3d-viewer{padding:7px}.tool-dxf-3d-controls button{flex:1 1 43%;font-size:11px}.tool-dxf-3d-heading button{width:100%}}

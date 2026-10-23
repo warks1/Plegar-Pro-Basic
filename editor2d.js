@@ -88,11 +88,11 @@ function renderDimensionTable(){
   const bend=i+1,hasBend=i<state.angles.length,angle=state.angles[i];
   return '<tr'+(hasBend&&selected===bend?' class="ed-dim-selected"':'')+'>'+
    '<th scope="row">Tramo '+(i+1)+'</th>'+
-   '<td><input data-ed-program-segment="'+i+'" type="number" inputmode="decimal" min="0.1" max="100000" step="0.1" value="'+length+'" aria-label="Medida del tramo '+(i+1)+' en milímetros"></td>'+
-   '<td>'+(hasBend?'<button type="button" data-ed-focus="'+bend+'" class="ed-dim-bend-button" aria-label="Seleccionar pliegue '+bend+'">B'+bend+'</button>':'—')+'</td>'+
-   '<td>'+(hasBend?'<input data-ed-program-angle="'+i+'" type="number" inputmode="decimal" min="-179" max="179" step="0.1" value="'+angle+'" aria-label="Ángulo firmado del pliegue '+bend+' en grados">':'—')+'</td>'+
-   '<td>'+(hasBend?'<select data-ed-program-position="'+bend+'" aria-label="Orden del pliegue '+bend+'">'+state.sequence.map((id,j)=>'<option value="'+(j+1)+'"'+(id===bend?' selected':'')+'>Paso '+(j+1)+'</option>').join('')+'</select>':'—')+'</td>'+
-   '<td class="ed-dim-sum">'+fmt(accumulated)+' mm</td></tr>';
+   '<td data-label="Longitud (mm)"><input data-ed-program-segment="'+i+'" type="number" inputmode="decimal" min="0.1" max="100000" step="0.1" value="'+length+'" aria-label="Medida del tramo '+(i+1)+' en milímetros"></td>'+
+   '<td data-label="Pliegue">'+(hasBend?'<button type="button" data-ed-focus="'+bend+'" class="ed-dim-bend-button" aria-label="Seleccionar pliegue '+bend+'">B'+bend+'</button>':'—')+'</td>'+
+   '<td data-label="Giro (°)">'+(hasBend?'<input data-ed-program-angle="'+i+'" type="number" inputmode="decimal" min="-179" max="179" step="0.1" value="'+angle+'" aria-label="Ángulo firmado del pliegue '+bend+' en grados">':'—')+'</td>'+
+   '<td data-label="Orden">'+(hasBend?'<select data-ed-program-position="'+bend+'" aria-label="Orden del pliegue '+bend+'">'+state.sequence.map((id,j)=>'<option value="'+(j+1)+'"'+(id===bend?' selected':'')+'>Paso '+(j+1)+'</option>').join('')+'</select>':'—')+'</td>'+
+   '<td class="ed-dim-sum" data-label="Posición nominal">'+fmt(accumulated)+' mm</td></tr>';
  }).join('');
  const total=$('#ed-dimensions-total');
  if(total)total.textContent=state.segments.length+' tramos · '+state.angles.length+' pliegues · '+fmt(G.totalLength(state))+' mm nominales en cadena (NO desarrollo)';

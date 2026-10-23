@@ -4,10 +4,11 @@
 (function(root,factory){
  const api=factory(typeof module==='object'&&module.exports?require('./geometry2d.js'):root.PlegarGeometry2D,
                    typeof module==='object'&&module.exports?require('./piece3d.js'):root.PlegarPiece3D,
-                    typeof module==='object'&&module.exports?require('./sheet-offset.js'):root.PlegarSheetOffset);
+                    typeof module==='object'&&module.exports?require('./sheet-offset.js'):root.PlegarSheetOffset,
+                    typeof module==='object'&&module.exports?require('./bendcalc.js'):root.PlegarBendCalc);
  if(typeof module==='object'&&module.exports)module.exports=api;
  else root.PlegarPlanDrawing=api;
-})(typeof globalThis!=='undefined'?globalThis:this,function(G,M,Offset){
+})(typeof globalThis!=='undefined'?globalThis:this,function(G,M,Offset,C){
  'use strict';
  const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\'':'&apos;'}[c]));
  const fmt=v=>Number(v).toFixed(2).replace(/\.00$/,'');
@@ -43,8 +44,16 @@
    return `<text x="${x.toFixed(2)}" y="${y.toFixed(2)}" fill="#153c59" font-size="14" font-weight="bold" text-anchor="middle">${fmt(value)} mm</text>`;}).join('');
   const bends=p.angles.map((a,i)=>{const v=view[i+1];return `<g><circle cx="${v.x.toFixed(2)}" cy="${v.y.toFixed(2)}" r="16" fill="#f2a84a" stroke="#9b5a18"/><text x="${v.x.toFixed(2)}" y="${(v.y+4).toFixed(2)}" text-anchor="middle" font-size="12" fill="#092435">B${i+1}</text><text x="${(v.x+20).toFixed(2)}" y="${(v.y+25).toFixed(2)}" font-size="12" fill="#714b22">${fmt(a)}°</text></g>`;}).join('');
   const line=view.map(xy).join(' ');
-  const status='GEOMETRÍA NOMINAL · COTAS ENTRE VÉRTICES TEÓRICOS · NO CNC';
-  const common=`<text x="30" y="518" fill="#214965" font-size="14">Material: ${esc(p.material)} · Espesor: ${fmt(p.thickness)} mm · ${p.angles.length} pliegues</text><text x="30" y="545" fill="#8b3f1d" font-size="12">${status}</text><text x="30" y="572" fill="#46687c" font-size="12">Orden: ${p.sequence.map(id=>'B'+id).join(' → ')}</text>`;
+  let reference='REFERENCIA DE COTAS NO CONFIRMADA',flatLine='Desarrollo no calculado';
+  if(profile.setup){
+   try{
+    const calc=C.estimate(p,profile.setup);
+    reference=calc.dimensionBasis==='outer'?'COTAS EXTERIORES':calc.dimensionBasis==='inner'?'COTAS INTERIORES':'RECTAS HASTA TANGENCIA';
+    flatLine=calc.flat===null?'Desarrollo NO CALCULABLE · revisar cotas':'Desarrollo nominal '+fmt(calc.flat)+' mm · Ri '+fmt(calc.setup.radius)+' · K '+calc.setup.kFactor;
+   }catch{/* El plano sigue siendo geométrico aunque los parámetros de fabricación no estén validados. */}
+  }
+  const status='PERFIL DE EJES · '+reference+' · '+flatLine+' · NO CNC';
+  const common=`<text x="30" y="518" fill="#214965" font-size="14">Material: ${esc(p.material)} · Espesor: ${fmt(p.thickness)} mm · ${p.angles.length} pliegues</text><text x="30" y="545" fill="#8b3f1d" font-size="12">${esc(status)}</text><text x="30" y="572" fill="#46687c" font-size="12">Orden: ${p.sequence.map(id=>'B'+id).join(' → ')}</text>`;
   const svg2d=XML+header(p.name,'PLANO 2D')+`<polyline points="${line}" stroke="#1f719a" stroke-width="${Math.max(3,Math.min(13,p.thickness*scale))}" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`+labels+bends+common+'</svg>';
   const mesh=meshFromProfile(pts,p.thickness,width);
   const projection=M.project(mesh,38,24,1);

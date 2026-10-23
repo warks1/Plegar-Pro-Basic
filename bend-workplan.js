@@ -19,23 +19,23 @@
    if(near)issues.push('Tramo contiguo bajo regla orientativa de 0,7×V');
    if(inside<calc.punch.angle||inside<calc.die.angle)issues.push('Ángulo interior inferior al ángulo nominal de herramienta');
    const row=calc.rows[index];
-   if(row&&row.setback*2>a+b)issues.push('Retranqueos del pliegue superan la suma de tramos contiguos');
+   if(row&&row.usedSetback*2>a+b)issues.push('Retranqueos del pliegue superan la suma de tramos contiguos');
    return {step:i+1,bend,angle,inside,preceding:a,following:b,
     die:setup.die,punch:setup.punch,opening:calc.die.opening,
-    minFlange,allowance:row.allowance,deduction:row.deduction,issues};
+    minFlange,allowance:row.allowance,deduction:row.deduction,flatCenter:calc.flat===null?null:row.flatCenter,issues};
   });
   return {name:p.name,material:p.material,thickness:p.thickness,width,
-   setup,rows,nominalLength:calc.nominal,flat:calc.flat,estimatedForceKN:review.forceKN,
+   setup,rows,nominalLength:calc.nominal,flat:calc.flat,estimatedForceKN:review.forceKN,dimensionBasis:calc.dimensionBasis,
    issues:[...calc.problems,...review.warnings],intersections:review.intersections,
    warning:'Ficha geométrica orientativa. NO CNC / NO APTO PARA FABRICACIÓN. Sin máquina calibrada, radios, colisiones o utillaje real validado.'};
  }
  const esc=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
  function html(plan){
   return '<div class="ed-workplan-heading"><strong>HOJA DE PLEGADO · ORDEN SELECCIONADO</strong><span>Se actualiza al tocar los pliegues o cambiar punzón, matriz, material o espesor.</span></div>'+
-   '<div class="ed-workplan-scroll"><table><thead><tr><th>Paso</th><th>Pliegue</th><th>Giro</th><th>Interior</th><th>Tramo antes</th><th>Tramo después</th><th>Punzón</th><th>Matriz</th><th>Revisión</th></tr></thead><tbody>'+
-   plan.rows.map(r=>'<tr><td>'+r.step+'</td><td>B'+r.bend+'</td><td>'+r.angle+'°</td><td>'+r.inside+'°</td><td>'+r.preceding+' mm</td><td>'+r.following+' mm</td><td>'+esc(r.punch)+'</td><td>'+esc(r.die)+'</td><td>'+(r.issues.length?esc(r.issues.join(' · ')):'Sin alertas locales')+'</td></tr>').join('')+'</tbody></table></div>'+
+   '<div class="ed-workplan-scroll"><table><thead><tr><th>Paso</th><th>Pliegue</th><th>Giro</th><th>Interior</th><th>Tramo antes</th><th>Tramo después</th><th>Punzón</th><th>Matriz</th><th>Centro desarrollo (mm)</th><th>Revisión</th></tr></thead><tbody>'+
+   plan.rows.map(r=>'<tr><td>'+r.step+'</td><td>B'+r.bend+'</td><td>'+r.angle+'°</td><td>'+r.inside+'°</td><td>'+r.preceding+' mm</td><td>'+r.following+' mm</td><td>'+esc(r.punch)+'</td><td>'+esc(r.die)+'</td><td>'+(r.flatCenter===null?'—':r.flatCenter.toFixed(2))+'</td><td>'+(r.issues.length?esc(r.issues.join(' · ')):'Sin alertas locales')+'</td></tr>').join('')+'</tbody></table></div>'+
    '<p class="ed-workplan-note">Desarrollo nominal: '+(plan.flat===null?'no calculable':plan.flat.toFixed(2)+' mm')+
-   ' · Fuerza aproximada: '+(plan.estimatedForceKN===null?'no calculable':plan.estimatedForceKN.toFixed(1)+' kN')+
+   ' · Base cotas: '+(plan.dimensionBasis==='outer'?'exterior':plan.dimensionBasis==='inner'?'interior':'tangentes')+' · Fuerza aproximada: '+(plan.estimatedForceKN===null?'no calculable':plan.estimatedForceKN.toFixed(1)+' kN')+
    '. <b>NO CNC / NO ACEPTACIÓN DE FABRICACIÓN.</b></p>'+
    '<button id="ed-export-workplan" type="button">↓ Exportar hoja de secuencia CSV</button>';
  }
@@ -43,13 +43,13 @@
  function csv(plan){
   const body=[
    ['PLEGAR PRO PLUS','HOJA DE PLEGADO NOMINAL'],
-   ['Pieza',plan.name],['Material',plan.material],['Espesor (mm)',plan.thickness],
+   ['Pieza',plan.name],['Material',plan.material],['Espesor (mm)',plan.thickness],['Referencia cotas',plan.dimensionBasis],
    ['Ancho introducido (mm)',plan.width],['Punzón nominal',plan.setup.punch],['Matriz nominal',plan.setup.die],
    ['Desarrollo nominal (mm)',plan.flat===null?'NO CALCULABLE':plan.flat],
    ['Fuerza aproximada (kN)',plan.estimatedForceKN===null?'NO CALCULABLE':plan.estimatedForceKN],
    ['AVISO',plan.warning],
-   ['Paso','Pliegue','Giro (°)','Interior (°)','Tramo anterior (mm)','Tramo posterior (mm)','Apertura V (mm)','Punzón','Matriz','Incidencias'],
-   ...plan.rows.map(r=>[r.step,r.bend,r.angle,r.inside,r.preceding,r.following,r.opening,r.punch,r.die,r.issues.join(' · ')])
+   ['Paso','Pliegue','Giro (°)','Interior (°)','Tramo anterior (mm)','Tramo posterior (mm)','Apertura V (mm)','Punzón','Matriz','Centro en desarrollo (mm)','Incidencias'],
+   ...plan.rows.map(r=>[r.step,r.bend,r.angle,r.inside,r.preceding,r.following,r.opening,r.punch,r.die,r.flatCenter===null?'NO CALCULABLE':r.flatCenter,r.issues.join(' · ')])
   ];
   return '\uFEFF'+body.map(line=>line.map(field).join(';')).join('\r\n')+'\r\n';
  }

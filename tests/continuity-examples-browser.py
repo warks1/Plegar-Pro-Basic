@@ -83,6 +83,20 @@ with sync_playwright() as pw:
   page.locator('[data-project-action="program2d"]').first.click()
   assert page.locator('#ed-workplan table').count()==1
   assert page.locator('#ed-export-workplan').count()==1
+  assert page.locator('#ed-basis').count()==1 and page.locator('#ed-quick-basis').count()==1
+  assert page.locator('#ed-flat-pattern .ed-flat-svg').count()==1
+  outside=page.evaluate('PlegarBendCalc.estimate(PlegarEditor2D.getData(),PlegarEditor2D.getData().setup).flat')
+  page.locator('#ed-quick-basis').select_option('inner')
+  assert page.evaluate('PlegarEditor2D.getData().setup.dimensionBasis')=='inner'
+  inside=page.evaluate('PlegarBendCalc.estimate(PlegarEditor2D.getData(),PlegarEditor2D.getData().setup).flat')
+  assert abs(outside-inside)>0.01
+  page.locator('#ed-basis').select_option('outer')
+  assert page.evaluate('PlegarEditor2D.getData().setup.dimensionBasis')=='outer'
+  assert page.locator('#ed-flat-pattern .ed-flat-table-wrap tr').count()>1
+  measured=page.evaluate('PlegarBendCalc.estimate(PlegarEditor2D.getData(),{...PlegarEditor2D.getData().setup,kFactor:0.42}).flat')
+  page.locator('#ed-trial-flat').fill(str(measured))
+  page.locator('#ed-calibrate-k').click()
+  assert abs(page.evaluate('PlegarEditor2D.getData().setup.kFactor')-0.42)<0.0001
   assert page.locator('#ed-example-gallery [data-example-id]').count()==4
   svg_views=page.locator('#ed-example-gallery .example-gadget svg').evaluate_all('(els)=>els.map(el=>el.innerHTML)')
   assert len(svg_views)==8 and len(set(svg_views))==8,'Cada tarjeta debe mostrar un plano 2D y una geometría 3D propios'

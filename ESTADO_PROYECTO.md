@@ -169,3 +169,9 @@ Ajuste de presentación a pantalla completa sin franjas de imagen no ocupadas. S
 - Nuevo motor independiente `touch-view.js` con drag a un dedo/ratón, pellizco a dos dedos para zoom 0,7–4x y doble toque/doble clic para centrar. Se aplica al panel principal, vista previa, Seguimiento 2D y Simulación 3D sin borrar sus vistas al actualizar los fotogramas.
 - Botones anteriores de zoom, cámaras y orden se conservan. Los gestos transforman la cámara de presentación y no alteran medidas, coordenadas de fabricación ni la simulación de máquina.
 - Actualización de caché offline v44 y precarga del archivo de imagen existente; pruebas Node y Chromium por verificar.
+
+## v0.45 — Desarrollo de chapa y selección de referencia dimensional (23 octubre 2026)
+- `bendcalc.js`: mantiene BA, BD y OSSB tradicionales para cotas exteriores como valor por defecto, añade cotas interiores (ISSB), longitudes rectas hasta tangencia, validaciones por tramo, arcos de fibra neutra y coordenadas en el desarrollo de B1…Bn. El motor exige una referencia única para toda la pieza.
+- `flat-pattern-view.js`: vista de la tira plana según el modo seleccionado, con zonas de arco, centros de pliegue y cotas acumuladas. El resultado se anula si los tramos son demasiado cortos; no se exporta un corte validado.
+- En Programación 2D se eligen modo de cota, Ri, espesor, K; nuevo botón de calibración matemática de K a partir de un ensayo real (requiere medir la probeta). Sensibilidad entre K=0,30 y K=0,50. Los perfiles heredados continúan con referencia exterior para no romper la compatibilidad.
+- La hoja de trabajo muestra la referencia y centros de pliegue; el plano 2D/3D generado aclara que es nominal y añade desarrollo calculado, si es viable. Fórmulas no consideran springback, ancho variable, conformado plástico complejo ni tablas reales de máquina; NO apto para CNC ni fabricación sin calibración.

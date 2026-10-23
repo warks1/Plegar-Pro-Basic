@@ -3,10 +3,11 @@
  */
 (function(root,factory){
  const api=factory(typeof module==='object'&&module.exports?require('./geometry2d.js'):root.PlegarGeometry2D,
-                   typeof module==='object'&&module.exports?require('./piece3d.js'):root.PlegarPiece3D);
+                   typeof module==='object'&&module.exports?require('./piece3d.js'):root.PlegarPiece3D,
+                    typeof module==='object'&&module.exports?require('./sheet-offset.js'):root.PlegarSheetOffset);
  if(typeof module==='object'&&module.exports)module.exports=api;
  else root.PlegarPlanDrawing=api;
-})(typeof globalThis!=='undefined'?globalThis:this,function(G,M){
+})(typeof globalThis!=='undefined'?globalThis:this,function(G,M,Offset){
  'use strict';
  const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\'':'&apos;'}[c]));
  const fmt=v=>Number(v).toFixed(2).replace(/\.00$/,'');
@@ -14,14 +15,11 @@
  const XML='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 600" role="img">';
  const header=(name,type)=>`<rect width="900" height="600" fill="#f8fafc"/><rect width="900" height="74" fill="#153c59"/><text x="30" y="32" fill="#fff" font-size="19" font-weight="bold">PLEGAR PRO PLUS · ${type}</text><text x="30" y="57" fill="#bde9ff" font-size="14">${esc(name)}</text>`;
  function meshFromProfile(points,thickness,width){
-  const vertices=[],faces=[];
+  const vertices=[],faces=[],offsets=Offset.normals(points,thickness);
   for(let i=0;i<points.length;i++){
-   const a=points[Math.max(0,i-1)],b=points[Math.min(points.length-1,i+1)];
-   let dx=b.x-a.x,dy=b.y-a.y,l=Math.hypot(dx,dy);
-   if(l<1e-9){dx=1;dy=0;l=1;}
-   const nx=-dy/l*thickness/2,ny=dx/l*thickness/2,p=points[i];
+   const p=points[i],{x:nx,y:ny}=offsets[i];
    vertices.push({x:p.x+nx,y:p.y+ny,z:0},{x:p.x-nx,y:p.y-ny,z:0},
-                 {x:p.x+nx,y:p.y+ny,z:width},{x:p.x-nx,y:p.y-ny,z:width});
+     {x:p.x+nx,y:p.y+ny,z:width},{x:p.x-nx,y:p.y-ny,z:width});
   }
   for(let i=0;i<points.length-1;i++){
    const a=i*4,b=a+4;

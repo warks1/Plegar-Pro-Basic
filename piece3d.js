@@ -5,6 +5,7 @@
 (function(root,factory){const api=factory();if(typeof module==='object'&&module.exports)module.exports=api;else root.PlegarPiece3D=api;})(typeof globalThis!=='undefined'?globalThis:this,function(){
  'use strict';
  const rad=d=>d*Math.PI/180;
+ const Offset=typeof module==='object'&&module.exports?require('./sheet-offset.js'):window.PlegarSheetOffset;
  function build(scene,width=100){
   if(!Number.isFinite(width)||width<=0||width>5000)throw new Error('Ancho ilustrativo inválido (0–5000 mm).');
   const contour=scene.assembly?.contour,t=scene.thickness;
@@ -24,13 +25,11 @@
    return slice.includes('active')?'active':slice.at(-1)||'pending';
   });
   if(points.length<2)throw new Error('Perfil degenerado.');
-  const vertices=[];
+  const vertices=[],offsets=Offset.normals(points,t);
   for(let i=0;i<points.length;i++){
-   const before=points[Math.max(0,i-1)],after=points[Math.min(points.length-1,i+1)];
-   let dx=after.x-before.x,dy=after.y-before.y,L=Math.hypot(dx,dy);
-   if(L<1e-9){dx=1;dy=0;L=1;}
-   const nx=-dy/L*t/2,ny=dx/L*t/2,p=points[i];
-   vertices.push({x:p.x+nx,y:p.y+ny,z:0},{x:p.x-nx,y:p.y-ny,z:0},{x:p.x+nx,y:p.y+ny,z:width},{x:p.x-nx,y:p.y-ny,z:width});
+   const {x:nx,y:ny}=offsets[i],p=points[i];
+   vertices.push({x:p.x+nx,y:p.y+ny,z:0},{x:p.x-nx,y:p.y-ny,z:0},
+    {x:p.x+nx,y:p.y+ny,z:width},{x:p.x-nx,y:p.y-ny,z:width});
   }
   const faces=[];
   for(let i=0;i<points.length-1;i++){

@@ -140,6 +140,7 @@
   if(typeof input!=='string'||input.length>MAX_SIZE||input.length<30)throw Error('DXF ASCII demasiado grande, vacío o inválido (máximo 750 KB).');
   if(input.includes('\0'))throw Error('DXF binario no admitido. Exporta en ASCII.');
   const rows=input.replace(/^\uFEFF/,'').replace(/\r/g,'').split('\n');
+  if(rows.length%2===1&&rows.pop().trim()!=='')throw Error('DXF truncado: código sin valor.');
   const pairs=[];
   for(let i=0;i+1<rows.length;i+=2){
    const code=Number(rows[i].trim()),value=rows[i+1].trim();
@@ -157,6 +158,7 @@
   }
   if(units!==null&&units!==0&&units!==4)throw Error('El DXF no está en milímetros ($INSUNITS='+units+'). Convierte primero a mm.');
   if((units===null||units===0)&&confirmUnitlessMm!==true)throw Error('DXF sin unidades definidas. Confirma expresamente que las coordenadas están en mm.');
+  if(!pairs.some(c=>c.code===0&&c.value==='EOF'))throw Error('DXF incompleto: falta marcador EOF.');
   let section='',entities=false;
   const polys=[],unsupported=[];
   for(let i=0;i<pairs.length;i++){
@@ -169,7 +171,16 @@
     const row=[];
     for(i++;i<pairs.length&&pairs[i].code!==0;i++)row.push(pairs[i]);
     i--;
-    const flags=Number(row.find(a=>a.code===70)?.value||0);
+    const value=(code,def)=>row.find(c=>c.code===code)?.value??def;
+    const flags=Number(value(70,'0'));
+    if(!Number.isInteger(flags)||(flags&~129))throw Error('LWPOLYLINE con banderas geométricas desconocidas.');
+    const elevation=Number(value(38,'0')),thickness=Number(value(39,'0'));
+    if(!finite(elevation)||!finite(thickness)||Math.abs(elevation)>1e-8||Math.abs(thickness)>1e-8)
+     throw Error('LWPOLYLINE elevada o con espesor tridimensional: proyectar a plano XY.');
+    const nx=Number(value(210,'0')),ny=Number(value(220,'0')),nz=Number(value(230,'1'));
+    if(!finite(nx)||!finite(ny)||!finite(nz)||Math.abs(nx)>1e-8||
+      Math.abs(ny)>1e-8||Math.abs(nz-1)>1e-8)
+     throw Error('LWPOLYLINE no está orientada en XY (+Z); transforma el CAD previamente.');
     const points=[];let variableWidth=false;
     for(const c of row){
      if(c.code===10)points.push({x:Number(c.value),y:null,bulge:0});
@@ -178,8 +189,7 @@
       if(!points.length)throw Error('Bulge sin vértice DXF.');
       points[points.length-1].bulge=Number(c.value);
      }
-     if([40,41,43].includes(c.code)&&Math.abs(Number(c.value))>1e-10)variableWidth=true;
-     if([210,220,230].includes(c.code)&&c.code!==230&&Math.abs(Number(c.value))>1e-10)throw Error('Plano DXF inclinado: convertir a vista XY.');
+     if([40,41,43].includes(c.code)&&(!finite(Number(c.value))||Math.abs(Number(c.value))>1e-10))variableWidth=true;
     }
     if(variableWidth)throw Error('DXF con anchura de polilínea variable no admitida.');
     if(points.some(p=>p.y===null))throw Error('Vértice sin Y.');

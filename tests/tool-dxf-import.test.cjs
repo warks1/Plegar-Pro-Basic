@@ -316,3 +316,21 @@ test('SVG de referencia maliciosa escapa título, no permite modificar puntos de
  assert.deepEqual(D.read()[0].points,original);
  D.remove(record.id);
 });
+
+
+test('LWPOLYLINE rechaza elevación Z, grosor CAD y normal invertida o inclinada',()=>{
+ const section=dxf(),front=section.includes('0\nLWPOLYLINE\n');
+ assert.equal(front,true);
+ const altered=part=>section.replace('0\nLWPOLYLINE\n','0\nLWPOLYLINE\n'+part);
+ for(const values of ['38\n3\n','39\n2\n','230\n-1\n','210\n0.3\n','220\n-0.5\n']){
+  assert.throws(()=>D.parseDXF(altered(values)),/elevada|espesor|XY/);
+ }
+ assert.throws(()=>D.parseDXF(altered('70\n16\n')),/banderas/);
+ assert.throws(()=>D.parseDXF(altered('43\nno-es-numero\n')),/anchura de polilínea variable/);
+});
+test('DXF incompleto, EOF ausente o código de grupo sin valor se rechaza',()=>{
+ const text=dxf();
+ assert.throws(()=>D.parseDXF(text.replace('0\nEOF\n','')),/EOF/);
+ assert.throws(()=>D.parseDXF(text+'10'),/truncado/);
+ assert.throws(()=>D.parseDXF(text.replace('0\nLWPOLYLINE\n','0\nLWPOLYLINE\n38\nno-es-numero\n')),/elevada/);
+});

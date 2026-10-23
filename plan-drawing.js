@@ -5,10 +5,11 @@
  const api=factory(typeof module==='object'&&module.exports?require('./geometry2d.js'):root.PlegarGeometry2D,
                    typeof module==='object'&&module.exports?require('./piece3d.js'):root.PlegarPiece3D,
                     typeof module==='object'&&module.exports?require('./sheet-offset.js'):root.PlegarSheetOffset,
-                    typeof module==='object'&&module.exports?require('./bendcalc.js'):root.PlegarBendCalc);
+                    typeof module==='object'&&module.exports?require('./bendcalc.js'):root.PlegarBendCalc,
+                    typeof module==='object'&&module.exports?require('./metal-render.js'):root.PlegarMetalRender);
  if(typeof module==='object'&&module.exports)module.exports=api;
  else root.PlegarPlanDrawing=api;
-})(typeof globalThis!=='undefined'?globalThis:this,function(G,M,Offset,C){
+})(typeof globalThis!=='undefined'?globalThis:this,function(G,M,Offset,C,R){
  'use strict';
  const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\'':'&apos;'}[c]));
  const fmt=v=>Number(v).toFixed(2).replace(/\.00$/,'');
@@ -57,8 +58,13 @@
   const svg2d=XML+header(p.name,'PLANO 2D')+`<polyline points="${line}" stroke="#1f719a" stroke-width="${Math.max(3,Math.min(13,p.thickness*scale))}" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`+labels+bends+common+'</svg>';
   const mesh=meshFromProfile(pts,p.thickness,width);
   const projection=M.project(mesh,38,24,1);
-  const polygons=projection.faces.map(f=>`<polygon points="${f.points.map(xy).join(' ')}" fill="${f.kind==='upper'?'#91c7e5':f.kind==='lower'?'#4f7b97':'#315d79'}" stroke="#163f5a" stroke-width="0.9" stroke-linejoin="round"/>`).join('');
-  const svg3d=XML+header(p.name,'VISTA AXONOMÉTRICA 3D')+`<g transform="translate(0 38)">${polygons}</g><text x="30" y="518" fill="#214965" font-size="14">Ancho introducido: ${fmt(width)} mm · Espesor: ${fmt(p.thickness)} mm · Material: ${esc(p.material)}</text><text x="30" y="545" fill="#8b3f1d" font-size="12">MALLA 3D NOMINAL DE ESPESOR · SIN RADIOS FÍSICOS NI RECUPERACIÓN ELÁSTICA</text><text x="30" y="572" fill="#46687c" font-size="12">Vista proyectada del mismo perfil acotado 2D · No es STEP/STL sólido validado.</text></svg>`;
+  const polygons=R.polys(mesh,projection,'pp-plan-metal',{material:p.material});
+  const svg3d=XML+header(p.name,'VISTA METAL SATINADO 3D')+
+   '<g transform="translate(0 74)">'+R.defs('pp-plan-metal')+R.background('pp-plan-metal')+polygons+'</g>'+
+   '<rect x="0" y="496" width="900" height="104" fill="#e7edf1"/>'+
+   '<text x="30" y="518" fill="#24435b" font-size="14">Ancho introducido: '+fmt(width)+' mm · Espesor: '+fmt(p.thickness)+' mm · Material: '+esc(p.material)+'</text>'+
+   '<text x="30" y="545" fill="#8b3f1d" font-size="12">METAL SATINADO SIMULADO · GEOMETRÍA NOMINAL · NO CNC</text>'+
+   '<text x="30" y="572" fill="#46687c" font-size="12">Solo caras de la chapa definidas: taladros, recortes y radios no se inventan.</text></svg>';
   const inside=s=>s.replace(/^<svg[^>]*>/,'').replace(/<\/svg>$/,'');
   const sheet='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1800 600" role="img"><svg x="0" y="0" width="900" height="600" viewBox="0 0 900 600">'+inside(svg2d)+'</svg><svg x="900" y="0" width="900" height="600" viewBox="0 0 900 600">'+inside(svg3d)+'</svg></svg>';
   return {profile:{...p,setup:profile.setup?{...profile.setup}:undefined},width,svg2d,svg3d,sheet,mesh,source:'Perfil calculado de longitudes y ángulos introducidos. NO sirve para fabricación ni CNC.'};

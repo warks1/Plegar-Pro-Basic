@@ -355,7 +355,7 @@ with sync_playwright() as pw:
   page.locator('.f2-range').evaluate("(el)=>{el.value='60';el.dispatchEvent(new Event('input',{bubbles:true}));}")
   assert page.locator('.f2d-svg [data-component="mesa"]').get_attribute('d')==mesa_antes
   assert page.locator('.f2d-svg [data-component="trancha"]').get_attribute('d')!=trancha_antes
-  assert 'PARCIALMENTE SIN COTAS' in page.locator('.f2d-svg').inner_text() if page.locator('.f2d-svg').is_visible() else True
+  assert 'PARCIALMENTE SIN COTAS' in page.locator('.f2d-svg').text_content()
   page.locator('[data-f2-action="reset"]').click()
   assert page.locator('.f2-tile svg').count()==4
   assert page.locator('.f2-tile[data-f2-step="start"]').count()==1

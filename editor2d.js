@@ -80,9 +80,27 @@ function draw(){
  $('#ed-total').textContent=`${fmt(G.totalLength(state))} mm nominales entre vértices`;
  $('#ed-count').textContent=`${state.segments.length} tramos · ${state.angles.length} pliegues`;
 }
+function renderDimensionTable(){
+ const host=$('#ed-dimensions-body');if(!host)return;
+ let accumulated=0;
+ host.innerHTML=state.segments.map((length,i)=>{
+  accumulated+=length;
+  const bend=i+1,hasBend=i<state.angles.length,angle=state.angles[i];
+  return '<tr'+(hasBend&&selected===bend?' class="ed-dim-selected"':'')+'>'+
+   '<th scope="row">Tramo '+(i+1)+'</th>'+
+   '<td data-label="Longitud (mm)"><input data-ed-program-segment="'+i+'" type="number" inputmode="decimal" min="0.1" max="100000" step="0.1" value="'+length+'" aria-label="Medida del tramo '+(i+1)+' en milímetros"></td>'+
+   '<td data-label="Pliegue">'+(hasBend?'<button type="button" data-ed-focus="'+bend+'" class="ed-dim-bend-button" aria-label="Seleccionar pliegue '+bend+'">B'+bend+'</button>':'—')+'</td>'+
+   '<td data-label="Giro (°)">'+(hasBend?'<input data-ed-program-angle="'+i+'" type="number" inputmode="decimal" min="-179" max="179" step="0.1" value="'+angle+'" aria-label="Ángulo firmado del pliegue '+bend+' en grados">':'—')+'</td>'+
+   '<td data-label="Orden">'+(hasBend?'<select data-ed-program-position="'+bend+'" aria-label="Orden del pliegue '+bend+'">'+state.sequence.map((id,j)=>'<option value="'+(j+1)+'"'+(id===bend?' selected':'')+'>Paso '+(j+1)+'</option>').join('')+'</select>':'—')+'</td>'+
+   '<td class="ed-dim-sum" data-label="Posición nominal">'+fmt(accumulated)+' mm</td></tr>';
+ }).join('');
+ const total=$('#ed-dimensions-total');
+ if(total)total.textContent=state.segments.length+' tramos · '+state.angles.length+' pliegues · '+fmt(G.totalLength(state))+' mm nominales en cadena (NO desarrollo)';
+}
 function render(){
  if(!$('#ed-svg'))return;
  renderPlanReference();
+ renderDimensionTable();
  $('#ed-name').value=state.name;
  $('#ed-material').value=state.material;
  $('#ed-thickness').value=String(state.thickness);
@@ -205,6 +223,14 @@ function renderCalc(){
  $('#ed-calc-result').setAttribute('data-calculable',String(result.flat!==null));
 }
 function layout(){return `<section class="editor2d" aria-label="Editor de programación 2D">
+ <section class="ed-dimensions-panel" aria-label="Introducir medidas de la pieza y los pliegues">
+ <div class="ed-dimensions-heading"><strong>MEDIDAS DE LA PIEZA · EDITAR TRAMOS Y PLIEGUES</strong><span id="ed-dimensions-total"></span></div>
+ <p>Introduce la longitud de cada tramo, el ángulo firmado (−/+), y el orden de cada pliegue. Se actualizan automáticamente el dibujo, la vista 3D y las simulaciones. Los valores son nominales y deben verificarse con el plano real.</p>
+ <div class="ed-dimensions-scroll" role="region" tabindex="0" aria-label="Tabla editable de medidas de plegado; desplazamiento horizontal en móvil">
+ <table class="ed-dimensions-table"><thead><tr><th>Tramo</th><th>Longitud (mm)</th><th>Pliegue</th><th>Giro (°)</th><th>Orden</th><th>Posición acumulada*</th></tr></thead><tbody id="ed-dimensions-body"></tbody></table></div>
+ <p class="ed-dimensions-foot">*Posición acumulada: suma de tramos introducidos, no medida real del desarrollo. Ángulo positivo/negativo indica el sentido nominal; la reorientación de la chapa no está validada.</p>
+ <div class="ed-dimensions-actions"><button type="button" id="ed-dim-add">＋ Añadir tramo / pliegue</button><button type="button" id="ed-dim-remove">− Quitar último tramo</button><button type="button" id="ed-dim-view">Ver pliegues en el dibujo ↓</button></div>
+ </section>
  <div class="ed-toolbar"><span class="ed-chip">EDITOR GEOMÉTRICO · v0.7</span><div class="ed-actions"><button type="button" id="ed-undo" aria-label="Deshacer">↶ Deshacer</button><button type="button" id="ed-redo" aria-label="Rehacer">↷ Rehacer</button><button type="button" id="ed-save">Guardar</button><label class="ed-plan-export-width">Ancho 3D (mm)<input id="ed-plan-width" type="number" min="1" max="5000" step="1" value="100" inputmode="decimal"/></label><button type="button" id="ed-save-plan">Crear y guardar plano 2D + 3D</button><button type="button" id="ed-export">Exportar JSON</button><label class="ed-import">Importar JSON<input type="file" id="ed-import" accept=".json,application/json" aria-label="Importar pieza JSON"></label></div></div>
  <div class="ed-quick-setup" role="group" aria-label="Configuración esencial de plegado">
  <div class="ed-quick-intro"><strong>PROGRAMACIÓN DE PLEGADO · CONTROLES PRINCIPALES</strong><span>Todos los parámetros se sincronizan con el editor inferior y el visor 3D.</span></div>
@@ -262,9 +288,9 @@ if(el.id==='ed-table-left'){if(el.value.trim()===''){edit(d=>{d.setup.tableLeft=
  if(el.id==='ed-ram-offset'){if(el.value.trim()===''){edit(d=>{d.setup.ramBottomOffset=null;});return;}const v=readNumber(el,10,500);if(v!==null)edit(d=>{d.setup.ramBottomOffset=v;});return;}
  if(el.id==='ed-backgauge'){const v=readNumber(el,1,10000);if(v!==null)edit(d=>{d.setup.backgaugeX=v;});return;}
  if(el.id==='ed-thickness'){const v=readNumber(el,.1,100);if(v!==null)edit(d=>{d.thickness=v;});return;}
- if(el.matches('[data-ed-segment]')){const v=readNumber(el,.1,100000);if(v!==null)edit(d=>{d.segments[Number(el.dataset.edSegment)]=v;});return;}
- if(el.matches('[data-ed-angle]')){const v=readNumber(el,-179,179);if(v!==null)edit(d=>{d.angles[Number(el.dataset.edAngle)]=v;});return;}
-  if(el.matches('[data-ed-position]')){const id=Number(el.dataset.edPosition),position=Number(el.value);
+ if(el.matches('[data-ed-segment],[data-ed-program-segment]')){const v=readNumber(el,.1,100000);if(v!==null)edit(d=>{d.segments[Number(el.dataset.edSegment??el.dataset.edProgramSegment)]=v;});return;}
+ if(el.matches('[data-ed-angle],[data-ed-program-angle]')){const v=readNumber(el,-179,179);if(v!==null)edit(d=>{d.angles[Number(el.dataset.edAngle??el.dataset.edProgramAngle)]=v;});return;}
+  if(el.matches('[data-ed-position],[data-ed-program-position]')){const id=Number(el.dataset.edPosition??el.dataset.edProgramPosition),position=Number(el.value);
    if(!Number.isInteger(position)||position<1||position>state.sequence.length)return;
    selected=id;edit(d=>{const at=d.sequence.indexOf(id);d.sequence.splice(at,1);d.sequence.splice(position-1,0,id);});
    inform('Orden actualizado y sincronizado con simulación 2D/3D.');return;}
@@ -273,6 +299,7 @@ function actions(event){
  const b=event.target.closest('button,[data-ed-bend]');if(!b)return;
  const example=b.closest('[data-example-id]')?.dataset.exampleId;
  if(example){const record=window.PlegarExamples3D?.get(example);if(record){orderPick=0;orderUsed.clear();loadProfile(record.profile,{width:record.width});inform('Pieza '+record.label+' cargada. Cambia el orden o reproduce sus pliegues.');}return;}
+ if(b.dataset.edFocus){selected=Number(b.dataset.edFocus);render();inform('Pliegue '+selected+' seleccionado. Puedes modificar su longitud, ángulo y orden desde la tabla superior.');return;}
  const sel=b.dataset.edSelect??b.dataset.edBend;
  if(sel){selected=Number(sel);
   if(orderPick&&b.dataset.edBend){
@@ -306,8 +333,9 @@ function actions(event){
  case 'ed-plan-create':configurePlan();return;
  case 'ed-plan-sim2d':if(planConfiguredId===planReference?.id)window.PlegarApp?.switchScreen('Simulación 2D');return;
  case 'ed-plan-sim3d':if(planConfiguredId===planReference?.id)window.PlegarApp?.switchScreen('Simulación 3D');return;
- case 'ed-add': if(state.segments.length>=G.MAX_SEGMENTS){inform('Máximo 24 tramos.');return;}edit(d=>{d.segments.push(60);d.angles.push(90);d.sequence.push(d.sequence.length+1);});break;
- case 'ed-remove': if(state.segments.length<=2)return;edit(d=>{d.segments.pop();d.angles.pop();d.sequence=d.sequence.filter(id=>id<=d.angles.length);});break;
+ case 'ed-dim-view':$('#ed-svg')?.scrollIntoView({behavior:'smooth',block:'center'});return;
+ case 'ed-dim-add':case 'ed-add': if(state.segments.length>=G.MAX_SEGMENTS){inform('Máximo 24 tramos.');return;}edit(d=>{d.segments.push(60);d.angles.push(90);d.sequence.push(d.sequence.length+1);});break;
+ case 'ed-dim-remove':case 'ed-remove': if(state.segments.length<=2)return;edit(d=>{d.segments.pop();d.angles.pop();d.sequence=d.sequence.filter(id=>id<=d.angles.length);});break;
  case 'ed-undo':history('undo');break;
  case 'ed-redo':history('redo');break;
  case 'ed-up':case 'ed-down':{

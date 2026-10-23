@@ -4,9 +4,10 @@
 (function(root,factory){
  const api=factory(typeof module==='object'&&module.exports?require('./geometry2d.js'):root.PlegarGeometry2D,
  typeof module==='object'&&module.exports?require('./plan-drawing.js'):root.PlegarPlanDrawing,
- typeof module==='object'&&module.exports?require('./piece3d.js'):root.PlegarPiece3D);
+ typeof module==='object'&&module.exports?require('./piece3d.js'):root.PlegarPiece3D,
+ typeof module==='object'&&module.exports?require('./metal-render.js'):root.PlegarMetalRender);
  if(typeof module==='object'&&module.exports)module.exports=api;else root.PlegarExamples3D=api;
-})(typeof globalThis!=='undefined'?globalThis:this,function(G,D,M){
+})(typeof globalThis!=='undefined'?globalThis:this,function(G,D,M,R){
  'use strict';
  const setup={radius:2,kFactor:.33,punch:'p88-r1',die:'v16-88',backgaugeX:120};
  const shapes=[
@@ -23,10 +24,9 @@
  function get(id){return list().find(s=>s.id===id)||null;}
  function thumb(item){
   const p=G.validate(item.profile),mesh=D.meshFromProfile(G.vertices(p),p.thickness,item.width);
-  const proj=M.project(mesh,38,28,1);
-  const colors={upper:'#57bde5',lower:'#1d668e',edge:'#89d5f1'};
-  const faces=proj.faces.map(f=>'<polygon points="'+f.points.map(v=>v.x.toFixed(2)+','+v.y.toFixed(2)).join(' ')+'" fill="'+(colors[f.kind]||colors.upper)+'" stroke="#b8ecff" stroke-width="1.6" stroke-linejoin="round"/>').join('');
-  return '<svg viewBox="0 0 900 480" role="img" aria-label="Sólido ilustrativo 3D '+item.label+'"><rect width="900" height="480" fill="#10283c"/>'+faces+'</svg>';
+  const proj=M.project(mesh,38,28,1),prefix='pp-gallery-metal';
+  return '<svg viewBox="0 0 900 480" role="img" aria-label="Vista metálica ilustrativa 3D '+item.label+'">'+
+   R.defs(prefix)+R.background(prefix)+R.polys(mesh,proj,prefix,{material:p.material})+'</svg>';
  }
  function cards(selectedName=''){
   return list().map(item=>'<button type="button" class="example-gadget'+(item.profile.name===selectedName?' selected':'')+'" data-example-id="'+item.id+'" aria-label="Cargar pieza '+item.label+'">'+

@@ -145,7 +145,7 @@ with sync_playwright() as pw:
   if w<=1120:page.locator('#open-menu').click()
   page.locator('button.nav-item[data-screen="Utillaje"]').click()
   # Importación métrica desde un contorno cerrado real del archivo, sin convertirlo en útil homologado.
-  page.locator('.tool-dxf-importer summary').click()
+  page.locator('.tool-dxf-importer > details > summary').click()
   dxf_rows=[
    '0','SECTION','2','HEADER','9','$INSUNITS','70','4','0','ENDSEC',
    '0','SECTION','2','ENTITIES','0','LWPOLYLINE','90','4','70','1',
@@ -268,6 +268,41 @@ with sync_playwright() as pw:
   with page.expect_download(timeout=10000) as svg_download:
    page.locator('[data-dxf-section="svg"]').click()
   assert svg_download.value.suggested_filename.endswith('.svg')
+  # Cotejo nominal de herramientas locales: advertir medidas y no prometer colisiones seguras.
+  page.locator('.tool-dxf-card [data-dxf-length-input]').fill('250')
+  page.locator('.tool-dxf-card [data-dxf-length-save]').click()
+  punch_id=page.evaluate("""() => {
+   const pts=[[0,0],[45,0],[45,150],[0,150]],lines=[
+    '0','SECTION','2','HEADER','9','$INSUNITS','70','4','0','ENDSEC',
+    '0','SECTION','2','ENTITIES','0','LWPOLYLINE','90','4','70','1'];
+   for(const [x,y] of pts)lines.push('10',String(x),'20',String(y));
+   lines.push('0','ENDSEC','0','EOF');
+   const punch=PlegarToolDXF.add({brand:'MECOS',kind:'punch',code:'P300-TEST',
+    name:'Punzón local',lengthMm:300},lines.join('\\n')+'\\n');
+   PlegarToolFitAudit.refresh();
+   return punch.id;
+  }""")
+  die_id=page.evaluate("PlegarToolDXF.read().find(x=>x.kind==='die').id")
+  page.locator('.tool-fit-panel summary').click()
+  page.locator('[data-tool-fit="punch"]').select_option(punch_id)
+  page.locator('[data-tool-fit="die"]').select_option(die_id)
+  page.locator('[data-tool-fit="sheet"]').fill('400')
+  page.locator('[data-tool-fit="machine"]').select_option('bystronic-ep-ii-31-100-2006')
+  page.locator('[data-tool-fit-action="inspect"]').click()
+  assert 'INCOMPATIBILIDAD NOMINAL' in page.locator('[data-tool-fit-result]').inner_text()
+  assert page.locator('.tool-fit-graph').count()==1
+  assert page.evaluate("""() => {
+   const r=PlegarToolFitAudit.inspect({
+    punch:PlegarToolDXF.read().find(x=>x.kind==='punch'),
+    die:PlegarToolDXF.read().find(x=>x.kind==='die'),
+    sheetWidthMm:400,machine:PlegarMachineReferences.reference});
+   return r.checks.sheetExceedsSinglePair && !r.approvedForCNC && !r.collisionClearanceVerified;
+  }""")
+  with page.expect_download(timeout=10000) as audit_download:
+   page.locator('[data-tool-fit-action="export"]').click()
+  assert audit_download.value.suggested_filename.endswith('SIN-VALIDAR.json')
+  page.evaluate("(id) => {PlegarToolDXF.remove(id);PlegarToolFitAudit.refresh();}",punch_id)
+  assert page.locator('[data-tool-fit="punch"] option').count()==1
   page.locator('[data-dxf-remove]').click()
   assert page.locator('.tool-dxf-card').count()==0
   assert page.locator('.mfg-card').count()>=20

@@ -33,7 +33,7 @@ function svg(m,zoom,bounds){
  <defs><pattern id="f2d-grid" width="20" height="20" patternUnits="userSpaceOnUse"><path d="M20 0V20H0" fill="none" stroke="#193a55" stroke-width=".7"/></pattern><linearGradient id="f2d-metal" x1="0" y1="0" x2="1" y2="0"><stop stop-color="#435970"/><stop offset=".48" stop-color="#b8d2e9"/><stop offset="1" stop-color="#364a60"/></linearGradient><linearGradient id="f2d-sheet" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#e0f5ff"/><stop offset="1" stop-color="#38b6ed"/></linearGradient></defs>
  <rect width="900" height="480" fill="#071a29"/><rect width="900" height="480" fill="url(#f2d-grid)"/>
  <g transform="translate(440 250) scale(${s.toFixed(5)}) translate(${-centreX.toFixed(5)} ${-centreY.toFixed(5)})">
- <path d="${dieOutline}" fill="url(#f2d-metal)" stroke="#83a1ba" stroke-width=".7"/>
+ <path d="${dieOutline}" fill="#744047" stroke="#d2767b" stroke-width=".7"/>
  <path d="M ${-half} 0 L 0 ${m.dieDepth} L ${half} 0" stroke="#b7d8ee" stroke-width=".9" fill="none"/>
  <path d="${punchOutline}" fill="url(#f2d-metal)" stroke="#d0e5f4" stroke-width=".9"/>
  ${wholePaths}
@@ -42,7 +42,7 @@ function svg(m,zoom,bounds){
  <path d="${line}" stroke="url(#f2d-sheet)" stroke-width="${m.thickness}" fill="none" stroke-linejoin="round" stroke-linecap="round"/>
  <g stroke="#f8bf56" stroke-width=".6" fill="#f8bf56"><circle cx="${-half}" cy="0" r=".9"/><circle cx="${half}" cy="0" r=".9"/></g>
  <circle cx="0" cy="${m.center.y}" r="1.1" fill="#ffb754"/>
- <rect x="${m.stop.x}" y="${m.stop.top}" width="${m.stop.width}" height="${m.stop.bottom-m.stop.top}" rx="1" fill="${overlap?'#dc7770':'#e7b34a'}" stroke="#f8d890" stroke-width=".4"/>
+ <rect x="${m.stop.x}" y="${m.stop.top}" width="${m.stop.width}" height="${m.stop.bottom-m.stop.top}" rx="1" fill="${overlap?'#dc7770':'#53ae81'}" stroke="#afe7c1" stroke-width=".4"/>
  <path d="M ${m.stop.x+m.stop.width/2} ${m.stop.top} v -15 h ${Math.max(5,m.dieOpening/3)}" stroke="#ddab4b" stroke-width="1.4" fill="none"/>
  <path d="M ${-half} ${dimension} V ${dimension-3} M ${half} ${dimension} V ${dimension-3} M ${-half} ${dimension-1.5} H ${half}" stroke="#67bce9" stroke-width=".6" fill="none" stroke-dasharray="1.5 1"/>
  </g>
@@ -54,7 +54,7 @@ function svg(m,zoom,bounds){
  <text x="885" y="28" text-anchor="end" font-size="11" fill="#eac187">PERFIL CON RADIO · APROXIMACIÓN</text>
  <text x="885" y="434" text-anchor="end" font-size="11" fill="${overlap?'#ff927b':warn}">Cribado 2D: ${html(m.interferences.status)}</text>
  <text x="885" y="450" text-anchor="end" font-size="11" fill="${warn}">Descenso estimado del eje: ${as2(m.depth)} mm</text>
- <text x="15" y="455" font-size="11" fill="#c8d5df">Azul: tramos pendientes. Naranja: ya plegados (bisagra aguda). NO verifica seguridad.</text>
+ <text x="15" y="455" font-size="11" fill="#c8d5df">Punzón gris · Matriz rojo oscuro · Chapa azul · Tope verde. Sin validación física.</text>
  </svg>`;
 }
 function halt(){
@@ -165,7 +165,7 @@ function mount(host,getData,getSelection=()=>1,onSelect=()=>{}){
  loop:window.PlegarSettings?.get?.().repeat!==false,holdUntil:null,selfSelecting:false,cameraKey:null,bounds:null,tilesKey:null};
  host.innerHTML=`<section class="f2-view" aria-label="Seguimiento cinemático 2D de plegado">
  <div class="f2-title"><div><strong>SEGUIMIENTO DE PLEGADO · PERFIL</strong><small>Punzón superior · matriz V inferior · tope posterior · chapa</small></div><span>PERFIL GEOMÉTRICO v0.39</span></div>
- <div class="f2-stage" aria-label="Mueve la simulación 2D con un dedo y usa dos dedos para cambiar el zoom"><div class="f2-camera-content"></div></div><div class="f2-toolbar"><strong class="f2-step-label"></strong><div class="f2-controls"><button type="button" data-f2-action="previous">← Anterior</button><button type="button" data-f2-action="play">▶ Reproducir sin pausas</button><button type="button" data-f2-action="mode" aria-pressed="false">☐ Ciclo completo</button><button type="button" data-f2-action="next">Siguiente →</button><button type="button" data-f2-action="reset">Reiniciar</button><label class="f2-loop-control"><input class="f2-loop" type="checkbox" checked> Repetir secuencia</label><button type="button" data-f2-action="zoom-out" aria-label="Reducir zoom">−</button><button type="button" data-f2-action="zoom-in" aria-label="Ampliar zoom">+</button></div></div>
+ <div class="f2-layout"><div class="f2-stage" aria-label="Mueve la simulación 2D con un dedo y usa dos dedos para cambiar el zoom"><div class="f2-camera-content"></div></div><aside class="f2-data-panel" aria-label="Datos de operación nominal"><h3>DATOS</h3><dl class="f2-data-values"></dl><small>Geometría ilustrativa. Sin fuerzas calculadas ni trayectorias certificadas.</small></aside></div><div class="f2-toolbar"><strong class="f2-step-label"></strong><div class="f2-controls"><button type="button" data-f2-action="previous">← Anterior</button><button type="button" data-f2-action="play">▶ Reproducir sin pausas</button><button type="button" data-f2-action="mode" aria-pressed="false">☐ Ciclo completo</button><button type="button" data-f2-action="next">Siguiente →</button><button type="button" data-f2-action="reset">Reiniciar</button><label class="f2-loop-control"><input class="f2-loop" type="checkbox" checked> Repetir secuencia</label><button type="button" data-f2-action="zoom-out" aria-label="Reducir zoom">−</button><button type="button" data-f2-action="zoom-in" aria-label="Ampliar zoom">+</button></div></div>
  <div class="f2-cycle-state" role="status" aria-label="Fase cinemática 2D"></div><div class="f2-slider"><label for="f2-range">Avance del ciclo o conformado</label><input id="f2-range" class="f2-range" type="range" min="0" max="100" step="1" value="0"><output class="f2-progress" for="f2-range">0 %</output></div>
  <div class="f2-steps" aria-label="Orden de plegado"></div><div class="f2-prior-summary" role="status"></div><div class="f2-nominal" role="status"></div><ul class="f2-notes"></ul></section>`;
  active.touchCamera=window.PlegarTouchView.attach(host.querySelector('.f2-stage'),host.querySelector('.f2-camera-content'));

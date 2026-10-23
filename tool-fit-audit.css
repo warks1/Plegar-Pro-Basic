@@ -1,0 +1,17 @@
+/* Comparador documental de longitudes de montaje: nunca un chequeo de colisiones. */
+.tool-fit-panel{margin:13px 0 17px;min-width:0;border:1px solid #458da3;border-radius:10px;background:#0d3147;color:#eef6ff}
+.tool-fit-panel>details{padding:10px}
+.tool-fit-panel summary{cursor:pointer;color:#b9eeff;font-size:14px;font-weight:750;line-height:1.45;padding:8px}
+.tool-fit-panel p{font-size:12px;line-height:1.55;color:#d4e7f3}
+.tool-fit-fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:12px 0}
+.tool-fit-fields label{display:grid;gap:5px;min-width:0;font-size:12px;font-weight:650}
+.tool-fit-fields select,.tool-fit-fields input{min-height:44px;width:100%;min-width:0;border:1px solid #70adc9;background:#0b2437;color:#f4fbff;border-radius:7px;padding:9px;font:inherit}
+.tool-fit-panel button{min-height:44px;margin:3px 8px 5px 0;border:1px solid #60abd8;border-radius:7px;background:#08638c;color:#fff;padding:9px 13px;font-size:12px;font-weight:700;cursor:pointer}
+.tool-fit-graph{display:block;max-width:100%;width:100%;height:auto;border-radius:8px;border:1px solid #3a6981;background:#091f32}
+.tool-fit-panel [data-tool-fit-result]{padding:9px;margin:10px 0;border-radius:7px;border:1px solid #3d708a;background:#09283b}
+.tool-fit-panel [data-tool-fit-result]>p{font-weight:700;color:#ffdbab}
+.tool-fit-panel [data-tool-fit-result] ul{margin:7px 0 12px;padding-left:23px}
+.tool-fit-panel [data-tool-fit-result] li{font-size:12px;line-height:1.5;padding:2px 0}
+.tool-fit-subtitle{margin:10px 0 4px;font-size:12px;font-weight:700;color:#bfe9fc!important}
+.tool-fit-warning{border-left:3px solid #ffc782;padding:8px 12px;background:#573a253b}
+@media(max-width:650px){.tool-fit-fields{grid-template-columns:1fr}.tool-fit-panel>details{padding:8px}.tool-fit-panel button{display:block;width:100%;margin:7px 0}}

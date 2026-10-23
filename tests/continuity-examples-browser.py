@@ -28,6 +28,23 @@ with sync_playwright() as pw:
    const raw=PlegarSequenceTimeline.advance;
    PlegarSequenceTimeline.advance=(state,dt,steps,options)=>raw(state,dt*120,steps,options);
   }""")
+  # Inicio: visor geométrico animado y cuatro miniaturas de distinta geometría.
+  assert page.locator('#home-machine-3d svg.home-simulation-svg').count()==1
+  assert page.locator('#home-machine-3d polygon[data-group="punch"]').count()>0
+  assert page.locator('#home-machine-3d polygon[data-group="sheet"]').count()>0
+  assert page.locator('.machine-stage > img').count()==0
+  assert page.locator('#home-preview-3d svg.home-preview-svg').count()==1
+  assert page.locator('.preview-image > img').count()==0
+  cards=page.locator('#projects .home-project-thumb svg').evaluate_all('(els)=>els.map(el=>el.innerHTML)')
+  assert len(cards)==4 and len(set(cards))==4,'Cuatro perfiles 3D de proyecto diferentes'
+  previous=page.locator('#home-preview-3d').inner_html()
+  page.locator('#projects [data-project="1"]').click()
+  assert page.locator('#project-name').inner_text()=='Cubierta lateral Inox 304'
+  assert page.locator('#home-preview-3d').inner_html()!=previous
+  page.locator('#play').click()
+  page.wait_for_function("""() => document.querySelector('#step-description')?.textContent==='Pieza terminada' &&
+   document.querySelector('#home-machine-3d polygon[data-group="punch"]')""",timeout=10000)
+  print('Inicio animado, vista previa y cuatro miniaturas verificadas',w,flush=True)
   if w<=1120:page.locator('#open-menu').click()
   page.locator('button.nav-item[data-screen="Programación 2D"]').click()
   assert page.locator('#ed-example-gallery [data-example-id]').count()==4

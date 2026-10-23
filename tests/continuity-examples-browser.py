@@ -86,6 +86,13 @@ with sync_playwright() as pw:
    document.querySelector('#home-machine-3d polygon[data-group="punch"]')""",timeout=10000)
   print('Inicio animado, vista previa y cuatro miniaturas verificadas',w,flush=True)
   if w<=1120:page.locator('#open-menu').click()
+  page.locator('button.nav-item[data-screen="Máquinas"]').click()
+  assert page.locator('.machine-reference').is_visible()
+  assert '925 mm' in page.locator('.machine-reference').inner_text()
+  assert '200 mm' in page.locator('.machine-reference').inner_text()
+  assert page.locator('.machine-reference').locator('a[href*="bystronic-ep-ii-31-100"]').count()==1
+  assert 'pendientes' in page.locator('.machine-reference').inner_text()
+  if w<=1120:page.locator('#open-menu').click()
   page.locator('button.nav-item[data-screen="Proyectos"]').click()
   assert page.locator('.project-work-buttons').count()>=12
   assert page.locator('[data-project-action="plan"]').count()>=12

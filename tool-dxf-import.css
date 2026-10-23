@@ -55,3 +55,11 @@
 .tool-dxf-3d-controls button:focus-visible{outline:3px solid #ffdb86}
 .tool-dxf-3d-note{font-size:12px;color:#ffe0a8;line-height:1.55;margin:0}
 @media(max-width:620px){.tool-dxf-3d-viewer{padding:7px}.tool-dxf-3d-controls button{flex:1 1 43%;font-size:11px}.tool-dxf-3d-heading button{width:100%}}
+
+
+/* Cota axial editable sin reimportar DXF, dato manual no homologado. */
+.tool-dxf-length-editor{border:1px solid #477a95;border-radius:7px;padding:9px;margin:10px 0;display:flex;align-items:end;flex-wrap:wrap;gap:9px;background:#102b3e}
+.tool-dxf-length-editor>label{display:grid;gap:6px;flex:1 1 160px;color:#e3eff8;font-size:12px}
+.tool-dxf-length-editor input{min-height:42px;border-radius:6px;background:#061c2b;color:#fff;border:1px solid #6a9ebd;padding:8px;width:100%;min-width:0}
+.tool-dxf-length-editor button{flex:1 1 150px;min-height:42px;background:#07638a;color:white;border:1px solid #57a7cc;border-radius:6px;padding:9px;font-size:11px;font-weight:700}
+.tool-dxf-length-editor small{color:#bdd1e1;font-size:11px;line-height:1.45;flex-basis:100%}

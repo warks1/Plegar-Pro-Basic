@@ -1,7 +1,7 @@
 /* Plegar Pro Plus v0.28 - Planos: importación privada de carpetas ZIP PDF. */
 (function(root,factory){const api=factory(root);if(typeof module==='object'&&module.exports)module.exports=api;else root.PlegarPlans=api;})(typeof globalThis!=='undefined'?globalThis:this,function(root){
 'use strict';
-const C=()=>root.PlegarPlansCore;
+const C=()=>root.PlegarPlansCore,D=()=>root.PlegarPlanDrawing;
 const DB='plegar-pro-planos-v1',MAX_FILE=22*1024*1024,MAX_COUNT=150;
 let listenerController=null,dbPromise=null,host=null,selectedFolder='all',selectedPlan=null,search='',busy=false,previewURL=null,folderCache=[],plansCache=[];
 const escape=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -27,6 +27,46 @@ function tell(message,error=false){if(!host)return;const output=host.querySelect
 function canvas(w,h){const element=document.createElement('canvas');element.width=w;element.height=h;return element;}
 function drawContained(ctx,source,x,y,w,h){const s=Math.min(w/source.width,h/source.height);ctx.drawImage(source,x+(w-source.width*s)/2,y+(h-source.height*s)/2,source.width*s,source.height*s);}
 async function jpegPdf(picture){const data=await new Promise((resolve,reject)=>picture.toBlob(blob=>blob?resolve(blob):reject(Error('No se pudo codificar la imagen.')),'image/jpeg',0.84));return C().pdfWithJpeg(new Uint8Array(await data.arrayBuffer()),picture.width,picture.height);}
+const drawingSrc=svg=>'data:image/svg+xml;charset=utf-8,'+encodeURIComponent(svg);
+async function drawingPdf(svg){
+ const url=URL.createObjectURL(new Blob([svg],{type:'image/svg+xml;charset=utf-8'}));
+ try{
+  const image=await new Promise((resolve,reject)=>{
+   const img=new Image();img.onload=()=>resolve(img);img.onerror=()=>reject(Error('No se pudo convertir el plano SVG a PDF.'));img.src=url;
+  });
+  const c=canvas(1800,600),ctx=c.getContext('2d');
+  ctx.fillStyle='#ffffff';ctx.fillRect(0,0,c.width,c.height);ctx.drawImage(image,0,0,1800,600);
+  return await jpegPdf(c);
+ }finally{URL.revokeObjectURL(url);}
+}
+async function saveProgram(profile,{width=100,name=null,folderId=null,sourcePlanId=null}={}){
+ if(busy)throw Error('Otra importación está en curso.');
+ if(!D())throw Error('Motor de planos 2D/3D no disponible.');
+ const named={...profile,name:(name||profile.name||'').trim()};
+ const drawing=D().create(named,{width});
+ const saved=await all('plans');
+ if(saved.length>=MAX_COUNT)throw Error('Límite local de 150 planos. Exporta una copia ZIP.');
+ let folders=await all('folders');
+ if(!folders.length){const initial={id:'default',name:'Sin cliente'};await change('folders','put',initial);folders=[initial];}
+ const chosen=folderId||host?.querySelector('#pl-target')?.value;
+ const folder=folders.find(f=>f.id===chosen&&!f.repository)||folders.find(f=>f.id==='default')||folders.find(f=>!f.repository);
+ if(!folder)throw Error('No hay carpeta local para guardar.');
+ const basename=C().safeName(drawing.profile.name).replace(/\.(pdf|json|svg)$/i,'').slice(0,90);
+ const editable={format:'plegar-pro-profile2d',version:2,...drawing.profile};
+ const row={
+  id:identity(),folderId:folder.id,name:basename+'.pdf',originalName:basename+'.json',
+  created:new Date().toISOString(),original:new Blob([JSON.stringify(editable,null,2)],{type:'application/json'}),
+  pdf:await drawingPdf(drawing.sheet),
+  thumbnail:drawingSrc(drawing.svg2d),svg2d:drawing.svg2d,svg3d:drawing.svg3d,
+  profile:drawing.profile,width:drawing.width,sourcePlanId,
+  pdfKind:'generated-2d-3d',
+  note:'Plano 2D acotado y vista 3D derivados del programa. Geometría nominal, no apta para CNC.',
+  mime:'application/json'
+ };
+ await change('plans','put',row);
+ if(host){await refresh();tell('Planos 2D y 3D guardados en '+folder.name+'. Exporta una copia ZIP de seguridad.');}
+ return {id:row.id,name:row.name,folderId:row.folderId};
+}
 function thumb(picture){const c=canvas(176,124),ctx=c.getContext('2d');ctx.fillStyle='#f4f8fc';ctx.fillRect(0,0,176,124);drawContained(ctx,picture,4,4,168,116);return c.toDataURL('image/jpeg',0.72);}
 async function fromImage(file){let bitmap=null;try{bitmap=await createImageBitmap(file,{imageOrientation:'from-image'});}catch{throw Error('La foto no puede abrirse en este dispositivo. Convierte HEIC/RAW a JPG o PNG y reintenta.');}
  try{const scale=Math.min(1,1700/Math.max(bitmap.width,bitmap.height));const c=canvas(Math.max(1,Math.round(bitmap.width*scale)),Math.max(1,Math.round(bitmap.height*scale)));const ctx=c.getContext('2d');ctx.fillStyle='#ffffff';ctx.fillRect(0,0,c.width,c.height);ctx.drawImage(bitmap,0,0,c.width,c.height);return {pdf:await jpegPdf(c),thumbnail:thumb(c),note:'PDF con la fotografía de la pieza.',type:'image'};}
@@ -130,5 +170,5 @@ async function mount(container){destroy();host=container;listenerController=new 
  container.addEventListener('input',e=>{if(e.target.id!=='pl-search')return;search=e.target.value;const position=e.target.selectionStart;render();const fld=host.querySelector('#pl-search');fld.focus();fld.setSelectionRange(position,position);},{signal});
 }
 function destroy(){listenerController?.abort();listenerController=null;revokePreview();host=null;selectedPlan=null;}
-return {mount,destroy,openDb,convertFile,importFolderZip,dbName:DB};
+return {mount,destroy,openDb,convertFile,importFolderZip,saveProgram,dbName:DB};
 });

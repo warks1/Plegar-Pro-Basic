@@ -41,17 +41,32 @@
   if(!profile||!Array.isArray(profile.segments)||!Array.isArray(profile.angles)||profile.angles.length!==profile.segments.length-1||!profile.segments.every(v=>Number.isFinite(v)&&v>0)||!profile.angles.every(a=>Number.isFinite(a)&&Math.abs(a)<180)||!Number.isFinite(profile.thickness)||profile.thickness<=0){throw new Error('Perfil nominal no válido para cálculo.');}
   const die=lookup(DIES,setup.die),punch=lookup(PUNCHES,setup.punch);
   const e=profile.thickness,R=setup.radius,K=setup.kFactor,basis=setup.dimensionBasis;
+  const overrides=profile.bendOverrides;
+  if(overrides!==undefined){
+   if(!Array.isArray(overrides)||overrides.length!==profile.angles.length)
+    throw new Error('La tabla de Ri/K individuales no coincide con los pliegues.');
+   overrides.forEach((v,i)=>{
+    if(v===null)return;
+    if(!v||typeof v!=='object'||Array.isArray(v))throw new Error('Parámetros del pliegue B'+(i+1)+' incorrectos.');
+    for(const [key,min,max] of [['radius',.1,500],['kFactor',.2,.6]]){
+     if(v[key]!==undefined&&v[key]!==null&&(!Number.isFinite(v[key])||v[key]<min||v[key]>max))
+      throw new Error('Valor '+key+' incorrecto en B'+(i+1)+'.');
+    }
+   });
+  }
   // Las longitudes de tramo se interpretan TODAS según la misma referencia:
   // exterior/interior hasta intersección virtual de caras, o recta hasta tangencia.
   const rows=profile.angles.map((signed,i)=>{
    const theta=Math.abs(signed)*Math.PI/180;
-   const outsideSetback=(R+e)*Math.tan(theta/2);
-   const insideSetback=R*Math.tan(theta/2);
+   const override=overrides?.[i],r=override?.radius??R,k=override?.kFactor??K;
+   const outsideSetback=(r+e)*Math.tan(theta/2);
+   const insideSetback=r*Math.tan(theta/2);
    const usedSetback=basis==='outer'?outsideSetback:basis==='inner'?insideSetback:0;
-   const allowance=theta*(R+K*e);
+   const allowance=theta*(r+k*e);
    const deduction=2*usedSetback-allowance;
    return {bend:i+1,angle:Math.abs(signed),signedAngle:signed,inside:180-Math.abs(signed),
-    theta,allowance,setback:outsideSetback,outsideSetback,insideSetback,usedSetback,deduction,neutralRadius:R+K*e};
+    theta,allowance,setback:outsideSetback,outsideSetback,insideSetback,usedSetback,deduction,
+    radius:r,kFactor:k,localRadius:override?.radius!=null,localK:override?.kFactor!=null,neutralRadius:r+k*e};
   });
   const nominal=profile.segments.reduce((a,b)=>a+b,0);
   const deduction=rows.reduce((a,r)=>a+r.deduction,0);
@@ -83,7 +98,9 @@
   const warnings=[];
   const vRatio=die.opening/e;
   if(vRatio<6||vRatio>10)warnings.push(`V/e = ${vRatio.toFixed(2)}: fuera del rango orientativo 6–10 para plegado al aire. Referencia habitual V≈8×e.`);
-  if(R<punch.nose)warnings.push('Radio supuesto inferior al radio nominal de punta del punzón; revisar geometría y condiciones reales.');
+  if(rows.some(row=>row.radius<punch.nose))warnings.push('Radio supuesto de uno o más pliegues inferior a punta de punzón; revisar geometría y condiciones reales.');
+  if(rows.some(row=>row.localRadius||row.localK))warnings.push('Se aplican radios/factores K específicos por pliegue: deben confirmarse con ensayos independientes.');
+  if(rows.some(row=>row.angle>0&&row.radius<.2*e))warnings.push('Hay pliegues con Ri inferior a 0,2×espesor: revisar plegado real y límite del material.');
   if(rows.some(r=>r.angle>0&&r.inside<punch.angle))warnings.push('Uno o más ángulos interiores son inferiores al ángulo nominal del punzón seleccionado.');
   if(rows.some(r=>r.angle>0&&r.inside<die.angle))warnings.push('Uno o más ángulos interiores son inferiores al ángulo nominal de la matriz seleccionada.');
   if(rows.some(r=>r.angle>150))warnings.push('Pliegue muy cerrado: la hipótesis geométrica simplificada puede perder validez.');
@@ -97,14 +114,15 @@
   warnings.push('Resultado orientativo. Confirmar K, radio real, referencias dimensionales y primeras piezas antes de fabricar.');
   return {rows,nominal,allowance,deduction,flat:flatValid?flat:null,problems,warnings,vRatio,die,punch,setup,
    dimensionBasis:basis,straight,flatSegments:flatValid?flatSegments:[],flatBends:flatValid?flatBends:[],
-   neutralRadius:R+K*e,measurementReference:basis==='outer'?'cotas exteriores':basis==='inner'?'cotas interiores':'rectas hasta tangencia'};
+   neutralRadius:R+K*e,hasBendOverrides:rows.some(row=>row.localRadius||row.localK),measurementReference:basis==='outer'?'cotas exteriores':basis==='inner'?'cotas interiores':'rectas hasta tangencia'};
  }
  function calibrateK(profile,setupInput,measuredFlat){
   const setup=validateSetup(setupInput),measured=Number(measuredFlat);
   if(!Number.isFinite(measured)||measured<=0||measured>1000000)throw new Error('Introduce un desarrollo de ensayo medido, positivo y en mm.');
   const current=estimate(profile,setup);
+  if(current.rows.some(row=>row.localK))throw new Error('Hay factores K individuales; desactívalos antes de calibrar un único K general.');
   if(current.flat===null)throw new Error('No se puede calibrar un perfil con geometría no desarrollable.');
-  const radians=profile.angles.reduce((sum,deg)=>sum+Math.abs(deg)*Math.PI/180,0);
+  const radians=current.rows.reduce((sum,row)=>sum+row.theta,0);
   if(radians<1e-9)throw new Error('Para calibrar K se necesita al menos un pliegue no nulo.');
   const derivative=profile.thickness*radians;
   const factor=setup.kFactor+(measured-current.flat)/derivative;
@@ -121,7 +139,8 @@
   if(!Number.isFinite(kMin)||!Number.isFinite(kMax)||kMin<.2||kMax>.6||kMin>kMax)
    throw new Error('Intervalo de K no válido.');
   const low=estimate(profile,{...setup,kFactor:kMin}),high=estimate(profile,{...setup,kFactor:kMax});
-  return {kMin,kMax,flatMin:low.flat,flatMax:high.flat,spread:low.flat===null||high.flat===null?null:high.flat-low.flat};
+  return {kMin,kMax,flatMin:low.flat,flatMax:high.flat,spread:low.flat===null||high.flat===null?null:high.flat-low.flat,
+   note:profile.bendOverrides?.some(x=>x?.kFactor!=null)?'Sólo cambia K general; los K individuales permanecen fijos.':'K general para todos los pliegues sin valor local.'};
  }
  return {PUNCHES,DIES,DEFAULT_SETUP,validateSetup,estimate,calibrateK,sensitivity};
 });

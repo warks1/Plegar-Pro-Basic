@@ -214,4 +214,17 @@ if('serviceWorker' in navigator&&location.protocol.startsWith('http')){
     .then(reg=>reg.update().catch(()=>{})).catch(()=>{});
 }
 
-window.PlegarApp={switchScreen,getProjects:()=>projects.map(p=>({...p}))};
+function linkProjectPlan(i,profile,width){
+ if(!projects[i]||!profile)return false;
+ try{
+  const geometry=window.PlegarGeometry2D.validate(profile);
+  const setup=window.PlegarBendCalc.validateSetup(profile.setup);
+  if(!Number.isFinite(width)||width<1||width>5000)return false;
+  const next={...projects[i],profile:{...geometry,setup},width};
+  const updated=projects.slice();updated[i]=next;
+  localStorage.setItem('plegarpro-demo-projects',JSON.stringify(updated));
+  projects=updated;renderProjects();
+  return true;
+ }catch{return false;}
+}
+window.PlegarApp={switchScreen,linkProjectPlan,getProjects:()=>projects.map(p=>({...p}))};

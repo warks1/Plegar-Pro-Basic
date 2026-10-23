@@ -48,10 +48,8 @@
    '<rect x="15" y="46" width="870" height="17" rx="4" fill="url(#home-bed)" stroke="#477087"/>'+
    '<rect x="17" y="410" width="866" height="28" rx="5" fill="url(#home-bed)" stroke="#4f738c"/>'+
    '<rect x="30" y="75" width="14" height="334" fill="#284257"/><rect x="855" y="75" width="14" height="334" fill="#284257"/>'+
-   polys(mesh,yaw,elevation,zoom,bounds,profile,'pp-machine-metal')+
-   '<text x="60" y="100" fill="#9edfff" font-size="16">GEMELO GEOMÉTRICO 3D · '+esc(f.phase.toUpperCase())+'</text>'+
-   '<text x="60" y="126" fill="#d7eefb" font-size="14">Punzón Y: '+f.punchY.toFixed(1)+' mm · ángulo: '+f.angle.toFixed(1)+'°</text>'+
-   '<text x="60" y="395" fill="#ffcf9f" font-size="12">Matriz y tope nominales fijos · movimiento ilustrativo, sin CNC</text></svg>';
+   '<title>Simulación geométrica de '+esc(f.phase)+'; ángulo '+f.angle.toFixed(1)+' grados. Modelo nominal no CNC.</title>'+
+   polys(mesh,yaw,elevation,zoom,bounds,profile,'pp-machine-metal')+'</svg>';
   return {svg,frame:f,faceCount:mesh.faces.length};
  }
  function finishedMesh(profile,width){const f=frame(profile,steps(profile),1);return M.build(f.scene,width);}

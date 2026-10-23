@@ -5,7 +5,7 @@
  const api=factory(typeof module==='object'&&module.exports?require('./geometry2d.js'):root.PlegarGeometry2D,
  typeof module==='object'&&module.exports?require('./plan-drawing.js'):root.PlegarPlanDrawing,
  typeof module==='object'&&module.exports?require('./piece3d.js'):root.PlegarPiece3D,
- typeof module==='object'&&module.exports?require('./fold-kinematics.js'):root.PlegarFoldKinematics,
+ typeof module==='object'&&module.exports?()=>require('./fold-kinematics.js'):()=>root.PlegarFoldKinematics,
  typeof module==='object'&&module.exports?require('./tooling3d.js'):root.PlegarTooling3D);
  if(typeof module==='object'&&module.exports)module.exports=api;else root.PlegarHome3D=api;
 })(typeof globalThis!=='undefined'?globalThis:this,function(G,D,M,K,T){
@@ -17,9 +17,9 @@
  function steps(profile){return G.validate(profile).angles.length+2;}
  function frame(profile,stage,progress=0){
   const total=steps(profile),index=Math.max(1,Math.min(total,Math.floor(stage)));
-  if(index===1)return K.frame(profile,0,0);
-  if(index===total)return K.frame(profile,total-3,1);
-  return K.frame(profile,index-2,Math.max(0,Math.min(1,progress)));
+  if(index===1)return K().frame(profile,0,0);
+  if(index===total)return K().frame(profile,total-3,1);
+  return K().frame(profile,index-2,Math.max(0,Math.min(1,progress)));
  }
  function frameMesh(profile,stage,progress,width,tools){
   const f=frame(profile,stage,progress),m=M.build(f.scene,width);

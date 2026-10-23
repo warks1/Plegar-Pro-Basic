@@ -127,7 +127,7 @@ with sync_playwright() as pw:
   first.fill('72')
   first.dispatch_event('change')
   assert page.evaluate('PlegarEditor2D.getData().segments[0]')==72
-  assert '72 mm' in page.locator('#ed-dimensions-total').inner_text() or '72' in page.locator('#ed-dimensions-body tr').first.inner_text()
+  assert page.locator('#ed-dimensions-body [data-ed-segment="0"]').input_value()=='72'
   page.locator('#ed-dimensions-body [data-ed-angle="0"]').fill('-83')
   page.locator('#ed-dimensions-body [data-ed-angle="0"]').dispatch_event('change')
   assert page.evaluate('PlegarEditor2D.getData().angles[0]')==-83

@@ -73,7 +73,7 @@ test('Validaciones previenen medidas imposibles antes de guardar',()=>{
 });
 
 test('Ri/K por pliegue se conservan al añadir y eliminar alas en el asistente 2D/3D',()=>{
- const original={...source,bendOverrides:[
+ const original={...source,width:240,bendOverrides:[
   {radius:3.2,kFactor:0.42},{radius:null,kFactor:0.35},
   {radius:4,kFactor:null},{radius:null,kFactor:null}
  ]};

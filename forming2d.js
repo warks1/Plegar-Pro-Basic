@@ -84,7 +84,7 @@
    bend,orderIndex,step:orderIndex+1,steps:piece.sequence.length,progress,turn,
    targetAngle:Math.abs(turn),currentAngle:angle,left,right,center,wingLeft,wingRight,
    tangentLeft,tangentRight,centerline,dieOpening:die.opening,dieDepth,
-   punchAngle:punch.angle,punchNose:punch.nose,punchHeight:punch.height,dieAngle:die.angle,dieHeight:die.height,thickness:t,
+   punchAngle:punch.angle,punchNose:punch.nose,punchHeight:punch.height,dieAngle:die.angle,dieHeight:setup.dieHeight??die.height,thickness:t,
    insideRadius:setup.radius,centreRadius:R,tangentSetback,tangentX,
    // 'depth' is nominal centreline descent from its START position, not CNC Y.
    depth:round(cy+t/2),punchTipY:round(cy-t/2),shoulderY,

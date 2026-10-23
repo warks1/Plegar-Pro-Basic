@@ -2,6 +2,8 @@ name: Plegar Pro Plus - navegador 2D y 3D
 on:
   push:
     branches: [main]
+  pull_request:
+    branches: [main]
   workflow_dispatch:
 permissions:
   contents: read

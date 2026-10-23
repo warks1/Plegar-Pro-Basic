@@ -11,7 +11,7 @@
  const LIB=typeof module==='object'&&module.exports?require('./tool-library.js'):window.PlegarToolLibrary;
  if(!LIB)throw new Error('Biblioteca de herramientas no cargada.');
  const {PUNCHES,DIES}=LIB;
- const DEFAULT_SETUP=Object.freeze({radius:2,kFactor:0.33,punch:'p88-r1',die:'v16-88',backgaugeX:120,dimensionBasis:'outer'});
+ const DEFAULT_SETUP=Object.freeze({radius:2,kFactor:0.33,punch:'p88-r1',die:'v16-88',backgaugeX:120,dimensionBasis:'outer',dieHeight:null});
  function lookup(list,id){return list.find(item=>item.id===id);}
  function validateSetup(source){
   const s={...DEFAULT_SETUP,...source};
@@ -22,9 +22,11 @@
   if(!lookup(DIES,s.die))throw new Error('Matriz no reconocida.');
   const dimensionBasis=s.dimensionBasis||'outer';
   if(!['outer','inner','tangent'].includes(dimensionBasis))throw new Error('Referencia de cotas desconocida. Selecciona exterior, interior o tramo recto hasta tangencia.');
+  const dieHeight=s.dieHeight==null||s.dieHeight===''?null:Number(s.dieHeight);
+  if(dieHeight!==null&&(!Number.isFinite(dieHeight)||dieHeight<5||dieHeight>400))throw new Error('Altura de matriz H entre 5 y 400 mm, o desconocida.');
   const backgaugeX=Number(s.backgaugeX);
   if(!Number.isFinite(backgaugeX)||backgaugeX<1||backgaugeX>10000)throw new Error('Posición nominal del tope X entre 1 y 10000 mm.');
-  return {radius,kFactor,punch:s.punch,die:s.die,backgaugeX,dimensionBasis};
+  return {radius,kFactor,punch:s.punch,die:s.die,backgaugeX,dimensionBasis,dieHeight};
  }
  function estimate(profile,setupInput){
   const setup=validateSetup(setupInput);

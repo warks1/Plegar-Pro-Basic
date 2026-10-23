@@ -32,7 +32,7 @@ test('Rechaza cotas no declaradas, pulgadas y curvas sin linealización',()=>{
  assert.ok(rounded.points.length>4,'Los arcos DXF generan vértices de precisión controlada');
  assert.equal(rounded.collisionApproved,false);
  assert.throws(()=>D.parseDXF(dxf({closed:false})),/cerrada/);
- assert.throws(()=>D.parseDXF(dxf({extra:[[0,'CIRCLE'],[10,0],[20,0],[40,2]]})),/varios perfiles o entidades/);
+ assert.throws(()=>D.parseDXF(dxf({extra:[[0,'CIRCLE'],[10,0],[20,0],[40,2]]})),/entidades geométricas no soportadas/);
  assert.throws(()=>D.parseDXF(dxf({points:[[0,0],[10,10],[0,10],[10,0]]})),/autointersecado/);
  assert.throws(()=>D.parseDXF(dxf({points:[[0,0],[1000000,0],[1000000,3],[0,3]]})),/fuera de rango/);
 });

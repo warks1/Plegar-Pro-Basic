@@ -112,6 +112,7 @@ with sync_playwright() as pw:
   img=page.locator('.machine-photo-reference img')
   assert img.is_visible()
   assert img.get_attribute('src')=='assets/bystronic-frontal-referencia.svg'
+  img.scroll_into_view_if_needed()  # SVG con loading=lazy sólo carga cuando entra en el viewport
   page.wait_for_function("""() => {
    const img=document.querySelector('.machine-photo-reference img');
    return img&&img.complete&&img.naturalWidth>0;

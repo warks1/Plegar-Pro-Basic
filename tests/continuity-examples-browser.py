@@ -253,7 +253,7 @@ with sync_playwright() as pw:
    assert sorted(page.evaluate('PlegarEditor2D.getData().sequence'))==[1,2,3,4]
   assert 'NO CNC' in page.locator('#ed-auto-plan').inner_text()
   page.locator('#ed-example-gallery [data-example-id="u"]').click()
-  assert page.evaluate('PlegarEditor2D.getData().segments')==[55,100,55]
+  assert page.evaluate('PlegarEditor2D.getData().segments')==[55,100,55], f"Canal U no se cargó: {page.evaluate('PlegarEditor2D.getData()')} errores={errors[-3:]}"
   page.locator('[data-ed-position="2"]').select_option('1')
   assert page.evaluate('PlegarEditor2D.getData().sequence')==[2,1]
   page.locator('#ed-order-reset').click()

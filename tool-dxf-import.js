@@ -47,6 +47,59 @@
   if(maxX-minX<.001||maxY-minY<.001)throw Error('Dimensión de perfil inferior a 0,001 mm.');
   return {points:p,bounds:{minX,maxX,minY,maxY,width:maxX-minX,height:maxY-minY},areaMm2:Math.abs(area(p))};
  }
+ // Separar material y huecos sin inventar sólidos CAD. Se admiten un
+ // perímetro exterior y como máximo 8 cavidades de perfil, sin islas anidadas.
+ const MAX_CONTOURS=9;
+ function insideStrict(point,poly){
+  let hits=false;
+  for(let i=0,j=poly.length-1;i<poly.length;j=i++){
+   const a=poly[i],b=poly[j],cross=(point.x-a.x)*(b.y-a.y)-(point.y-a.y)*(b.x-a.x);
+   if(Math.abs(cross)<1e-8&&point.x>=Math.min(a.x,b.x)-1e-8&&
+     point.x<=Math.max(a.x,b.x)+1e-8&&point.y>=Math.min(a.y,b.y)-1e-8&&
+     point.y<=Math.max(a.y,b.y)+1e-8)return false;
+   if((a.y>point.y)!==(b.y>point.y)){
+    const x=a.x+(point.y-a.y)*(b.x-a.x)/(b.y-a.y);
+    if(point.x<x)hits=!hits;
+   }
+  }
+  return hits;
+ }
+ function contoursCross(a,b){
+  for(let i=0;i<a.length;i++)for(let j=0;j<b.length;j++)
+   if(isIntersect(a[i],a[(i+1)%a.length],b[j],b[(j+1)%b.length]))return true;
+  return false;
+ }
+ function validateGeometry(outside,holes=[]){
+  if(!Array.isArray(holes)||holes.length>=MAX_CONTOURS)
+   throw Error('Máximo de 8 huecos por sección de utillaje.');
+  const outer=validatePoints(outside),cavities=holes.map(validatePoints);
+  if(outer.points.length+cavities.reduce((sum,h)=>sum+h.points.length,0)>MAX_POINTS)
+   throw Error('La sección DXF supera el límite total de 400 vértices.');
+  for(const h of cavities){
+   if(contoursCross(outer.points,h.points)||!h.points.every(p=>insideStrict(p,outer.points)))
+    throw Error('Un hueco invade o toca el contorno exterior.');
+   for(const other of cavities){
+    if(h===other)continue;
+    if(contoursCross(h.points,other.points)||insideStrict(h.points[0],other.points))
+     throw Error('Huecos solapados, en contacto o anidados: geometría no admitida.');
+   }
+  }
+  const material=outer.areaMm2-cavities.reduce((a,h)=>a+h.areaMm2,0);
+  if(material<=1e-7)throw Error('La sección no contiene material válido.');
+  return {points:outer.points,holes:cavities.map(x=>x.points),bounds:outer.bounds,
+   areaMm2:material,holeCount:cavities.length};
+ }
+ function fromContours(polys){
+  if(polys.length>MAX_CONTOURS)throw Error('Máximo: una sección exterior y 8 huecos.');
+  if(polys.reduce((sum,p)=>sum+p.points.length,0)>MAX_POINTS)
+   throw Error('Demasiados vértices: límite 400 sumando todos los contornos.');
+  const areaOf=p=>Math.abs(area(p.points));
+  const sorted=[...polys].sort((a,b)=>areaOf(b)-areaOf(a));
+  return {...validateGeometry(sorted[0].points,sorted.slice(1).map(p=>p.points)),
+   arcCount:polys.reduce((n,p)=>n+p.arcCount,0),
+   chordErrorMm:polys.some(p=>p.arcCount)?CHORD_ERROR_MM:0,
+   sourceFormat:[...new Set(polys.map(p=>p.sourceFormat))].join(' + ')};
+ }
  // Los bulges DXF describen arcos circulares firmados. Aproximamos
  // únicamente la representación, con desviación de cuerda máxima de 0,05 mm.
  // No se pierde el dato de que hubo curvas y nunca se certifica su geometría.
@@ -176,10 +229,10 @@
    }
   }
   if(!entities||!polys.length)throw Error('Se requiere DXF ASCII con una LWPOLYLINE o POLYLINE cerrada en ENTITIES.');
-  if(polys.length!==1||unsupported.length)throw Error('El archivo contiene varios perfiles o entidades geométricas no soportadas ('+unsupported.slice(0,4).join(', ')+'). Exporta únicamente una sección exterior cerrada.');
-  const result=validatePoints(polys[0].points);
-  return {...result,arcCount:polys[0].arcCount,chordErrorMm:polys[0].chordErrorMm,
-   unit:'mm',unitsDeclared:units===4,sourceFormat:polys[0].sourceFormat,geometryCertified:false,collisionApproved:false};
+  if(unsupported.length)throw Error('DXF con entidades geométricas no soportadas ('+unsupported.slice(0,4).join(', ')+'). Exporta solo polilíneas cerradas.');
+  const result=fromContours(polys);
+  return {...result,unit:'mm',unitsDeclared:units===4,
+   geometryCertified:false,collisionApproved:false};
  }
  function normalizeRecord(r){
   if(!r||typeof r!=='object')throw Error('Registro no válido.');
@@ -187,17 +240,21 @@
   if(!['punch','die'].includes(r.kind))throw Error('Tipo de útil desconocido.');
   const code=String(r.code||'').trim(),name=String(r.name||'').trim();
   if(!code||code.length>70||!name||name.length>120)throw Error('Referencia y descripción obligatorias (máximo 70/120 caracteres).');
-  const geometry=validatePoints(r.points);
+  const geometry=validateGeometry(r.points,r.holes??[]);
   const id=String(r.id||'').trim();
   if(!/^local-[a-z0-9-]{8,60}$/.test(id))throw Error('Identificador local no válido.');
   const lengthMm=r.lengthMm===null||r.lengthMm===''||r.lengthMm===undefined?null:Number(r.lengthMm);
   if(lengthMm!==null&&(!finite(lengthMm)||lengthMm<=0||lengthMm>10000))throw Error('Longitud nominal de herramienta incorrecta.');
   return {id,brand:r.brand,kind:r.kind,code,name,
-   lengthMm,points:geometry.points,bounds:geometry.bounds,areaMm2:geometry.areaMm2,
+   lengthMm,points:geometry.points,holes:geometry.holes,holeCount:geometry.holeCount,
+   bounds:geometry.bounds,areaMm2:geometry.areaMm2,
    sourceFile:String(r.sourceFile||'').slice(0,140),importedAt:String(r.importedAt||''),
    unitsDeclared:r.unitsDeclared===true,arcCount:Number.isInteger(r.arcCount)&&r.arcCount>0?r.arcCount:0,
    chordErrorMm:r.arcCount>0?CHORD_ERROR_MM:0,
-   sourceFormat:r.sourceFormat==='DXF ASCII POLYLINE'?'DXF ASCII POLYLINE':'DXF ASCII LWPOLYLINE',
+   sourceFormat:['DXF ASCII POLYLINE','DXF ASCII LWPOLYLINE',
+     'DXF ASCII POLYLINE + DXF ASCII LWPOLYLINE',
+     'DXF ASCII LWPOLYLINE + DXF ASCII POLYLINE'].includes(r.sourceFormat)?
+     r.sourceFormat:'DXF ASCII LWPOLYLINE',
    geometryCertified:false,collisionApproved:false,simulatable:false};
  }
  function read(){
@@ -238,7 +295,8 @@
     const old=byId.get(profile.id);
     // La hora/metadatos pueden variar, pero un mismo ID no puede contener otros puntos.
     if(old.brand!==profile.brand||old.kind!==profile.kind||
-      JSON.stringify(old.points)!==JSON.stringify(profile.points))
+      JSON.stringify(old.points)!==JSON.stringify(profile.points)||
+      JSON.stringify(old.holes)!==JSON.stringify(profile.holes))
      throw Error('La copia contiene un perfil distinto con identificador ya existente.');
     continue;
    }
@@ -252,7 +310,7 @@
   const parsed=parseDXF(dxfText,opts),list=read();
   if(list.length>=MAX_FILES)throw Error('Máximo de '+MAX_FILES+' perfiles locales. Exporta y elimina uno antes de añadir.');
   const uid='local-'+(Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,10));
-  const r=normalizeRecord({...metadata,id:uid,points:parsed.points,unitsDeclared:parsed.unitsDeclared,
+  const r=normalizeRecord({...metadata,id:uid,points:parsed.points,holes:parsed.holes,unitsDeclared:parsed.unitsDeclared,
     arcCount:parsed.arcCount,sourceFormat:parsed.sourceFormat,importedAt:new Date().toISOString()});
   store([r,...list]);return r;
  }
@@ -365,5 +423,5 @@
   };
   paint();
  }
- return {KEY,BRANDS,parseDXF,validatePoints,normalizeRecord,add,read,remove,store,exportBackup,importBackup,render,html,mount};
+ return {KEY,BRANDS,parseDXF,validatePoints,validateGeometry,normalizeRecord,add,read,remove,store,exportBackup,importBackup,render,html,mount};
 });

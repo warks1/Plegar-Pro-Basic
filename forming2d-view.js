@@ -2,7 +2,7 @@
    Muestra una aproximación con radio, no controla una plegadora. */
 (function(){
 'use strict';
-const Model=window.PlegarFormingGeometry,K=window.PlegarFoldKinematics,TL=window.PlegarSequenceTimeline;
+const Model=window.PlegarFormingGeometry,K=()=>window.PlegarFoldKinematics,TL=()=>window.PlegarSequenceTimeline;
 const as2=n=>Number(n).toLocaleString('es-ES',{maximumFractionDigits:2});
 let active=null;
 function extents(m){
@@ -12,7 +12,7 @@ function extents(m){
 }
 function fixedExtents(data,step,mode){
  // Encuadre estable durante la carrera del punzon: matriz y tope quietos.
- const ext=[0,.11,.22,.5,.78,.89,1].map(t=>extents(mode==='cycle'?K.frame(data,step,t).scene:Model.scene(data,step,t)));
+ const ext=[0,.11,.22,.5,.78,.89,1].map(t=>extents(mode==='cycle'?K().frame(data,step,t).scene:Model.scene(data,step,t)));
  return [Math.min(...ext.map(v=>v[0])),Math.max(...ext.map(v=>v[1])),Math.min(...ext.map(v=>v[2])),Math.max(...ext.map(v=>v[3]))];
 }
 function svg(m,zoom,bounds){
@@ -65,7 +65,7 @@ function animation(now){
  const ctl=active;if(!ctl||ctl.timer===null||!ctl.host.isConnected){halt();return;}
  if(ctl.lastFrame===null)ctl.lastFrame=now;
  const dt=Math.min(100,Math.max(0,now-ctl.lastFrame));ctl.lastFrame=now;
- const next=TL.advance({step:ctl.currentStep,cycle:ctl.progress},dt,ctl.getData().sequence.length,{speed:ctl.speed});
+ const next=TL().advance({step:ctl.currentStep,cycle:ctl.progress},dt,ctl.getData().sequence.length,{speed:ctl.speed});
  ctl.currentStep=next.step;ctl.progress=next.cycle;
  if(next.transition){
   ctl.selfSelecting=true;
@@ -82,7 +82,7 @@ function render(){
  if(ctl.currentStep>=order.length)ctl.currentStep=0;
  const key=JSON.stringify([data,ctl.currentStep,ctl.mode]);
  if(ctl.cameraKey!==key){ctl.bounds=fixedExtents(data,ctl.currentStep,ctl.mode);ctl.cameraKey=key;}
- const motion=ctl.mode==='cycle'?K.frame(data,ctl.currentStep,ctl.progress):null;
+ const motion=ctl.mode==='cycle'?K().frame(data,ctl.currentStep,ctl.progress):null;
  const m=motion?motion.scene:Model.scene(data,ctl.currentStep,ctl.progress);
  ctl.host.querySelector('.f2-stage').innerHTML=svg(m,ctl.zoom,ctl.bounds);
  const label=ctl.host.querySelector('.f2-step-label');label.textContent=`Paso ${m.step} de ${m.steps} · pliegue ${m.bend} · ${as2(m.turn)}°`;

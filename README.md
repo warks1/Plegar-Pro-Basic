@@ -1,8 +1,18 @@
-# Plegar Pro Plus · Prototipo v0.29
+# Plegar Pro Plus · Prototipo v0.42
 
 Repositorio: `warks1/Plegar-Pro-Basic`.
 
-**Identidad visual:** la pantalla Inicio mantiene la disposición e imágenes del boceto aprobado, localizado en `assets/referencia-aprobada.webp`. El diseño de Inicio sigue siendo ilustrativo, no una simulación 3D ni un gemelo digital.
+**Identidad visual:** se conserva la composición aprobada en `assets/referencia-aprobada.webp`; el panel de simulación y la vista previa usan ahora SVG 3D geométrico calculado, no fotografías estáticas. La reproducción es ilustrativa, sin física/CNC certificados.
+
+## Novedades funcionales v0.42 · 23 de octubre de 2026
+
+**Planos y piezas:** en `Planos` aparecen doce piezas con perfil 2D acotado nominalmente y representación de volumen 3D calculada. Se pueden guardar con nombre como PDF, SVG 2D, SVG 3D y JSON editable. `Proyectos` muestra ambas vistas por pieza. Los perfiles de ejemplo están señalados, no se hacen pasar por planos de clientes. Los proyectos nuevos sin programa verificado usan un borrador de chapa claramente etiquetado.
+
+**Programación 2D:** la parte superior incorpora los controles más usados: material, espesor, ancho, punzón, matriz, radio, factor K, tope nominal, recomendación ilustrativa de V y acceso a simulación. «Elegir orden tocando los pliegues» permite tocar cada número de pliegue para construir la secuencia; el orden se sincroniza con 2D/3D. Introducir las cotas verdaderas y comprobar por máquina.
+
+**Motores:** `engineering-checks.js` muestra estimaciones de carga al aire, V/espesor, ala corta, desarrollo e intersecciones del perfil, con hipótesis explícitas. `sheet-offset.js` calcula una unión por bisectriz para mejorar la continuidad del espesor nominal entre los sólidos de los planos y la simulación. No sustituye modelos CAD con radios reales ni ensayos de material/herramientas.
+
+**Validación:** las pruebas Node de motores están automatizadas en GitHub Actions. Hay pruebas Chromium PC/móvil de las rutas principales. El resultado de CI y publicación debe verificarse siempre para el SHA actual.
 
 ## Programación 2D
 

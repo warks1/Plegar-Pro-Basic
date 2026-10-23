@@ -149,3 +149,11 @@ Ajuste de presentación a pantalla completa sin franjas de imagen no ocupadas. S
 - En Simulación/Programación 3D se incorporan selectores de pliegue por paso, que intercambian posiciones preservando la secuencia válida y guardada.
 - Motor `examples3d.js`: cuatro piezas de ejemplo (L, U, Z, Omega) con dimensiones, ángulos y tarjetas SVG 3D distintas, calculadas directamente desde los vértices del perfil y su anchura extruida. Accesibles en Programación 2D y en Simulación/Programación 3D.
 - Incluye actualizaciones del precaché PWA v39 y scripts de prueba de navegador. No implementa física de recolocación, control CNC ni seguridad.
+
+## Continuidad v0.42 — 23 octubre 2026
+- `sample-library.js`: 12 piezas geométricas de ejemplo con nombre, tramos, ángulos, material, espesor, ancho, orden y dibujos 2D/3D independientes. Se añaden a Proyectos conservando registros locales existentes, sin presentarse como planos originales. Planos incluye 12 tarjetas y opciones «Programar 2D» y «Guardar planos 2D/3D».
+- Nuevas tarjetas muestran **ambas vistas**, 2D y 3D. Los proyectos de usuario sin geometría confirmada tienen una forma de BORRADOR expresamente advertida; nunca se afirma que coincide con su plano real.
+- Programación 2D: panel superior de configuración rápida de material, espesor, ancho, punzón, matriz, radio, K, tope X. Botón de V nominal cercana a 8×espesor. Botón de orden táctil, numeración de paso sobre vértices y detección de repetidos al tocar.
+- `engineering-checks.js`: diagnóstico estático de desarrollo, V/espesor, fuerza aproximada con Rm supuesto por material, ala corta y posibles intersecciones del perfil. **No** es cálculo de fabricante, máquina ni seguridad.
+- `sheet-offset.js`: geometría de miter limitada y compartida entre `piece3d.js` y `plan-drawing.js` para mejorar la coherencia de espesores en los vértices. No se modelan radios de pliegue reales ni springback.
+- Se conserva el diseño aprobado de Inicio y la aplicación es adaptativa. Pendiente: extracción CAD paramétrica de capturas/fotos, geometría exacta de planos de clientes, simulación física, secuencia real de recolocación, límites por máquina y colisiones/posprocesado CNC certificados.

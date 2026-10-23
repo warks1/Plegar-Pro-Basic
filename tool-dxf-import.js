@@ -59,7 +59,7 @@
   }
   let arcCount=0;
   for(let i=0;i<endpoints.length;i++){
-   const a=endpoints[i],b=endpoints[(i+1)%endpoints.length],bulge=a.bulge||0;
+   const a=endpoints[i],b=endpoints[(i+1)%endpoints.length],bulge=a.bulge??0;
    if(!finite(bulge)||Math.abs(bulge)>1000)throw Error('Bulge DXF no válido.');
    points.push({x:a.x,y:a.y});
    if(Math.abs(bulge)<1e-10)continue;

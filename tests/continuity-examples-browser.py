@@ -168,6 +168,15 @@ with sync_playwright() as pw:
   assert '40 × 65 mm' in page.locator('.tool-dxf-card').inner_text()
   assert 'NO COLISIONES/CNC' in page.locator('.tool-dxf-card').inner_text()
   assert page.evaluate("JSON.parse(localStorage.getItem('plegarpro-tool-dxf-v1'))[0].collisionApproved")==False
+  backup=page.evaluate('PlegarToolDXF.exportBackup()')
+  assert 'plegar-pro-tool-profiles' in backup
+  page.locator('[data-dxf-remove]').click()
+  assert page.locator('.tool-dxf-card').count()==0
+  page.locator('[data-dxf-backup-file]').set_input_files({
+   "name":"mis-perfiles.json","mimeType":"application/json","buffer":backup.encode('utf-8')})
+  page.wait_for_function("() => document.querySelectorAll('.tool-dxf-card').length===1",timeout=8000)
+  assert '40 × 65 mm' in page.locator('.tool-dxf-card').inner_text()
+  assert 'NO COLISIONES/CNC' in page.locator('.tool-dxf-card').inner_text()
   page.locator('[data-dxf-remove]').click()
   assert page.locator('.tool-dxf-card').count()==0
   # DXF clásico VERTEX/SEQEND (común en controles y CAD anteriores).

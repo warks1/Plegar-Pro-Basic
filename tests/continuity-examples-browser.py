@@ -161,7 +161,9 @@ with sync_playwright() as pw:
    "name":"perfil-de-prueba.dxf","mimeType":"text/plain","buffer":('\n'.join(dxf_rows)+'\n').encode('utf-8')
   })
   page.locator('.tool-dxf-form button[type="submit"]').click()
-  assert page.locator('.tool-dxf-card').count()==1
+  page.wait_for_function("""() => document.querySelectorAll('.tool-dxf-card').length===1 ||
+   document.querySelector('.tool-dxf-feedback')?.textContent.includes('No se pudo importar')""",timeout=8000)
+  assert page.locator('.tool-dxf-card').count()==1, f"Importador: {page.locator('.tool-dxf-feedback').inner_text()} errores={errors[-3:]}"
   assert page.locator('.tool-dxf-art').count()==2
   assert '40 × 65 mm' in page.locator('.tool-dxf-card').inner_text()
   assert 'NO COLISIONES/CNC' in page.locator('.tool-dxf-card').inner_text()

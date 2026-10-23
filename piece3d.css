@@ -69,3 +69,10 @@
 .p3-order-slot select{display:block;margin-top:4px;max-width:100%;width:100%;min-height:36px;background:#113653;color:#f3fbff;border:1px solid #518ab1;border-radius:6px}
 @media(max-width:720px){.example-gallery{grid-template-columns:repeat(2,minmax(0,1fr))}.example-gallery-wrap{padding:8px}}
 @media(max-width:350px){.example-gadget-name{font-size:11px}.example-gadget small{font-size:9px}}
+
+/* v0.42 · los gadgets incluyen su plano 2D y su sólido 3D */
+.example-gadget-paired{display:grid;grid-template-columns:1fr 1fr;gap:4px;min-width:0}
+.example-gadget-plan,.example-gadget-volume{display:block;min-width:0;overflow:hidden;border-radius:4px;background:#f8faff}
+.example-gadget-volume{background:#10283c}
+.example-gadget-paired svg{width:100%;height:100%;min-height:70px;max-width:100%;display:block}
+.example-gadget-paired .example-gadget-plan svg{background:white}

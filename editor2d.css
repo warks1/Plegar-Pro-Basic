@@ -161,3 +161,8 @@
 .ed-quick-warning{color:#ffc48f}
 @media(max-width:720px){.ed-quick-setup{grid-template-columns:repeat(2,minmax(0,1fr));padding:10px}}
 @media(max-width:360px){.ed-quick-setup{grid-template-columns:1fr}}
+
+/* v0.42 · pasos legibles sobre pliegues */
+.ed-bend-point .ed-order-small{font-size:12px;fill:#9bddff;pointer-events:none}
+.ed-bend-point.ed-order-chosen circle{fill:#187d57;stroke:#78ffd1;stroke-width:3}
+#ed-quick-order[aria-pressed="true"]{background:#078365;border-color:#a1f3da}

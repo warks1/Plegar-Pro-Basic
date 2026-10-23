@@ -49,7 +49,16 @@ with sync_playwright() as pw:
   page.locator('button.nav-item[data-screen="Programación 2D"]').click()
   assert page.locator('#ed-example-gallery [data-example-id]').count()==4
   svg_views=page.locator('#ed-example-gallery .example-gadget svg').evaluate_all('(els)=>els.map(el=>el.innerHTML)')
-  assert len(set(svg_views))==4,'Cuatro piezas no tienen cuatro geometrías diferentes'
+  assert len(svg_views)==8 and len(set(svg_views))==8,'Cada tarjeta debe mostrar un plano 2D y una geometría 3D propios'
+  assert page.locator('#ed-quick-material').count()==1 and page.locator('#ed-quick-punch').count()==1
+  assert page.locator('#ed-quick-die').count()==1
+  page.locator('#ed-quick-material').select_option('Inox 304')
+  assert page.evaluate('PlegarEditor2D.getData().material')=='Inox 304'
+  page.locator('#ed-quick-thickness').fill('1.5')
+  page.locator('#ed-quick-thickness').dispatch_event('change')
+  assert page.evaluate('PlegarEditor2D.getData().thickness')==1.5
+  page.locator('#ed-quick-v').click()
+  assert page.evaluate('PlegarEditor2D.getData().setup.die')=='v12-88'
   page.locator('#ed-example-gallery [data-example-id="u"]').click()
   assert page.evaluate('PlegarEditor2D.getData().segments')==[55,100,55]
   page.locator('[data-ed-position="2"]').select_option('1')

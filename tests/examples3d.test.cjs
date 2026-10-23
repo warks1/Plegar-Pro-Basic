@@ -18,7 +18,7 @@ test('las tarjetas 3D ofrecen botones táctiles y mantienen forma distintiva',()
  const markup=E.cards('Canal U (ejemplo)');
  assert.equal((markup.match(/class="example-gadget(?: selected)?"/g)||[]).length,4);
  assert.equal((markup.match(/data-example-id=/g)||[]).length,4);
- assert.equal((markup.match(/<svg/g)||[]).length,4);
+ assert.equal((markup.match(/<svg/g)||[]).length,8);
  assert.match(markup,/example-gadget selected/);
  assert.equal(E.get('missing'),null);
 });

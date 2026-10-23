@@ -12,7 +12,7 @@ function projectProfile(p,i){
    return {...valid,setup:p.profile.setup};
   }catch{return null;}
  }
- return Sample()?.get(p.sampleId)?.profile||Sample()?.byName(p.name)?.profile||null;
+ return Sample()?.get(p.sampleId)?.profile||Sample()?.byName(p.name)?.profile||Sample()?.draft(p.name,p.detail)?.profile||null;
 }
 function projectThumb(p,i){
  const model=projectProfile(p,i);
@@ -21,7 +21,8 @@ function projectThumb(p,i){
 }
 function projectRows(items){
  return items.slice(0,4).map((p,i)=>{
-  const model=projectProfile(p,i),detail=model?model.angles.length+' pliegues · '+model.thickness.toFixed(2)+' mm · '+(p.profile?'PROGRAMA VINCULADO':'EJEMPLO CON PLANO 2D/3D'):'SIN PLANO';
+  const model=projectProfile(p,i),isSample=!!(Sample()?.get(p.sampleId)||Sample()?.byName(p.name)),
+   detail=model?model.angles.length+' pliegues · '+model.thickness.toFixed(2)+' mm · '+(p.profile?'PROGRAMA VINCULADO':isSample?'EJEMPLO 2D/3D':'BORRADOR SIN COTAS CONFIRMADAS'):'SIN PLANO';
   return '<button class="project-row" type="button" data-project="'+i+'"><span class="home-project-thumb">'+projectThumb(p,i)+'</span><span class="ptext"><strong>'+escape(p.name)+'</strong><small>'+escape(detail)+'</small></span><time>'+escape(String(p.time||'').slice(0,10))+'</time></button>';
  }).join('');
 }
@@ -106,7 +107,7 @@ function selectProject(i){
  try{
   Editor().loadProfile({...model,name:p.name});
   state.width=p.width||Sample()?.get(p.sampleId)?.width||Sample()?.byName(p.name)?.width||100;state.profileKey='';state.cameraKey='';sync();
-  if(!p.profile)document.querySelector('#toast').textContent='Modelo de EJEMPLO con cotas propias, no el plano real de un cliente.';
+  if(!p.profile)document.querySelector('#toast').textContent='Geometría provisional de ejemplo o borrador; comprobar las cotas del plano real.';
  }catch(err){alert('No es posible cargar la pieza: '+err.message);}
 }
 function cloneControl(id,handler,event='click'){

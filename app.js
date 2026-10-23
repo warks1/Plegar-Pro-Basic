@@ -123,7 +123,7 @@ function renderModule(name){
    window.PlegarPiece3DView.mount($('#module-sample'),window.PlegarEditor2D.getData,window.PlegarEditor2D.getSelection,window.PlegarEditor2D.selectBend);
    return;
  }else if(name==='Proyectos'){
- content=projects.map((p,i)=>`<div class="module-tile"><div class="home-project-big-thumb">${window.PlegarHomeDashboard?.projectThumb(p,i)||'Sin plano vinculado'}</div><strong>${escapeHtml(p.name)}</strong><p>${p.profile?'Plano del programa vinculado':p.sampleId||window.PlegarSampleLibrary.byName(p.name)?'Plano 2D + vista 3D de ejemplo, no original de cliente':'Sin geometría asociada; vincula el programa real'}</p><button type="button" data-project="${i}">Abrir pieza</button><button type="button" data-attach-project="${i}">Vincular programa actual</button></div>`).join('')+`<div class="module-tile"><strong>Nuevo proyecto</strong><p>Crea un proyecto de muestra almacenado en este navegador.</p><button type="button" id="new-project">Crear proyecto</button></div>`;
+ content=projects.map((p,i)=>`<div class="module-tile"><div class="home-project-big-thumb">${window.PlegarHomeDashboard?.projectThumb(p,i)||'Sin plano vinculado'}</div><strong>${escapeHtml(p.name)}</strong><p>${p.profile?'Plano del programa vinculado':p.sampleId||window.PlegarSampleLibrary.byName(p.name)?'Plano 2D + vista 3D de ejemplo, no original de cliente':'Borrador 2D/3D con cotas sin confirmar; sustituir por programa real'}</p><button type="button" data-project="${i}">Abrir pieza</button><button type="button" data-attach-project="${i}">Vincular programa actual</button></div>`).join('')+`<div class="module-tile"><strong>Nuevo proyecto</strong><p>Crea un proyecto de muestra almacenado en este navegador.</p><button type="button" id="new-project">Crear proyecto</button></div>`;
  }else if(name==='Materiales'){
  content=materials.map(([title,thick],i)=>`<div class="module-tile"><img src="assets/chapa-mini.webp" alt="Muestra de chapa"/><strong>${title}</strong><p>Espesor de demostración: ${thick}</p><button type="button" data-material="${i}">Seleccionar material</button></div>`).join('');
  }else if(name==='Simulación 3D'||name==='Simulación 2D'){
@@ -161,7 +161,7 @@ document.addEventListener('click',event=>{
  }
  if(event.target.closest('#confirm-project')){
   const value=$('#new-project-name')?.value.trim();if(!value){toast('Introduce un nombre de proyecto.');return;}
-  projects.unshift({name:value,detail:'Nuevo proyecto · sin plano',time:new Date().toLocaleString('es-ES'),profile:null});localStorage.setItem('plegarpro-demo-projects',JSON.stringify(projects));$('#dialog').close();renderProjects();renderModule('Proyectos');toast('Proyecto de muestra guardado en este navegador.');return;
+  projects.unshift({name:value,detail:'BORRADOR geométrico · cotas por introducir',time:new Date().toLocaleString('es-ES'),profile:null});localStorage.setItem('plegarpro-demo-projects',JSON.stringify(projects));$('#dialog').close();renderProjects();renderModule('Proyectos');toast('Proyecto de muestra guardado en este navegador.');return;
  }
 });
 $('#brand-home').addEventListener('click',()=>switchScreen('Inicio'));

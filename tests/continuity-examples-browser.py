@@ -109,6 +109,11 @@ with sync_playwright() as pw:
   if w<=1120:page.locator('#open-menu').click()
   page.locator('button.nav-item[data-screen="Máquinas"]').click()
   assert page.locator('.machine-reference').is_visible()
+  img=page.locator('.machine-photo-reference img')
+  assert img.is_visible()
+  assert img.get_attribute('src')=='assets/bystronic-frontal-referencia.svg'
+  assert img.evaluate('(el)=>el.complete&&el.naturalWidth>0')
+  assert 'No equivale a plano oficial' in page.locator('.machine-photo-reference figcaption').inner_text()
   assert '925 mm' in page.locator('.machine-reference').inner_text()
   assert '200 mm' in page.locator('.machine-reference').inner_text()
   assert page.locator('.machine-reference').locator('a[href*="bystronic-ep-ii-31-100"]').count()==1

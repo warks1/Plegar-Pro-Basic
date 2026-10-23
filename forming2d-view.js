@@ -2,7 +2,7 @@
    Muestra una aproximación con radio, no controla una plegadora. */
 (function(){
 'use strict';
-const Model=window.PlegarFormingGeometry,K=window.PlegarFoldKinematics;
+const Model=window.PlegarFormingGeometry,K=window.PlegarFoldKinematics,TL=window.PlegarSequenceTimeline;
 const as2=n=>Number(n).toLocaleString('es-ES',{maximumFractionDigits:2});
 let active=null;
 function extents(m){
@@ -57,7 +57,24 @@ function svg(m,zoom,bounds){
  <text x="15" y="455" font-size="11" fill="#c8d5df">Azul: tramos pendientes. Naranja: ya plegados (bisagra aguda). NO verifica seguridad.</text>
  </svg>`;
 }
-function halt(){if(active?.timer){clearInterval(active.timer);active.timer=null;}if(active){const b=active.host.querySelector('[data-f2-action="play"]');if(b)b.textContent='▶ Reproducir';}}
+function halt(){
+ if(active?.timer!==null&&active?.timer!==undefined){cancelAnimationFrame(active.timer);active.timer=null;}
+ if(active){active.lastFrame=null;const b=active.host.querySelector('[data-f2-action="play"]');if(b)b.textContent='▶ Reproducir sin pausas';}
+}
+function animation(now){
+ const ctl=active;if(!ctl||ctl.timer===null||!ctl.host.isConnected){halt();return;}
+ if(ctl.lastFrame===null)ctl.lastFrame=now;
+ const dt=Math.min(100,Math.max(0,now-ctl.lastFrame));ctl.lastFrame=now;
+ const next=TL.advance({step:ctl.currentStep,cycle:ctl.progress},dt,ctl.getData().sequence.length,{speed:ctl.speed});
+ ctl.currentStep=next.step;ctl.progress=next.cycle;
+ if(next.transition){
+  ctl.selfSelecting=true;
+  try{ctl.onSelect(ctl.getData().sequence[ctl.currentStep]);}finally{ctl.selfSelecting=false;}
+ }
+ if(next.finished)halt();
+ if(ctl.lastPaint===null||now-ctl.lastPaint>=33||next.finished||next.transition){render();ctl.lastPaint=now;}
+ if(ctl.timer!==null)ctl.timer=requestAnimationFrame(animation);
+}
 function destroy(){halt();active=null;}
 function render(){
  const ctl=active;if(!ctl||!ctl.host.isConnected)return;
@@ -92,10 +109,10 @@ function mount(host,getData,getSelection=()=>1,onSelect=()=>{}){
  destroy();
  if(!host)return;
  let step=Math.max(0,getData().sequence.indexOf(getSelection()));
- active={host,getData,getSelection,onSelect,currentStep:step,progress:0,zoom:1,mode:'bend',timer:null,cameraKey:null,bounds:null};
+ active={host,getData,getSelection,onSelect,currentStep:step,progress:0,zoom:1,mode:'bend',timer:null,lastFrame:null,lastPaint:null,speed:1,selfSelecting:false,cameraKey:null,bounds:null};
  host.innerHTML=`<section class="f2-view" aria-label="Seguimiento cinemático 2D de plegado">
- <div class="f2-title"><div><strong>SEGUIMIENTO DE PLEGADO · PERFIL</strong><small>Punzón superior · matriz V inferior · tope posterior · chapa</small></div><span>PERFIL GEOMÉTRICO v0.37</span></div>
- <div class="f2-stage"></div><div class="f2-toolbar"><strong class="f2-step-label"></strong><div class="f2-controls"><button type="button" data-f2-action="previous">← Anterior</button><button type="button" data-f2-action="play">▶ Reproducir</button><button type="button" data-f2-action="mode" aria-pressed="false">☐ Ciclo completo</button><button type="button" data-f2-action="next">Siguiente →</button><button type="button" data-f2-action="reset">Reiniciar</button><button type="button" data-f2-action="zoom-out" aria-label="Reducir zoom">−</button><button type="button" data-f2-action="zoom-in" aria-label="Ampliar zoom">+</button></div></div>
+ <div class="f2-title"><div><strong>SEGUIMIENTO DE PLEGADO · PERFIL</strong><small>Punzón superior · matriz V inferior · tope posterior · chapa</small></div><span>PERFIL GEOMÉTRICO v0.39</span></div>
+ <div class="f2-stage"></div><div class="f2-toolbar"><strong class="f2-step-label"></strong><div class="f2-controls"><button type="button" data-f2-action="previous">← Anterior</button><button type="button" data-f2-action="play">▶ Reproducir sin pausas</button><button type="button" data-f2-action="mode" aria-pressed="false">☐ Ciclo completo</button><button type="button" data-f2-action="next">Siguiente →</button><button type="button" data-f2-action="reset">Reiniciar</button><button type="button" data-f2-action="zoom-out" aria-label="Reducir zoom">−</button><button type="button" data-f2-action="zoom-in" aria-label="Ampliar zoom">+</button></div></div>
  <div class="f2-cycle-state" role="status" aria-label="Fase cinemática 2D"></div><div class="f2-slider"><label for="f2-range">Avance del ciclo o conformado</label><input id="f2-range" class="f2-range" type="range" min="0" max="100" step="1" value="0"><output class="f2-progress" for="f2-range">0 %</output></div>
  <div class="f2-steps" aria-label="Orden de plegado"></div><div class="f2-prior-summary" role="status"></div><div class="f2-nominal" role="status"></div><ul class="f2-notes"></ul></section>`;
  host.onclick=e=>{
@@ -106,14 +123,11 @@ function mount(host,getData,getSelection=()=>1,onSelect=()=>{}){
   if(!action)return;
   if(action==='mode'){halt();ctl.mode=ctl.mode==='bend'?'cycle':'bend';ctl.progress=0;render();return;}
   if(action==='play'){
-   if(ctl.timer){halt();return;}
-   if(ctl.progress>=1)ctl.progress=0;
+   if(ctl.timer!==null){halt();render();return;}
+   if(ctl.progress>=1){ctl.currentStep=0;ctl.progress=0;}
    ctl.host.querySelector('[data-f2-action="play"]').textContent='⏸ Pausar';
-   ctl.timer=setInterval(()=>{
-    if(active!==ctl||!ctl.host.isConnected){halt();return;}
-    ctl.progress=Math.min(1,Math.round((ctl.progress+0.025)*1000)/1000);
-    render();if(ctl.progress>=1)halt();
-   },75);return;
+   ctl.lastFrame=null;ctl.lastPaint=null;
+   ctl.timer=requestAnimationFrame(animation);return;
   }
   halt();
   if(action==='previous'||action==='next'){
@@ -128,6 +142,6 @@ function mount(host,getData,getSelection=()=>1,onSelect=()=>{}){
  host.oninput=e=>{if(!e.target.matches('.f2-range')||!active||active.host!==host)return;halt();active.progress=Number(e.target.value)/100;render();};
  render();
 }
-function refresh(){const ctl=active;if(!ctl)return;halt();let next=ctl.getData().sequence.indexOf(ctl.getSelection());if(next>=0)ctl.currentStep=next;render();}
+function refresh(){const ctl=active;if(!ctl||ctl.selfSelecting)return;halt();let next=ctl.getData().sequence.indexOf(ctl.getSelection());if(next>=0)ctl.currentStep=next;render();}
 window.PlegarForming2D={mount,destroy,refresh};
 })();

@@ -313,7 +313,7 @@ function actions(event){
   return;
  }
  switch(b.id){
- case 'ed-quick-new':{orderPick=0;orderUsed.clear();loadProfile({name:'Nueva pieza',material:state.material,thickness:state.thickness,segments:[100,100],angles:[90],sequence:[1],setup:clone(state.setup)},{width:projectWidth});inform('Nueva pieza creada: introduce medidas y ángulos.');return;}
+ case 'ed-quick-new':window.PlegarNewPiece.open({screen:'Programación 2D'});return;
  case 'ed-quick-v':{const wanted=8*state.thickness,selectedDie=C.DIES.filter(d=>d.angle===88).sort((a,b)=>Math.abs(a.opening-wanted)-Math.abs(b.opening-wanted))[0];if(selectedDie){edit(d=>{d.setup.die=selectedDie.id;});inform('Matriz orientativa '+selectedDie.name+' seleccionada. Confirmar compatibilidad antes de fabricar.');}return;}
  case 'ed-quick-sim':window.PlegarApp?.switchScreen('Simulación 3D');return;
  case 'ed-apply-auto':{

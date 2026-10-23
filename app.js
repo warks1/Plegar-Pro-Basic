@@ -123,7 +123,7 @@ function renderModule(name){
    window.PlegarPiece3DView.mount($('#module-sample'),window.PlegarEditor2D.getData,window.PlegarEditor2D.getSelection,window.PlegarEditor2D.selectBend);
    return;
  }else if(name==='Proyectos'){
- content=projects.map((p,i)=>`<div class="module-tile"><div class="home-project-big-thumb">${window.PlegarHomeDashboard?.projectThumb(p,i)||'Sin plano vinculado'}</div><strong>${escapeHtml(p.name)}</strong><p>${p.profile?'Plano del programa vinculado':p.sampleId||window.PlegarSampleLibrary.byName(p.name)?'Plano 2D + vista 3D de ejemplo, no original de cliente':'Borrador 2D/3D con cotas sin confirmar; sustituir por programa real'}</p><button type="button" data-project="${i}">Abrir pieza</button><button type="button" data-attach-project="${i}">Vincular programa actual</button></div>`).join('')+`<div class="module-tile"><strong>Nuevo proyecto</strong><p>Crea un proyecto de muestra almacenado en este navegador.</p><button type="button" id="new-project">Crear proyecto</button></div>`;
+ content=projects.map((p,i)=>`<div class="module-tile"><div class="home-project-big-thumb">${window.PlegarHomeDashboard?.projectThumb(p,i)||'Sin plano vinculado'}</div><strong>${escapeHtml(p.name)}</strong><p>${p.profile?'Plano del programa vinculado':p.sampleId||window.PlegarSampleLibrary.byName(p.name)?'Plano 2D + vista 3D de ejemplo, no original de cliente':'Borrador 2D/3D con cotas sin confirmar; sustituir por programa real'}</p><div class="project-work-buttons"><button type="button" data-project-action="plan" data-project-index="${i}">Ver plano y pieza 3D</button><button type="button" data-project-action="program2d" data-project-index="${i}">Programar 2D</button><button type="button" data-project-action="sim3d" data-project-index="${i}">Simular 3D</button><button type="button" data-project-action="save" data-project-index="${i}">Guardar planos</button><button type="button" data-attach-project="${i}">Vincular programa actual</button></div></div>`).join('')+`<div class="module-tile"><strong>Nuevo proyecto</strong><p>Crea un proyecto de muestra almacenado en este navegador.</p><button type="button" id="new-project">Crear proyecto</button></div>`;
  }else if(name==='Materiales'){
  content=materials.map(([title,thick],i)=>`<div class="module-tile"><img src="assets/chapa-mini.webp" alt="Muestra de chapa"/><strong>${title}</strong><p>Espesor de demostración: ${thick}</p><button type="button" data-material="${i}">Seleccionar material</button></div>`).join('');
  }else if(name==='Simulación 3D'||name==='Simulación 2D'){
@@ -139,10 +139,44 @@ function renderModule(name){
  $('#module-sample').innerHTML=content;
 }
 
+function projectGeometry(i){
+ const p=projects[i];if(!p)return null;
+ const sample=window.PlegarSampleLibrary;
+ const item=sample?.get(p.sampleId)||sample?.byName(p.name);
+ const source=p.profile||item?.profile||sample?.draft(p.name,p.detail)?.profile;
+ if(!source)return null;
+ try{
+  const profile={...window.PlegarGeometry2D.validate(source),setup:window.PlegarBendCalc.validateSetup(source.setup)};
+  return {profile,width:p.width||item?.width||100,kind:p.profile?'vinculado':item?'ejemplo':'borrador'};
+ }catch{return null;}
+}
+function projectAction(i,action){
+ const item=projectGeometry(i);if(!item){toast('Revisa las medidas del proyecto.');return;}
+ const record=projects[i],value={...item.profile,name:record.name};
+ if(action==='plan'){
+  showDialog('Plano 2D y pieza 3D · '+record.name,
+    '<div class="project-plan-dialog">'+window.PlegarSampleLibrary.paired(value,item.width)+'</div>'+
+    '<p>Geometría '+escapeHtml(item.kind)+' · '+value.angles.length+' pliegues · '+item.width+
+    ' mm de ancho. Sin taladros ni recortes no programados. NO ES PLANO DE FABRICACIÓN NI CNC.</p>');
+  return;
+ }
+ if(action==='save'){
+  if(item.kind==='borrador'){toast('El borrador necesita cotas confirmadas en Programación 2D antes de guardarlo.');return;}
+  window.PlegarPlans.saveProgram(value,{width:item.width})
+   .then(()=>toast('Ficha PDF, vistas 2D/3D y programa editable guardados en Planos (dispositivo local).'))
+   .catch(e=>toast('No se pudo guardar el plano: '+e.message));return;
+ }
+ window.PlegarEditor2D.loadProfile(value,{width:item.width});
+ switchScreen(action==='sim3d'?'Simulación 3D':'Programación 2D');
+ toast('Proyecto '+record.name+' cargado · '+item.kind+'.');
+}
+
 // Delegación: navegación y selecciones. Todas las superficies que actúan son botones reales.
 document.addEventListener('click',event=>{
  const screen=event.target.closest('[data-screen]');if(screen){switchScreen(screen.dataset.screen);return;}
  const step=event.target.closest('[data-step]');if(step){stopPlayer();setStep(Number(step.dataset.step));return;}
+ const projectButton=event.target.closest('[data-project-action]');
+ if(projectButton){projectAction(Number(projectButton.dataset.projectIndex),projectButton.dataset.projectAction);return;}
  const attach=event.target.closest('[data-attach-project]');if(attach){
   const i=Number(attach.dataset.attachProject),data=window.PlegarEditor2D?.getData();
   if(!projects[i]||!data)return;

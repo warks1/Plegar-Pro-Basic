@@ -105,7 +105,7 @@ function selectProject(i){
  const model=projectProfile(p,i);if(!model){alert('Este proyecto no contiene un plano geométrico vinculado.');return;}
  stop();
  try{
-  Editor().loadProfile({...model,name:p.name});
+  Editor().loadProfile({...model,name:p.name},{width:p.width||Sample()?.get(p.sampleId)?.width||Sample()?.byName(p.name)?.width||100});
   state.width=p.width||Sample()?.get(p.sampleId)?.width||Sample()?.byName(p.name)?.width||100;state.profileKey='';state.cameraKey='';sync();
   if(!p.profile)document.querySelector('#toast').textContent='Geometría provisional de ejemplo o borrador; comprobar las cotas del plano real.';
  }catch(err){alert('No es posible cargar la pieza: '+err.message);}

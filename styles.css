@@ -46,3 +46,12 @@
 .home-project-big-thumb{max-width:320px}
 .home-project-big-thumb .sample-plan-pair{min-height:140px}
 @media(max-width:650px){.home-project-thumb{flex-basis:65px;width:65px;height:38px}.home-project-big-thumb .sample-plan-pair{min-height:110px}}
+
+/* v0.43 · acceso a los planos reales de cada tarjeta */
+.project-work-buttons{display:flex;flex-wrap:wrap;gap:6px;margin-top:9px}
+.project-work-buttons button{font:inherit;font-size:11px;border:1px solid #376f91;color:#ebf8ff;background:#123654;padding:8px;border-radius:6px;min-height:37px;flex:1 1 116px;white-space:normal}
+.project-work-buttons button:hover{background:#165e86}
+.project-plan-dialog{max-width:100%;overflow:hidden}
+.project-plan-dialog .sample-plan-pair{height:auto;min-height:220px}
+.project-plan-dialog .sample-plan-view,.project-plan-dialog .sample-part-view{aspect-ratio:900/600}
+@media(max-width:620px){.project-plan-dialog .sample-plan-pair{grid-template-columns:1fr;min-height:0}.project-plan-dialog .sample-plan-view,.project-plan-dialog .sample-part-view{min-height:135px}}

@@ -145,7 +145,7 @@ with sync_playwright() as pw:
   if w<=1120:page.locator('#open-menu').click()
   page.locator('button.nav-item[data-screen="Utillaje"]').click()
   # Importación métrica desde un contorno cerrado real del archivo, sin convertirlo en útil homologado.
-  page.locator('.tool-dxf-importer summary').click()
+  page.locator('.tool-dxf-importer > details > summary').click()
   dxf_rows=[
    '0','SECTION','2','HEADER','9','$INSUNITS','70','4','0','ENDSEC',
    '0','SECTION','2','ENTITIES','0','LWPOLYLINE','90','4','70','1',

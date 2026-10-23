@@ -59,7 +59,7 @@
   const mesh=meshFromProfile(pts,p.thickness,width);
   const projection=M.project(mesh,38,24,1);
   const polygons=R.polys(mesh,projection,'pp-plan-metal',{material:p.material});
-  const svg3d=XML+header(p.name,'VISTA METAL SATINADO 3D')+
+  const svg3d=XML+header(p.name,'VISTA AXONOMÉTRICA 3D · METAL SATINADO')+
    '<g transform="translate(0 74)">'+R.defs('pp-plan-metal')+R.background('pp-plan-metal')+polygons+'</g>'+
    '<rect x="0" y="496" width="900" height="104" fill="#e7edf1"/>'+
    '<text x="30" y="518" fill="#24435b" font-size="14">Ancho introducido: '+fmt(width)+' mm · Espesor: '+fmt(p.thickness)+' mm · Material: '+esc(p.material)+'</text>'+

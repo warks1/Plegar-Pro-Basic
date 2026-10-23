@@ -106,3 +106,17 @@
 .development-table-scroll th{background:#123751;color:#b9e9fc}
 .development-table-scroll [data-dev-status="REVISAR"],.development-table-scroll [data-dev-status="NO DESARROLLABLE"]{background:#352a21}
 @media(max-width:650px){.development-tools{padding:9px}.development-kpi{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+/* Ficha de Bystronic 2006: medidas generales verificadas vs datos de colisión no aportados. */
+.machine-reference{max-width:100%;border:1px solid #41718e;background:#0b2539;border-radius:10px;padding:16px;color:#e2f1fa;line-height:1.55}
+.machine-reference h2{font-size:18px;color:#79d5fa;margin:0 0 10px}
+.machine-reference h3{font-size:14px;color:#ffd995;margin:16px 0 8px}
+.machine-reference p{font-size:12px;margin:8px 0}
+.machine-reference-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin:12px 0}
+.machine-reference-grid>div{padding:12px;border-radius:7px;border:1px solid #416179;background:#15374c;min-width:0}
+.machine-reference-grid small{display:block;color:#b9d4e6;font-size:11px}
+.machine-reference-grid strong{display:block;color:#f7fcff;font-size:16px;margin-top:3px}
+.machine-reference-warning{padding:10px;border-left:3px solid #e4ae62;background:#2a291f;color:#ffe6c0}
+.machine-reference a{color:#89d7ff;text-decoration:underline}
+@media(max-width:800px){.machine-reference-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.machine-reference{padding:10px}.machine-reference-grid strong{font-size:14px}}
+@media(max-width:380px){.machine-reference-grid{grid-template-columns:1fr}}

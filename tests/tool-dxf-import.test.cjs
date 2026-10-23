@@ -125,3 +125,57 @@ test('POLYLINE clásica rechaza mallas, elevaciones, vertices spline o seqend au
  const bad=classic().replace('0\nPOLYLINE\n66','0\nPOLYLINE\n230\n-1\n66');
  assert.throws(()=>D.parseDXF(bad),/inclinada/);
 });
+
+test('Copia JSON guarda y recupera perfiles locales sin activar colisiones',()=>{
+ const first=D.add({brand:'AMADA',kind:'punch',code:'COPIA-P',name:'Punzón de prueba'},dxf());
+ const second=D.add({brand:'MECOS',kind:'die',code:'COPIA-V',name:'Matriz de prueba'},dxf({points:[[0,0],[24,0],[24,80],[0,80]]}));
+ const saved=D.exportBackup(),source=JSON.parse(saved);
+ assert.equal(source.format,'plegar-pro-tool-profiles');
+ assert.equal(source.version,1);
+ assert.equal(source.profiles.length,2);
+ assert.equal(source.profiles[0].collisionApproved,false);
+ D.remove(first.id);D.remove(second.id);
+ assert.equal(D.read().length,0);
+ const restored=D.importBackup(saved);
+ assert.deepEqual(restored,{added:2,total:2});
+ assert.equal(D.read().find(r=>r.id===first.id).bounds.height,150);
+ assert.equal(D.read().find(r=>r.id===second.id).bounds.width,24);
+ assert.ok(D.read().every(r=>!r.geometryCertified&&!r.collisionApproved&&!r.simulatable));
+ assert.deepEqual(D.importBackup(saved),{added:0,total:2},'Una copia repetida no duplica perfiles');
+ D.remove(first.id);D.remove(second.id);
+});
+test('Copia corrupta o colisionada se rechaza por completo sin perder los perfiles actuales',()=>{
+ const base=D.add({brand:'EUROSTAMP',kind:'punch',code:'C001',name:'Prueba'},dxf());
+ const previous=D.read().map(r=>r.id);
+ const backup=JSON.parse(D.exportBackup());
+ assert.throws(()=>D.importBackup('{broken'),/JSON/);
+ assert.throws(()=>D.importBackup(JSON.stringify({...backup,format:'otro'})),/Formato/);
+ const altered=structuredClone(backup);
+ altered.profiles[0].points[1].x+=10;
+ assert.throws(()=>D.importBackup(JSON.stringify(altered)),/identificador ya existente/);
+ assert.deepEqual(D.read().map(r=>r.id),previous);
+ const corrupted=structuredClone(backup);
+ corrupted.profiles[0].points[2].x=1000000;
+ assert.throws(()=>D.importBackup(JSON.stringify(corrupted)),/Coordenada/);
+ assert.deepEqual(D.read().map(r=>r.id),previous);
+ const duplicated=structuredClone(backup);
+ duplicated.profiles.push(duplicated.profiles[0]);
+ assert.throws(()=>D.importBackup(JSON.stringify(duplicated)),/duplicados/);
+ assert.deepEqual(D.read().map(r=>r.id),previous);
+ D.remove(base.id);
+});
+test('La importación de copias anula certificaciones falsas y respeta el formato DXF',()=>{
+ const record=D.add({brand:'Bystronic',kind:'die',code:'TEST',name:'Local'},dxf());
+ const backup=JSON.parse(D.exportBackup());
+ backup.profiles[0].geometryCertified=true;
+ backup.profiles[0].collisionApproved=true;
+ backup.profiles[0].simulatable=true;
+ D.remove(record.id);
+ const restored=D.importBackup(JSON.stringify(backup));
+ assert.equal(restored.added,1);
+ assert.equal(D.read()[0].geometryCertified,false);
+ assert.equal(D.read()[0].collisionApproved,false);
+ assert.equal(D.read()[0].simulatable,false);
+ assert.equal(D.read()[0].sourceFormat,'DXF ASCII LWPOLYLINE');
+ D.remove(record.id);
+});

@@ -1,6 +1,7 @@
 """Prueba real de navegador: cuatro tarjetas 3D, orden editable y ciclo continuo."""
 from pathlib import Path
-import re, shutil
+import re, shutil, base64
+from xml.etree import ElementTree
 from playwright.sync_api import sync_playwright
 
 ROOT=Path(__file__).resolve().parents[1]
@@ -109,6 +110,20 @@ with sync_playwright() as pw:
   if w<=1120:page.locator('#open-menu').click()
   page.locator('button.nav-item[data-screen="Máquinas"]').click()
   assert page.locator('.machine-reference').is_visible()
+  img=page.locator('.machine-photo-reference img')
+  assert img.is_visible()
+  assert img.get_attribute('src')=='assets/bystronic-frontal-referencia.svg'
+  # El ensayo usa page.set_content(about:blank): no hay servidor de activos relativos.
+  # Comprobar el SVG real como XML y cargarlo en el navegador mediante data URL.
+  svgbytes=(ROOT/'assets/bystronic-frontal-referencia.svg').read_bytes()
+  ElementTree.fromstring(svgbytes)
+  embedded='data:image/svg+xml;base64,'+base64.b64encode(svgbytes).decode('ascii')
+  img.evaluate('(el,uri)=>{el.loading="eager";el.src=uri;}',embedded)
+  page.wait_for_function("""() => {
+   const img=document.querySelector('.machine-photo-reference img');
+   return img&&img.complete&&img.naturalWidth>0;
+  }""",timeout=9000)
+  assert 'No equivale a plano oficial' in page.locator('.machine-photo-reference figcaption').inner_text()
   assert '925 mm' in page.locator('.machine-reference').inner_text()
   assert '200 mm' in page.locator('.machine-reference').inner_text()
   assert page.locator('.machine-reference').locator('a[href*="bystronic-ep-ii-31-100"]').count()==1

@@ -1,0 +1,62 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 700" role="img" aria-labelledby="title desc">
+<title id="title">Vista frontal ilustrativa de plegadora Bystronic</title>
+<desc id="desc">Reproducción vectorial a partir de la fotografía del usuario: cuerpos laterales rojos Y1 y Y2, panel gris, trancha con amarre segmentado, matriz inferior, mesa, soportes y topes traseros. No es un plano acotado ni representación CAD.</desc>
+<defs>
+<linearGradient id="bg" x2="0" y2="1"><stop stop-color="#2c333b"/><stop offset="1" stop-color="#0b1520"/></linearGradient>
+<linearGradient id="metal" x1="0" x2="1" y1="0" y2=".12"><stop stop-color="#74828d"/><stop offset=".26" stop-color="#edf0f3"/><stop offset=".6" stop-color="#aebac3"/><stop offset="1" stop-color="#65727a"/></linearGradient>
+<linearGradient id="red" x1="0" x2="1" y1="0" y2=".2"><stop stop-color="#f04b2d"/><stop offset=".5" stop-color="#d52418"/><stop offset="1" stop-color="#9c251e"/></linearGradient>
+<linearGradient id="tool" x1="0" x2="1"><stop stop-color="#45515c"/><stop offset=".45" stop-color="#b9c8d2"/><stop offset="1" stop-color="#526371"/></linearGradient>
+<linearGradient id="bed" x1="0" x2="0" y1="0" y2="1"><stop stop-color="#b6c3cd"/><stop offset=".45" stop-color="#637989"/><stop offset="1" stop-color="#152637"/></linearGradient>
+<pattern id="grain" width="8" height="8" patternUnits="userSpaceOnUse"><path d="M0 2h8" stroke="#ffffff" opacity=".09" stroke-width=".4"/></pattern>
+</defs>
+<rect width="1200" height="700" fill="url(#bg)"/>
+<path d="M20 145H1180M20 530H1180" stroke="#53718a" opacity=".23"/>
+<!-- Columnas y base al fondo -->
+<rect x="95" y="118" width="1025" height="479" rx="13" fill="#0c141d" stroke="#465965" stroke-width="6"/>
+<rect x="132" y="148" width="64" height="426" fill="#1c2935"/>
+<rect x="1005" y="148" width="65" height="426" fill="#202a35"/>
+<!-- Cabecero móvil gris, superficie frontal -->
+<rect x="161" y="93" width="872" height="392" rx="15" fill="url(#metal)" stroke="#e4e9ef" stroke-width="4"/>
+<rect x="161" y="93" width="872" height="392" rx="15" fill="url(#grain)"/>
+<path d="M176 475H1018" stroke="#354b5d" stroke-width="11"/>
+<!-- Capuchones rojos laterales -->
+<path d="M54 115H188L207 137V467H55Z" fill="url(#red)" stroke="#ff7457" stroke-width="4"/>
+<path d="M1019 113H1146V471H1008V139Z" fill="url(#red)" stroke="#e25746" stroke-width="4"/>
+<text x="115" y="338" text-anchor="middle" font-size="39" font-family="Arial" fill="#21232b">Y₁</text>
+<text x="1086" y="338" text-anchor="middle" font-size="39" font-family="Arial" fill="#21232b">Y₂</text>
+<path d="M300 183H443V350H300Z" fill="#d93122"/>
+<text x="319" y="227" font-size="26" font-family="Arial" font-weight="bold" fill="#fff">Bystronic</text>
+<g stroke="#36434b" fill="#516675">
+<circle cx="192" cy="148" r="10"/><circle cx="1002" cy="147" r="10"/>
+<circle cx="80" cy="253" r="4"/><circle cx="80" cy="440" r="4"/><circle cx="1119" cy="240" r="4"/>
+</g>
+<!-- Trascha / sistema de amarre superior, sin cotas inferidas -->
+<path d="M192 489H1017V508H192Z" fill="url(#tool)" stroke="#c0d4de" stroke-width="2"/>
+<g fill="#758894" stroke="#cbd8e3" stroke-width="1.5">
+<rect x="247" y="504" width="71" height="34" rx="3"/><rect x="325" y="504" width="71" height="34" rx="3"/>
+<rect x="403" y="504" width="71" height="34" rx="3"/><rect x="481" y="504" width="71" height="34" rx="3"/>
+<rect x="559" y="504" width="71" height="34" rx="3"/><rect x="637" y="504" width="71" height="34" rx="3"/>
+<rect x="715" y="504" width="71" height="34" rx="3"/><rect x="793" y="504" width="71" height="34" rx="3"/>
+<rect x="871" y="504" width="71" height="34" rx="3"/>
+</g>
+<!-- Mesa y topes traseros -->
+<path d="M140 558H1055L1110 583V605H110L110 583Z" fill="url(#tool)" stroke="#b9c9d8" stroke-width="3"/>
+<path d="M148 601H1045V625H145Z" fill="url(#bed)"/>
+<path d="M170 626H1025V665H172Z" fill="#354a60" stroke="#708698" stroke-width="2"/>
+<path d="M176 633H1024" stroke="#93b7c7" stroke-width="4"/>
+<g fill="#3c5569" stroke="#a7c1d2" stroke-width="2">
+<path d="M280 535L280 585L344 585V537Z"/>
+<path d="M567 535L567 585L633 585V535Z"/>
+<path d="M856 535L856 585L922 585V535Z"/>
+</g>
+<g fill="#78bfa0" stroke="#ace9d0" stroke-width="2">
+<path d="M285 548h48v7h-48z"/><path d="M576 548h47v7h-47z"/><path d="M868 548h46v7h-46z"/>
+</g>
+<!-- Útiles superior/inferior indicativos, sin falsa geometría de acoplamiento -->
+<path d="M530 540H670V564H621L602 582L583 564H530Z" fill="#95b4c9" stroke="#dcf0fa" stroke-width="2"/>
+<path d="M528 600H671V573H629L600 595L571 573H528Z" fill="#344657" stroke="#a9bece" stroke-width="2"/>
+<path d="M182 666H1017" stroke="#c6d4dd" stroke-width="4"/>
+<text x="22" y="35" font-size="19" fill="#b8e3ff" font-family="Arial">VISTA FRONTAL · BYSTRONIC</text>
+<rect x="18" y="43" width="525" height="27" fill="#071e33" opacity=".9" rx="5"/>
+<text x="29" y="61" font-size="13" fill="#ffd7a9" font-family="Arial">ESQUEMA VISUAL DE REFERENCIA · NO ES PLANO DE MÁQUINA NI CAD</text>
+</svg>

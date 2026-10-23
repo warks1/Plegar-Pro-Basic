@@ -51,3 +51,60 @@ test('Planificador: controles contra búsqueda explosiva y otros perfiles',()=>{
  assert.equal(skipped.best,null);
  assert.ok(skipped.note.includes('12 pliegues'));
 });
+
+test('Datos de mesa y trancha: nunca se rellenan de forma ficticia',()=>{
+ const result=B.validateSetup(omega.setup);
+ for(const name of ['tableLeft','tableRight','ramWidth','ramBottomOffset'])assert.equal(result[name],null);
+ assert.throws(()=>B.validateSetup({...omega.setup,tableLeft:-10}),/tableLeft/);
+ assert.throws(()=>B.validateSetup({...omega.setup,ramWidth:0}),/ramWidth/);
+ const same=B.validateSetup({...omega.setup,dieHeight:60,tableLeft:160,tableRight:170,ramWidth:110,ramBottomOffset:100});
+ assert.equal(same.tableLeft,160);
+ assert.equal(same.ramBottomOffset,100);
+});
+test('Recorte continuo de un segmento contra rectángulos nominales de máquina',()=>{
+ const rect={minX:60,maxX:150,minY:60,maxY:100};
+ assert.equal(M.overlapsSegmentRect({x:0,y:80},{x:170,y:80},1,rect),true);
+ assert.equal(M.overlapsSegmentRect({x:0,y:20},{x:170,y:20},1,rect),false);
+ assert.equal(M.overlapsSegmentRect({x:0,y:0},{x:0,y:200},1,rect),false);
+ assert.equal(M.overlapsSegmentRect({x:50,y:80},{x:55,y:80},1,rect),false);
+});
+test('Avisos de choques con mesa y trancha frente a cotas y escena artificial',()=>{
+ const profile={...omega,setup:{...omega.setup,dieHeight:60,tableLeft:160,tableRight:160,ramWidth:80,ramBottomOffset:80}};
+ const fake={
+  punchTipY:0,dieDepth:8,toolProfiles:{die:{outline:[{x:-20,y:0},{x:20,y:0},{x:20,y:60},{x:-20,y:60}]}},
+  assembly:{left:{items:[{from:{x:-120,y:80},to:{x:-80,y:80},status:'realizado'}]},right:{items:[{from:{x:-10,y:-90},to:{x:10,y:-90},status:'pendiente'}]}},
+  centerline:[],interferences:{problems:[]}
+ };
+ const scan=M.inspect(profile,fake);
+ assert.equal(scan.possibleTableContact,true);
+ assert.equal(scan.possibleRamContact,true);
+ assert.equal(scan.unknown.length,0);
+ assert.ok(scan.alerts.some(x=>x.startsWith('MESA:')));
+ assert.ok(scan.alerts.some(x=>x.startsWith('TRANCHA:')));
+ assert.equal(scan.physicallyValidated,false);
+ assert.equal(scan.cncApproved,false);
+ const omitted=M.inspect({...profile,setup:{...profile.setup,tableLeft:null,tableRight:null,ramWidth:null,ramBottomOffset:null}},fake);
+ assert.equal(omitted.possibleTableContact,false);
+ assert.equal(omitted.possibleRamContact,false);
+ assert.equal(omitted.unknown.length,4);
+});
+test('Muestreo del ciclo de doblado nunca certifica separación o seguridad',()=>{
+ const profile={...omega,setup:{...omega.setup,dieHeight:60,tableLeft:180,tableRight:180,ramWidth:95,ramBottomOffset:100}};
+ const scan=M.sweep(profile,1,{intervals:4});
+ assert.equal(scan.frames,5);
+ assert.equal(scan.continuousSweep,false);
+ assert.equal(scan.cncApproved,false);
+ assert.ok(Array.isArray(scan.events));
+ assert.throws(()=>M.sweep(profile,0,{intervals:50}),/Muestreo/);
+});
+test('Los prismas 3D de mesa/trancha sólo aparecen con cotas aportadas',()=>{
+ const T=require('../tooling3d.js'),Part=require('../piece3d.js');
+ const base=F.scene(omega,0,.5),basic=T.assemble(Part.build(base,100),base);
+ assert.equal(basic.groups.table,0);assert.equal(basic.groups.ram,0);
+ const p={...omega,setup:{...omega.setup,dieHeight:60,tableLeft:180,tableRight:180,ramWidth:100,ramBottomOffset:100}};
+ const sc=F.scene(p,0,.5),drawn=T.assemble(Part.build(sc,100),sc);
+ assert.equal(drawn.groups.table,1);assert.equal(drawn.groups.ram,1);
+ assert.ok(drawn.faces.some(f=>f.group==='ram'));
+ assert.ok(drawn.faces.some(f=>f.group==='table'));
+ assert.ok(drawn.vertices.every(v=>Number.isFinite(v.x)&&Number.isFinite(v.y)&&Number.isFinite(v.z)));
+});

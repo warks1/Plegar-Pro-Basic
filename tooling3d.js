@@ -4,7 +4,7 @@
  */
 (function(root,factory){const api=factory();if(typeof module==='object'&&module.exports)module.exports=api;else root.PlegarTooling3D=api;})(typeof globalThis!=='undefined'?globalThis:this,function(){
  'use strict';
- const groups=['sheet','punch','die','gauge'];
+ const groups=['sheet','punch','die','gauge','table','ram'];
  const finite=v=>typeof v==='number'&&Number.isFinite(v);
  function extrude(outline,z0,z1,group){
   if(!Array.isArray(outline)||outline.length<3||!outline.every(p=>finite(p.x)&&finite(p.y)))throw new Error('Contorno de herramienta inválido.');
@@ -28,16 +28,30 @@
   const g=scene.stop;
   if(![g.x,g.top,g.bottom,g.width].every(finite)||g.width<=0||g.bottom<=g.top)throw new Error('Tope nominal inválido.');
   const gaugeDepth=Math.max(8,Math.min(26,sheet.width*.16));
-  return [
+  const bodies=[
    {group:'punch',outline:scene.toolProfiles.punch.outline,z0:-margin,z1:sheet.width+margin},
    {group:'die',outline:scene.toolProfiles.die.outline,z0:-margin,z1:sheet.width+margin},
    {group:'gauge',outline:[{x:g.x,y:g.top},{x:g.x+g.width,y:g.top},{x:g.x+g.width,y:g.bottom},{x:g.x,y:g.bottom}],z0:Math.max(0,(sheet.width-gaugeDepth)/2),z1:Math.min(sheet.width,(sheet.width+gaugeDepth)/2)}
   ];
+  const cfg=scene.machineSetup||{},outer=Math.max(...scene.toolProfiles.die.outline.map(p=>Math.abs(p.x)));
+  const rectangle=(xmin,ymin,xmax,ymax)=>[{x:xmin,y:ymin},{x:xmax,y:ymin},{x:xmax,y:ymax},{x:xmin,y:ymax}];
+  if(cfg.dieHeight!==null&&Number.isFinite(cfg.dieHeight)){
+   const h=cfg.dieHeight;
+   if(Number.isFinite(cfg.tableLeft)&&cfg.tableLeft>outer)
+    bodies.push({group:'table',outline:rectangle(-cfg.tableLeft,h,-outer,h+25),z0:-margin,z1:sheet.width+margin});
+   if(Number.isFinite(cfg.tableRight)&&cfg.tableRight>outer)
+    bodies.push({group:'table',outline:rectangle(outer,h,cfg.tableRight,h+25),z0:-margin,z1:sheet.width+margin});
+  }
+  if(Number.isFinite(cfg.ramWidth)&&Number.isFinite(cfg.ramBottomOffset)){
+   const bottom=scene.punchTipY-cfg.ramBottomOffset,half=cfg.ramWidth/2;
+   bodies.push({group:'ram',outline:rectangle(-half,bottom-35,half,bottom),z0:-margin,z1:sheet.width+margin});
+  }
+  return bodies;
  }
  function assemble(sheet,scene,visible={}){
   if(!sheet||!Array.isArray(sheet.vertices)||!Array.isArray(sheet.faces))throw new Error('Malla de chapa requerida.');
   const descriptors=prisms(sheet,scene);
-  const out={vertices:sheet.vertices.map(v=>({...v})),faces:sheet.faces.map(f=>({...f,ids:[...f.ids],group:'sheet'})),width:sheet.width,thickness:sheet.thickness,groups:{sheet:1,punch:0,die:0,gauge:0}};
+  const out={vertices:sheet.vertices.map(v=>({...v})),faces:sheet.faces.map(f=>({...f,ids:[...f.ids],group:'sheet'})),width:sheet.width,thickness:sheet.thickness,groups:{sheet:1,punch:0,die:0,gauge:0,table:0,ram:0}};
   for(const d of descriptors){
    if(visible[d.group]===false)continue;
    const mesh=extrude(d.outline,d.z0,d.z1,d.group),offset=out.vertices.length;

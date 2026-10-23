@@ -11,7 +11,7 @@
  const LIB=typeof module==='object'&&module.exports?require('./tool-library.js'):window.PlegarToolLibrary;
  if(!LIB)throw new Error('Biblioteca de herramientas no cargada.');
  const {PUNCHES,DIES}=LIB;
- const DEFAULT_SETUP=Object.freeze({radius:2,kFactor:0.33,punch:'p88-r1',die:'v16-88',backgaugeX:120,dimensionBasis:'outer',dieHeight:null});
+ const DEFAULT_SETUP=Object.freeze({radius:2,kFactor:0.33,punch:'p88-r1',die:'v16-88',backgaugeX:120,dimensionBasis:'outer',dieHeight:null,tableLeft:null,tableRight:null,ramWidth:null,ramBottomOffset:null});
  function lookup(list,id){return list.find(item=>item.id===id);}
  function validateSetup(source){
   const s={...DEFAULT_SETUP,...source};
@@ -24,9 +24,17 @@
   if(!['outer','inner','tangent'].includes(dimensionBasis))throw new Error('Referencia de cotas desconocida. Selecciona exterior, interior o tramo recto hasta tangencia.');
   const dieHeight=s.dieHeight==null||s.dieHeight===''?null:Number(s.dieHeight);
   if(dieHeight!==null&&(!Number.isFinite(dieHeight)||dieHeight<5||dieHeight>400))throw new Error('Altura de matriz H entre 5 y 400 mm, o desconocida.');
+  // Coordenadas de los envolventes de máquina en vista de perfil, nunca supuestas.
+  const optional=(key,min,max)=>{
+   const value=s[key]==null||s[key]===''?null:Number(s[key]);
+   if(value!==null&&(!Number.isFinite(value)||value<min||value>max))throw new Error(key+' debe estar entre '+min+' y '+max+' mm, o quedar sin definir.');
+   return value;
+  };
+  const tableLeft=optional('tableLeft',20,2000),tableRight=optional('tableRight',20,2000);
+  const ramWidth=optional('ramWidth',20,2000),ramBottomOffset=optional('ramBottomOffset',10,500);
   const backgaugeX=Number(s.backgaugeX);
   if(!Number.isFinite(backgaugeX)||backgaugeX<1||backgaugeX>10000)throw new Error('Posición nominal del tope X entre 1 y 10000 mm.');
-  return {radius,kFactor,punch:s.punch,die:s.die,backgaugeX,dimensionBasis,dieHeight};
+  return {radius,kFactor,punch:s.punch,die:s.die,backgaugeX,dimensionBasis,dieHeight,tableLeft,tableRight,ramWidth,ramBottomOffset};
  }
  function estimate(profile,setupInput){
   const setup=validateSetup(setupInput);

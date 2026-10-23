@@ -129,6 +129,18 @@ with sync_playwright() as pw:
   page.locator('#ed-quick-height').fill('60')
   page.locator('#ed-quick-height').dispatch_event('change')
   assert page.evaluate('PlegarEditor2D.getData().setup.dieHeight')==60
+
+  for selector,number in [('#ed-quick-table-left','180'),('#ed-quick-table-right','180'),
+                          ('#ed-quick-ram-width','110'),('#ed-quick-ram-offset','100')]:
+   page.locator(selector).fill(number)
+   page.locator(selector).dispatch_event('change')
+  assert page.evaluate('PlegarEditor2D.getData().setup.tableLeft')==180
+  assert page.evaluate('PlegarEditor2D.getData().setup.ramWidth')==110
+  groups=page.evaluate("""() => {
+    const p=PlegarEditor2D.getData(),s=PlegarFormingGeometry.scene(p,1,.5);
+    return PlegarTooling3D.assemble(PlegarPiece3D.build(s,100),s).groups;
+  }""")
+  assert groups['ram']==1 and groups['table']==1,groups
   assert 'Perfil omega' in page.locator('#ed-auto-plan').inner_text()
   assert 'H matriz 60 mm' in page.locator('#ed-auto-plan').inner_text()
   assert page.locator('#ed-apply-auto').count()==1

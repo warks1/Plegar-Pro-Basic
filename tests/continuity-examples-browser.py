@@ -46,7 +46,16 @@ with sync_playwright() as pw:
    document.querySelector('#home-machine-3d polygon[data-group="punch"]')""",timeout=10000)
   print('Inicio animado, vista previa y cuatro miniaturas verificadas',w,flush=True)
   if w<=1120:page.locator('#open-menu').click()
-  page.locator('button.nav-item[data-screen="Programación 2D"]').click()
+  page.locator('button.nav-item[data-screen="Proyectos"]').click()
+  assert page.locator('.project-work-buttons').count()>=12
+  assert page.locator('[data-project-action="plan"]').count()>=12
+  page.locator('[data-project-action="plan"]').first.click()
+  assert page.locator('#dialog[open] .project-plan-dialog svg').count()==2
+  assert 'NO ES PLANO DE FABRICACIÓN' in page.locator('#dialog-body').inner_text()
+  page.locator('#dialog-close').click()
+  page.locator('[data-project-action="program2d"]').first.click()
+  assert page.locator('#ed-workplan table').count()==1
+  assert page.locator('#ed-export-workplan').count()==1
   assert page.locator('#ed-example-gallery [data-example-id]').count()==4
   svg_views=page.locator('#ed-example-gallery .example-gadget svg').evaluate_all('(els)=>els.map(el=>el.innerHTML)')
   assert len(svg_views)==8 and len(set(svg_views))==8,'Cada tarjeta debe mostrar un plano 2D y una geometría 3D propios'

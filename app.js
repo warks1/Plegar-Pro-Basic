@@ -198,7 +198,11 @@ document.addEventListener('click',event=>{
  const project=event.target.closest('[data-project]');if(project){chooseProject(Number(project.dataset.project));return;}
  const material=event.target.closest('[data-material]');if(material){setMaterial(Number(material.dataset.material));return;}
  const tool=event.target.closest('[data-tab]');if(tool){$$('#tool-tabs [data-tab]').forEach(b=>b.classList.toggle('selected',b===tool));$('#tool-code').textContent=tool.dataset.tab==='Punzones'?'P-88-R1':tool.dataset.tab==='Matrices'?'M-V16-88':'ADAPTADOR';toast(`Ficha visual: ${tool.dataset.tab}. Dimensiones por verificar.`);return;}
- const calc=event.target.closest('[data-calc]');if(calc){$$('#calc-tabs [data-calc]').forEach(b=>b.classList.toggle('selected',b===calc));toast(`${calc.dataset.calc}: cálculo todavía no conectado.`);return;}
+ const calc=event.target.closest('[data-calc]');if(calc){
+  $('#calc-tabs [data-calc]').forEach(b=>b.classList.toggle('selected',b===calc));
+  switchScreen(calc.dataset.calc==='Curva perfecta'?'Curva perfecta':'Calculadora de plegado');
+  return;
+ }
  if(event.target.closest('#new-project')){
   showDialog('Nuevo proyecto de demostración','<p>Este formulario crea únicamente un registro local, no un proyecto CAD.</p><label>Nombre del proyecto<input type="text" id="new-project-name" maxlength="55" placeholder="Ej. Soporte plegado"/></label><button type="button" class="dialog-btn" id="confirm-project">Crear proyecto</button>');return;
  }
@@ -221,7 +225,7 @@ $('#view-option').addEventListener('click',()=>toast('Vista frontal del boceto a
 $('#realistic-option').addEventListener('click',()=>toast('Modo visual realista: imagen de referencia aprobada.'));
 $('#views').addEventListener('click',()=>toast('Otras vistas 3D pendientes del futuro motor geométrico.'));
 $('#section-switch').addEventListener('click',()=>switchScreen('Simulación 2D'));
-$('#calc-action').addEventListener('click',()=>showNotice('Motor de cálculo','No se mostrarán desarrollos, fuerzas o radios inventados. Se programará y verificará el motor antes de habilitar el cálculo de fabricación.'));
+$('#calc-action').addEventListener('click',()=>switchScreen('Calculadora de plegado'));
 $('#calc-close').addEventListener('click',()=>toast('Calculadora visible en el panel del boceto aprobado.'));
 $('#tool-select').addEventListener('change',event=>toast(`Seleccionado: ${event.target.value}. Imagen ilustrativa.`));
 $('#open-menu').setAttribute('aria-expanded','false');

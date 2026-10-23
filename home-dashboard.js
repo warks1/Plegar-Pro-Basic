@@ -77,6 +77,17 @@ function draw(){
 function preview(){
  if(!visible())return;
  const p=program();if(!p)return;
+ const output=$('.calc-output strong');
+ if(output)try{
+  const c=window.PlegarBendCalc.estimate(p,p.setup);
+  output.textContent=c.flat===null?'Desarrollo no calculable · revisar perfil':c.flat.toFixed(2)+' mm · nominal NO CNC';
+  output.title='Cálculo del programa 2D, referencia '+c.measurementReference+'; para modificar cotas abre Programación 2D.';
+  const fields=[p.thickness,Math.abs(p.angles[0]),c.setup.radius,c.die.opening];
+  document.querySelectorAll('.calc-fields input').forEach((input,i)=>{
+   input.value=String(fields[i]);input.readOnly=true;
+   input.title='Parámetro del programa actual. Para editarlo abre Programación 2D.';
+  });
+ }catch(e){output.textContent='Revisar programa 2D: '+e.message;}
  try{
   $('#home-preview-drawing').innerHTML=H().preview(p,{width:state.width,yaw:state.previewYaw,elevation:25,zoom:state.previewZoom});
   $('#active-project-thumb').innerHTML=H().thumb(p,{width:state.width});

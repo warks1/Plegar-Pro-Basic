@@ -59,6 +59,8 @@ test('Vista documental no incluye metadatos de colisión falsos',()=>{
  assert.ok(html.includes('data-mfg-filter="brand"'));
  assert.ok(html.includes('data-mfg-filter="kind"'));
  assert.ok(html.includes('data-mfg-filter="q"'));
- assert.ok(html.includes('0 perfiles CAD'));
+ assert.ok(html.includes('data-mfg-results'));
+ assert.ok(html.includes('no ofrecen para simulación'));
+ assert.equal(C.validate().exactProfiles,0);
  assert.ok(!html.includes('data-tool-set'));
 });

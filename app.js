@@ -214,4 +214,4 @@ if('serviceWorker' in navigator&&location.protocol.startsWith('http')){
     .then(reg=>reg.update().catch(()=>{})).catch(()=>{});
 }
 
-window.PlegarApp={switchScreen};
+window.PlegarApp={switchScreen,getProjects:()=>projects.map(p=>({...p}))};

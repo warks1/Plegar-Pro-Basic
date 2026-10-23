@@ -145,12 +145,21 @@ with sync_playwright() as pw:
   if w<=1120:page.locator('#open-menu').click()
   page.locator('button.nav-item[data-screen="Utillaje"]').click()
   assert page.locator('.mfg-card').count()>=20
-  assert page.locator('.mfg-card .mfg-art').count()>=40
+  assert page.locator('.mfg-card .mfg-art').count()>=80
+  assert page.locator('.mfg-card').count()>=40
   assert page.locator('.mfg-card .mfg-warning').count()>=20
   assert page.locator('.mfg-card [data-tool-set]').count()==0
   page.locator('[data-mfg-filter="brand"]').select_option('Bystronic')
   assert page.locator('.mfg-card').count()>=4
   assert page.locator('.mfg-card').first.locator('strong').inner_text().startswith('Bystronic')
+  page.locator('[data-mfg-filter="brand"]').select_option('AMADA')
+  page.locator('[data-mfg-filter="q"]').fill('846')
+  assert page.locator('.mfg-card').count()==1
+  assert page.locator('.mfg-card [data-profile="cuello-cisne"]').count()==2
+  assert 'H 120 mm' in page.locator('.mfg-card').inner_text()
+  assert 'R0,6 mm' in page.locator('.mfg-card').inner_text()
+  assert page.locator('.mfg-card [data-tool-set]').count()==0
+  page.locator('[data-mfg-filter="q"]').fill('')
   page.locator('[data-mfg-filter="brand"]').select_option('EUROSTAMP')
   page.locator('[data-mfg-filter="kind"]').select_option('die')
   page.locator('[data-mfg-filter="q"]').fill('V24')

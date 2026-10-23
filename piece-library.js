@@ -6,7 +6,17 @@
   typeof module==='object'&&module.exports?require('./geometry2d.js'):root.PlegarGeometry2D,
   typeof module==='object'&&module.exports?require('./bendcalc.js'):root.PlegarBendCalc);
  if(typeof module==='object'&&module.exports)module.exports=api;
- else root.PlegarPieceLibrary=api.create(root.localStorage);
+ else {
+  // Algunos navegadores en modo privado o vistas sin origen bloquean incluso
+  // la lectura de window.localStorage. Mostrar fallo al guardar, no bloquear toda la app.
+  let storage;
+  try{storage=root.localStorage;}catch{storage=null;}
+  if(!storage){
+   const unavailable=()=>{throw Error('Almacenamiento local bloqueado. Abre la app por HTTPS y permite guardar datos para utilizar Mis piezas.');};
+   storage={getItem:unavailable,setItem:unavailable};
+  }
+  root.PlegarPieceLibrary=api.create(storage);
+ }
 })(typeof globalThis!=='undefined'?globalThis:this,function(G,C){
  'use strict';
  const KEY='plegarpro-my-pieces-v1',MAX=80,FORMAT='plegarpro-my-pieces',VERSION=1;

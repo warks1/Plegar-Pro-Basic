@@ -28,7 +28,7 @@ test('Visor 3D mantiene el largo axial medido como profundidad geométrica',()=>
  assert.equal(m.vertexCount,16);
  assert.equal(m.approvedForCNC,false);
  const p=V.projection(m,{yaw:32,pitch:22,zoom:1});
- assert.ok(p.scale>0,'Escala '+String(p.scale)+'; envolvente='+JSON.stringify(p.extrema)+'; bounds='+JSON.stringify(m.bounds)+'; z='+m.zLength);
+ assert.ok(p.scale>0,'Escala '+String(p.scale)+'; envolvente='+JSON.stringify(p.extrema)+'; bounds='+JSON.stringify(m.bounds)+'; z='+m.zLength+'; camera='+JSON.stringify(p.camera)+'; vertices='+JSON.stringify(m.loops.slice(0,2)));
  assert.ok(p.faces.some(x=>x.kind==='cap-front'));
  assert.ok(p.faces.some(x=>x.kind==='outer-wall'));
  assert.ok(p.faces.some(x=>x.kind==='hole-wall'));

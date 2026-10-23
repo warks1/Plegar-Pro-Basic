@@ -562,14 +562,14 @@
   host.onclick=e=>{
    const open=e.target.closest('[data-dxf-3d-open]');
    if(open){
-    selected3D=open.dataset.dxf3dOpen;
+    selected3D=open.getAttribute('data-dxf-3d-open');
     camera3D={yaw:32,pitch:22,zoom:1};
     draw3D();
     viewer.scrollIntoView?.({block:'nearest',behavior:'smooth'});
     return;
    }
    const action=e.target.closest('[data-dxf-3d-action]');
-   if(action){change3D(action.dataset.dxf3dAction);return;}
+   if(action){change3D(action.getAttribute('data-dxf-3d-action'));return;}
    const section=e.target.closest('[data-dxf-section]');
    if(section){
     try{

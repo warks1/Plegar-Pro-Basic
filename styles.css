@@ -10,3 +10,29 @@
 .maximized-panel .machine-stage{flex:1;max-height:none}
 .maximized-panel .steps{flex-basis:94px}
 @media(max-width:700px){.maximized-panel{inset:5px}.maximized-panel .machine-stage{aspect-ratio:auto;min-height:200px}.maximized-panel .steps{flex-basis:90px}}
+
+
+/* v0.40 · Visores geométricos reales en los paneles existentes. La retícula aprobada no cambia. */
+.home-machine-3d,.home-machine-3d svg{display:block;width:100%;height:100%;min-height:280px}
+.machine-stage:has(.home-machine-3d){background:#081d2e}
+.home-machine-3d svg{max-width:100%;aspect-ratio:900/480}
+.home-machine-3d polygon{vector-effect:non-scaling-stroke}
+#home-preview-3d,#home-preview-3d svg{display:block;width:100%;height:100%;min-height:145px}
+#home-preview-3d svg{max-width:100%}
+.home-preview-caption{position:absolute;bottom:4px;right:6px;max-width:94%;padding:3px 6px;background:#061727d9;border:1px solid #1b567b;border-radius:4px;color:#bed9ed;font-size:9px;text-align:right}
+.home-active-thumb{width:91px;height:60px;border-radius:5px;flex:0 0 91px;overflow:hidden;background:#142f45}
+.home-active-thumb svg{display:block;width:100%;height:100%}
+.home-project-thumb{display:block;flex:0 0 46px;width:46px;height:34px;overflow:hidden;border-radius:4px;background:#102b40}
+.home-project-thumb svg{display:block;width:100%;height:100%}
+.home-project-big-thumb{display:block;width:100%;max-width:240px;aspect-ratio:900/480;overflow:hidden;border:1px solid #345b73;border-radius:6px;margin-bottom:7px}
+.home-project-big-thumb svg{width:100%;height:100%;display:block}
+.home-no-profile{font-size:9px;line-height:1.2;color:#fccd86;padding:3px;display:block}
+.step-card>.home-step-svg{width:90%;height:43px;display:block;flex:0 0 43px;max-width:100%}
+.step-card>.home-step-svg polygon{stroke-width:3;stroke-linejoin:round}
+.step-card small{overflow:hidden;text-overflow:ellipsis;max-width:100%;text-align:center}
+.home-preview-svg polygon,.home-thumb-svg polygon,.home-step-svg polygon{vector-effect:non-scaling-stroke}
+@media (max-width:700px){
+ .home-machine-3d,.home-machine-3d svg{min-height:220px}
+ .home-preview-caption{font-size:9px}
+ .home-active-thumb{flex-basis:70px;width:70px;height:52px}
+}

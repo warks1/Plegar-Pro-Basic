@@ -178,3 +178,20 @@
 .ed-workplan-scroll th{color:#b3e4fd;background:#11334e}
 .ed-workplan-note{font-size:11px;line-height:1.6;color:#afcfe4}
 #ed-export-workplan{background:#115684;color:#f2fcff;border:1px solid #48b3ed;border-radius:7px;padding:9px 11px;cursor:pointer;min-height:38px}
+
+/* v0.45 · desarrollo de fibra neutra con cotas B y calibración por probeta */
+.ed-flat-pattern{min-width:0;max-width:100%;padding:10px;margin-top:12px;border:1px solid #365c77;background:#092134;border-radius:9px;color:#dbefff}
+.ed-flat-pattern>strong{font-size:12px;color:#5bd3ff}
+.ed-flat-pattern p,.ed-flat-pattern small{display:block;color:#c5ddeb;font-size:11px;line-height:1.5}
+.ed-flat-pattern .ed-flat-svg{width:100%;height:auto;display:block;max-width:100%;min-height:100px}
+.ed-flat-table-wrap{max-width:100%;overflow-x:auto}
+.ed-flat-table-wrap table{width:100%;min-width:380px;font-size:11px;border-collapse:collapse}
+.ed-flat-table-wrap td,.ed-flat-table-wrap th{padding:7px;border-bottom:1px solid #244d67;text-align:right}
+.ed-flat-table-wrap th:first-child,.ed-flat-table-wrap td:first-child{text-align:left}
+.ed-flat-error{color:#f5a08a}
+.ed-sensitivity{font-size:11px;color:#b2d8ef;line-height:1.5}
+.ed-calibrate-controls{display:flex;gap:9px;flex-wrap:wrap;align-items:flex-end;background:#0a2c44;padding:10px;border:1px solid #376d8c;border-radius:7px}
+.ed-calibrate-controls label{min-width:160px;flex:1 1 170px;font-size:12px;color:#c5e5f7}
+.ed-calibrate-controls input{display:block;margin-top:5px;min-height:37px;width:100%;background:#102a42;color:#fff;border:1px solid #478eb9;border-radius:5px;padding:7px}
+.ed-calibrate-controls button{min-height:37px;color:white;border:1px solid #43b8ea;background:#126392;border-radius:6px;padding:9px 11px}
+.ed-measurement-note{font-size:11px;color:#e7c39d;line-height:1.5}

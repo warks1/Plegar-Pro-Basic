@@ -467,6 +467,7 @@ function setMachineEnvelope(values){
  const next=C.validateSetup({...state.setup,...values});
  return edit(d=>{for(const key of keys)d.setup[key]=next[key];});
 }
+function setPunch(id){if(!C.PUNCHES.some(d=>d.id===id))throw Error('Punzón no reconocido.');return edit(d=>{d.setup.punch=id;});}
 function setDie(id){if(!C.DIES.some(d=>d.id===id))throw Error('Matriz no reconocida.');return edit(d=>{d.setup.die=id;});}
-window.PlegarEditor2D={mount,setPlanReference,loadProfile,setSequence,setDie,setMachineEnvelope,getPlanReference:()=>planReference,isPlanConfigured:()=>!planReference||planConfiguredId===planReference.id,getData:()=>clone(state),getWidth:()=>projectWidth,getSelection:()=>selected,selectBend:id=>{if(state.sequence.includes(id)){selected=id;render();}}};
+window.PlegarEditor2D={mount,setPlanReference,loadProfile,setSequence,setPunch,setDie,setMachineEnvelope,getPlanReference:()=>planReference,isPlanConfigured:()=>!planReference||planConfiguredId===planReference.id,getData:()=>clone(state),getWidth:()=>projectWidth,getSelection:()=>selected,selectBend:id=>{if(state.sequence.includes(id)){selected=id;render();}}};
 })();

@@ -36,7 +36,7 @@ with sync_playwright() as pw:
   assert page.locator('#home-preview-3d svg.home-preview-svg').count()==1
   assert page.locator('.preview-image > img').count()==0
   cards=page.locator('#projects .home-project-thumb svg').evaluate_all('(els)=>els.map(el=>el.innerHTML)')
-  assert len(cards)==4 and len(set(cards))==4,'Cuatro perfiles 3D de proyecto diferentes'
+  assert len(cards)==8 and len(set(cards))==8,'Cada proyecto reciente debe tener su plano 2D y una pieza 3D diferentes'
   previous=page.locator('#home-preview-3d').inner_html()
   page.locator('#projects [data-project="1"]').click()
   assert page.locator('#project-name').inner_text()=='Cubierta lateral Inox 304'

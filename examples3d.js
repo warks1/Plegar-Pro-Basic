@@ -30,7 +30,7 @@
  }
  function cards(selectedName=''){
   return list().map(item=>'<button type="button" class="example-gadget'+(item.profile.name===selectedName?' selected':'')+'" data-example-id="'+item.id+'" aria-label="Cargar pieza '+item.label+'">'+
-   '<span class="example-gadget-visual">'+thumb(item)+'</span><span class="example-gadget-name">'+item.label+'</span><small>'+item.profile.angles.length+' pliegues · '+item.width+' mm de ancho ilustrativo</small></button>').join('');
+   '<span class="example-gadget-visual example-gadget-paired"><span class="example-gadget-plan" title="Plano 2D con cotas">'+D.create(item.profile,{width:item.width}).svg2d+'</span><span class="example-gadget-volume" title="Forma 3D">'+thumb(item)+'</span></span><span class="example-gadget-name">'+item.label+'</span><small>'+item.profile.angles.length+' pliegues · '+item.width+' mm de ancho ilustrativo</small></button>').join('');
  }
  return {list,get,thumb,cards};
 });

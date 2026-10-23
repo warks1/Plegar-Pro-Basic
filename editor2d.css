@@ -242,3 +242,5 @@
  .ed-dimensions-table input,.ed-dimensions-table select{min-width:0;min-height:46px;width:100%}
  .ed-dimensions-table .ed-dim-sum{justify-content:end;color:#c6e5f7}
 }
+
+.ed-new-piece-top{display:flex;margin:8px 0 3px}.editor2d #ed-create-piece{background:#0b7ab8;border:1px solid #84d6ff;color:#fff;font-weight:700;font-size:13px;min-height:45px;max-width:100%}@media(max-width:700px){.editor2d #ed-create-piece{width:100%;font-size:12px}}

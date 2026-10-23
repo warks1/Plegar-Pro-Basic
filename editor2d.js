@@ -224,7 +224,7 @@ function renderCalc(){
 }
 function layout(){return `<section class="editor2d" aria-label="Editor de programación 2D">
  <section class="ed-dimensions-panel" aria-label="Introducir medidas de la pieza y los pliegues">
- <div class="ed-dimensions-heading"><strong>MEDIDAS DE LA PIEZA · EDITAR TRAMOS Y PLIEGUES</strong><span id="ed-dimensions-total"></span></div>
+ <div class="ed-dimensions-heading"><strong>MEDIDAS DE LA PIEZA · EDITAR TRAMOS Y PLIEGUES</strong><span id="ed-dimensions-total"></span></div><div class="ed-new-piece-top"><button type="button" id="ed-create-piece">＋ Crear nueva pieza · configurar medidas y pliegues</button></div>
  <p>Introduce la longitud de cada tramo, el ángulo firmado (−/+), y el orden de cada pliegue. Se actualizan automáticamente el dibujo, la vista 3D y las simulaciones. Los valores son nominales y deben verificarse con el plano real.</p>
  <div class="ed-dimensions-scroll" role="region" tabindex="0" aria-label="Tabla editable de medidas de plegado; desplazamiento horizontal en móvil">
  <table class="ed-dimensions-table"><thead><tr><th>Tramo</th><th>Longitud (mm)</th><th>Pliegue</th><th>Giro (°)</th><th>Orden</th><th>Posición acumulada*</th></tr></thead><tbody id="ed-dimensions-body"></tbody></table></div>
@@ -247,7 +247,7 @@ function layout(){return `<section class="editor2d" aria-label="Editor de progra
  <label>Radio interior supuesto (mm)<input id="ed-quick-radius" type="number" min="0.1" max="500" step="0.1" inputmode="decimal"/></label>
  <label>Factor K<input id="ed-quick-kfactor" type="number" min="0.2" max="0.6" step="0.001" inputmode="decimal"/></label><label>Referencia de las cotas<select id="ed-quick-basis"><option value="outer">Exteriores (caras exteriores)</option><option value="inner">Interiores (caras interiores)</option><option value="tangent">Tramos rectos hasta tangencia</option></select></label>
  <label>Posición del tope X (mm)<input id="ed-quick-backgauge" type="number" min="1" max="10000" step="0.1" inputmode="decimal"/></label>
- <div class="ed-quick-buttons"><button id="ed-quick-order" type="button" aria-pressed="false">☞ Elegir orden tocando los pliegues</button><button id="ed-quick-new" type="button">＋ Nueva pieza</button><button id="ed-quick-v" type="button">Sugerir matriz V≈8×e</button><button id="ed-quick-sim" type="button">Simulación 3D</button></div>
+ <div class="ed-quick-buttons"><button id="ed-quick-order" type="button" aria-pressed="false">☞ Elegir orden tocando los pliegues</button><button id="ed-quick-new" type="button">＋ Crear nueva pieza</button><button id="ed-quick-v" type="button">Sugerir matriz V≈8×e</button><button id="ed-quick-sim" type="button">Simulación 3D</button></div>
  <div id="ed-quick-analysis" class="ed-quick-info" role="status">Estimación orientativa de desarrollo, matriz y fuerza.</div>
  <div class="ed-quick-info" id="ed-auto-plan" role="status">Preparando cribado del orden de plegado.</div>
  <div class="ed-quick-buttons"><button type="button" id="ed-apply-auto">Aplicar orden sugerido (sin verificar)</button></div>
@@ -313,7 +313,7 @@ function actions(event){
   return;
  }
  switch(b.id){
- case 'ed-quick-new':{orderPick=0;orderUsed.clear();loadProfile({name:'Nueva pieza',material:state.material,thickness:state.thickness,segments:[100,100],angles:[90],sequence:[1],setup:clone(state.setup)},{width:projectWidth});inform('Nueva pieza creada: introduce medidas y ángulos.');return;}
+ case 'ed-create-piece':case 'ed-quick-new':window.PlegarNewPiece.open({screen:'Programación 2D'});return;
  case 'ed-quick-v':{const wanted=8*state.thickness,selectedDie=C.DIES.filter(d=>d.angle===88).sort((a,b)=>Math.abs(a.opening-wanted)-Math.abs(b.opening-wanted))[0];if(selectedDie){edit(d=>{d.setup.die=selectedDie.id;});inform('Matriz orientativa '+selectedDie.name+' seleccionada. Confirmar compatibilidad antes de fabricar.');}return;}
  case 'ed-quick-sim':window.PlegarApp?.switchScreen('Simulación 3D');return;
  case 'ed-apply-auto':{

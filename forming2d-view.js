@@ -114,8 +114,47 @@ function render(){
  ctl.host.querySelector('.f2-nominal').dataset.status=m.interferences.problems.length?'warning':'info';
  ctl.host.querySelector('.f2-prior-summary').textContent=`Perfil completo: ${m.assembly.contour.length} puntos · ${m.assembly.completed.length} pliegues previos · ${m.assembly.pending} pliegues pendientes. ${m.previous.paths.length?'Holguras 2D orientativas de alas contiguas: '+m.interferences.flangeClearances.map(v=>`${v.component} ${as2(v.gap)} mm`).join(' · '):'No hay alas previas contiguas comprobables en este paso.'}`;
  ctl.host.querySelector('.f2-notes').innerHTML=m.interferences.problems.map(p=>`<li><strong>${html(p.component)}:</strong> ${html(p.message)}</li>`).join('')+m.warnings.map(w=>`<li>${html(w)}</li>`).join('')+`<li>${html(m.interferences.disclosure)}</li><li>${html(m.note)}</li>`;
- const options=ctl.host.querySelector('.f2-steps');
- options.innerHTML=order.map((id,i)=>`<button type="button" class="f2-step ${i===ctl.currentStep?'selected':''}" data-f2-step="${i}" aria-pressed="${i===ctl.currentStep}">${i+1} · P${id}</button>`).join('');
+ const pane=ctl.host.querySelector('.f2-data-values'),setup=data.setup||{};
+ if(pane){
+  const values=[
+   ['Máquina','Modelo por confirmar'],['Punzón',setup.punch||'No elegido'],
+   ['Matriz',setup.die||'No elegida'],['Espesor',as2(data.thickness)+' mm'],
+   ['Material',data.material||'Sin especificar'],['Fuerza actual','NO CALCULADA'],
+   ['Ángulo',as2(m.currentAngle)+'°'],
+   ['Y geométrica',as2(motion?.punchY??m.punchTipY)+' mm · NO CNC'],
+   ['Avisos nominales',String(m.interferences.problems.length)]
+  ];
+  pane.innerHTML=values.map(([key,value])=>'<div><dt>'+html(key)+'</dt><dd>'+html(value)+'</dd></div>').join('');
+ }
+ const tiles=ctl.host.querySelector('.f2-steps'),key2=JSON.stringify(data);
+ if(ctl.tilesKey!==key2){ctl.tilesKey=key2;tiles.innerHTML=gallery(data,order);}
+ tiles.querySelectorAll('[data-f2-step]').forEach(button=>{
+  const id=button.dataset.f2Step;
+  const selected=id==='final'?ctl.currentStep===order.length-1&&ctl.progress===1:
+   id==='start'?ctl.currentStep===0&&ctl.progress===0:Number(id)===ctl.currentStep;
+  button.classList.toggle('selected',selected);
+  button.setAttribute('aria-pressed',String(selected));
+ });
+}
+function stepArt(data,index,progress){
+ const m=Model.scene(data,index,progress);
+ const [x1,x2,y1,y2]=extents(m),scale=Math.min(4,188/Math.max(25,x2-x1),73/Math.max(20,y2-y1));
+ const cx=(x1+x2)/2,cy=(y1+y2)/2;
+ const path=pts=>pts.map((p,i)=>(i?'L':'M')+p.x+' '+p.y).join(' ');
+ const punch=path(m.toolProfiles.punch.outline)+' Z',die=path(m.toolProfiles.die.outline)+' Z';
+ const sheet=path(m.assembly.contour);
+ return '<svg viewBox="0 0 222 96" aria-hidden="true"><rect width="222" height="96" fill="#061929"/>'+
+  '<g transform="translate(111 44) scale('+scale.toFixed(4)+') translate('+(-cx).toFixed(3)+' '+(-cy).toFixed(3)+')">'+
+  '<path d="'+die+'" fill="#744346" stroke="#c67572" stroke-width=".8"/>'+
+  '<path d="'+punch+'" fill="#b2c6d8" stroke="#ebf8ff" stroke-width=".8"/>'+
+  '<path d="'+sheet+'" fill="none" stroke="#69ccff" stroke-width="'+Math.max(1.4,m.thickness)+'" stroke-linejoin="round"/></g></svg>';
+}
+function gallery(data,order){
+ const card=(key,label,modelIdx,pct)=>'<button type="button" class="f2-step f2-tile" data-f2-step="'+key+'">'+
+  stepArt(data,modelIdx,pct)+'<span>'+label+'</span></button>';
+ let out=card('start','0 · Posicionar',0,0);
+ for(let i=0;i<order.length;i++)out+=card(String(i),(i+1)+' · Pliegue '+order[i],i,1);
+ return out+card('final','Final · pieza plegada',order.length-1,1);
 }
 const html=v=>String(v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 function mount(host,getData,getSelection=()=>1,onSelect=()=>{}){
@@ -123,7 +162,7 @@ function mount(host,getData,getSelection=()=>1,onSelect=()=>{}){
  if(!host)return;
  let step=Math.max(0,getData().sequence.indexOf(getSelection()));
  active={host,getData,getSelection,onSelect,currentStep:step,progress:0,zoom:1,mode:'cycle',timer:null,lastFrame:null,lastPaint:null,speed:Number(window.PlegarSettings?.get?.().speed)||1,
- loop:window.PlegarSettings?.get?.().repeat!==false,holdUntil:null,selfSelecting:false,cameraKey:null,bounds:null};
+ loop:window.PlegarSettings?.get?.().repeat!==false,holdUntil:null,selfSelecting:false,cameraKey:null,bounds:null,tilesKey:null};
  host.innerHTML=`<section class="f2-view" aria-label="Seguimiento cinemático 2D de plegado">
  <div class="f2-title"><div><strong>SEGUIMIENTO DE PLEGADO · PERFIL</strong><small>Punzón superior · matriz V inferior · tope posterior · chapa</small></div><span>PERFIL GEOMÉTRICO v0.39</span></div>
  <div class="f2-stage" aria-label="Mueve la simulación 2D con un dedo y usa dos dedos para cambiar el zoom"><div class="f2-camera-content"></div></div><div class="f2-toolbar"><strong class="f2-step-label"></strong><div class="f2-controls"><button type="button" data-f2-action="previous">← Anterior</button><button type="button" data-f2-action="play">▶ Reproducir sin pausas</button><button type="button" data-f2-action="mode" aria-pressed="false">☐ Ciclo completo</button><button type="button" data-f2-action="next">Siguiente →</button><button type="button" data-f2-action="reset">Reiniciar</button><label class="f2-loop-control"><input class="f2-loop" type="checkbox" checked> Repetir secuencia</label><button type="button" data-f2-action="zoom-out" aria-label="Reducir zoom">−</button><button type="button" data-f2-action="zoom-in" aria-label="Ampliar zoom">+</button></div></div>
@@ -133,7 +172,13 @@ function mount(host,getData,getSelection=()=>1,onSelect=()=>{}){
   host.onclick=e=>{
   const ctl=active;if(!ctl||ctl.host!==host)return;
   const stepBtn=e.target.closest('[data-f2-step]');
-  if(stepBtn){halt();ctl.currentStep=Number(stepBtn.dataset.f2Step);ctl.progress=0;ctl.onSelect(ctl.getData().sequence[ctl.currentStep]);render();return;}
+  if(stepBtn){
+   halt();ctl.holdUntil=null;
+   const target=stepBtn.dataset.f2Step,total=ctl.getData().sequence.length;
+   ctl.currentStep=target==='start'?0:target==='final'?total-1:Number(target);
+   ctl.progress=target==='final'?1:0;
+   ctl.onSelect(ctl.getData().sequence[ctl.currentStep]);render();return;
+  }
   const action=e.target.closest('[data-f2-action]')?.dataset.f2Action;
   if(!action)return;
   if(action==='mode'){halt();ctl.mode=ctl.mode==='bend'?'cycle':'bend';ctl.progress=0;ctl.holdUntil=null;render();return;}

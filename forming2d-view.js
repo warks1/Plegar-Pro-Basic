@@ -2,14 +2,22 @@
    Muestra una aproximación con radio, no controla una plegadora. */
 (function(){
 'use strict';
-const Model=window.PlegarFormingGeometry;
+const Model=window.PlegarFormingGeometry,K=window.PlegarFoldKinematics;
 const as2=n=>Number(n).toLocaleString('es-ES',{maximumFractionDigits:2});
 let active=null;
-function svg(m,zoom){
+function extents(m){
+ const pts=[...m.assembly.contour,...m.toolProfiles.die.outline,...m.toolProfiles.punch.outline,
+ {x:m.stop.x,y:m.stop.top},{x:m.stop.x+m.stop.width,y:m.stop.bottom}];
+ return [Math.min(...pts.map(v=>v.x)),Math.max(...pts.map(v=>v.x)),Math.min(...pts.map(v=>v.y)),Math.max(...pts.map(v=>v.y))];
+}
+function fixedExtents(data,step,mode){
+ // Encuadre estable durante la carrera del punzon: matriz y tope quietos.
+ const ext=[0,.11,.22,.5,.78,.89,1].map(t=>extents(mode==='cycle'?K.frame(data,step,t).scene:Model.scene(data,step,t)));
+ return [Math.min(...ext.map(v=>v[0])),Math.max(...ext.map(v=>v[1])),Math.min(...ext.map(v=>v[2])),Math.max(...ext.map(v=>v[3]))];
+}
+function svg(m,zoom,bounds){
  const half=m.dieOpening/2;
- const geometry=[...m.assembly.contour,...m.toolProfiles.die.outline,...m.toolProfiles.punch.outline, {x:m.stop.x,y:m.stop.top}, {x:m.stop.x+m.stop.width,y:m.stop.bottom}];
- const minX=Math.min(...geometry.map(p=>p.x)),maxX=Math.max(...geometry.map(p=>p.x));
- const minY=Math.min(...geometry.map(p=>p.y)),maxY=Math.max(...geometry.map(p=>p.y));
+ const [minX,maxX,minY,maxY]=bounds||extents(m);
  const s=Math.min(7.5,740/Math.max(35,maxX-minX),315/Math.max(35,maxY-minY))*zoom;
  const centreX=(minX+maxX)/2,centreY=(minY+maxY)/2;
  const dieOutline=m.toolProfiles.die.outline.map((p,i)=>`${i?'L':'M'}${p.x.toFixed(3)} ${p.y.toFixed(3)}`).join(' ')+' Z';
@@ -55,12 +63,21 @@ function render(){
  const ctl=active;if(!ctl||!ctl.host.isConnected)return;
  const data=ctl.getData(), order=data.sequence;
  if(ctl.currentStep>=order.length)ctl.currentStep=0;
- const m=Model.scene(data,ctl.currentStep,ctl.progress);
- ctl.host.querySelector('.f2-stage').innerHTML=svg(m,ctl.zoom);
+ const key=JSON.stringify([data,ctl.currentStep,ctl.mode]);
+ if(ctl.cameraKey!==key){ctl.bounds=fixedExtents(data,ctl.currentStep,ctl.mode);ctl.cameraKey=key;}
+ const motion=ctl.mode==='cycle'?K.frame(data,ctl.currentStep,ctl.progress):null;
+ const m=motion?motion.scene:Model.scene(data,ctl.currentStep,ctl.progress);
+ ctl.host.querySelector('.f2-stage').innerHTML=svg(m,ctl.zoom,ctl.bounds);
  const label=ctl.host.querySelector('.f2-step-label');label.textContent=`Paso ${m.step} de ${m.steps} · pliegue ${m.bend} · ${as2(m.turn)}°`;
- ctl.host.querySelector('.f2-progress').textContent=`${Math.round(m.progress*100)} %`;
- const slider=ctl.host.querySelector('.f2-range');slider.value=String(Math.round(m.progress*100));
- slider.setAttribute('aria-valuetext',`${as2(m.currentAngle)} grados de ${as2(m.targetAngle)}`);
+ ctl.host.querySelector('.f2-progress').textContent=`${Math.round(ctl.progress*100)} %`;
+ const slider=ctl.host.querySelector('.f2-range');slider.value=String(Math.round(ctl.progress*100));
+ slider.setAttribute('aria-valuetext',`${as2(m.currentAngle)} grados de ${as2(m.targetAngle)} · ${motion?motion.phase:'conformado'}`);
+ const modeButton=ctl.host.querySelector('[data-f2-action="mode"]');
+ modeButton.textContent=ctl.mode==='cycle'?'☑ Ciclo completo':'☐ Ciclo completo';
+ modeButton.setAttribute('aria-pressed',String(ctl.mode==='cycle'));
+ ctl.host.querySelector('.f2-cycle-state').textContent=motion
+  ? `FASE: ${motion.phase.toUpperCase()} · Punzón Y nominal ${as2(motion.punchY)} mm · retirada ${as2(motion.punchLift)} mm. ${motion.notice}. NO CNC / SIN VERIFICAR.`
+  : 'MODO CONFORMADO · avance angular sin aproximación ni retirada. Activa Ciclo completo para ver las tres fases.';
  ctl.host.querySelector('[data-f2-action="previous"]').disabled=ctl.currentStep===0;
  ctl.host.querySelector('[data-f2-action="next"]').disabled=ctl.currentStep>=order.length-1;
  ctl.host.querySelector('.f2-nominal').textContent=`Tope X ${as2(m.stop.x)} mm · extremo derecho: ${as2(m.wingRight.x)} mm · separación horizontal: ${as2(m.interferences.backgaugeGap)} mm · ${m.interferences.backgaugeState}`;
@@ -75,11 +92,11 @@ function mount(host,getData,getSelection=()=>1,onSelect=()=>{}){
  destroy();
  if(!host)return;
  let step=Math.max(0,getData().sequence.indexOf(getSelection()));
- active={host,getData,getSelection,onSelect,currentStep:step,progress:0,zoom:1,timer:null};
+ active={host,getData,getSelection,onSelect,currentStep:step,progress:0,zoom:1,mode:'bend',timer:null,cameraKey:null,bounds:null};
  host.innerHTML=`<section class="f2-view" aria-label="Seguimiento cinemático 2D de plegado">
- <div class="f2-title"><div><strong>SEGUIMIENTO DE PLEGADO · PERFIL</strong><small>Punzón superior · matriz V inferior · tope posterior · chapa</small></div><span>PERFIL GEOMÉTRICO v0.8</span></div>
- <div class="f2-stage"></div><div class="f2-toolbar"><strong class="f2-step-label"></strong><div class="f2-controls"><button type="button" data-f2-action="previous">← Anterior</button><button type="button" data-f2-action="play">▶ Reproducir</button><button type="button" data-f2-action="next">Siguiente →</button><button type="button" data-f2-action="reset">Reiniciar</button><button type="button" data-f2-action="zoom-out" aria-label="Reducir zoom">−</button><button type="button" data-f2-action="zoom-in" aria-label="Ampliar zoom">+</button></div></div>
- <div class="f2-slider"><label for="f2-range">Avance del pliegue</label><input id="f2-range" class="f2-range" type="range" min="0" max="100" step="1" value="0"><output class="f2-progress" for="f2-range">0 %</output></div>
+ <div class="f2-title"><div><strong>SEGUIMIENTO DE PLEGADO · PERFIL</strong><small>Punzón superior · matriz V inferior · tope posterior · chapa</small></div><span>PERFIL GEOMÉTRICO v0.37</span></div>
+ <div class="f2-stage"></div><div class="f2-toolbar"><strong class="f2-step-label"></strong><div class="f2-controls"><button type="button" data-f2-action="previous">← Anterior</button><button type="button" data-f2-action="play">▶ Reproducir</button><button type="button" data-f2-action="mode" aria-pressed="false">☐ Ciclo completo</button><button type="button" data-f2-action="next">Siguiente →</button><button type="button" data-f2-action="reset">Reiniciar</button><button type="button" data-f2-action="zoom-out" aria-label="Reducir zoom">−</button><button type="button" data-f2-action="zoom-in" aria-label="Ampliar zoom">+</button></div></div>
+ <div class="f2-cycle-state" role="status" aria-label="Fase cinemática 2D"></div><div class="f2-slider"><label for="f2-range">Avance del ciclo o conformado</label><input id="f2-range" class="f2-range" type="range" min="0" max="100" step="1" value="0"><output class="f2-progress" for="f2-range">0 %</output></div>
  <div class="f2-steps" aria-label="Orden de plegado"></div><div class="f2-prior-summary" role="status"></div><div class="f2-nominal" role="status"></div><ul class="f2-notes"></ul></section>`;
  host.onclick=e=>{
   const ctl=active;if(!ctl||ctl.host!==host)return;
@@ -87,6 +104,7 @@ function mount(host,getData,getSelection=()=>1,onSelect=()=>{}){
   if(stepBtn){halt();ctl.currentStep=Number(stepBtn.dataset.f2Step);ctl.progress=0;ctl.onSelect(ctl.getData().sequence[ctl.currentStep]);render();return;}
   const action=e.target.closest('[data-f2-action]')?.dataset.f2Action;
   if(!action)return;
+  if(action==='mode'){halt();ctl.mode=ctl.mode==='bend'?'cycle':'bend';ctl.progress=0;render();return;}
   if(action==='play'){
    if(ctl.timer){halt();return;}
    if(ctl.progress>=1)ctl.progress=0;

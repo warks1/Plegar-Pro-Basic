@@ -259,6 +259,22 @@ with sync_playwright() as p:
   assert page.locator('.f2-progress').inner_text()=='60 %'
   page.locator('[data-f2-action="reset"]').click()
   assert page.locator('.f2-progress').inner_text()=='0 %'
+  # El ciclo 2D mueve el punzon mientras mantiene fijo el contorno de matriz.
+  die_shape=page.locator('.f2d-svg path[stroke="#83a1ba"]').get_attribute('d')
+  punch_shape=page.locator('.f2d-svg path[stroke="#d0e5f4"]').get_attribute('d')
+  page.locator('[data-f2-action="mode"]').click()
+  assert page.locator('[data-f2-action="mode"]').get_attribute('aria-pressed')=='true'
+  assert 'FASE: APROXIMACIÓN' in page.locator('.f2-cycle-state').inner_text()
+  page.locator('#f2-range').fill('15')
+  assert page.locator('.f2-progress').inner_text()=='15 %'
+  assert page.locator('.f2d-svg path[stroke="#83a1ba"]').get_attribute('d')==die_shape
+  assert page.locator('.f2d-svg path[stroke="#d0e5f4"]').get_attribute('d')!=punch_shape
+  page.locator('#f2-range').fill('50')
+  assert 'FASE: PLEGADO' in page.locator('.f2-cycle-state').inner_text()
+  page.locator('#f2-range').fill('100')
+  assert 'FASE: RETIRADA' in page.locator('.f2-cycle-state').inner_text()
+  page.locator('[data-f2-action="mode"]').click()
+  assert page.locator('[data-f2-action="mode"]').get_attribute('aria-pressed')=='false'
   print('editing',tag,flush=True)
   page.locator('input[data-ed-segment="1"]').fill('91')
   page.locator('input[data-ed-segment="1"]').evaluate('(el)=>el.blur()')
@@ -404,6 +420,10 @@ with sync_playwright() as p:
   assert page.locator('.p3-svg polygon[data-group="punch"]').count()>0
   assert page.locator('.p3-disclosure').inner_text().find('sin')>=0 or page.locator('.p3-disclosure').count()==1
   prior=page.locator('.p3-svg').inner_html()
+  page.locator('[data-p3="profile"]').click()
+  assert page.locator('.p3-svg').inner_html()!=prior
+  page.locator('[data-p3="iso"]').click()
+  assert page.locator('.p3-svg').inner_html()==prior
   page.locator('[data-p3="right"]').click()
   assert page.locator('.p3-svg').inner_html()!=prior
   page.locator('.p3-width').fill('140')

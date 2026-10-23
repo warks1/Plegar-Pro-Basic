@@ -129,3 +129,9 @@ Ajuste de presentación a pantalla completa sin franjas de imagen no ocupadas. S
 - `tests/service-worker.test.cjs`: cobertura del precache, HTML online más reciente, fallback offline y no almacenamiento de PDF.
 - Pruebas locales: 209 Node, diez orientaciones/resoluciones de splash y navegación PC/tablet/móvil 390/320 px. Diseño e imágenes aprobados sin modificación.
 - Al publicar, comprobar el commit de `main` y la acción GitHub Pages. La visibilidad real en el móvil del usuario debe confirmarse allí.
+
+## Continuidad v0.37 · 23 octubre 2026
+- Seguimiento 2D: modo opcional «Ciclo completo» con acercamiento, conformado y retirada mediante el motor cinemático compartido con 3D. Modo original conservado por defecto.
+- Encuadre estable en vista lateral durante la reproducción, sin aparente movimiento de matriz o tope por reescalado de cámara.
+- Visor 3D: cámaras lateral e isométrica; pausa visible de 500 ms al acabar cada pliegue antes del siguiente. La recolocación física entre pasos NO está modelada.
+- Caché offline actualizada v37; pruebas de navegación ampliadas. No se valida CNC ni seguridad.

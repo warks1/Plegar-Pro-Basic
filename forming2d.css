@@ -7,6 +7,8 @@
 .f2-title>span{font-size:10px;letter-spacing:.5px;color:#ffcc78}
 .f2-stage{background:#061727;max-width:100%;overflow:hidden}
 .f2d-svg{display:block;width:100%;height:auto;aspect-ratio:900/480}
+.f2-cycle-state{padding:9px 14px;background:#12364d;border-top:1px solid #315b70;color:#c6eaff;font-size:12px;line-height:1.5;overflow-wrap:anywhere}
+.f2-view [data-f2-action="mode"][aria-pressed="true"]{border-color:#8bdcff;background:#166d8a}
 .f2-toolbar{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:9px;padding:12px 14px;border-top:1px solid #244963}
 .f2-toolbar>strong{font-size:12px;color:#b7daf2}
 .f2-controls{display:flex;flex-wrap:wrap;gap:6px}

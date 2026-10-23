@@ -19,6 +19,17 @@ with sync_playwright() as pw:
   page.on('pageerror',lambda err:errors.append(str(err)))
   page.set_content(html,wait_until='domcontentloaded')
   page.add_style_tag(content=css)
+  # La página de pruebas se inyecta en about:blank (origen opaco): no dispone de
+  # localStorage real. Simular su contrato en memoria para probar el flujo UI.
+  page.evaluate("""() => {
+    const data=new Map();
+    Object.defineProperty(window,'localStorage',{configurable:true,value:{
+      getItem:key=>data.has(key)?data.get(key):null,
+      setItem:(key,value)=>data.set(key,String(value)),
+      removeItem:key=>data.delete(key),
+      clear:()=>data.clear()
+    }});
+  }""")
   page.evaluate("document.getElementById('startup-splash')?.remove()")
   for source in scripts:
    if source=='splash.js':continue
@@ -123,6 +134,9 @@ with sync_playwright() as pw:
   assert page.evaluate('PlegarEditor2D.getData().sequence')==[2,1]
   assert page.evaluate('PlegarEditor2D.getWidth()')==250
   assert page.locator('#ed-dimensions-body tr').count()==3
+  assert page.evaluate('PlegarPieceLibrary.list().length')==1
+  assert page.evaluate('PlegarPieceLibrary.list()[0].width')==250
+  assert page.locator('#ed-my-pieces').is_visible()
   # Los módulos de cálculo ya no deben ser pantallas provisionales.
   if w<=1120:page.locator('#open-menu').click()
   page.locator('button.nav-item[data-screen="Calculadora de plegado"]').click()
@@ -258,7 +272,32 @@ with sync_playwright() as pw:
   assert page.evaluate('PlegarEditor2D.getData().segments')==[35,75]
   assert page.evaluate('PlegarEditor2D.getData().angles')==[-120]
   assert page.evaluate('PlegarEditor2D.getWidth()')==220
+  assert page.evaluate('PlegarPieceLibrary.list().length')==2
   assert page.locator('.p3-svg polygon[data-group="sheet"]').count()>0
+  # Editar desde Programación 3D: se actualiza la pieza activa sin crear un duplicado.
+  page.locator('[data-p3="edit"]').click()
+  assert 'EDITAR PIEZA' in page.locator('#np-title').inner_text()
+  assert page.locator('[data-np-length="0"]').input_value()=='35'
+  page.locator('[data-np-length="0"]').fill('50')
+  page.locator('[data-np-length="0"]').dispatch_event('change')
+  page.locator('[data-np-action="create"]').click()
+  assert page.evaluate('PlegarEditor2D.getData().segments')==[50,75]
+  assert page.evaluate('PlegarPieceLibrary.list().length')==2
+  # Abrir desde Mis piezas en 2D recupera medidas, ancho y secuencia.
+  page.locator('[data-p3="library"]').click()
+  assert page.locator('#pieces-dialog').is_visible()
+  assert page.locator('.ps-item').count()==2
+  target=page.locator('.ps-item').filter(has=page.locator('h3',has_text='Soporte nuevo desde 2D'))
+  target.locator('[data-ps-action="open2d"]').click()
+  assert page.locator('#module-title').inner_text()=='Programación 2D'
+  assert page.evaluate('PlegarEditor2D.getData().name')=='Soporte nuevo desde 2D'
+  assert page.evaluate('PlegarEditor2D.getData().segments')==[40,85,60]
+  assert page.evaluate('PlegarEditor2D.getData().sequence')==[2,1]
+  assert page.evaluate('PlegarEditor2D.getWidth()')==250
+  page.locator('#ed-my-pieces').click()
+  assert page.locator('.ps-item').count()==2
+  page.locator('[data-ps-action="close"]').last.click()
+
   assert page.evaluate('document.documentElement.scrollWidth <= innerWidth+2'),"Desbordamiento horizontal"
   assert not errors,(w,errors)
   print(f'Cinemática continua y 4 piezas 3D · {w} px OK',flush=True)

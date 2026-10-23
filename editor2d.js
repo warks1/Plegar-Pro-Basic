@@ -224,7 +224,7 @@ function renderCalc(){
 }
 function layout(){return `<section class="editor2d" aria-label="Editor de programación 2D">
  <section class="ed-dimensions-panel" aria-label="Introducir medidas de la pieza y los pliegues">
- <div class="ed-dimensions-heading"><strong>MEDIDAS DE LA PIEZA · EDITAR TRAMOS Y PLIEGUES</strong><span id="ed-dimensions-total"></span></div><div class="ed-new-piece-top"><button type="button" id="ed-create-piece">＋ Crear nueva pieza · configurar medidas y pliegues</button></div>
+ <div class="ed-dimensions-heading"><strong>MEDIDAS DE LA PIEZA · EDITAR TRAMOS Y PLIEGUES</strong><span id="ed-dimensions-total"></span></div><div class="ed-new-piece-top"><button type="button" id="ed-create-piece">＋ Crear nueva pieza · configurar medidas y pliegues</button></div><div class="ed-library-buttons"><button type="button" id="ed-edit-piece">✎ Editar pieza actual</button><button type="button" id="ed-my-pieces">▤ Mis piezas</button><button type="button" id="ed-save-library">Guardar en Mis piezas</button></div>
  <p>Introduce la longitud de cada tramo, el ángulo firmado (−/+), y el orden de cada pliegue. Se actualizan automáticamente el dibujo, la vista 3D y las simulaciones. Los valores son nominales y deben verificarse con el plano real.</p>
  <div class="ed-dimensions-scroll" role="region" tabindex="0" aria-label="Tabla editable de medidas de plegado; desplazamiento horizontal en móvil">
  <table class="ed-dimensions-table"><thead><tr><th>Tramo</th><th>Longitud (mm)</th><th>Pliegue</th><th>Giro (°)</th><th>Orden</th><th>Posición acumulada*</th></tr></thead><tbody id="ed-dimensions-body"></tbody></table></div>
@@ -314,6 +314,12 @@ function actions(event){
  }
  switch(b.id){
  case 'ed-create-piece':case 'ed-quick-new':window.PlegarNewPiece.open({screen:'Programación 2D'});return;
+ case 'ed-edit-piece':window.PlegarNewPiece.open({screen:'Programación 2D',edit:true});return;
+ case 'ed-my-pieces':window.PlegarPieceShelf.open({screen:'Programación 2D'});return;
+ case 'ed-save-library':case 'ed-save':{
+  try{const saved=window.PlegarPieceShelf.saveActive();inform('Pieza «'+saved.name+'» guardada en Mis piezas. Exporta una copia JSON de seguridad.');}
+  catch(error){inform('No se ha podido guardar: '+error.message);}return;
+ }
  case 'ed-quick-v':{const wanted=8*state.thickness,selectedDie=C.DIES.filter(d=>d.angle===88).sort((a,b)=>Math.abs(a.opening-wanted)-Math.abs(b.opening-wanted))[0];if(selectedDie){edit(d=>{d.setup.die=selectedDie.id;});inform('Matriz orientativa '+selectedDie.name+' seleccionada. Confirmar compatibilidad antes de fabricar.');}return;}
  case 'ed-quick-sim':window.PlegarApp?.switchScreen('Simulación 3D');return;
  case 'ed-apply-auto':{
@@ -361,7 +367,7 @@ function actions(event){
    inform('Hoja de plegado exportada: referencia nominal, no CNC.');
   }catch(error){inform('Error al exportar: '+error.message);}break;
  }
- case 'ed-save':inform(persist()?'Datos guardados en este navegador.':'No se pudo guardar en este navegador.');break;
+ 
   case 'ed-save-plan':{
    const widthField=$('#ed-plan-width'),width=projectWidth;
    if(!widthField?.value.trim()||!Number.isFinite(width)||width<1||width>5000){inform('Introduce un ancho 3D entre 1 y 5000 mm.');break;}
@@ -401,6 +407,7 @@ function mount(){
 }
 function loadProfile(profile,{width=null}={}){
  const next=fromEditor(profile);
+ window.PlegarPieceShelf?.resetActive();
  if(Number.isFinite(width)&&width>=1&&width<=5000){projectWidth=width;try{localStorage.setItem('plegarpro-program-width-v1',String(width));}catch{}}
  orderPick=0;orderUsed.clear();
  undoStack.push(clone(state));if(undoStack.length>50)undoStack.shift();

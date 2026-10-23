@@ -7,7 +7,7 @@
  const $=(q,root=document)=>root.querySelector(q);
  const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
  const num=(v)=>Number(v);
- let draft=null,picked=[],destination='Programación 2D',dialog=null;
+ let draft=null,picked=[],destination='Programación 2D',dialog=null,editing=false;
  const setupOptions=(values,id)=>values.map(v=>'<option value="'+esc(v.id)+'"'+(v.id===id?' selected':'')+'>'+esc(v.name)+'</option>').join('');
  function draw2d(){
   const pts=G.vertices(draft),minX=Math.min(...pts.map(p=>p.x)),maxX=Math.max(...pts.map(p=>p.x)),
@@ -124,7 +124,11 @@
     try{
      syncFormValues();
      const {profile,width}=Core.build(draft);
+     const library=window.PlegarPieceShelf,previousId=editing?library.getActiveId():null;
+     // Guardar el programa validado antes de cerrar. Si falla el almacenamiento, el borrador sigue abierto.
+     const saved=window.PlegarPieceLibrary.save(profile,width,{id:previousId});
      window.PlegarEditor2D.loadProfile(profile,{width});
+     library.setActiveId(saved.id);
      close();
      window.PlegarApp.switchScreen(destination);
     }catch(ex){error('No se ha guardado: '+ex.message);}
@@ -166,17 +170,19 @@
    }catch(ex){error(ex.message);}
   });
  }
- function open({screen='Programación 2D'}={}){
+ function open({screen='Programación 2D',edit=false}={}){
   construct();
   destination=screen==='Programación 3D'?'Programación 3D':'Programación 2D';
-  draft=Core.create(window.PlegarEditor2D?.getData(),window.PlegarEditor2D?.getWidth?.());
+  editing=Boolean(edit);
+  const previous=window.PlegarEditor2D?.getData();
+  draft=editing?{...Core.clone(previous),width:window.PlegarEditor2D.getWidth()}:Core.create(previous,window.PlegarEditor2D?.getWidth?.());
   picked=[];
-  dialog.innerHTML='<div class="np-header"><div><h2 id="np-title">CREAR NUEVA PIEZA · '+(destination==='Programación 3D'?'PROGRAMACIÓN 3D':'PROGRAMACIÓN 2D')+'</h2><p>Introduce medidas reales y define cada pliegue. Al crear se sincronizará con los módulos 2D y 3D.</p></div><button type="button" data-np-action="cancel" aria-label="Cerrar sin guardar">✕</button></div>'+
+  dialog.innerHTML='<div class="np-header"><div><h2 id="np-title">'+(editing?'EDITAR PIEZA':'CREAR NUEVA PIEZA')+' · '+(destination==='Programación 3D'?'PROGRAMACIÓN 3D':'PROGRAMACIÓN 2D')+'</h2><p>Introduce las medidas, material y secuencia. Al guardar se sincronizará con ambos módulos.</p></div><button type="button" data-np-action="cancel" aria-label="Cerrar sin guardar">✕</button></div>'+
    '<div class="np-content"><fieldset><legend>1 · Material, chapa y utillaje</legend>'+fields()+'</fieldset>'+
    '<fieldset><legend>2 · Alas, longitudes, ángulos y sentidos</legend><div id="np-rows"></div><div class="np-add-controls"><button type="button" data-np-action="add">＋ Añadir ala y pliegue</button><button type="button" data-np-action="remove">− Quitar última ala</button></div></fieldset>'+
    '<fieldset><legend>3 · Elegir orden de plegado tocando B1, B2…</legend><p id="np-sequence" aria-live="polite"></p><button type="button" data-np-action="reset">Restablecer orden 1, 2, 3…</button><div class="np-visuals"><div id="np-drawing"></div><div id="np-volume"></div></div><p id="np-count"></p><p id="np-estimate"></p></fieldset>'+
    '<p class="np-caution">Los pliegues positivos/negativos indican el sentido respecto al dibujo. Para la máquina real pueden requerir voltear la pieza. El orden elegido no certifica ausencia de colisiones con matriz, trancha, mesa o topes.</p>'+
-   '</div><div class="np-bottom"><span id="np-status" role="status" aria-live="polite"></span><button type="button" data-np-action="cancel">Cancelar</button><button type="button" data-np-action="create" class="np-primary">Crear pieza y abrir '+(destination==='Programación 3D'?'3D':'2D')+'</button></div>';
+   '</div><div class="np-bottom"><span id="np-status" role="status" aria-live="polite"></span><button type="button" data-np-action="cancel">Cancelar</button><button type="button" data-np-action="create" class="np-primary">'+(editing?'Guardar cambios y abrir ':'Crear pieza y abrir ')+(destination==='Programación 3D'?'3D':'2D')+'</button></div>';
   paint();dialog.showModal();
  }
  window.PlegarNewPiece={open,close};

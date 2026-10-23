@@ -55,3 +55,12 @@ test('Ingeniería: advierte al pasar los límites y no inventa fuerza sin Rm de 
  assert.throws(()=>E.analyse(p,{width:0}));
  assert.throws(()=>E.analyse(p,{width:5001}));
 });
+
+test('Ingeniería: señala cruces de alas no adyacentes y deja en paz una L sencilla',()=>{
+ const G=require('../geometry2d.js');
+ const square={name:'Cierre',material:'Acero S235JR',thickness:2,segments:[100,100,100,100],angles:[90,90,90],sequence:[1,2,3],setup:{radius:2,kFactor:.33,punch:'p88-r1',die:'v16-88',backgaugeX:120}};
+ assert.ok(E.profileIntersections(square).length>0);
+ assert.ok(E.analyse(square).warnings.some(x=>x.includes('autointersección')));
+ const simple=S.get('escuadra-l').profile;
+ assert.deepEqual(E.profileIntersections(simple),[]);
+});

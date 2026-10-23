@@ -41,7 +41,7 @@ catch { projects=initialProjects.slice(); }
 // Agregar piezas de muestra nuevas sin reemplazar ni eliminar los proyectos locales del usuario.
 if(!Array.isArray(projects))projects=initialProjects.slice();
 for(const example of initialProjects){if(!projects.some(p=>p.sampleId===example.sampleId||p.name===example.name))projects.push(example);}
-let activeScreen='Inicio', currentStep=3, playerTimer=null, machineZoom=1, previewZoom=1, previewRotation=0, toastTimeout;
+let previousScreen='Inicio', activeScreen='Inicio', currentStep=3, playerTimer=null, machineZoom=1, previewZoom=1, previewRotation=0, toastTimeout;
 
 const steps=['Posicionar chapa','Plegado 1','Plegado 2','Plegado 3','Plegado 4','Pieza terminada'];
 function buildNav(){
@@ -91,7 +91,7 @@ function switchScreen(name){
  window.PlegarPlans?.destroy();
  window.PlegarForming2D?.destroy();
  window.PlegarPiece3DView?.destroy();
- stopPlayer();activeScreen=name;buildNav();closeMenu();
+ stopPlayer();if(name!==activeScreen)previousScreen=activeScreen;activeScreen=name;buildNav();closeMenu();
  $$('.mobile-bottom [data-screen]').forEach(b=>b.classList.toggle('active',b.dataset.screen===name));
  $('#summary-cards').hidden=name!=='Inicio';$('#module-view').hidden=name==='Inicio';
  $$('.main-panels,.bottom-panels').forEach(el=>el.hidden=name!=='Inicio');
@@ -223,6 +223,7 @@ document.addEventListener('click',event=>{
   }catch(error){toast('Medida no guardada: '+error.message);}
   return;
  }
+ if(event.target.closest('[data-app-back]')){switchScreen(previousScreen||'Inicio');return;}
  const screen=event.target.closest('[data-screen]');if(screen){switchScreen(screen.dataset.screen);return;}
  const chosenTool=event.target.closest('[data-tool-set]');
  if(chosenTool){

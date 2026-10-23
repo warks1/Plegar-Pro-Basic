@@ -19,3 +19,12 @@
 .tool-dxf-card button{background:#513642;border-color:#ad7284}
 .tool-dxf-card svg{background:#061624}
 @media(max-width:680px){.tool-dxf-form{grid-template-columns:1fr}.tool-dxf-importer{padding:7px}.tool-dxf-importer>details{padding:8px}}
+
+
+/* Copias de la biblioteca de perfiles CAD locales, sin borrar los planos existentes. */
+.tool-dxf-backup{display:flex;flex-wrap:wrap;gap:10px;align-items:center;padding:11px;margin:10px 0;border-radius:8px;border:1px solid #497c9e;background:#112f47;color:#d8f2ff}
+.tool-dxf-backup>button,.tool-dxf-backup>label{font-size:12px;font-weight:700;min-height:43px;border:1px solid #64a4d2;background:#07588b;color:#fff;border-radius:7px;padding:9px 12px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer}
+.tool-dxf-backup>label{position:relative;overflow:hidden}
+.tool-dxf-backup>label>input[type="file"]{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer}
+.tool-dxf-backup>small{display:block;flex-basis:100%;line-height:1.45;color:#c0d9e9;font-size:11px}
+@media(max-width:520px){.tool-dxf-backup>button,.tool-dxf-backup>label{flex:1 1 100%}}

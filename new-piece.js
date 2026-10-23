@@ -127,7 +127,7 @@
      window.PlegarEditor2D.loadProfile(profile,{width});
      close();
      window.PlegarApp.switchScreen(destination);
-    }catch(ex){error('No se ha guardado: '+ex.message);}
+    }catch(ex){error('No se ha guardado: '+ex.message+' [ancho='+String(draft?.width)+', campo='+String(dialog.querySelector('[data-np-field="width"]')?.value)+']');}
     return;
    }
    const id=Number(e.target.closest('[data-np-touch]')?.dataset.npTouch);

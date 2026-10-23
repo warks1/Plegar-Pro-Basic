@@ -43,6 +43,8 @@ with sync_playwright() as pw:
     return {zoom,reset:Number(el.dataset.touchScale),hasCamera:!!el.querySelector('.touch-camera-content,.p3-camera-content,.f2-camera-content')};
    }""",selector)
   assert page.locator('.home-machine-photo').is_visible()
+  assert 'nominal NO CNC' in page.locator('.calc-output strong').inner_text()
+  assert page.locator('.calc-fields input[readonly]').count()==4
   assert page.locator('#realistic-option').get_attribute('aria-pressed')=='true'
   assert page.locator('#home-machine-cad').is_hidden()
   main_gesture=gesture('#home-machine-3d')

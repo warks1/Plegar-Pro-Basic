@@ -320,9 +320,20 @@ with sync_playwright() as pw:
   if w<=1120:page.locator('#open-menu').click()
   page.locator('button.nav-item[data-screen="Simulación 2D"]').click()
   assert gesture('.f2-stage')['zoom']>1
+  assert page.locator('.f2-data-panel').is_visible()
+  assert 'Ángulo' in page.locator('.f2-data-panel').inner_text()
+  assert 'NO CALCULADA' in page.locator('.f2-data-panel').inner_text()
+  assert page.locator('.f2-tile svg').count()==4
+  assert page.locator('.f2-tile[data-f2-step="start"]').count()==1
+  assert page.locator('.f2-tile[data-f2-step="final"]').count()==1
+  assert page.locator('.f2-loop').is_checked()
   page.locator('[data-f2-action="play"]').click()
   page.wait_for_function("""() => document.querySelector('.f2-step-label')?.textContent.includes('Paso 2 de 2') &&
    document.querySelector('.f2-progress')?.textContent.includes('100 %')""",timeout=12000)
+  page.wait_for_function("""() => document.querySelector('.f2-step-label')?.textContent.includes('Paso 1 de 2') &&
+   document.querySelector('[data-f2-action="play"]')?.textContent.includes('Pausar')""",timeout=7000)
+  page.locator('[data-f2-action="play"]').click()
+  assert 'Reproducir' in page.locator('[data-f2-action="play"]').inner_text()
   if w<=1120:page.locator('#open-menu').click()
   page.locator('button.nav-item[data-screen="Simulación 3D"]').click()
   assert page.locator('.p3-example-gallery [data-example-id]').count()==4

@@ -120,3 +120,37 @@
 .machine-reference a{color:#89d7ff;text-decoration:underline}
 @media(max-width:800px){.machine-reference-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.machine-reference{padding:10px}.machine-reference-grid strong{font-size:14px}}
 @media(max-width:380px){.machine-reference-grid{grid-template-columns:1fr}}
+
+/* v0.53 · Simulación 3D: selector real de cámara, datos fuera de la malla y pantalla completa. */
+.machine-panel .heading-actions{position:relative}
+.home-view-menu{position:absolute;z-index:70;right:0;top:calc(100% + 8px);width:min(250px,85vw);display:flex;flex-direction:column;gap:5px;padding:9px;background:#0c2438;border:1px solid #68a7d0;box-shadow:0 12px 34px #000c;border-radius:9px}
+.home-view-menu[hidden]{display:none!important}
+.home-view-menu button{display:block;text-align:left;width:100%;min-height:42px;padding:10px 12px;border-radius:6px;border:1px solid #385e79;background:#13354e;color:#f0f8ff;font-weight:600}
+.home-view-menu button:hover,.home-view-menu button:focus-visible{background:#17628c;border-color:#81c8ec}
+.home-stage-readout{position:absolute;z-index:3;top:8px;right:8px;max-width:calc(100% - 95px);padding:6px 9px;pointer-events:none;border:1px solid #285773;border-radius:6px;background:#071927ed;color:#d1f0fa;font-size:11px;font-weight:600;line-height:1.35}
+.home-stage-readout[hidden]{display:none!important}
+.machine-panel.maximized-panel{position:fixed!important;inset:0!important;z-index:100!important;width:100vw!important;height:100dvh!important;max-width:none!important;max-height:none!important;display:flex!important;flex-direction:column!important;border-radius:0!important;margin:0!important;background:#071726!important}
+.machine-panel.maximized-panel .machine-stage{flex:1 1 0!important;min-height:0!important;aspect-ratio:auto!important}
+.machine-panel.maximized-panel .panel-heading{flex:0 0 auto;z-index:6;background:#0c2539}
+.machine-panel.maximized-panel .player{flex:0 0 auto}
+.machine-panel.maximized-panel .steps{flex:0 0 auto;max-height:min(20dvh,140px);overflow-x:auto;overflow-y:hidden;grid-auto-flow:column;grid-auto-columns:minmax(90px,1fr);grid-template-columns:none}
+.machine-panel.maximized-panel .step-card>.home-step-svg{height:55px}
+.home-machine-3d .home-simulation-svg polygon{vector-effect:non-scaling-stroke;stroke-linejoin:round}
+@media(max-width:700px){
+ .machine-panel .heading-actions #views{display:inline-flex!important;align-items:center;justify-content:center;min-height:36px}
+ .machine-panel .heading-actions{isolation:isolate}
+ .home-view-menu{top:calc(100% + 5px);right:0}
+ .home-stage-readout{font-size:10px;line-height:1.3;max-width:calc(100% - 88px)}
+ .machine-panel.maximized-panel{padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom)}
+ .machine-panel.maximized-panel .steps{min-height:76px}
+ .machine-panel.maximized-panel .machine-stage{min-height:0!important;aspect-ratio:auto!important}
+ .machine-panel.maximized-panel .panel-heading{max-height:30dvh;overflow-y:auto}
+}
+
+/* Identificador persistente de piezas independiente del movimiento de cámara. */
+.home-part-legend{position:absolute;z-index:3;bottom:34px;left:10px;display:flex;flex-wrap:wrap;gap:7px;max-width:calc(100% - 20px);padding:6px 8px;border-radius:7px;background:#071827e9;border:1px solid #365875;color:#e7f3fc;font-size:10px;pointer-events:none}
+.home-part-legend[hidden]{display:none!important}
+.home-part-legend span{display:inline-flex;align-items:center;gap:5px}
+.home-part-legend i{display:inline-block;width:10px;height:10px;border-radius:2px;border:1px solid #ffffff80}
+.legend-sheet{background:#d9e1e6}.legend-punch{background:#237dc0}.legend-die{background:#415360}.legend-gauge{background:#29966b}
+@media(max-width:700px){.home-part-legend{font-size:9px;gap:5px;bottom:27px;left:6px;padding:4px 6px}}

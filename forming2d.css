@@ -31,3 +31,8 @@
 
 /* v0.7: contextual prior-flange annotations */
 .f2-prior-summary {padding: 8px 12px;border:1px solid #9e7046;background:rgba(115,69,27,.15);border-radius:8px;color:#f6d8b7;font-size:12px;line-height:1.5;overflow-wrap:anywhere}
+
+/* v0.44 · pellizcar con dos dedos y desplazamiento táctil en el perfil */
+.f2-stage{position:relative;touch-action:none;overscroll-behavior:contain;user-select:none;-webkit-user-select:none;cursor:grab;overflow:hidden}
+.f2-stage:active{cursor:grabbing}
+.f2-camera-content{width:100%;height:auto;will-change:transform;transform-origin:center center}

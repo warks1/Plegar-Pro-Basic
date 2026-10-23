@@ -75,7 +75,7 @@ function animation(now){
  if(ctl.lastPaint===null||now-ctl.lastPaint>=33||next.finished||next.transition){render();ctl.lastPaint=now;}
  if(ctl.timer!==null)ctl.timer=requestAnimationFrame(animation);
 }
-function destroy(){halt();active=null;}
+function destroy(){halt();active?.touchCamera?.destroy();active=null;}
 function render(){
  const ctl=active;if(!ctl||!ctl.host.isConnected)return;
  const data=ctl.getData(), order=data.sequence;
@@ -84,7 +84,7 @@ function render(){
  if(ctl.cameraKey!==key){ctl.bounds=fixedExtents(data,ctl.currentStep,ctl.mode);ctl.cameraKey=key;}
  const motion=ctl.mode==='cycle'?K().frame(data,ctl.currentStep,ctl.progress):null;
  const m=motion?motion.scene:Model.scene(data,ctl.currentStep,ctl.progress);
- ctl.host.querySelector('.f2-stage').innerHTML=svg(m,ctl.zoom,ctl.bounds);
+ ctl.host.querySelector('.f2-camera-content').innerHTML=svg(m,ctl.zoom,ctl.bounds);
  const label=ctl.host.querySelector('.f2-step-label');label.textContent=`Paso ${m.step} de ${m.steps} · pliegue ${m.bend} · ${as2(m.turn)}°`;
  ctl.host.querySelector('.f2-progress').textContent=`${Math.round(ctl.progress*100)} %`;
  const slider=ctl.host.querySelector('.f2-range');slider.value=String(Math.round(ctl.progress*100));
@@ -112,10 +112,11 @@ function mount(host,getData,getSelection=()=>1,onSelect=()=>{}){
  active={host,getData,getSelection,onSelect,currentStep:step,progress:0,zoom:1,mode:'bend',timer:null,lastFrame:null,lastPaint:null,speed:1,selfSelecting:false,cameraKey:null,bounds:null};
  host.innerHTML=`<section class="f2-view" aria-label="Seguimiento cinemático 2D de plegado">
  <div class="f2-title"><div><strong>SEGUIMIENTO DE PLEGADO · PERFIL</strong><small>Punzón superior · matriz V inferior · tope posterior · chapa</small></div><span>PERFIL GEOMÉTRICO v0.39</span></div>
- <div class="f2-stage"></div><div class="f2-toolbar"><strong class="f2-step-label"></strong><div class="f2-controls"><button type="button" data-f2-action="previous">← Anterior</button><button type="button" data-f2-action="play">▶ Reproducir sin pausas</button><button type="button" data-f2-action="mode" aria-pressed="false">☐ Ciclo completo</button><button type="button" data-f2-action="next">Siguiente →</button><button type="button" data-f2-action="reset">Reiniciar</button><button type="button" data-f2-action="zoom-out" aria-label="Reducir zoom">−</button><button type="button" data-f2-action="zoom-in" aria-label="Ampliar zoom">+</button></div></div>
+ <div class="f2-stage" aria-label="Mueve la simulación 2D con un dedo y usa dos dedos para cambiar el zoom"><div class="f2-camera-content"></div></div><div class="f2-toolbar"><strong class="f2-step-label"></strong><div class="f2-controls"><button type="button" data-f2-action="previous">← Anterior</button><button type="button" data-f2-action="play">▶ Reproducir sin pausas</button><button type="button" data-f2-action="mode" aria-pressed="false">☐ Ciclo completo</button><button type="button" data-f2-action="next">Siguiente →</button><button type="button" data-f2-action="reset">Reiniciar</button><button type="button" data-f2-action="zoom-out" aria-label="Reducir zoom">−</button><button type="button" data-f2-action="zoom-in" aria-label="Ampliar zoom">+</button></div></div>
  <div class="f2-cycle-state" role="status" aria-label="Fase cinemática 2D"></div><div class="f2-slider"><label for="f2-range">Avance del ciclo o conformado</label><input id="f2-range" class="f2-range" type="range" min="0" max="100" step="1" value="0"><output class="f2-progress" for="f2-range">0 %</output></div>
  <div class="f2-steps" aria-label="Orden de plegado"></div><div class="f2-prior-summary" role="status"></div><div class="f2-nominal" role="status"></div><ul class="f2-notes"></ul></section>`;
- host.onclick=e=>{
+ active.touchCamera=window.PlegarTouchView.attach(host.querySelector('.f2-stage'),host.querySelector('.f2-camera-content'));
+  host.onclick=e=>{
   const ctl=active;if(!ctl||ctl.host!==host)return;
   const stepBtn=e.target.closest('[data-f2-step]');
   if(stepBtn){halt();ctl.currentStep=Number(stepBtn.dataset.f2Step);ctl.progress=0;ctl.onSelect(ctl.getData().sequence[ctl.currentStep]);render();return;}

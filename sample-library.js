@@ -45,7 +45,7 @@
   return '<article class="sample-catalog-card" data-sample-id="'+escape(sample.id)+'"><div class="sample-catalog-images">'+paired(sample.profile,sample.width)+'</div><strong>'+escape(sample.name)+'</strong>'
    +'<small>'+sample.profile.angles.length+' pliegues · '+sample.thickness.toFixed(2)+' mm · ancho '+sample.width+' mm</small>'
    +'<p>Modelo geométrico de demostración, editable y con sus propias cotas.</p>'
-   +'<div class="sample-catalog-buttons"><button type="button" data-sample-program="'+escape(sample.id)+'">Programar 2D</button><button type="button" data-sample-save="'+escape(sample.id)+'">Guardar planos 2D/3D</button></div></article>';
+   +'<div class="sample-catalog-buttons"><button type="button" data-action="sample-program" data-sample-program="'+escape(sample.id)+'">Programar 2D</button><button type="button" data-action="sample-save" data-sample-save="'+escape(sample.id)+'">Guardar planos 2D/3D</button></div></article>';
  }
  return {list,get,byName,drawing,paired,projectCard};
 });

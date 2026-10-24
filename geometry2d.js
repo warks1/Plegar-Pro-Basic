@@ -50,7 +50,9 @@
     model.segments.forEach((length,i) => {
       if (i > 0) direction += model.angles[i-1] * Math.PI / 180;
       x += Math.cos(direction) * length;
-      y += Math.sin(direction) * length;
+      // Coordenadas SVG: Y crece hacia abajo, pero el programa indica + = arriba.
+      // Convertir el seno para que plano 2D y cinemática 3D compartan el signo.
+      y -= Math.sin(direction) * length;
       points.push({x,y});
     });
     return points;

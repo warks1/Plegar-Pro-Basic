@@ -72,7 +72,7 @@ function svg(m,zoom,bounds){
  </g>
  <rect x="14" y="16" width="290" height="92" rx="7" fill="#0b2941" stroke="#2b678b"/>
  <text x="27" y="36" font-size="12" fill="#96c6e4">PLEGADO ACTIVO · ${m.bend} / ${m.steps}</text>
- <text x="27" y="59" font-size="18" font-weight="bold" fill="#e0f3ff">${as2(m.currentAngle)}° / ${as2(m.targetAngle)}°</text>
+ <text x="27" y="59" font-size="18" font-weight="bold" fill="#e0f3ff">${as2(m.signedAngle)}° / ${as2(m.turn)}°</text>
  <text x="27" y="77" font-size="11" fill="#93b9d4">Radio interior supuesto: ${as2(m.insideRadius)} mm</text>
  <text x="27" y="94" font-size="11" fill="#93b9d4">Espesor ${as2(m.thickness)} mm · V${m.dieOpening} · P${m.punchAngle}°</text>
  <text x="885" y="28" text-anchor="end" font-size="11" fill="#eac187">PERFIL CON RADIO · APROXIMACIÓN</text>
@@ -125,7 +125,7 @@ function render(){
  const label=ctl.host.querySelector('.f2-step-label');label.textContent=`Paso ${m.step} de ${m.steps} · pliegue ${m.bend} · ${as2(m.turn)}°`;
  ctl.host.querySelector('.f2-progress').textContent=`${Math.round(ctl.progress*100)} %`;
  const slider=ctl.host.querySelector('.f2-range');slider.value=String(Math.round(ctl.progress*100));
- slider.setAttribute('aria-valuetext',`${as2(m.currentAngle)} grados de ${as2(m.targetAngle)} · ${motion?motion.phase:'conformado'}`);
+ slider.setAttribute('aria-valuetext',`${as2(m.signedAngle)} grados de ${as2(m.turn)} · ${motion?motion.phase:'conformado'}`);
  const modeButton=ctl.host.querySelector('[data-f2-action="mode"]');
  modeButton.textContent=ctl.mode==='cycle'?'☑ Ciclo completo':'☐ Ciclo completo';
  modeButton.setAttribute('aria-pressed',String(ctl.mode==='cycle'));
@@ -145,7 +145,7 @@ function render(){
    ['Máquina','Modelo por confirmar'],['Punzón',setup.punch||'No elegido'],
    ['Matriz',setup.die||'No elegida'],['Espesor',as2(data.thickness)+' mm'],
    ['Material',data.material||'Sin especificar'],['Fuerza actual','NO CALCULADA'],
-   ['Ángulo',as2(m.currentAngle)+'°'],
+   ['Ángulo',as2(m.signedAngle)+'°'],
    ['Y geométrica',as2(motion?.punchY??m.punchTipY)+' mm · NO CNC'],
    ['Avisos nominales',String(m.interferences.problems.length)]
   ];

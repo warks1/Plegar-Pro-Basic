@@ -6,8 +6,8 @@ test('perfil con ángulos firmados calculado como ejes',()=>{
  const p=g.vertices(base);
  assert.equal(p.length,4);
  assert.ok(Math.abs(p[1].x-60)<1e-9&&Math.abs(p[1].y)<1e-9);
- assert.ok(Math.abs(p[2].x-60)<1e-9&&Math.abs(p[2].y-80)<1e-9);
- assert.ok(Math.abs(p[3].x-120)<1e-9&&Math.abs(p[3].y-80)<1e-9);
+ assert.ok(Math.abs(p[2].x-60)<1e-9&&Math.abs(p[2].y+80)<1e-9);
+ assert.ok(Math.abs(p[3].x-120)<1e-9&&Math.abs(p[3].y+80)<1e-9);
  assert.equal(g.totalLength(base),200);
 });
 test('validación no acepta NaN, tramos negativos o secuencia duplicada',()=>{

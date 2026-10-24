@@ -16,7 +16,8 @@
   for (const side of ['left','right']){
    const backwards=side==='left';
    const origin=backwards?m.wingLeft:m.wingRight;
-   let direction=backwards?(-Math.PI+m.currentAngle*Math.PI/360):(-m.currentAngle*Math.PI/360);
+   const halfSigned=(m.signedAngle??Math.sign(m.turn||1)*m.currentAngle)*Math.PI/360;
+   let direction=backwards?(-Math.PI+halfSigned):(-halfSigned);
    // Skip the current bend and use only joints ALREADY formed in order.
    let j=backwards?m.bend-1:m.bend+1;
    const points=[{x:origin.x,y:origin.y}];
@@ -25,7 +26,7 @@
    while(j>=1&&j<=profile.angles.length&&iter++<profile.angles.length){
     if(!completed.has(j))break;
     const angle=profile.angles[j-1];
-    direction+=(backwards?-1:1)*rad(angle);
+    direction+=(backwards?1:-1)*rad(angle);
     const length=profile.segments[backwards?j-1:j];
     const from=points[points.length-1];
     const target={x:from.x+length*Math.cos(direction),y:from.y+length*Math.sin(direction)};

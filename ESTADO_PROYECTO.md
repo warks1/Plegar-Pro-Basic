@@ -185,3 +185,9 @@ Ajuste de presentación a pantalla completa sin franjas de imagen no ocupadas. S
 - `bendOverrides` opcional permite especificar Ri/K para B1…Bn, heredando valores generales. Se valida, persiste y sincroniza al reordenar, agregar o quitar pliegues.
 - Motor geométrico, BA/BD y posiciones del desarrollo aplican Ri/K efectivos de cada B. La calibración del K general se desactiva si hay K locales; la sensibilidad cambia solo K heredado.
 - Calculadora, vista desplegada, hoja de secuencia y CSV muestran radios/factores K por pliegue. NO CNC ni datos calibrados de máquina.
+
+## Corrección del sentido de plegado — 24 octubre 2026
+- Convenio uniforme en Crear nueva pieza, geometría 2D, seguimiento y malla 3D: **+ = arriba; − = abajo**. Coordenadas SVG descendentes convertidas correctamente en geometría 2D.
+- El arco activo conserva su signo y el recorrido de alas anteriores invierte apropiadamente el sentido al caminar a izquierda/derecha. Las 4 figuras L/U/Z/Omega se cotejan geométricamente contra el perfil final incluso al variar la secuencia.
+- Los pliegues negativos reflejan la **orientación de la pieza en su sistema geométrico**, no un montaje físicamente simulado. Para plegar sobre una matriz real hay que modelar giro/volteo, contacto y topes verificados; informes de holgura siguen **NO CNC / SIN VALIDAR**.
+- Refresco de caché offline v73. Conserva la interfaz aprobada.

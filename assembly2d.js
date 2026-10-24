@@ -10,11 +10,14 @@
   const done=new Set(profile.sequence.slice(0,model.orderIndex));
   function walk(side){
    const left=side==='left',base=left?model.wingLeft:model.wingRight;
-   let angle=left?-Math.PI+deg(model.currentAngle/2):-deg(model.currentAngle/2);
+   const halfSigned=deg((model.signedAngle??Math.sign(model.turn||1)*model.currentAngle)/2);
+   let angle=left?-Math.PI+halfSigned:-halfSigned;
    const items=[],hinges=[]; let from=point(base.x,base.y);
    for(let j=model.bend+(left?-1:1);j>=1&&j<=profile.angles.length;j+=left?-1:1){
     const completed=done.has(j);
-    if(completed)angle+=(left?-1:1)*deg(profile.angles[j-1]);
+    // Recorrer hacia la izquierda invierte el sentido del giro respecto al
+    // recorrido original. En coordenadas SVG, +arriba equivale a restar ángulo.
+    if(completed)angle+=(left?1:-1)*deg(profile.angles[j-1]);
     const len=profile.segments[left?j-1:j];
     const to=point(from.x+len*Math.cos(angle),from.y+len*Math.sin(angle));
     hinges.push({bend:j,point:from,status:completed?'realizado':'pendiente'});

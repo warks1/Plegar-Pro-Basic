@@ -523,8 +523,8 @@ with sync_playwright() as pw:
   # La vista de perfil debe mostrar las seis piezas con colores y movimiento real del carro nominal.
   for component in ['trancha','punzon','chapa','matriz','mesa','topes','amarre-punzon','mordaza','portamatriz','estructura-inferior','tope-carro','tope-brazo']:
    assert page.locator('.f2d-svg [data-component="'+component+'"]').count()==1,component
-  assert '9 zonas modeladas' in page.locator('.f2-machine-zones').inner_text()
-  assert page.locator('.f2-zone-grid .f2-zone').count()==9
+  assert '11 zonas modeladas' in page.locator('.f2-machine-zones').inner_text()
+  assert page.locator('.f2-zone-grid .f2-zone').count()==11
   assert page.locator('.f2d-svg [data-component="indicador-tope"]').count()==1
   assert '21 posiciones' in page.locator('.f2-machine-zones').inner_text()
   mesa_antes=page.locator('.f2d-svg [data-component="mesa"]').get_attribute('d')

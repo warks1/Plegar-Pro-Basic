@@ -280,3 +280,10 @@ Ajuste de presentación a pantalla completa sin franjas de imagen no ocupadas. S
 - Omega B1→B2→B4→B3 con valores particulares mantiene posiciones y presenta transiciones entre 70→95→145→120 mm nominales. Sin necesidad de pulsar siguiente.
 - Se sincronizaron etiquetas de fase y panel de información; zoom estable contempla el desplazamiento X. La secuencia no prescribe velocidades, aceleraciones, volteos ni autorizaciones CNC.
 - Regresiones del motor y caché v89; el contacto físico REAL, tope CNC y máquina siguen sin validar.
+
+
+## v90 — signo de plegado explícito y control de secuencia en vista 2D (24 octubre 2026)
+- En Programación 2D ambos editores de ángulos permiten escribir magnitud positiva 0..179 y seleccionar ↑ Arriba (+) / ↓ Abajo (−). El programa sigue guardando el signo real. El teclado numérico del iPhone ya no requiere el carácter '-' para obtener -90°.
+- Simulación 2D muestra paso, ID B y giro firmado; permite modificar ángulo, sentido y posición del B activo desde la propia pantalla. Comparte los valores con Programación 2D/3D.
+- Las pruebas Chromium escritorio/móvil comprueban cambios 83+↓=-83, -90/-110/+90 y reordenar B2 entre pasos 1 y 2, más las pruebas unitarias anteriores.
+- Aún NO existe el volteo físico/traslado de la chapa que muestran los vídeos Cybelec; la cinemática y colisiones siguen siendo aproximadas. NO CNC.

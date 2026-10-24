@@ -446,8 +446,16 @@ with sync_playwright() as pw:
   first.dispatch_event('change')
   assert page.evaluate('PlegarEditor2D.getData().segments[0]')==72
   assert page.locator('#ed-dimensions-body [data-ed-program-segment="0"]').input_value()=='72'
-  page.locator('#ed-dimensions-body [data-ed-program-angle="0"]').fill('-83')
+  # Teclado móvil: escribir 83 sin signo y escoger flecha abajo guarda -83.
+  page.locator('#ed-dimensions-body [data-ed-program-angle="0"]').fill('83')
   page.locator('#ed-dimensions-body [data-ed-program-angle="0"]').dispatch_event('change')
+  page.locator('#ed-dimensions-body [data-ed-program-direction="0"]').select_option('down')
+  assert page.evaluate('PlegarEditor2D.getData().angles[0]')==-83
+  assert page.locator('#ed-dimensions-body [data-ed-program-angle="0"]').input_value()=='83'
+  assert page.locator('#ed-angles [data-ed-direction="0"]').input_value()=='down'
+  page.locator('#ed-angles [data-ed-direction="0"]').select_option('up')
+  assert page.evaluate('PlegarEditor2D.getData().angles[0]')==83
+  page.locator('#ed-dimensions-body [data-ed-program-direction="0"]').select_option('down')
   assert page.evaluate('PlegarEditor2D.getData().angles[0]')==-83
   assert page.locator('#ed-svg .ed-bend-point').count()==page.evaluate('PlegarEditor2D.getData().angles.length')
   page.locator('#ed-dimensions-body [data-ed-program-segment="0"]').fill(original)
@@ -465,6 +473,19 @@ with sync_playwright() as pw:
   assert page.evaluate('PlegarEditor2D.getData().setup.die')=='v12-88'
   page.locator('#ed-example-gallery [data-example-id="omega"]').click()
   assert page.evaluate('PlegarEditor2D.getData().sequence')==[1,2,4,3]
+  # Signos independientes del teclado. La pieza mantiene B1/B2/B4/B3.
+  page.locator('[data-ed-program-direction="2"]').select_option('down')
+  assert page.evaluate('PlegarEditor2D.getData().angles[2]')==-90
+  assert page.locator('[data-ed-program-angle="2"]').input_value()=='90'
+  assert page.locator('[data-ed-direction="2"]').input_value()=='down'
+  assert page.evaluate('PlegarFormingGeometry.scene(PlegarEditor2D.getData(),3,.5).turn')==-90
+  page.locator('[data-ed-angle="2"]').fill('120')
+  page.locator('[data-ed-angle="2"]').dispatch_event('change')
+  assert page.evaluate('PlegarEditor2D.getData().angles[2]')==-120
+  page.locator('[data-ed-direction="2"]').select_option('up')
+  assert page.evaluate('PlegarEditor2D.getData().angles[2]')==120
+  page.locator('[data-ed-angle="2"]').fill('90')
+  page.locator('[data-ed-angle="2"]').dispatch_event('change')
   page.locator('#ed-order-reset').click()
   assert page.evaluate('PlegarEditor2D.getData().sequence')==[1,2,4,3], 'Restablecer no debe volver al orden antiguo de Omega'
   page.locator('[data-ed-bend-gauge="3"]').fill('70')
@@ -533,6 +554,29 @@ with sync_playwright() as pw:
   assert page.locator('.f2-camera-content').inner_html()!=scene_before
   page.locator('[data-f2-action="focus"]').click()
   assert page.locator('[data-f2-action="focus"]').get_attribute('aria-pressed')=='false'
+  # Cambiar sentido y paso desde Simulación 2D, no solo desde Programación.
+  assert page.locator('[data-f2-angle]').count()==1
+  assert page.locator('[data-f2-direction]').count()==1
+  assert 'Orden ejecutado:' in page.locator('.f2-order-live').inner_text()
+  assert 'B2' in page.locator('.f2-step-label').inner_text()
+  page.locator('[data-f2-direction]').select_option('down')
+  assert page.evaluate('PlegarEditor2D.getData().angles[1]')==-90
+  assert '-90' in page.locator('.f2-step-label').inner_text()
+  assert page.evaluate('PlegarFoldKinematics.frame(PlegarEditor2D.getData(),0,.7).scene.turn')==-90
+  page.locator('[data-f2-angle]').fill('110')
+  page.locator('[data-f2-angle]').dispatch_event('change')
+  assert page.evaluate('PlegarEditor2D.getData().angles[1]')==-110
+  page.locator('[data-f2-angle]').fill('90')
+  page.locator('[data-f2-angle]').dispatch_event('change')
+  page.locator('[data-f2-direction]').select_option('up')
+  assert page.evaluate('PlegarEditor2D.getData().angles[1]')==90
+  page.locator('[data-f2-position]').select_option('2')
+  assert page.evaluate('PlegarEditor2D.getData().sequence')==[1,2]
+  assert 'B2' in page.locator('.f2-step-label').inner_text()
+  assert 'Paso 2 de 2' in page.locator('.f2-step-label').inner_text()
+  page.locator('[data-f2-position]').select_option('1')
+  assert page.evaluate('PlegarEditor2D.getData().sequence')==[2,1]
+  assert 'Paso 1 de 2' in page.locator('.f2-step-label').inner_text()
   assert page.locator('.f2-data-panel').is_visible()
   assert 'Ángulo' in page.locator('.f2-data-panel').inner_text()
   assert 'NO CALCULADA' in page.locator('.f2-data-panel').inner_text()

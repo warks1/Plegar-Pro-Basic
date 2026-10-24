@@ -70,3 +70,10 @@
 
 /* Botón para acercarse al área de la V y volver a la máquina completa. */
 .f2-view [data-f2-action="focus"][aria-pressed="true"]{border-color:#8bdcff;background:#166d8a}
+
+.f2-order-live{padding:10px 12px;font-weight:700;color:#f7e1a3;background:#0b2a40;line-height:1.5;overflow-wrap:anywhere}
+.f2-program-controls{display:flex;align-items:end;flex-wrap:wrap;gap:10px;background:#11344b;border:1px solid #467b94;padding:12px;border-radius:8px}
+.f2-program-controls>strong{flex-basis:100%;color:#dcf7ff}
+.f2-program-controls>label{display:flex;flex-direction:column;gap:5px;color:#d5ecfc;font-size:12px;flex:1 1 135px}
+.f2-program-controls input,.f2-program-controls select{min-height:40px;padding:8px;background:#091f30;color:#effaff;border:1px solid #6092af;border-radius:5px;max-width:100%;font-size:14px}
+.f2-program-controls>small{flex-basis:100%;color:#ffdca6}

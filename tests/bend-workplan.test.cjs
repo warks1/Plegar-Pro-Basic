@@ -41,3 +41,21 @@ test('ancho no válido y pliegues incorrectos no se aceptan',()=>{
  assert.throws(()=>Work.build(p,{width:5001}));
  assert.throws(()=>Work.build({...p,sequence:[1,1]},{width:100}));
 });
+
+test('Hoja de trabajo y CSV emplean X del pliegue B, no el X del paso',()=>{
+ const sample=Samples.get('perfil-omega'),p={...sample.profile,sequence:[1,2,4,3],
+  setup:{...sample.profile.setup,backgaugeX:120,backgaugeByBend:[70,95,null,145]}};
+ const w=Work.build(p,{width:140});
+ assert.deepEqual(w.rows.map(r=>r.bend),[1,2,4,3]);
+ assert.deepEqual(w.rows.map(r=>r.backgaugeX),[70,95,145,120]);
+ assert.deepEqual(w.rows.map(r=>r.backgaugeSource),['por-pliegue','por-pliegue','por-pliegue','general']);
+ const html=Work.html(w),csv=Work.csv(w);
+ assert.ok(html.includes('Tope X (mm)'));
+ assert.ok(html.includes('145 mm (B)'));
+ assert.ok(csv.includes('Tope X (mm)'));
+ assert.ok(csv.includes('"145";"por-pliegue"'));
+ assert.ok(csv.includes('"120";"general"'));
+ assert.match(w.warning,/NO CNC/);
+ const reversed=Work.build({...p,sequence:[4,1,3,2]},{width:140});
+ assert.deepEqual(reversed.rows.map(r=>r.backgaugeX),[145,70,120,95]);
+});

@@ -22,6 +22,8 @@
    if(row&&row.usedSetback*2>a+b)issues.push('Retranqueos del pliegue superan la suma de tramos contiguos');
    return {step:i+1,bend,angle,inside,preceding:a,following:b,
     die:setup.die,punch:setup.punch,opening:calc.die.opening,
+    backgaugeX:setup.backgaugeByBend?.[index]??setup.backgaugeX,
+    backgaugeSource:setup.backgaugeByBend?.[index]!=null?'por-pliegue':'general',
     minFlange,radius:row.radius,kFactor:row.kFactor,allowance:row.allowance,deduction:row.deduction,flatCenter:calc.flat===null?null:row.flatCenter,issues};
   });
   return {name:p.name,material:p.material,thickness:p.thickness,width,
@@ -31,9 +33,9 @@
  }
  const esc=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
  function html(plan){
-  return '<div class="ed-workplan-heading"><strong>HOJA DE PLEGADO · ORDEN SELECCIONADO</strong><span>Se actualiza al tocar los pliegues o cambiar punzón, matriz, material o espesor.</span></div>'+
-   '<div class="ed-workplan-scroll"><table><thead><tr><th>Paso</th><th>Pliegue</th><th>Giro</th><th>Interior</th><th>Tramo antes</th><th>Tramo después</th><th>Ri efectivo (mm)</th><th>K efectivo</th><th>Punzón</th><th>Matriz</th><th>Centro desarrollo (mm)</th><th>Revisión</th></tr></thead><tbody>'+
-   plan.rows.map(r=>'<tr><td>'+r.step+'</td><td>B'+r.bend+'</td><td>'+r.angle+'°</td><td>'+r.inside+'°</td><td>'+r.preceding+' mm</td><td>'+r.following+' mm</td><td>'+r.radius.toFixed(3)+'</td><td>'+r.kFactor.toFixed(4)+'</td><td>'+esc(r.punch)+'</td><td>'+esc(r.die)+'</td><td>'+(r.flatCenter===null?'—':r.flatCenter.toFixed(2))+'</td><td>'+(r.issues.length?esc(r.issues.join(' · ')):'Sin alertas locales')+'</td></tr>').join('')+'</tbody></table></div>'+
+  return '<div class="ed-workplan-heading"><strong>HOJA DE PLEGADO · ORDEN SELECCIONADO</strong><span>Se actualiza al tocar los pliegues, cambiar el orden, los útiles o el tope X particular de cada B.</span></div>'+
+   '<div class="ed-workplan-scroll"><table><thead><tr><th>Paso</th><th>Pliegue</th><th>Giro</th><th>Interior</th><th>Tramo antes</th><th>Tramo después</th><th>Ri efectivo (mm)</th><th>K efectivo</th><th>Punzón</th><th>Matriz</th><th>Tope X (mm)</th><th>Centro desarrollo (mm)</th><th>Revisión</th></tr></thead><tbody>'+
+   plan.rows.map(r=>'<tr><td>'+r.step+'</td><td>B'+r.bend+'</td><td>'+r.angle+'°</td><td>'+r.inside+'°</td><td>'+r.preceding+' mm</td><td>'+r.following+' mm</td><td>'+r.radius.toFixed(3)+'</td><td>'+r.kFactor.toFixed(4)+'</td><td>'+esc(r.punch)+'</td><td>'+esc(r.die)+'</td><td>'+esc(r.backgaugeX)+' mm ('+(r.backgaugeSource==='por-pliegue'?'B':'general')+')</td><td>'+(r.flatCenter===null?'—':r.flatCenter.toFixed(2))+'</td><td>'+(r.issues.length?esc(r.issues.join(' · ')):'Sin alertas locales')+'</td></tr>').join('')+'</tbody></table></div>'+
    '<p class="ed-workplan-note">Desarrollo nominal: '+(plan.flat===null?'no calculable':plan.flat.toFixed(2)+' mm')+
    ' · Base cotas: '+(plan.dimensionBasis==='outer'?'exterior':plan.dimensionBasis==='inner'?'interior':'tangentes')+' · Fuerza aproximada: '+(plan.estimatedForceKN===null?'no calculable':plan.estimatedForceKN.toFixed(1)+' kN')+
    '. <b>NO CNC / NO ACEPTACIÓN DE FABRICACIÓN.</b></p>'+
@@ -48,8 +50,8 @@
    ['Desarrollo nominal (mm)',plan.flat===null?'NO CALCULABLE':plan.flat],
    ['Fuerza aproximada (kN)',plan.estimatedForceKN===null?'NO CALCULABLE':plan.estimatedForceKN],
    ['AVISO',plan.warning],
-   ['Paso','Pliegue','Giro (°)','Interior (°)','Tramo anterior (mm)','Tramo posterior (mm)','Ri efectivo (mm)','K efectivo','Apertura V (mm)','Punzón','Matriz','Centro en desarrollo (mm)','Incidencias'],
-   ...plan.rows.map(r=>[r.step,r.bend,r.angle,r.inside,r.preceding,r.following,r.radius,r.kFactor,r.opening,r.punch,r.die,r.flatCenter===null?'NO CALCULABLE':r.flatCenter,r.issues.join(' · ')])
+   ['Paso','Pliegue','Giro (°)','Interior (°)','Tramo anterior (mm)','Tramo posterior (mm)','Ri efectivo (mm)','K efectivo','Apertura V (mm)','Punzón','Matriz','Tope X (mm)','Origen X','Centro en desarrollo (mm)','Incidencias'],
+   ...plan.rows.map(r=>[r.step,r.bend,r.angle,r.inside,r.preceding,r.following,r.radius,r.kFactor,r.opening,r.punch,r.die,r.backgaugeX,r.backgaugeSource,r.flatCenter===null?'NO CALCULABLE':r.flatCenter,r.issues.join(' · ')])
   ];
   return '\uFEFF'+body.map(line=>line.map(field).join(';')).join('\r\n')+'\r\n';
  }

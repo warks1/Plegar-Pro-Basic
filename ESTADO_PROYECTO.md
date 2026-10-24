@@ -266,3 +266,9 @@ Ajuste de presentación a pantalla completa sin franjas de imagen no ocupadas. S
 - El motor de seguimiento usa la posición asociada al B activo, no a su puesto en la secuencia. Omega B1-B2-B4-B3 emplea X de B4 en el tercer golpe, manteniendo el tope nominal fijo durante el golpe.
 - Al crear pieza nueva no se heredan posiciones de la anterior. Editar y añadir/quitar alas conserva el emparejamiento; deshacer/rehacer y exportación JSON incluyen los valores.
 - NO se simula el recorrido físico del tope entre golpes ni se certifica contacto con chapa. NO CNC. Caché offline v87 y regresiones.
+
+
+## v88 — hoja de plegado sincronizada con topes X por B (24 octubre 2026)
+- La hoja de proceso en Programación 2D y su CSV presentan X de tope específico del identificador B, o el X general cuando no hay excepción.
+- Al reordenar Omega B1→B2→B4→B3, el tercer paso usa X de B4; la hoja coincide con la simulación 2D. Mantiene el aviso NO CNC.
+- Incluye regresiones de CSV, HTML y orden alternativo, caché v88.

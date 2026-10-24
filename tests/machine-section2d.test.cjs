@@ -20,7 +20,9 @@ test('Elementos inferiores quietos, portapunzón y trancha siguen la carrera Y',
 });
 test('El cribado conserva estados nominales por pieza sin certificar contacto real',()=>{
  const a=F.scene(model,0,.7),s=V.build(a),scan=V.inspect(a,s);
- assert.equal(scan.checked.length,9);
+ assert.equal(scan.checked.length,11);
+ assert.ok(scan.checked.some(x=>x.id==='punzon'&&x.expectedContact));
+ assert.ok(scan.checked.some(x=>x.id==='matriz'&&x.expectedContact));
  assert.equal(scan.physicallyValidated,false);
  assert.equal(scan.cncApproved,false);
  assert.ok(scan.checked.every(x=>typeof x.possibleOverlap==='boolean'));

@@ -49,12 +49,12 @@
   // slope and a half-thickness offset. This is NOT a calculated force/contact.
   const shoulderAngle=(half<tangentX && R>0)?Math.asin(Math.min(1,half/R)):beta;
   const cy= -relativeY(half,beta,R)-(t/2)*Math.cos(shoulderAngle);
-  // En la referencia de la pieza, + gira hacia arriba (Y SVG decrece).
-  // El útil idealizado siempre baja; para los pliegues negativos se invierte
-  // SOLO la representación de la chapa respecto al centro del pliegue.
-  // Esto no supone que una plegadora pueda conformar sin dar la vuelta a la pieza.
-  const sheetSign=turn<0?-1:1;
-  const sheetY=y=>round(cy+sheetSign*(y-cy));
+  // El signo del plano (+/-) no cambia el sentido de deformación sobre la
+  // matriz V. Para un -90° se necesita voltear la chapa ANTES del golpe.
+  // No se considera resuelta la cinemática del volteo o la sujeción.
+  const mountSign=turn<0?-1:1;
+  const machineAngle=angle,sheetSign=1;
+  const sheetY=y=>round(y);
   const ty=cy-R*(1-Math.cos(beta));
   const wingLeft={x:round(-tangentX-leftStraight*Math.cos(beta)),y:sheetY(ty-leftStraight*Math.sin(beta))};
   const wingRight={x:round(tangentX+rightStraight*Math.cos(beta)),y:sheetY(ty-rightStraight*Math.sin(beta))};
@@ -84,11 +84,13 @@
   if(setup.radius<punch.nose-1e-8){
    warnings.push('Radio interior supuesto inferior al radio nominal de punta del punzón.');
   }
-  if(turn<0)warnings.push('Pliegue negativo (abajo): el sentido de la chapa se representa en coordenadas de la pieza. Requiere volteo o recolocación física antes del golpe, NO modelados; las holguras respecto a punzón/matriz no son verificables.');
+  if(turn<0)warnings.push('B'+bend+' '+turn+'°: requiere VOLTEO previo de chapa. Se muestra la orientación nominal ya preparada sobre la matriz V; el giro, agarre, retirada y recolocación reales no están calculados. NO CNC.');
   if(angle>150)warnings.push('Pliegue superior a 150°: aproximación fuera de su aplicación habitual.');
   const output={
    bend,orderIndex,step:orderIndex+1,steps:piece.sequence.length,progress,turn,
-   targetAngle:Math.abs(turn),currentAngle:angle,signedAngle:round(turn*progress),sheetSign,left,right,center,wingLeft,wingRight,
+   targetAngle:Math.abs(turn),currentAngle:angle,signedAngle:round(turn*progress),
+   mountSign,machineAngle,sheetSign,requiresTurnover:turn<0,orientationVerified:false,
+   left,right,center,wingLeft,wingRight,
    tangentLeft,tangentRight,centerline,dieOpening:die.opening,dieDepth,
    punchAngle:punch.angle,punchNose:punch.nose,punchHeight:punch.height,dieAngle:die.angle,dieHeight:setup.dieHeight??die.height,thickness:t,
    insideRadius:setup.radius,centreRadius:R,tangentSetback,tangentX,
@@ -98,7 +100,7 @@
    stop:{x:setup.backgaugeByBend?.[bend-1]??setup.backgaugeX,bend,
     source:setup.backgaugeByBend?.[bend-1]!=null?'por-pliegue':'general',
     y:round(-t/2),width:Math.max(2,t),top:round(-t/2-12),bottom:round(-t/2+4)},warnings,
-   note:'Perfil de la chapa con signo + arriba y − abajo. Los pliegues negativos se visualizan en el sistema de referencia de la pieza, NO en una orientación de amarre real: falta modelar volteo, recolocación y contacto físico con el punzón/matriz. Tope X nominal por B cuando se configura, fijo durante cada golpe sin simular la transición del eje; NO certifica colisiones, fuerzas ni posicionamiento CNC.'
+   note:'El signo (+/−) corresponde al PLANO final. Sobre la V se representa el golpe de prensa con punzón superior y alas elevándose; para -90° se supone un VOLTEO ANTERIOR que NO se ha simulado. No se conocen agarres, cambios de apoyo o trayectoria real. NO CNC ni colisiones verificadas.'
   };
   output.toolProfiles=T.profiles(output);
   output.previous=P.calculate(piece,output);

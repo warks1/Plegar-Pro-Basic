@@ -2,7 +2,7 @@
    Muestra una aproximación con radio, no controla una plegadora. */
 (function(){
 'use strict';
-const Model=window.PlegarFormingGeometry,K=()=>window.PlegarFoldKinematics,TL=()=>window.PlegarSequenceTimeline,Section=window.PlegarMachineSection2D;
+const Model=window.PlegarFormingGeometry,K=()=>window.PlegarFoldKinematics,TL=()=>window.PlegarSequenceTimeline,Section=window.PlegarMachineSection2D,G=window.PlegarGeometry2D;
 const as2=n=>Number(n).toLocaleString('es-ES',{maximumFractionDigits:2});
 let active=null;
 const finite=n=>typeof n==='number'&&Number.isFinite(n)&&n>0;
@@ -89,6 +89,41 @@ function svg(m,zoom,bounds){
  <text x="15" y="471" font-size="10" fill="#ffd49e">Mesa / trancha ${bodies.tableMeasured&&bodies.ramMeasured?'con cotas introducidas':'PARCIALMENTE SIN COTAS · esquemas'} · NO CNC</text>
  </svg>`;
 }
+
+function finalPoints(data){return G.vertices(G.validate(data));}
+function profileExtent(points){
+ const xs=points.map(p=>p.x),ys=points.map(p=>p.y);
+ return {cx:(Math.min(...xs)+Math.max(...xs))/2,cy:(Math.min(...ys)+Math.max(...ys))/2,
+  w:Math.max(...xs)-Math.min(...xs),h:Math.max(...ys)-Math.min(...ys)};
+}
+// La geometría objetivo sale del plano de la pieza, nunca de la posición del último golpe.
+function finalSvg(data,zoom=1){
+ const profile=G.validate(data),points=finalPoints(data),box=profileExtent(points);
+ const scale=Math.min(8,740/Math.max(32,box.w),326/Math.max(32,box.h))*zoom;
+ const chain=points.map(p=>p.x.toFixed(4)+','+p.y.toFixed(4)).join(' ');
+ const labels=points.slice(1,-1).map((p,i)=>'<g><circle cx="'+p.x+'" cy="'+p.y+'" r="2.1" fill="#ffb86b"/>'+
+  '<text x="'+(p.x+5)+'" y="'+(p.y-5)+'" font-size="9" fill="#ffcb86">B'+(i+1)+'</text></g>').join('');
+ return '<svg class="f2d-svg" data-f2-final="true" viewBox="0 0 900 480" role="img" aria-label="Pieza final nominal según cotas y ángulos del plano, sin posición en máquina">'+
+  '<rect width="900" height="480" fill="#071a29"/>'+
+  '<g transform="translate(450 246) scale('+scale.toFixed(5)+') translate('+(-box.cx).toFixed(5)+' '+(-box.cy).toFixed(5)+')">'+
+  '<polyline data-component="chapa-final" points="'+chain+'" fill="none" stroke="#071a29" stroke-width="'+(profile.thickness+2)+'" stroke-linejoin="round" stroke-linecap="round"/>'+
+  '<polyline points="'+chain+'" fill="none" stroke="#65d5f5" stroke-width="'+profile.thickness+'" stroke-linejoin="round" stroke-linecap="round"/>'+
+  labels+'</g><rect x="14" y="16" width="368" height="84" rx="7" fill="#123348" stroke="#477b98"/>'+
+  '<text x="27" y="41" font-size="18" fill="#dcf7ff">PIEZA FINAL · PLANO NOMINAL</text>'+
+  '<text x="27" y="66" font-size="12" fill="#abd4e8">'+profile.angles.length+' pliegues · espesor '+as2(profile.thickness)+' mm</text>'+
+  '<text x="27" y="87" font-size="10" fill="#ffe3ae">Perfil objetivo, no posición de máquina ni recolocación</text>'+
+  '<text x="882" y="458" text-anchor="end" font-size="12" fill="#ffcf95">NO CNC · esquinas teóricas sin radio físico</text></svg>';
+}
+function finalThumb(data){
+ const points=finalPoints(data),box=profileExtent(points);
+ const scale=Math.min(3,184/Math.max(30,box.w),58/Math.max(20,box.h));
+ return '<svg viewBox="0 0 222 96" aria-label="Miniatura del perfil final nominal">'+
+  '<rect width="222" height="96" fill="#071a29"/><g transform="translate(111 42) scale('+scale.toFixed(5)+') translate('+(-box.cx).toFixed(5)+' '+(-box.cy).toFixed(5)+')">'+
+  '<polyline data-component="chapa-final" points="'+points.map(p=>p.x.toFixed(4)+','+p.y.toFixed(4)).join(' ')+
+  '" fill="none" stroke="#65d5f5" stroke-width="'+Math.max(1.4,data.thickness)+'" stroke-linecap="round" stroke-linejoin="round"/></g>'+
+  '<text x="8" y="89" font-size="11" fill="#9cddf3">FINAL · PLANO 2D</text></svg>';
+}
+
 function halt(){
  if(active?.timer!==null&&active?.timer!==undefined){cancelAnimationFrame(active.timer);active.timer=null;}
  if(active){active.lastFrame=null;const b=active.host.querySelector('[data-f2-action="play"]');if(b)b.textContent='▶ Reproducir sin pausas';}
@@ -100,13 +135,13 @@ function animation(now){
  let finished=false,transition=false;
  if(ctl.holdUntil!==null){
   if(now>=ctl.holdUntil){
-   ctl.currentStep=0;ctl.progress=0;ctl.holdUntil=null;transition=true;
+   ctl.currentStep=0;ctl.progress=0;ctl.showFinal=false;ctl.holdUntil=null;transition=true;
    ctl.selfSelecting=true;
    try{ctl.onSelect(ctl.getData().sequence[0]);}finally{ctl.selfSelecting=false;}
   }
  }else{
   const next=TL().advance({step:ctl.currentStep,cycle:ctl.progress},dt,ctl.getData().sequence.length,{speed:ctl.speed});
-  ctl.currentStep=next.step;ctl.progress=next.cycle;finished=next.finished;transition=next.transition;
+  ctl.currentStep=next.step;ctl.progress=next.cycle;ctl.showFinal=next.finished;finished=next.finished;transition=next.transition;
   if(next.transition){
    ctl.selfSelecting=true;
    try{ctl.onSelect(ctl.getData().sequence[ctl.currentStep]);}finally{ctl.selfSelecting=false;}
@@ -128,14 +163,15 @@ function render(){
  if(ctl.cameraKey!==key){ctl.bounds=ctl.focus?detailExtents(data,ctl.currentStep):fixedExtents(data,ctl.currentStep,ctl.mode);ctl.cameraKey=key;}
  const motion=ctl.mode==='cycle'?K().frame(data,ctl.currentStep,ctl.progress):null;
  const m=motion?motion.scene:Model.scene(data,ctl.currentStep,ctl.progress);
- ctl.host.querySelector('.f2-camera-content').innerHTML=svg(m,ctl.zoom,ctl.bounds);
+ ctl.host.querySelector('.f2-camera-content').innerHTML=ctl.showFinal?finalSvg(data,ctl.zoom):svg(m,ctl.zoom,ctl.bounds);
  const proximity=Section.inspect(m),zones=ctl.host.querySelector('.f2-machine-zones');
  const sweepKey=JSON.stringify([data,ctl.currentStep]);
  if(ctl.sectionSweepKey!==sweepKey){
   ctl.sectionSweep=Section.sweep(data,ctl.currentStep,{intervals:20});
   ctl.sectionSweepKey=sweepKey;
  }
- if(zones){
+ if(zones&&ctl.showFinal)zones.innerHTML='<strong>PIEZA FINAL DEL PLANO</strong><p>Referencia de la geometría objetivo con todos los pliegues. La orientación de la chapa en la máquina y sus volteos siguen sin calcularse. NO CNC.</p>';
+ if(zones&&!ctl.showFinal){
   const checked=proximity.checked.map(part=>'<span class="f2-zone'+(part.possibleOverlap?' f2-zone-near':'')+
    '" title="Modelo 2D nominal; no es plano CAD verificado">'+part.name+' · '+
    (part.distanceMm===null?'sin tramo analizable':part.possibleOverlap?(part.expectedContact?'contacto previsto o posible solape':'posible cruce 2D'):part.distanceMm.toFixed(1)+' mm aprox.')+'</span>').join('');
@@ -147,7 +183,7 @@ function render(){
    (first?'primeras proximidades: '+first:'sin cruce en las posiciones muestreadas')+
    '. El contacto del punzón y la matriz con la chapa puede ser intencionado. Sin barrido continuo ni volteo real.</p>';
  }
- const label=ctl.host.querySelector('.f2-step-label');label.textContent=`Paso ${m.step} de ${m.steps} · pliegue ${m.bend} · ${as2(m.turn)}°`;
+ const label=ctl.host.querySelector('.f2-step-label');label.textContent=ctl.showFinal?`Paso ${m.step} de ${m.steps} · PIEZA FINAL DEL PLANO`:`Paso ${m.step} de ${m.steps} · pliegue ${m.bend} · ${as2(m.turn)}°`;
  ctl.host.querySelector('.f2-progress').textContent=`${Math.round(ctl.progress*100)} %`;
  const slider=ctl.host.querySelector('.f2-range');slider.value=String(Math.round(ctl.progress*100));
  slider.setAttribute('aria-valuetext',`${as2(m.signedAngle)} grados de ${as2(m.turn)} · ${motion?motion.phase:'conformado'}`);
@@ -155,7 +191,7 @@ function render(){
  modeButton.textContent=ctl.mode==='cycle'?'☑ Ciclo completo':'☐ Ciclo completo';
  modeButton.setAttribute('aria-pressed',String(ctl.mode==='cycle'));
  const fb=ctl.host.querySelector('[data-f2-action="focus"]');if(fb){fb.setAttribute('aria-pressed',String(ctl.focus));fb.textContent=ctl.focus?'◱ Vista completa':'⌕ Detalle del pliegue';}
- ctl.host.querySelector('.f2-cycle-state').textContent=motion
+ ctl.host.querySelector('.f2-cycle-state').textContent=ctl.showFinal?'FIN DEL PROGRAMA · Pieza objetivo desde el plano. No representa la última posición de la prensa ni verifica colisiones.':motion
   ? `FASE: ${motion.phase.toUpperCase()} · Punzón Y nominal ${as2(motion.punchY)} mm · retirada ${as2(motion.punchLift)} mm. ${motion.notice}. NO CNC / SIN VERIFICAR.`
   : 'MODO CONFORMADO · avance angular sin aproximación ni retirada. Activa Ciclo completo para ver las tres fases.';
  ctl.host.querySelector('[data-f2-action="previous"]').disabled=ctl.currentStep===0;
@@ -207,7 +243,7 @@ function stepArt(data,index,progress){
 }
 function gallery(data,order){
  const card=(key,label,modelIdx,pct)=>'<button type="button" class="f2-step f2-tile" data-f2-step="'+key+'">'+
-  stepArt(data,modelIdx,pct)+'<span>'+label+'</span></button>';
+  (key==='final'?finalThumb(data):stepArt(data,modelIdx,pct))+'<span>'+label+'</span></button>';
  let out=card('start','0 · Posicionar',0,0);
  for(let i=0;i<order.length;i++)out+=card(String(i),(i+1)+' · Pliegue '+order[i],i,1);
  return out+card('final','Final · pieza plegada',order.length-1,1);
@@ -217,7 +253,7 @@ function mount(host,getData,getSelection=()=>1,onSelect=()=>{}){
  destroy();
  if(!host)return;
  let step=Math.max(0,getData().sequence.indexOf(getSelection()));
- active={host,getData,getSelection,onSelect,currentStep:step,progress:0,zoom:1,focus:false,mode:'cycle',timer:null,lastFrame:null,lastPaint:null,speed:Number(window.PlegarSettings?.get?.().speed)||1,
+ active={host,getData,getSelection,onSelect,currentStep:step,progress:0,zoom:1,focus:false,showFinal:false,mode:'cycle',timer:null,lastFrame:null,lastPaint:null,speed:Number(window.PlegarSettings?.get?.().speed)||1,
  loop:window.PlegarSettings?.get?.().repeat!==false,holdUntil:null,selfSelecting:false,cameraKey:null,bounds:null,tilesKey:null};
  host.innerHTML=`<section class="f2-view" aria-label="Seguimiento cinemático 2D de plegado">
  <div class="f2-title"><div><strong>SEGUIMIENTO DE PLEGADO · PERFIL</strong><small>Punzón superior · matriz V inferior · tope posterior · chapa</small></div><span>PERFIL GEOMÉTRICO v0.39</span></div>
@@ -232,15 +268,15 @@ function mount(host,getData,getSelection=()=>1,onSelect=()=>{}){
    halt();ctl.holdUntil=null;
    const target=stepBtn.dataset.f2Step,total=ctl.getData().sequence.length;
    ctl.currentStep=target==='start'?0:target==='final'?total-1:Number(target);
-   ctl.progress=target==='final'?1:0;
+   ctl.progress=target==='final'?1:0;ctl.showFinal=target==='final';
    ctl.onSelect(ctl.getData().sequence[ctl.currentStep]);render();return;
   }
   const action=e.target.closest('[data-f2-action]')?.dataset.f2Action;
   if(!action)return;
-  if(action==='mode'){halt();ctl.mode=ctl.mode==='bend'?'cycle':'bend';ctl.progress=0;ctl.holdUntil=null;render();return;}
+  if(action==='mode'){halt();ctl.showFinal=false;ctl.mode=ctl.mode==='bend'?'cycle':'bend';ctl.progress=0;ctl.holdUntil=null;render();return;}
   if(action==='play'){
    if(ctl.timer!==null){halt();render();return;}
-   if(ctl.progress>=1){ctl.currentStep=0;ctl.progress=0;}
+   if(ctl.progress>=1||ctl.showFinal){ctl.currentStep=0;ctl.progress=0;ctl.showFinal=false;}
    ctl.host.querySelector('[data-f2-action="play"]').textContent='⏸ Pausar';
    ctl.holdUntil=null;ctl.lastFrame=null;ctl.lastPaint=null;
    ctl.timer=requestAnimationFrame(animation);return;
@@ -248,10 +284,10 @@ function mount(host,getData,getSelection=()=>1,onSelect=()=>{}){
   halt();ctl.holdUntil=null;
   if(action==='focus'){ctl.focus=!ctl.focus;ctl.cameraKey=null;render();return;}
   if(action==='previous'||action==='next'){
-   ctl.currentStep=Math.max(0,Math.min(ctl.getData().sequence.length-1,ctl.currentStep+(action==='next'?1:-1)));
+   ctl.showFinal=false;ctl.currentStep=Math.max(0,Math.min(ctl.getData().sequence.length-1,ctl.currentStep+(action==='next'?1:-1)));
    ctl.progress=0;ctl.onSelect(ctl.getData().sequence[ctl.currentStep]);
   }
-  if(action==='reset')ctl.progress=0;
+  if(action==='reset'){ctl.progress=0;ctl.showFinal=false;}
   if(action==='zoom-in')ctl.zoom=Math.min(1.8,Math.round((ctl.zoom+.1)*10)/10);
   if(action==='zoom-out')ctl.zoom=Math.max(.7,Math.round((ctl.zoom-.1)*10)/10);
   render();
@@ -265,10 +301,10 @@ function mount(host,getData,getSelection=()=>1,onSelect=()=>{}){
    render();return;
   }
   if(!e.target.matches('.f2-range'))return;
-  halt();active.holdUntil=null;active.progress=Number(e.target.value)/100;render();
+  halt();active.holdUntil=null;active.showFinal=false;active.progress=Number(e.target.value)/100;render();
  };
  render();
 }
-function refresh(){const ctl=active;if(!ctl||ctl.selfSelecting)return;halt();let next=ctl.getData().sequence.indexOf(ctl.getSelection());if(next>=0)ctl.currentStep=next;render();}
+function refresh(){const ctl=active;if(!ctl||ctl.selfSelecting)return;halt();ctl.showFinal=false;let next=ctl.getData().sequence.indexOf(ctl.getSelection());if(next>=0)ctl.currentStep=next;render();}
 window.PlegarForming2D={mount,destroy,refresh};
 })();

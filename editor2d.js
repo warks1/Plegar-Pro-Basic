@@ -14,8 +14,24 @@ const $ = selector => document.querySelector(selector);
 const esc = value => String(value).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const fmt = n => new Intl.NumberFormat('es-ES',{maximumFractionDigits:2}).format(n);
 const initial = {name:'Perfil omega (ejemplo)', material:'Acero S235JR', thickness:2, segments:[60,85,120,85,60], angles:[-90,90,90,-90], sequence:[1,2,4,3]};
+// Migración MUY restrictiva: solo el ejemplo Omega intacto guardado por versiones
+// antiguas con orden 1,2,3,4. Jamás modificar una pieza de usuario.
+const oldDemo=fromEditor({...initial,sequence:[1,2,3,4]});
+function migrateDefaultOmega(p){
+ const v=fromEditor(p);
+ const untouched=v.name===oldDemo.name&&v.material===oldDemo.material&&v.thickness===oldDemo.thickness&&
+  JSON.stringify(v.segments)===JSON.stringify(oldDemo.segments)&&
+  JSON.stringify(v.angles)===JSON.stringify(oldDemo.angles)&&
+  JSON.stringify(v.sequence)===JSON.stringify(oldDemo.sequence)&&
+  JSON.stringify(v.setup)===JSON.stringify(oldDemo.setup)&&
+  JSON.stringify(v.bendOverrides??null)===JSON.stringify(oldDemo.bendOverrides??null);
+ return untouched?{...v,sequence:[1,2,4,3]}:v;
+}
 let state = fromEditor(initial);
-try {const raw=localStorage.getItem(STORAGE);if(raw)state=fromEditor(JSON.parse(raw));}catch { /* Mantener ejemplo por defecto si el perfil guardado está dañado. */ }
+try {const raw=localStorage.getItem(STORAGE);if(raw){const saved=JSON.parse(raw);state=migrateDefaultOmega(saved);
+ if(JSON.stringify(state.sequence)!==JSON.stringify(saved.sequence))
+  localStorage.setItem(STORAGE,JSON.stringify(state));
+}}catch { /* Mantener ejemplo por defecto si el perfil guardado está dañado. */ }
 let planReference=null, planConfiguredId=null;
 const Trace=window.PlegarPlanTrace;
 let planVision={zoom:1,dx:0,dy:0,marking:false,pending:null,marks:[]};
@@ -493,7 +509,7 @@ function loadProfile(profile,{width=null}={}){
  planVision={zoom:1,dx:0,dy:0,marking:false,pending:null,marks:[]};
  persist();if(document.querySelector('#ed-svg'))render();return clone(state);
 }
-function loadLocal(){try{const raw=localStorage.getItem(STORAGE);return raw?fromEditor(JSON.parse(raw)):null;}catch{return null;}}
+function loadLocal(){try{const raw=localStorage.getItem(STORAGE);return raw?migrateDefaultOmega(JSON.parse(raw)):null;}catch{return null;}}
 function setSequence(next){orderPick=0;orderUsed.clear();return edit(d=>{d.sequence=[...next];});}
  function setBendAngle(id,signedAngle){
   if(!Number.isInteger(id)||id<1||id>state.angles.length||!Number.isFinite(signedAngle)||Math.abs(signedAngle)>179)throw Error('Pliegue o giro fuera de rango.');

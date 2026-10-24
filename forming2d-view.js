@@ -23,6 +23,11 @@ function fixedExtents(data,step,mode){
  const ext=[0,.11,.22,.5,.78,.89,1].map(t=>extents(mode==='cycle'?K().frame(data,step,t).scene:Model.scene(data,step,t)));
  return [Math.min(...ext.map(v=>v[0])),Math.max(...ext.map(v=>v[1])),Math.min(...ext.map(v=>v[2])),Math.max(...ext.map(v=>v[3]))];
 }
+// Encuadre de detalle: la zona lejana queda fuera deliberadamente.
+function detailExtents(data,step){
+ const m=Model.scene(data,step,0),w=Math.max(36,m.dieOpening*2.4);
+ return [-w,w,-w*.95,w*1.05];
+}
 function svg(m,zoom,bounds){
  const half=m.dieOpening/2;
  const [minX,maxX,minY,maxY]=bounds||extents(m);
@@ -119,8 +124,8 @@ function render(){
  const ctl=active;if(!ctl||!ctl.host.isConnected)return;
  const data=ctl.getData(), order=data.sequence;
  if(ctl.currentStep>=order.length)ctl.currentStep=0;
- const key=JSON.stringify([data,ctl.currentStep,ctl.mode]);
- if(ctl.cameraKey!==key){ctl.bounds=fixedExtents(data,ctl.currentStep,ctl.mode);ctl.cameraKey=key;}
+ const key=JSON.stringify([data,ctl.currentStep,ctl.mode,ctl.focus]);
+ if(ctl.cameraKey!==key){ctl.bounds=ctl.focus?detailExtents(data,ctl.currentStep):fixedExtents(data,ctl.currentStep,ctl.mode);ctl.cameraKey=key;}
  const motion=ctl.mode==='cycle'?K().frame(data,ctl.currentStep,ctl.progress):null;
  const m=motion?motion.scene:Model.scene(data,ctl.currentStep,ctl.progress);
  ctl.host.querySelector('.f2-camera-content').innerHTML=svg(m,ctl.zoom,ctl.bounds);
@@ -149,6 +154,7 @@ function render(){
  const modeButton=ctl.host.querySelector('[data-f2-action="mode"]');
  modeButton.textContent=ctl.mode==='cycle'?'☑ Ciclo completo':'☐ Ciclo completo';
  modeButton.setAttribute('aria-pressed',String(ctl.mode==='cycle'));
+ const fb=ctl.host.querySelector('[data-f2-action="focus"]');if(fb){fb.setAttribute('aria-pressed',String(ctl.focus));fb.textContent=ctl.focus?'◱ Vista completa':'⌕ Detalle del pliegue';}
  ctl.host.querySelector('.f2-cycle-state').textContent=motion
   ? `FASE: ${motion.phase.toUpperCase()} · Punzón Y nominal ${as2(motion.punchY)} mm · retirada ${as2(motion.punchLift)} mm. ${motion.notice}. NO CNC / SIN VERIFICAR.`
   : 'MODO CONFORMADO · avance angular sin aproximación ni retirada. Activa Ciclo completo para ver las tres fases.';
@@ -210,11 +216,11 @@ function mount(host,getData,getSelection=()=>1,onSelect=()=>{}){
  destroy();
  if(!host)return;
  let step=Math.max(0,getData().sequence.indexOf(getSelection()));
- active={host,getData,getSelection,onSelect,currentStep:step,progress:0,zoom:1,mode:'cycle',timer:null,lastFrame:null,lastPaint:null,speed:Number(window.PlegarSettings?.get?.().speed)||1,
+ active={host,getData,getSelection,onSelect,currentStep:step,progress:0,zoom:1,focus:false,mode:'cycle',timer:null,lastFrame:null,lastPaint:null,speed:Number(window.PlegarSettings?.get?.().speed)||1,
  loop:window.PlegarSettings?.get?.().repeat!==false,holdUntil:null,selfSelecting:false,cameraKey:null,bounds:null,tilesKey:null};
  host.innerHTML=`<section class="f2-view" aria-label="Seguimiento cinemático 2D de plegado">
  <div class="f2-title"><div><strong>SEGUIMIENTO DE PLEGADO · PERFIL</strong><small>Punzón superior · matriz V inferior · tope posterior · chapa</small></div><span>PERFIL GEOMÉTRICO v0.39</span></div>
- <div class="f2-layout"><div class="f2-stage" aria-label="Mueve la simulación 2D con un dedo y usa dos dedos para cambiar el zoom"><div class="f2-camera-content"></div></div><aside class="f2-data-panel" aria-label="Datos de operación nominal"><h3>DATOS</h3><dl class="f2-data-values"></dl><small>Geometría ilustrativa. Sin fuerzas calculadas ni trayectorias certificadas.</small></aside></div><div class="f2-toolbar"><strong class="f2-step-label"></strong><div class="f2-controls"><button type="button" data-f2-action="previous">← Anterior</button><button type="button" data-f2-action="play">▶ Reproducir sin pausas</button><button type="button" data-f2-action="mode" aria-pressed="false">☐ Ciclo completo</button><button type="button" data-f2-action="next">Siguiente →</button><button type="button" data-f2-action="reset">Reiniciar</button><label class="f2-loop-control"><input class="f2-loop" type="checkbox" checked> Repetir secuencia</label><button type="button" data-f2-action="zoom-out" aria-label="Reducir zoom">−</button><button type="button" data-f2-action="zoom-in" aria-label="Ampliar zoom">+</button></div></div>
+ <div class="f2-layout"><div class="f2-stage" aria-label="Mueve la simulación 2D con un dedo y usa dos dedos para cambiar el zoom"><div class="f2-camera-content"></div></div><aside class="f2-data-panel" aria-label="Datos de operación nominal"><h3>DATOS</h3><dl class="f2-data-values"></dl><small>Geometría ilustrativa. Sin fuerzas calculadas ni trayectorias certificadas.</small></aside></div><div class="f2-toolbar"><strong class="f2-step-label"></strong><div class="f2-controls"><button type="button" data-f2-action="previous">← Anterior</button><button type="button" data-f2-action="play">▶ Reproducir sin pausas</button><button type="button" data-f2-action="mode" aria-pressed="false">☐ Ciclo completo</button><button type="button" data-f2-action="next">Siguiente →</button><button type="button" data-f2-action="reset">Reiniciar</button><button type="button" data-f2-action="focus" aria-pressed="false">⌕ Detalle del pliegue</button><label class="f2-loop-control"><input class="f2-loop" type="checkbox" checked> Repetir secuencia</label><button type="button" data-f2-action="zoom-out" aria-label="Reducir zoom">−</button><button type="button" data-f2-action="zoom-in" aria-label="Ampliar zoom">+</button></div></div>
  <div class="f2-cycle-state" role="status" aria-label="Fase cinemática 2D"></div><div class="f2-slider"><label for="f2-range">Avance del ciclo o conformado</label><input id="f2-range" class="f2-range" type="range" min="0" max="100" step="1" value="0"><output class="f2-progress" for="f2-range">0 %</output></div>
  <div class="f2-steps" aria-label="Orden de plegado"></div><div class="f2-machine-zones" role="status" aria-label="Componentes de máquina y proximidades"></div><div class="f2-prior-summary" role="status"></div><div class="f2-nominal" role="status"></div><ul class="f2-notes"></ul></section>`;
  active.touchCamera=window.PlegarTouchView.attach(host.querySelector('.f2-stage'),host.querySelector('.f2-camera-content'));
@@ -239,6 +245,7 @@ function mount(host,getData,getSelection=()=>1,onSelect=()=>{}){
    ctl.timer=requestAnimationFrame(animation);return;
   }
   halt();ctl.holdUntil=null;
+  if(action==='focus'){ctl.focus=!ctl.focus;ctl.cameraKey=null;render();return;}
   if(action==='previous'||action==='next'){
    ctl.currentStep=Math.max(0,Math.min(ctl.getData().sequence.length-1,ctl.currentStep+(action==='next'?1:-1)));
    ctl.progress=0;ctl.onSelect(ctl.getData().sequence[ctl.currentStep]);

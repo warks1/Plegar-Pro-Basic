@@ -198,3 +198,9 @@ Ajuste de presentación a pantalla completa sin franjas de imagen no ocupadas. S
 - Los puntos de pliegue del formulario muestran flechas ↑/↓. El editor anuncia la orientación mediante etiquetas accesibles.
 - Pruebas automáticas sobre SVG exportados de +90°, −90°, +45°, −45° y comprobaciones Chromium en PC/móvil de programación y formulario; caché v74.
 - Simulación nominal; el volteo/recolocación física, geometría real de útiles, colisiones y CNC siguen sin validar.
+
+
+## Continuidad v75 — pieza final invariable al cambiar el orden (24 octubre 2026)
+- Las tarjetas 3D de la pieza objetivo y la miniatura del paso final ya NO se construyen reusando la chapa orientada por el último golpe de la cinemática. Utilizan el mismo perfil validado y la misma malla de Planos, de modo que la geometría nominal final es independiente de la secuencia.
+- La vista del golpe en máquina sigue separada, con sus limitaciones de recolocación física y contacto; no se confunde con la referencia geométrica final.
+- Las pruebas comparan mallas exactas de Planos/vista previa y estabilidad de L, U, Z y Omega cuando se invierte el orden. Caché offline v75. No CNC.

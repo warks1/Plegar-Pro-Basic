@@ -52,7 +52,13 @@
    polys(mesh,yaw,elevation,zoom,bounds,profile,'pp-machine-metal')+'</svg>';
   return {svg,frame:f,faceCount:mesh.faces.length};
  }
- function finishedMesh(profile,width){const f=frame(profile,steps(profile),1);return M.build(f.scene,width);}
+ // La pieza objetivo NO depende del último golpe, del orden ni de la recolocación.
+ // Usar exactamente el mismo perfil y malla que Planos (referencia nominal).
+ function finishedMesh(profile,width){
+  const p=G.validate(profile);
+  if(!Number.isFinite(width)||width<1||width>5000)throw Error('Ancho final de la pieza de 1 a 5000 mm.');
+  return D.meshFromProfile(G.vertices(p),p.thickness,width);
+ }
  function preview(profile,{width=100,yaw=38,elevation=25,zoom=1}={}){
   const mesh=finishedMesh(profile,width);
   return '<svg class="home-preview-svg" viewBox="0 0 900 480" role="img" aria-label="Vista previa 3D de la pieza programada">'+
@@ -64,8 +70,8 @@
  }
  function thumb(profile,{width=100}={}){const svg=preview(profile,{width});return svg.replace('home-preview-svg','home-thumb-svg');}
  function stepThumbnail(profile,stage,{width=100}={}){
-  const {mesh}=frameMesh(profile,stage,stage===1?0:1,width,false);
+  const mesh=stage===steps(profile)?finishedMesh(profile,width):frameMesh(profile,stage,stage===1?0:1,width,false).mesh;
   return '<svg class="home-step-svg" viewBox="0 0 900 480" aria-hidden="true">'+R.defs('pp-step-metal')+R.background('pp-step-metal')+polys(mesh,38,25,1,null,profile,'pp-step-metal')+'</svg>';
  }
- return {steps,frame,boundsFor,machine,preview,thumb,stepThumbnail};
+ return {steps,frame,boundsFor,machine,preview,thumb,stepThumbnail,finishedMesh};
 });

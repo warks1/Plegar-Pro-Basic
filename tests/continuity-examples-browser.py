@@ -465,6 +465,8 @@ with sync_playwright() as pw:
   assert page.evaluate('PlegarEditor2D.getData().setup.die')=='v12-88'
   page.locator('#ed-example-gallery [data-example-id="omega"]').click()
   assert page.evaluate('PlegarEditor2D.getData().sequence')==[1,2,4,3]
+  page.locator('#ed-order-reset').click()
+  assert page.evaluate('PlegarEditor2D.getData().sequence')==[1,2,4,3], 'Restablecer no debe volver al orden antiguo de Omega'
   page.locator('#ed-quick-height').fill('60')
   page.locator('#ed-quick-height').dispatch_event('change')
   assert page.evaluate('PlegarEditor2D.getData().setup.dieHeight')==60
@@ -533,6 +535,8 @@ with sync_playwright() as pw:
   assert page.locator('.f2-zone-grid .f2-zone').count()==11
   assert page.locator('.f2d-svg [data-component="indicador-tope"]').count()==1
   assert '21 posiciones' in page.locator('.f2-machine-zones').inner_text()
+  assert page.locator('.f2d-svg [data-component="separacion-tope"]').count()==1
+  assert 'contacto nominal' in page.locator('.f2-nominal').inner_text().lower()
   mesa_antes=page.locator('.f2d-svg [data-component="mesa"]').get_attribute('d')
   trancha_antes=page.locator('.f2d-svg [data-component="trancha"]').get_attribute('d')
   page.locator('.f2-range').evaluate("(el)=>{el.value='60';el.dispatchEvent(new Event('input',{bubbles:true}));}")

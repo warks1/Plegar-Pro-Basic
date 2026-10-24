@@ -254,3 +254,8 @@ Ajuste de presentación a pantalla completa sin franjas de imagen no ocupadas. S
 - La tarjeta Final y la pantalla de fin de secuencia dibujan los tramos y ángulos desde geometry2d.vertices, exactamente la geometría nominal de Planos y la vista final 3D. No utilizan la pieza colocada para el último golpe.
 - La vista de máquina se conserva en cada golpe con topes y amarres; al completar el ciclo se muestra un instante la pieza objetivo y el bucle vuelve a empezar. Seleccionar Inicio regresa al puesto de plegado.
 - Los vértices del dibujo final se contrastan en Chromium PC/móvil. Es un perfil teórico de vértices sin radio físico, amarre ni validación CNC. Caché offline v85.
+
+## v86 — orden Omega inicial y lectura de contacto nominal con tope (24 octubre 2026)
+- La plantilla de arranque del editor también utiliza B1→B2→B4→B3 (antes persistía B1→B2→B3→B4). Restablecer orden en una Omega de cuatro pliegues utiliza la propuesta de estudio; otras piezas conservan el orden ascendente. Las piezas guardadas manualmente NO se sobreescriben; pueden usar la propuesta o restablecer.
+- En seguimiento 2D se dibuja la distancia X proyectada desde el extremo del ala al tope, distinguida como SIN CONTACTO nominal, CONTACTO nominal o POSIBLE SOLAPE. No se desplaza automáticamente el tope y no se interpreta como contacto físico demostrado.
+- Pruebas de navegador móvil/escritorio y caché offline v86. No hay posicionamiento real de eje X ni orientación de volteos acreditada.

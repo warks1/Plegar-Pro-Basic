@@ -65,6 +65,7 @@ function svg(m,zoom,bounds){
  <path data-component="chapa" d="${line}" stroke="url(#f2d-sheet)" stroke-width="${m.thickness}" fill="none" stroke-linejoin="round" stroke-linecap="round"/>
  <g stroke="#f8bf56" stroke-width=".6" fill="#f8bf56"><circle cx="${-half}" cy="0" r=".9"/><circle cx="${half}" cy="0" r=".9"/></g>
  <circle cx="0" cy="${m.center.y}" r="1.1" fill="#ffb754"/>
+ <line data-component="separacion-tope" x1="${m.wingRight.x}" y1="${m.wingRight.y}" x2="${m.stop.x}" y2="${m.wingRight.y}" stroke="#ebd48e" stroke-width=".7" stroke-dasharray="2 2" aria-label="Proyección horizontal del extremo de chapa al tope"/>
  <path data-component="topes" d="${path(bodies.finger)}" fill="#50e4a7" stroke="#d0ffe7" stroke-width="1"/>
  <text x="${m.stop.x+5}" y="${m.stop.top-9}" font-size="5" fill="#cbffe6">TOPE X</text>
  <text x="${-Math.max(20,m.dieOpening*1.2)}" y="${m.toolProfiles.punch.outline[0].y-12}" font-size="5" fill="#d6efff">AMARRE · ILUSTRATIVO</text>
@@ -85,6 +86,7 @@ function svg(m,zoom,bounds){
  <text x="885" y="28" text-anchor="end" font-size="11" fill="#eac187">PERFIL CON RADIO · APROXIMACIÓN</text>
  <text x="885" y="434" text-anchor="end" font-size="11" fill="${overlap?'#ff927b':warn}">Cribado 2D: ${html(m.interferences.status)}</text>
  <text x="885" y="450" text-anchor="end" font-size="11" fill="${warn}">Descenso estimado del eje: ${as2(m.depth)} mm</text>
+ <text x="15" y="433" font-size="11" fill="${m.interferences.backgaugeGap>0.05?'#ffd29e':m.interferences.backgaugeGap<-.05?'#ff9d9d':'#acffdd'}">TOPE X · ${m.interferences.backgaugeGap>0.05?'SIN CONTACTO nominal':m.interferences.backgaugeGap<-.05?'POSIBLE SOLAPE':'CONTACTO nominal'} · ${as2(m.interferences.backgaugeGap)} mm en proyección</text>
  <text x="15" y="455" font-size="11" fill="#c8d5df">Trancha gris · Punzón acero · Chapa azul · Matriz granate · Mesa violeta · Topes verdes.</text>
  <text x="15" y="471" font-size="10" fill="#ffd49e">Mesa / trancha ${bodies.tableMeasured&&bodies.ramMeasured?'con cotas introducidas':'PARCIALMENTE SIN COTAS · esquemas'} · NO CNC</text>
  </svg>`;
@@ -197,7 +199,7 @@ function render(){
  ctl.host.querySelector('[data-f2-action="previous"]').disabled=ctl.currentStep===0;
  ctl.host.querySelector('[data-f2-action="next"]').disabled=ctl.currentStep>=order.length-1;
  const loopBox=ctl.host.querySelector('.f2-loop');if(loopBox)loopBox.checked=ctl.loop;
- ctl.host.querySelector('.f2-nominal').textContent=`Tope X ${as2(m.stop.x)} mm · extremo derecho: ${as2(m.wingRight.x)} mm · separación horizontal: ${as2(m.interferences.backgaugeGap)} mm · ${m.interferences.backgaugeState}`;
+ ctl.host.querySelector('.f2-nominal').textContent=`Tope X ${as2(m.stop.x)} mm · borde nominal ${as2(m.wingRight.x)} mm · ${m.interferences.backgaugeGap>0.05?'SIN CONTACTO nominal':m.interferences.backgaugeGap<-.05?'POSIBLE SOLAPE con el tope':'CONTACTO nominal'} · distancia X ${as2(m.interferences.backgaugeGap)} mm. El contacto real no se ha calculado.`;
  ctl.host.querySelector('.f2-nominal').dataset.status=m.interferences.problems.length?'warning':'info';
  ctl.host.querySelector('.f2-prior-summary').textContent=`Perfil completo: ${m.assembly.contour.length} puntos · ${m.assembly.completed.length} pliegues previos · ${m.assembly.pending} pliegues pendientes. ${m.previous.paths.length?'Holguras 2D orientativas de alas contiguas: '+m.interferences.flangeClearances.map(v=>`${v.component} ${as2(v.gap)} mm`).join(' · '):'No hay alas previas contiguas comprobables en este paso.'}`;
  ctl.host.querySelector('.f2-notes').innerHTML=m.interferences.problems.map(p=>`<li><strong>${html(p.component)}:</strong> ${html(p.message)}</li>`).join('')+m.warnings.map(w=>`<li>${html(w)}</li>`).join('')+`<li>${html(m.interferences.disclosure)}</li><li>${html(m.note)}</li>`;

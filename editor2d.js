@@ -13,7 +13,7 @@ const STORAGE='plegarpro-editor2d-v1';
 const $ = selector => document.querySelector(selector);
 const esc = value => String(value).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const fmt = n => new Intl.NumberFormat('es-ES',{maximumFractionDigits:2}).format(n);
-const initial = {name:'Perfil omega (ejemplo)', material:'Acero S235JR', thickness:2, segments:[60,85,120,85,60], angles:[-90,90,90,-90], sequence:[1,2,3,4]};
+const initial = {name:'Perfil omega (ejemplo)', material:'Acero S235JR', thickness:2, segments:[60,85,120,85,60], angles:[-90,90,90,-90], sequence:[1,2,4,3]};
 let state = fromEditor(initial);
 try {const raw=localStorage.getItem(STORAGE);if(raw)state=fromEditor(JSON.parse(raw));}catch { /* Mantener ejemplo por defecto si el perfil guardado está dañado. */ }
 let planReference=null, planConfiguredId=null;
@@ -361,7 +361,7 @@ function actions(event){
   }catch(error){inform('No se pudo aplicar el orden: '+error.message);}return;
  }
  case 'ed-quick-order':case 'ed-order-pick':orderPick=orderPick?0:1;orderUsed.clear();render();if(orderPick)$('#ed-svg')?.scrollIntoView({behavior:'smooth',block:'center'});inform(orderPick?'Toca los pliegues numerados sobre el dibujo, desde el primero.':'Selección cancelada.');return;
- case 'ed-order-reset':orderPick=0;orderUsed.clear();selected=1;edit(d=>{d.sequence=d.angles.map((_,i)=>i+1);});inform('Orden restablecido.');return;
+ case 'ed-order-reset':orderPick=0;orderUsed.clear();selected=1;edit(d=>{d.sequence=window.PlegarMachineClearance.omegaPocket(d)!==null&&d.angles.length===4?[1,2,4,3]:d.angles.map((_,i)=>i+1);});inform('Orden de estudio restablecido. No certifica ausencia de colisiones.');return;
  case 'ed-plan-zoom-in':zoomPlan(1.3);return;
  case 'ed-plan-zoom-out':zoomPlan(1/1.3);return;
  case 'ed-plan-zoom-reset':planVision.zoom=1;planVision.dx=0;planVision.dy=0;stageTransform();return;

@@ -213,3 +213,8 @@ Ajuste de presentación a pantalla completa sin franjas de imagen no ocupadas. S
 ## v77 — secuencia Omega (24 octubre 2026)
 - Los ejemplos Omega cargan B1→B2→B4→B3 por defecto. El planificador añade el candidato solicitado, con riesgos y datos ausentes visibles. El editor permite utilizar esta propuesta para estudiar la animación; nunca se aprueba CNC ni se supone libre de colisiones.
 - La recomendación automática conserva sus bloqueos de riesgos y medidas faltantes. Nuevas regresiones y pruebas de Chromium.
+
+## v78 — inspección del contorno y muestreo del ciclo (24 octubre 2026)
+- La proximidad de alas a portapunzón, mordaza, portamatriz, mesa, estructura inferior y topes se estima con distancia al polígono real dibujado, NO solo al AABB. El medio espesor de chapa se incluye en el margen.
+- Análisis de 21 posiciones por golpe, con primer posible contacto por componente y fase; panel detallado de nueve zonas. Es muestreo discreto en 2D, no barrido continuo ni certificación CNC.
+- Recuadro fijo con posición X nominal del tope, visible sin depender del zoom; el detalle no está a escala. Caché offline v78.

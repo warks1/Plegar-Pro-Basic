@@ -524,6 +524,9 @@ with sync_playwright() as pw:
   for component in ['trancha','punzon','chapa','matriz','mesa','topes','amarre-punzon','mordaza','portamatriz','estructura-inferior','tope-carro','tope-brazo']:
    assert page.locator('.f2d-svg [data-component="'+component+'"]').count()==1,component
   assert '9 zonas modeladas' in page.locator('.f2-machine-zones').inner_text()
+  assert page.locator('.f2-zone-grid .f2-zone').count()==9
+  assert page.locator('.f2d-svg [data-component="indicador-tope"]').count()==1
+  assert '21 posiciones' in page.locator('.f2-machine-zones').inner_text()
   mesa_antes=page.locator('.f2d-svg [data-component="mesa"]').get_attribute('d')
   trancha_antes=page.locator('.f2d-svg [data-component="trancha"]').get_attribute('d')
   page.locator('.f2-range').evaluate("(el)=>{el.value='60';el.dispatchEvent(new Event('input',{bubbles:true}));}")

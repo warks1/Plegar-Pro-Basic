@@ -27,3 +27,19 @@ test('El cribado conserva estados nominales por pieza sin certificar contacto re
  assert.ok(scan.hits.every(x=>x.verified===false));
 });
 test('No se aceptan escenas sin útiles',()=>assert.throws(()=>V.build({stop:{x:0}})));
+
+test('La comprobación de contornos evita un falso positivo del rectángulo envolvente',()=>{
+ const poly=[{x:0,y:0},{x:10,y:0},{x:0,y:10}];
+ const a={x:8,y:8},b={x:9,y:9};
+ assert.equal(V.crosses(a,b,V.bounds(poly)),true);
+ assert.ok(require('../clearance2d.js').segmentPolygon(a,b,poly)>3);
+});
+test('Muestreo 2D informa primer posible contacto por fase y conserva el aviso NO CNC',()=>{
+ const r=V.sweep(model,2,{intervals:12});
+ assert.equal(r.frames,13);
+ assert.equal(r.continuousSweep,false);
+ assert.equal(r.cncApproved,false);
+ assert.ok(r.hits.every(x=>x.step===3&&x.cyclePercent>=0&&x.cyclePercent<=100));
+ assert.ok(r.minimums.every(x=>x.distanceMm>=0));
+ assert.throws(()=>V.sweep(model,0,{intervals:70}),/Muestreo/);
+});

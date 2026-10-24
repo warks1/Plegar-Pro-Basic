@@ -60,3 +60,10 @@
 /* Sección de máquina / revisión conservadora por componentes */
 .f2-machine-zones{padding:10px 13px;background:#112c40;color:#def0fa;font-size:12px;line-height:1.6;border-top:1px solid #3e6e84;overflow-wrap:anywhere}
 @media(max-width:700px){.f2-machine-zones{font-size:11px}}
+
+/* Vista por componente: separaciones de contorno nominales */
+.f2-zone-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;margin:9px 0}
+.f2-zone{min-width:0;border:1px solid #4b6b82;border-radius:5px;background:#0e2537;color:#e5f1fa;padding:7px;line-height:1.4}
+.f2-zone-near{border-style:dashed;border-width:2px}
+.f2-machine-zones p{margin:7px 0;font-size:11px}
+@media(max-width:700px){.f2-zone-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:5px}}

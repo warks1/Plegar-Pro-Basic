@@ -63,11 +63,18 @@
   c.host.querySelector('[data-p3="play"]').setAttribute('aria-pressed',String(c.playing&&!c.all));
   c.host.querySelector('[data-p3="all"]').setAttribute('aria-pressed',String(c.playing&&c.all));
   const repeat=c.host.querySelector('.p3-loop');if(repeat)repeat.checked=c.loop;
-  const key=p.sequence.join(',');
+  const key=JSON.stringify([p.sequence,p.angles]);
   if(c.orderKey!==key){
-   c.host.querySelector('.p3-order-list').innerHTML=p.sequence.map((id,i)=>`<div class="p3-order-slot"><button data-p3-step="${i}" type="button" aria-label="Ver paso ${i+1}">Paso ${i+1}</button><select data-p3-order="${i}" aria-label="Pliegue para el paso ${i+1}">${p.sequence.map((_,j)=>`<option value="${j+1}" ${id===j+1?'selected':''}>Pliegue ${j+1}</option>`).join('')}</select></div>`).join('');
+   c.host.querySelector('.p3-order-list').innerHTML=p.sequence.map((id,i)=>{
+    const angle=p.angles[id-1],signed=(angle>0?'+':'')+angle+'°';
+    return `<div class="p3-order-slot"><button data-p3-step="${i}" type="button" aria-label="Ver paso ${i+1}, B${id}, giro ${signed}">Paso ${i+1} · B${id} ${signed}</button><select data-p3-order="${i}" aria-label="Elegir pliegue para paso ${i+1}">${p.sequence.map((candidate,j)=>`<option value="${j+1}" ${id===j+1?'selected':''}>B${j+1} ${p.angles[j]>0?'+':''}${p.angles[j]}°</option>`).join('')}</select></div>`;
+   }).join('');
    c.orderKey=key;
   }
+  c.host.querySelectorAll('[data-p3-step]').forEach(btn=>{
+   const current=Number(btn.dataset.p3Step)===c.step;
+   btn.setAttribute('aria-current',current?'step':'false');
+  });
  }
  function pause(){if(!active)return;active.playing=false;active.all=false;active.lastFrame=null;active.holdUntil=null;if(active.raf!==null){cancelAnimationFrame(active.raf);active.raf=null;}}
  function destroy(){pause();active?.touchCamera?.destroy();if(active?.host){active.host.onclick=null;active.host.oninput=null;active.host.onchange=null;}active=null;}

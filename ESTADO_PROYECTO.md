@@ -301,3 +301,9 @@ Ajuste de presentación a pantalla completa sin franjas de imagen no ocupadas. S
 - Las alas previas se orientan con referencia local del montaje nominal. El volteo, amarre y recolocación reales NO se han simulado y ninguna vista es una garantía frente a colisiones.
 - El selector de orden 3D mueve B al puesto elegido, desplazando los otros, igual que Programación 2D (antes intercambiaba posiciones). El ángulo permanece asociado al B.
 - Regresiones unitarias de la Omega -90/+90, malla y navegador 2D/3D, caché v92. NO CNC.
+
+
+## v93 — verificación visual del orden exacto en 3D
+- Ahora cada paso de Simulación 3D muestra PASO, ID del pliegue (B) y signo ± de su giro; se destaca el paso ejecutado.
+- Los cambios de B desde el selector 3D mueven ese pliegue a la posición elegida (misma semántica que 2D), sin mezclar los ángulos de B1/B2/B3/B4. Nuevas regresiones reales de navegador verifican Omega 1-2-4-3 y la reordenación 3-1-2-4.
+- Las cotas y signos se conservan en la programación y en el motor. La reorientación física de la chapa, contacto real y colisiones NO están resueltos. NO CNC.

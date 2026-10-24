@@ -654,6 +654,17 @@ with sync_playwright() as pw:
 
   page.locator('.p3-example-gallery [data-example-id="omega"]').click()
   assert len(page.evaluate('PlegarEditor2D.getData().segments'))==5
+  assert page.evaluate('PlegarEditor2D.getData().sequence')==[1,2,4,3]
+  assert 'B4 -90°' in page.locator('[data-p3-step="2"]').inner_text()
+  # Reordenar a B3 primero debe DESPLAZAR B1,B2,B4, no intercambiar con B1.
+  page.locator('[data-p3-order="0"]').select_option('3')
+  assert page.evaluate('PlegarEditor2D.getData().sequence')==[3,1,2,4]
+  assert [tuple(row) for row in page.evaluate("""() => {
+    const p=PlegarEditor2D.getData();
+    return p.sequence.map((_,i)=>{const s=PlegarFoldKinematics.frame(p,i,.78).scene;return [s.bend,s.turn]});
+   }""")]==[(3,90),(1,-90),(2,90),(4,-90)]
+  assert 'B3 +90°' in page.locator('[data-p3-step="0"]').inner_text()
+  assert page.locator('[data-p3-step="0"]').get_attribute('aria-current')=='step'
   assert page.locator('.p3-svg polygon[data-group="sheet"]').count()>0
   # Crear desde Programación 3D con el mismo formulario, conservando la geometría real.
   assert page.locator('.p3-new-piece').is_visible()

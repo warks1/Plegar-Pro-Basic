@@ -70,6 +70,13 @@ function svg(m,zoom,bounds){
  <text x="27" y="59" font-size="18" font-weight="bold" fill="#e0f3ff">${as2(m.signedAngle)}° / ${as2(m.turn)}°</text>
  <text x="27" y="77" font-size="11" fill="#93b9d4">Radio interior supuesto: ${as2(m.insideRadius)} mm</text>
  <text x="27" y="94" font-size="11" fill="#93b9d4">Espesor ${as2(m.thickness)} mm · V${m.dieOpening} · P${m.punchAngle}°</text>
+ <g data-component="indicador-tope" transform="translate(685 45)" aria-label="Detalle auxiliar del tope nominal, no a escala">
+ <rect width="200" height="67" rx="6" fill="#0d2b3e" stroke="#478b89"/>
+ <path d="M18 38 H181 M129 39 V21 H161" stroke="#51ddb2" stroke-width="3" fill="none"/>
+ <circle cx="129" cy="39" r="4" fill="#a6f8d7"/>
+ <text x="12" y="15" fill="#c4ffe6" font-size="11">TOPE X · ${as2(m.stop.x)} mm</text>
+ <text x="12" y="56" fill="#c1dbea" font-size="9">Referencia esquemática · no a escala</text>
+ </g>
  <text x="885" y="28" text-anchor="end" font-size="11" fill="#eac187">PERFIL CON RADIO · APROXIMACIÓN</text>
  <text x="885" y="434" text-anchor="end" font-size="11" fill="${overlap?'#ff927b':warn}">Cribado 2D: ${html(m.interferences.status)}</text>
  <text x="885" y="450" text-anchor="end" font-size="11" fill="${warn}">Descenso estimado del eje: ${as2(m.depth)} mm</text>
@@ -118,9 +125,23 @@ function render(){
  const m=motion?motion.scene:Model.scene(data,ctl.currentStep,ctl.progress);
  ctl.host.querySelector('.f2-camera-content').innerHTML=svg(m,ctl.zoom,ctl.bounds);
  const proximity=Section.inspect(m),zones=ctl.host.querySelector('.f2-machine-zones');
- if(zones)zones.textContent='SECCIÓN 2D · 9 zonas modeladas: estructura superior, portapunzón, mordaza, portamatriz, mesa, estructura inferior, dedo, brazo y carro de tope. '+
-  (proximity.hits.length?'Posibles proximidades proyectadas: '+proximity.hits.map(x=>x.component).join(', ')+'. ':'Sin proximidades observadas en la proyección; esto NO descarta choque real. ')+
-  'Los amarres, la estructura y los topes no disponen de CAD calibrado. NO CNC.';
+ const sweepKey=JSON.stringify([data,ctl.currentStep]);
+ if(ctl.sectionSweepKey!==sweepKey){
+  ctl.sectionSweep=Section.sweep(data,ctl.currentStep,{intervals:20});
+  ctl.sectionSweepKey=sweepKey;
+ }
+ if(zones){
+  const checked=proximity.checked.map(part=>'<span class="f2-zone'+(part.possibleOverlap?' f2-zone-near':'')+
+   '" title="Modelo 2D nominal; no es plano CAD verificado">'+part.name+' · '+
+   (part.distanceMm===null?'sin tramo analizable':part.possibleOverlap?'posible cruce 2D':part.distanceMm.toFixed(1)+' mm aprox.')+'</span>').join('');
+  const first=ctl.sectionSweep.hits.slice(0,4).map(hit=>hit.component+' · '+hit.phase+' '+hit.cyclePercent+' %').join('; ');
+  zones.innerHTML='<strong>SECCIÓN 2D · 9 zonas modeladas · NO CNC</strong>'+
+   '<p>Posición actual: '+(proximity.hits.length?'posibles cruces de contornos: '+proximity.hits.map(x=>x.component).join(', '):'sin cruce observado en esta proyección')+
+   '. Ausencia de cruces NO implica seguridad.</p><div class="f2-zone-grid">'+checked+'</div>'+
+   '<p>Muestreo del golpe ('+ctl.sectionSweep.frames+' posiciones): '+
+   (first?'primeras proximidades: '+first:'sin cruce en las posiciones muestreadas')+
+   '. No es barrido continuo ni considera el volteo físico de la chapa.</p>';
+ }
  const label=ctl.host.querySelector('.f2-step-label');label.textContent=`Paso ${m.step} de ${m.steps} · pliegue ${m.bend} · ${as2(m.turn)}°`;
  ctl.host.querySelector('.f2-progress').textContent=`${Math.round(ctl.progress*100)} %`;
  const slider=ctl.host.querySelector('.f2-range');slider.value=String(Math.round(ctl.progress*100));

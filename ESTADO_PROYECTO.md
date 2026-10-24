@@ -218,3 +218,8 @@ Ajuste de presentación a pantalla completa sin franjas de imagen no ocupadas. S
 - La proximidad de alas a portapunzón, mordaza, portamatriz, mesa, estructura inferior y topes se estima con distancia al polígono real dibujado, NO solo al AABB. El medio espesor de chapa se incluye en el margen.
 - Análisis de 21 posiciones por golpe, con primer posible contacto por componente y fase; panel detallado de nueve zonas. Es muestreo discreto en 2D, no barrido continuo ni certificación CNC.
 - Recuadro fijo con posición X nominal del tope, visible sin depender del zoom; el detalle no está a escala. Caché offline v78.
+
+## v79 — forma base del punzón genérico (24 octubre 2026)
+- Se abandona el triángulo que crecía de punta a cabeza durante toda la altura del punzón. El perfil nominal incluye una espiga recta y un corto flanco de punta 30°/88° redondeada, con dimensiones de estudio explícitamente NO VERIFICADAS.
+- Un punzón H100 y otro H150 mantienen ancho transversal superior análogo en la representación, en vez de multiplicarlo por la altura. Se mantienen selección de herramienta y radio programados. No se incorpora ni se atribuye una geometría oficial de fabricante.
+- Pruebas de perfil, amarre y cache v79; la inspección sigue siendo nominal y NO CNC.

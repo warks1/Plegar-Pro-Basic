@@ -43,3 +43,11 @@ test('Muestreo 2D informa primer posible contacto por fase y conserva el aviso N
  assert.ok(r.minimums.every(x=>x.distanceMm>=0));
  assert.throws(()=>V.sweep(model,0,{intervals:70}),/Muestreo/);
 });
+
+test('Amarre superior sigue siendo independiente del nuevo perfil de punzón',()=>{
+ const st=V.build(F.scene(model,1,.5));
+ const punch=F.scene(model,1,.5).toolProfiles.punch.outline;
+ assert.ok(st.upperHolder.length>=8);
+ assert.ok(punch[1].y<st.upperHolder.at(-1).y+100,'Cuerpo de punzón acotado y separado');
+ assert.equal(st.verified,false);
+});

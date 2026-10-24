@@ -90,7 +90,7 @@ function renderDimensionTable(){
    '<th scope="row">Tramo '+(i+1)+'</th>'+
    '<td data-label="Longitud (mm)"><input data-ed-program-segment="'+i+'" type="number" inputmode="decimal" min="0.1" max="100000" step="0.1" value="'+length+'" aria-label="Medida del tramo '+(i+1)+' en milímetros"></td>'+
    '<td data-label="Pliegue">'+(hasBend?'<button type="button" data-ed-focus="'+bend+'" class="ed-dim-bend-button" aria-label="Seleccionar pliegue '+bend+'">B'+bend+'</button>':'—')+'</td>'+
-   '<td data-label="Giro (°)">'+(hasBend?'<input data-ed-program-angle="'+i+'" type="number" inputmode="decimal" min="-179" max="179" step="0.1" value="'+angle+'" aria-label="Ángulo firmado del pliegue '+bend+' en grados">':'—')+'</td>'+
+   '<td data-label="Giro (°)">'+(hasBend?'<div class="ed-angle-pair"><input data-ed-program-angle="'+i+'" type="number" inputmode="decimal" min="0" max="179" step="0.1" value="'+Math.abs(angle)+'" aria-label="Grados del pliegue B'+bend+' sin signo negativo"><select data-ed-program-direction="'+i+'" aria-label="Sentido del pliegue B'+bend+'"><option value="up"'+(angle>=0?' selected':'')+'>↑ Arriba (+)</option><option value="down"'+(angle<0?' selected':'')+'>↓ Abajo (−)</option></select></div>':'—')+'</td>'+
    '<td data-label="Ri local (mm)">'+(hasBend?'<input data-ed-bend-radius="'+i+'" type="number" min="0.1" max="500" step="0.01" inputmode="decimal" placeholder="General" value="'+(state.bendOverrides?.[i]?.radius??'')+'" aria-label="Radio local del pliegue '+bend+' (vacío hereda Ri general)">':'—')+'</td>'+
    '<td data-label="K local">'+(hasBend?'<input data-ed-bend-k="'+i+'" type="number" min="0.2" max="0.6" step="0.001" inputmode="decimal" placeholder="General" value="'+(state.bendOverrides?.[i]?.kFactor??'')+'" aria-label="K local del pliegue '+bend+' (vacío hereda K general)">':'—')+'</td>'+
    '<td data-label="Tope X B'+bend+'">'+(hasBend?'<input data-ed-bend-gauge="'+i+'" type="number" min="1" max="10000" step="0.1" inputmode="decimal" placeholder="X general" value="'+(state.setup.backgaugeByBend?.[i]??'')+'" aria-label="Tope X B'+bend+'; vacío hereda el X general">':'—')+'</td>'+
@@ -162,7 +162,7 @@ function render(){
  $('#ed-tool-die').textContent=L.details(L.get('die',state.setup.die));
  renderOfficialReferences();
  $('#ed-segments').innerHTML=state.segments.map((length,i)=>`<label class="ed-cell"><span>Tramo ${i+1} (mm)</span><input type="number" min="0.1" max="100000" step="0.1" inputmode="decimal" data-ed-segment="${i}" aria-label="Longitud tramo ${i+1}" value="${length}"></label>`).join('');
- $('#ed-angles').innerHTML=state.angles.map((value,i)=>`<label class="ed-cell"><span>Pliegue ${i+1} (°)</span><input type="number" min="-179" max="179" step="1" inputmode="decimal" data-ed-angle="${i}" aria-label="Ángulo firmado pliegue ${i+1}" value="${value}"></label>`).join('');
+ $('#ed-angles').innerHTML=state.angles.map((value,i)=>`<div class="ed-cell"><label for="ed-unsigned-${i}">Grados del pliegue B${i+1}</label><input id="ed-unsigned-${i}" type="number" min="0" max="179" step="0.1" inputmode="decimal" data-ed-angle="${i}" aria-label="Grados positivos del pliegue B${i+1}" value="${Math.abs(value)}"><label for="ed-sign-${i}">Sentido</label><select id="ed-sign-${i}" data-ed-direction="${i}" aria-label="Sentido B${i+1}"><option value="up" ${value>=0?'selected':''}>↑ Arriba (+)</option><option value="down" ${value<0?'selected':''}>↓ Abajo (−)</option></select><small>Resultado: ${value>0?'+':''}${fmt(value)}°</small></div>`).join('');
  $('#ed-order').innerHTML=state.sequence.map((id,i)=>`<div class="ed-order-slot"><button class="ed-order-item ${selected===id?'current':''}" data-ed-select="${id}" type="button" aria-pressed="${selected===id}"><strong>${i+1}</strong> Pliegue ${id} <small>${state.angles[id-1]>0?'+':''}${fmt(state.angles[id-1])}°</small></button><label class="ed-order-position">Posición <select data-ed-position="${id}" aria-label="Posición en secuencia del pliegue ${id}">${state.sequence.map((_,j)=>`<option value="${j+1}" ${i===j?'selected':''}>${j+1}</option>`).join('')}</select></label></div>`).join('');
  const orderButton=$('#ed-order-pick');if(orderButton){orderButton.textContent=orderPick?'✓ Marcando paso '+orderPick+' · toca pliegues':'☞ Elegir orden tocando los pliegues';orderButton.setAttribute('aria-pressed',String(orderPick>0));}
  const gallery=$('#ed-example-gallery');if(gallery&&window.PlegarExamples3D)gallery.innerHTML=window.PlegarExamples3D.cards(state.name);
@@ -238,9 +238,9 @@ function renderCalc(){
 function layout(){return `<section class="editor2d" aria-label="Editor de programación 2D">
  <section class="ed-dimensions-panel" aria-label="Introducir medidas de la pieza y los pliegues">
  <div class="ed-dimensions-heading"><strong>MEDIDAS DE LA PIEZA · EDITAR TRAMOS Y PLIEGUES</strong><span id="ed-dimensions-total"></span></div><div class="ed-new-piece-top"><button type="button" id="ed-create-piece">＋ Crear nueva pieza · configurar medidas y pliegues</button></div><div class="ed-library-buttons"><button type="button" id="ed-edit-piece">✎ Editar pieza actual</button><button type="button" id="ed-my-pieces">▤ Mis piezas</button><button type="button" id="ed-save-library">Guardar en Mis piezas</button></div>
- <p>Introduce la longitud de cada tramo, el ángulo firmado (−/+), y el orden de cada pliegue. Se actualizan automáticamente el dibujo, la vista 3D y las simulaciones. Los valores son nominales y deben verificarse con el plano real.</p>
+ <p>Introduce los grados SIN teclear el signo negativo: selecciona ↑ Arriba (+) o ↓ Abajo (−). Toca los pliegues en el orden deseado. El sentido y la secuencia se comparten con 2D/3D. El volteo físico de la chapa aún no se representa.</p>
  <div class="ed-dimensions-scroll" role="region" tabindex="0" aria-label="Tabla editable de medidas de plegado; desplazamiento horizontal en móvil">
- <table class="ed-dimensions-table"><thead><tr><th>Tramo</th><th>Longitud (mm)</th><th>Pliegue</th><th>Giro (°)</th><th>Ri local (mm)</th><th>K local</th><th>Tope X B (mm)</th><th>Orden</th><th>Posición acumulada*</th></tr></thead><tbody id="ed-dimensions-body"></tbody></table></div>
+ <table class="ed-dimensions-table"><thead><tr><th>Tramo</th><th>Longitud (mm)</th><th>Pliegue</th><th>Grados y sentido (↑/↓)</th><th>Ri local (mm)</th><th>K local</th><th>Tope X B (mm)</th><th>Orden</th><th>Posición acumulada*</th></tr></thead><tbody id="ed-dimensions-body"></tbody></table></div>
  <p class="ed-dimensions-foot">Ri/K y X de tope locales: deja vacío para heredar el valor general. Se asocian al B, nunca al número de paso. Debes verificar el radio con una probeta. *Posición acumulada: suma de tramos introducidos, no medida real del desarrollo. Ángulo positivo/negativo indica el sentido nominal; la reorientación de la chapa no está validada.</p>
  <div class="ed-dimensions-actions"><button type="button" id="ed-dim-add">＋ Añadir tramo / pliegue</button><button type="button" id="ed-dim-remove">− Quitar último tramo</button><button type="button" id="ed-dim-view">Ver pliegues en el dibujo ↓</button></div>
  </section>
@@ -314,7 +314,19 @@ if(el.id==='ed-table-left'){if(el.value.trim()===''){edit(d=>{d.setup.tableLeft=
   return;
  }
  if(el.matches('[data-ed-segment],[data-ed-program-segment]')){const v=readNumber(el,.1,100000);if(v!==null)edit(d=>{d.segments[Number(el.dataset.edSegment??el.dataset.edProgramSegment)]=v;});return;}
- if(el.matches('[data-ed-angle],[data-ed-program-angle]')){const v=readNumber(el,-179,179);if(v!==null)edit(d=>{d.angles[Number(el.dataset.edAngle??el.dataset.edProgramAngle)]=v;});return;}
+ if(el.matches('[data-ed-angle],[data-ed-program-angle]')){
+  const i=Number(el.dataset.edAngle??el.dataset.edProgramAngle),v=readNumber(el,0,179);
+  if(v===null||!Number.isInteger(i)||i<0||i>=state.angles.length)return;
+  edit(d=>{d.angles[i]=d.angles[i]<0?-v:v;});
+  inform('B'+(i+1)+' = '+state.angles[i]+'°. Selecciona ↑ o ↓ para cambiar el signo.');return;
+ }
+ if(el.matches('[data-ed-direction],[data-ed-program-direction]')){
+  const i=Number(el.dataset.edDirection??el.dataset.edProgramDirection);
+  if(!Number.isInteger(i)||i<0||i>=state.angles.length||!['up','down'].includes(el.value))return;
+  const sign=el.value==='down'?-1:1;
+  edit(d=>{d.angles[i]=Math.abs(d.angles[i])*sign;});
+  inform('B'+(i+1)+' = '+state.angles[i]+'° ('+(sign<0?'abajo':'arriba')+').');return;
+ }
   if(el.matches('[data-ed-bend-radius],[data-ed-bend-k]')){
   const isRadius=el.matches('[data-ed-bend-radius]'),index=Number(isRadius?el.dataset.edBendRadius:el.dataset.edBendK);
   if(!Number.isInteger(index)||index<0||index>=state.angles.length)return;
@@ -483,6 +495,13 @@ function loadProfile(profile,{width=null}={}){
 }
 function loadLocal(){try{const raw=localStorage.getItem(STORAGE);return raw?fromEditor(JSON.parse(raw)):null;}catch{return null;}}
 function setSequence(next){orderPick=0;orderUsed.clear();return edit(d=>{d.sequence=[...next];});}
+ function setBendAngle(id,signedAngle){
+  if(!Number.isInteger(id)||id<1||id>state.angles.length||!Number.isFinite(signedAngle)||Math.abs(signedAngle)>179)throw Error('Pliegue o giro fuera de rango.');
+  selected=id;
+  const saved=edit(d=>{d.angles[id-1]=signedAngle;});
+  if(!document.querySelector('#ed-svg'))window.PlegarForming2D?.refresh?.();
+  return saved;
+ }
 function setMachineEnvelope(values){
  const keys=['dieHeight','tableLeft','tableRight','ramWidth','ramBottomOffset'];
  if(!values||typeof values!=='object'||Array.isArray(values))throw Error('Medidas de máquina no válidas.');
@@ -493,5 +512,5 @@ function setMachineEnvelope(values){
 }
 function setPunch(id){if(!C.PUNCHES.some(d=>d.id===id))throw Error('Punzón no reconocido.');return edit(d=>{d.setup.punch=id;});}
 function setDie(id){if(!C.DIES.some(d=>d.id===id))throw Error('Matriz no reconocida.');return edit(d=>{d.setup.die=id;});}
-window.PlegarEditor2D={mount,setPlanReference,loadProfile,setSequence,setPunch,setDie,setMachineEnvelope,getPlanReference:()=>planReference,isPlanConfigured:()=>!planReference||planConfiguredId===planReference.id,getData:()=>clone(state),getWidth:()=>projectWidth,getSelection:()=>selected,selectBend:id=>{if(state.sequence.includes(id)){selected=id;render();}}};
+window.PlegarEditor2D={mount,setPlanReference,loadProfile,setSequence,setBendAngle,setPunch,setDie,setMachineEnvelope,getPlanReference:()=>planReference,isPlanConfigured:()=>!planReference||planConfiguredId===planReference.id,getData:()=>clone(state),getWidth:()=>projectWidth,getSelection:()=>selected,selectBend:id=>{if(state.sequence.includes(id)){selected=id;render();}}};
 })();

@@ -186,7 +186,18 @@ function render(){
    (first?'primeras proximidades: '+first:'sin cruce en las posiciones muestreadas')+
    '. El contacto del punzón y la matriz con la chapa puede ser intencionado. Sin barrido continuo ni volteo real.</p>';
  }
- const label=ctl.host.querySelector('.f2-step-label');label.textContent=ctl.showFinal?`Paso ${m.step} de ${m.steps} · PIEZA FINAL DEL PLANO`:`Paso ${m.step} de ${m.steps} · pliegue ${m.bend} · ${as2(m.turn)}°`;
+ const label=ctl.host.querySelector('.f2-step-label');label.textContent=ctl.showFinal?`Paso ${m.step} de ${m.steps} · PIEZA FINAL DEL PLANO`:`Paso ${m.step} de ${m.steps} · B${m.bend} · ${m.turn>0?'+':''}${as2(m.turn)}° (${m.turn<0?'abajo':'arriba'})`;
+ const orderLabel=ctl.host.querySelector('.f2-order-live');
+ if(orderLabel)orderLabel.textContent='Orden ejecutado: '+order.map((id,i)=>(i===ctl.currentStep&&!ctl.showFinal?'▶ ':'')+'B'+id+' ('+(data.angles[id-1]>0?'+':'')+as2(data.angles[id-1])+'°)').join(' → ');
+ const program=ctl.host.querySelector('.f2-program-controls');
+ if(program){
+  const signed=data.angles[m.bend-1],magnitude=program.querySelector('[data-f2-angle]');
+  const direction=program.querySelector('[data-f2-direction]'),position=program.querySelector('[data-f2-position]');
+  magnitude.value=String(Math.abs(signed));
+  direction.value=signed<0?'down':'up';
+  position.innerHTML=order.map((id,i)=>'<option value="'+(i+1)+'"'+(id===m.bend?' selected':'')+'>Paso '+(i+1)+' · B'+id+'</option>').join('');
+  program.querySelector('.f2-edit-label').textContent='Editando B'+m.bend+' · giro '+(signed>0?'+':'')+as2(signed)+'°';
+ }
  ctl.host.querySelector('.f2-progress').textContent=`${Math.round(ctl.progress*100)} %`;
  const slider=ctl.host.querySelector('.f2-range');slider.value=String(Math.round(ctl.progress*100));
  slider.setAttribute('aria-valuetext',`${as2(m.signedAngle)} grados de ${as2(m.turn)} · ${motion?motion.phase:'conformado'}`);
@@ -262,7 +273,7 @@ function mount(host,getData,getSelection=()=>1,onSelect=()=>{}){
  host.innerHTML=`<section class="f2-view" aria-label="Seguimiento cinemático 2D de plegado">
  <div class="f2-title"><div><strong>SEGUIMIENTO DE PLEGADO · PERFIL</strong><small>Punzón superior · matriz V inferior · tope posterior · chapa</small></div><span>PERFIL GEOMÉTRICO v0.39</span></div>
  <div class="f2-layout"><div class="f2-stage" aria-label="Mueve la simulación 2D con un dedo y usa dos dedos para cambiar el zoom"><div class="f2-camera-content"></div></div><aside class="f2-data-panel" aria-label="Datos de operación nominal"><h3>DATOS</h3><dl class="f2-data-values"></dl><small>Geometría ilustrativa. Sin fuerzas calculadas ni trayectorias certificadas.</small></aside></div><div class="f2-toolbar"><strong class="f2-step-label"></strong><div class="f2-controls"><button type="button" data-f2-action="previous">← Anterior</button><button type="button" data-f2-action="play">▶ Reproducir sin pausas</button><button type="button" data-f2-action="mode" aria-pressed="false">☐ Ciclo completo</button><button type="button" data-f2-action="next">Siguiente →</button><button type="button" data-f2-action="reset">Reiniciar</button><button type="button" data-f2-action="focus" aria-pressed="false">⌕ Detalle del pliegue</button><label class="f2-loop-control"><input class="f2-loop" type="checkbox" checked> Repetir secuencia</label><button type="button" data-f2-action="zoom-out" aria-label="Reducir zoom">−</button><button type="button" data-f2-action="zoom-in" aria-label="Ampliar zoom">+</button></div></div>
- <div class="f2-cycle-state" role="status" aria-label="Fase cinemática 2D"></div><div class="f2-slider"><label for="f2-range">Avance del ciclo o conformado</label><input id="f2-range" class="f2-range" type="range" min="0" max="100" step="1" value="0"><output class="f2-progress" for="f2-range">0 %</output></div>
+ <div class="f2-order-live" role="status" aria-label="Orden real de ejecución en 2D"></div><div class="f2-program-controls" role="group" aria-label="Editar giro y orden del pliegue directamente en simulación 2D"><strong class="f2-edit-label"></strong><label>Grados (sin signo)<input data-f2-angle type="number" inputmode="decimal" min="0" max="179" step="0.1" aria-label="Grados sin signo del pliegue activo"></label><label>Sentido<select data-f2-direction aria-label="Sentido del pliegue activo"><option value="up">↑ Arriba (+)</option><option value="down">↓ Abajo (−)</option></select></label><label>Orden del pliegue<select data-f2-position aria-label="Posición del pliegue activo en la secuencia"></select></label><small>Estos valores se guardan en el programa 2D/3D. Los pliegues negativos requieren una recolocación de chapa aún NO representada.</small></div><div class="f2-cycle-state" role="status" aria-label="Fase cinemática 2D"></div><div class="f2-slider"><label for="f2-range">Avance del ciclo o conformado</label><input id="f2-range" class="f2-range" type="range" min="0" max="100" step="1" value="0"><output class="f2-progress" for="f2-range">0 %</output></div>
  <div class="f2-steps" aria-label="Orden de plegado"></div><div class="f2-machine-zones" role="status" aria-label="Componentes de máquina y proximidades"></div><div class="f2-prior-summary" role="status"></div><div class="f2-nominal" role="status"></div><ul class="f2-notes"></ul></section>`;
  active.touchCamera=window.PlegarTouchView.attach(host.querySelector('.f2-stage'),host.querySelector('.f2-camera-content'));
   host.onclick=e=>{
@@ -294,6 +305,27 @@ function mount(host,getData,getSelection=()=>1,onSelect=()=>{}){
   if(action==='reset'){ctl.progress=0;ctl.showFinal=false;}
   if(action==='zoom-in')ctl.zoom=Math.min(1.8,Math.round((ctl.zoom+.1)*10)/10);
   if(action==='zoom-out')ctl.zoom=Math.max(.7,Math.round((ctl.zoom-.1)*10)/10);
+  render();
+ };
+ host.onchange=e=>{
+  const ctl=active;if(!ctl||ctl.host!==host)return;
+  const control=e.target.closest('[data-f2-angle],[data-f2-direction],[data-f2-position]');
+  if(!control)return;
+  const data=ctl.getData(),id=data.sequence[ctl.currentStep];
+  if(control.matches('[data-f2-position]')){
+   const position=Number(control.value)-1;
+   if(!Number.isInteger(position)||position<0||position>=data.sequence.length)return;
+   const next=data.sequence.slice(),at=next.indexOf(id);
+   next.splice(at,1);next.splice(position,0,id);
+   halt();ctl.holdUntil=null;ctl.progress=0;ctl.showFinal=false;
+   window.PlegarEditor2D.setSequence(next);
+   ctl.currentStep=position;ctl.onSelect(id);render();return;
+  }
+  const magnEl=ctl.host.querySelector('[data-f2-angle]'),dirEl=ctl.host.querySelector('[data-f2-direction]');
+  const magnitude=Number(magnEl.value),signed=dirEl.value==='down'?-magnitude:magnitude;
+  if(magnEl.value.trim()===''||!Number.isFinite(magnitude)||magnitude<0||magnitude>179)return;
+  halt();ctl.holdUntil=null;ctl.progress=0;ctl.showFinal=false;
+  window.PlegarEditor2D.setBendAngle(id,signed);
   render();
  };
  host.oninput=e=>{

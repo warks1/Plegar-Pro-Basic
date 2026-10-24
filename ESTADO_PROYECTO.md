@@ -231,3 +231,9 @@ Ajuste de presentación a pantalla completa sin franjas de imagen no ocupadas. S
 ## v81 — alternar detalle del pliegue y máquina completa (24 octubre 2026)
 - En seguimiento 2D se añade un botón de acercamiento a la V que mantiene centro y escala estables durante el ciclo y permite regresar a la vista completa. En modo detalle quedan recortados elementos lejanos deliberadamente; el recuadro independiente sigue mostrando el X nominal del tope.
 - Control y gestos táctiles conservados, prueba Chromium escritorio/móvil y caché v81. Vista ilustrativa, NO CNC.
+
+
+## v82 — tangencia verdadera de punta de punzón nominal (24 octubre 2026)
+- Corregido arco circular en `toolprofiles2d.js`: el tramo empieza en ángulo medio de punzón α y termina en π−α, enlazando con los flancos en puntos de tangencia. Antes se dibujaba un arco π/2±α, lo que deformaba especialmente los perfiles de 30°.
+- Se conserva el radio de punta y la cota nominal de altura de las espigas H100/H120/H150; no se introduce ninguna geometría CAD oficial ni se atribuye a fabricante.
+- Regresiones para 30° y 88°, radios R1/R2, punta y continuidad de flancos. Caché offline v82.

@@ -22,11 +22,15 @@
   const points=[pt(-shankHalf,topY),pt(shankHalf,topY),
    pt(shankHalf,shoulderY),pt(tx,ty)];
   for(let i=1;i<=20;i++){
-   const a=Math.PI/2-alpha+(2*alpha*i/20);
+   // Contacto tangente al flanco recto en a=alpha; el lado izquierdo
+   // termina en pi-alpha. Para 30° el arco cubre 150°, para 88° cubre 92°.
+   // El intervalo anterior (pi/2 +/- alpha) rompía el enlace, sobre todo en 30°.
+   const a=alpha+(Math.PI-2*alpha)*i/20;
    points.push(pt(r*Math.cos(a),centerY+r*Math.sin(a)));
   }
   points.push(pt(-shankHalf,shoulderY));
   return {outline:points,tipY:punchTipY,nose:r,angle:punchAngle,
+   geometry:'flancos-rectos-tangentes-a-radio',
    model:'espiga-recta-con-punta-nominal',verified:false};
  }
  function die({dieOpening,dieDepth,dieHeight}){

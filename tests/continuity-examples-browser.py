@@ -471,6 +471,19 @@ with sync_playwright() as pw:
   assert page.evaluate('PlegarEditor2D.getData().thickness')==1.5
   page.locator('#ed-quick-v').click()
   assert page.evaluate('PlegarEditor2D.getData().setup.die')=='v12-88'
+  # Restaurar una Omega de muestra antigua sin cambiar programas del usuario.
+  check=page.evaluate("""() => {
+   const base={name:'Perfil omega (ejemplo)',material:'Acero S235JR',thickness:2,
+    segments:[60,85,120,85,60],angles:[-90,90,90,-90],
+    sequence:[1,2,3,4],setup:PlegarBendCalc.validateSetup()};
+   const demo=PlegarEditor2D.migrateLegacyDemo(base);
+   const customised=PlegarEditor2D.migrateLegacyDemo({...base,name:'Mi proyecto Omega'});
+   const repositioned=PlegarEditor2D.migrateLegacyDemo({...base,setup:{...base.setup,backgaugeX:135}});
+   return {demo:demo.sequence,customised:customised.sequence,repositioned:repositioned.sequence};
+  }""")
+  assert check['demo']==[1,2,4,3],check
+  assert check['customised']==[1,2,3,4],check
+  assert check['repositioned']==[1,2,3,4],check
   page.locator('#ed-example-gallery [data-example-id="omega"]').click()
   assert page.evaluate('PlegarEditor2D.getData().sequence')==[1,2,4,3]
   # Signos independientes del teclado. La pieza mantiene B1/B2/B4/B3.

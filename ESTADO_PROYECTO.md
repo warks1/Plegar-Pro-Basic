@@ -287,3 +287,10 @@ Ajuste de presentación a pantalla completa sin franjas de imagen no ocupadas. S
 - Simulación 2D muestra paso, ID B y giro firmado; permite modificar ángulo, sentido y posición del B activo desde la propia pantalla. Comparte los valores con Programación 2D/3D.
 - Las pruebas Chromium escritorio/móvil comprueban cambios 83+↓=-83, -90/-110/+90 y reordenar B2 entre pasos 1 y 2, más las pruebas unitarias anteriores.
 - Aún NO existe el volteo físico/traslado de la chapa que muestran los vídeos Cybelec; la cinemática y colisiones siguen siendo aproximadas. NO CNC.
+
+
+## v91 — restauración selectiva de Omega almacenada con secuencia antigua (24 octubre 2026)
+- La app guarda Programación 2D en localStorage. Una Omega DEMO de versiones antiguas podía conservar B1-B2-B3-B4 aunque el código inicial ya indicase B1-B2-B4-B3.
+- Se migra automáticamente SOLO la demostración local intacta cuyo nombre, material, espesor, tramos, ángulos, parámetros y orden coincidan exactamente con los del antiguo ejemplo. Se actualiza a B1-B2-B4-B3.
+- No se modifican piezas editadas por el usuario (nombre, parámetros, cotas, signos o secuencias personalizadas). Se comprueba en navegador tanto el caso de migración como que las piezas personalizadas permanecen intactas. Caché v91.
+- La migración no certifica colisiones. La reproducción de volteos físicos sigue pendiente. NO CNC.

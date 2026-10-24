@@ -528,5 +528,5 @@ function setMachineEnvelope(values){
 }
 function setPunch(id){if(!C.PUNCHES.some(d=>d.id===id))throw Error('Punzón no reconocido.');return edit(d=>{d.setup.punch=id;});}
 function setDie(id){if(!C.DIES.some(d=>d.id===id))throw Error('Matriz no reconocida.');return edit(d=>{d.setup.die=id;});}
-window.PlegarEditor2D={mount,setPlanReference,loadProfile,setSequence,setBendAngle,setPunch,setDie,setMachineEnvelope,getPlanReference:()=>planReference,isPlanConfigured:()=>!planReference||planConfiguredId===planReference.id,getData:()=>clone(state),getWidth:()=>projectWidth,getSelection:()=>selected,selectBend:id=>{if(state.sequence.includes(id)){selected=id;render();}}};
+window.PlegarEditor2D={mount,setPlanReference,loadProfile,setSequence,setBendAngle,migrateLegacyDemo:migrateDefaultOmega,setPunch,setDie,setMachineEnvelope,getPlanReference:()=>planReference,isPlanConfigured:()=>!planReference||planConfiguredId===planReference.id,getData:()=>clone(state),getWidth:()=>projectWidth,getSelection:()=>selected,selectBend:id=>{if(state.sequence.includes(id)){selected=id;render();}}};
 })();

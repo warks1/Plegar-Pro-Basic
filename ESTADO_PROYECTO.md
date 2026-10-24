@@ -272,3 +272,11 @@ Ajuste de presentación a pantalla completa sin franjas de imagen no ocupadas. S
 - La hoja de proceso en Programación 2D y su CSV presentan X de tope específico del identificador B, o el X general cuando no hay excepción.
 - Al reordenar Omega B1→B2→B4→B3, el tercer paso usa X de B4; la hoja coincide con la simulación 2D. Mantiene el aviso NO CNC.
 - Incluye regresiones de CSV, HTML y orden alternativo, caché v88.
+
+
+## v89 — transición del tope X entre golpes en motores 2D y 3D (24 octubre 2026)
+- `fold-kinematics.js` mantiene la reproducción continua, con una fase de preparación del X (primer 12 % del siguiente golpe) solo cuando el ID B seleccionado necesita un X diferente al anterior. Durante ella el punzón permanece retirado, la chapa aún no se conforma y el tope interpola X suavemente; no se inventan recorridos de chapa.
+- El motor comparte `scene.stop.x` transitorio en la vista de perfil, el prisma del tope 3D y las comprobaciones nominales. El estado de contacto/proximidad 2D se recalcula mientras se mueve el X.
+- Omega B1→B2→B4→B3 con valores particulares mantiene posiciones y presenta transiciones entre 70→95→145→120 mm nominales. Sin necesidad de pulsar siguiente.
+- Se sincronizaron etiquetas de fase y panel de información; zoom estable contempla el desplazamiento X. La secuencia no prescribe velocidades, aceleraciones, volteos ni autorizaciones CNC.
+- Regresiones del motor y caché v89; el contacto físico REAL, tope CNC y máquina siguen sin validar.

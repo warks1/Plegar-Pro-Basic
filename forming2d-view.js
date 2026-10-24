@@ -65,6 +65,7 @@ function svg(m,zoom,bounds){
  <path data-component="chapa" d="${line}" stroke="url(#f2d-sheet)" stroke-width="${m.thickness}" fill="none" stroke-linejoin="round" stroke-linecap="round"/>
  <g stroke="#f8bf56" stroke-width=".6" fill="#f8bf56"><circle cx="${-half}" cy="0" r=".9"/><circle cx="${half}" cy="0" r=".9"/></g>
  <circle cx="0" cy="${m.center.y}" r="1.1" fill="#ffb754"/>
+ ${m.stop.travelling?'<line data-component="recorrido-tope" x1="'+m.stop.previousX+'" y1="'+(m.stop.top-4)+'" x2="'+m.stop.targetX+'" y2="'+(m.stop.top-4)+'" stroke="#ffe38e" stroke-width=".9" stroke-dasharray="3 2"/>':''}
  <line data-component="separacion-tope" x1="${m.wingRight.x}" y1="${m.wingRight.y}" x2="${m.stop.x}" y2="${m.wingRight.y}" stroke="#ebd48e" stroke-width=".7" stroke-dasharray="2 2" aria-label="Proyección horizontal del extremo de chapa al tope"/>
  <path data-component="topes" d="${path(bodies.finger)}" fill="#50e4a7" stroke="#d0ffe7" stroke-width="1"/>
  <text x="${m.stop.x+5}" y="${m.stop.top-9}" font-size="5" fill="#cbffe6">TOPE X</text>
@@ -81,7 +82,7 @@ function svg(m,zoom,bounds){
  <path d="M18 38 H181 M129 39 V21 H161" stroke="#51ddb2" stroke-width="3" fill="none"/>
  <circle cx="129" cy="39" r="4" fill="#a6f8d7"/>
  <text x="12" y="15" fill="#c4ffe6" font-size="11">TOPE X · ${as2(m.stop.x)} mm</text>
- <text x="12" y="56" fill="#c1dbea" font-size="9">Referencia esquemática · no a escala</text>
+ <text x="12" y="56" fill="#c1dbea" font-size="9">${m.stop.travelling?'MOVIENDO HACIA X '+as2(m.stop.targetX)+' mm':'X FIJO DURANTE EL GOLPE'} · no a escala</text>
  </g>
  <text x="885" y="28" text-anchor="end" font-size="11" fill="#eac187">PERFIL CON RADIO · APROXIMACIÓN</text>
  <text x="885" y="434" text-anchor="end" font-size="11" fill="${overlap?'#ff927b':warn}">Cribado 2D: ${html(m.interferences.status)}</text>
@@ -194,7 +195,7 @@ function render(){
  modeButton.setAttribute('aria-pressed',String(ctl.mode==='cycle'));
  const fb=ctl.host.querySelector('[data-f2-action="focus"]');if(fb){fb.setAttribute('aria-pressed',String(ctl.focus));fb.textContent=ctl.focus?'◱ Vista completa':'⌕ Detalle del pliegue';}
  ctl.host.querySelector('.f2-cycle-state').textContent=ctl.showFinal?'FIN DEL PROGRAMA · Pieza objetivo desde el plano. No representa la última posición de la prensa ni verifica colisiones.':motion
-  ? `FASE: ${motion.phase.toUpperCase()} · Punzón Y nominal ${as2(motion.punchY)} mm · retirada ${as2(motion.punchLift)} mm. ${motion.notice}. NO CNC / SIN VERIFICAR.`
+  ? `FASE: ${motion.phase.toUpperCase()} · ${motion.backgaugeMotion.active?'TOPE X '+as2(motion.backgaugeMotion.fromX)+' → '+as2(motion.backgaugeMotion.toX)+' mm · posición '+as2(m.stop.x)+' mm · ':''}Punzón Y nominal ${as2(motion.punchY)} mm · retirada ${as2(motion.punchLift)} mm. ${motion.notice}. Movimiento de ejes y recolocación reales NO calculados. NO CNC.`
   : 'MODO CONFORMADO · avance angular sin aproximación ni retirada. Activa Ciclo completo para ver las tres fases.';
  ctl.host.querySelector('[data-f2-action="previous"]').disabled=ctl.currentStep===0;
  ctl.host.querySelector('[data-f2-action="next"]').disabled=ctl.currentStep>=order.length-1;
@@ -210,7 +211,7 @@ function render(){
    ['Matriz',setup.die||'No elegida'],['Espesor',as2(data.thickness)+' mm'],
    ['Material',data.material||'Sin especificar'],['Fuerza actual','NO CALCULADA'],
    ['Ángulo',as2(m.signedAngle)+'°'],
-   ['Tope B'+m.bend,as2(m.stop.x)+' mm · '+(m.stop.source==='por-pliegue'?'X particular':'X general')+' · NO CNC'],
+   ['Tope B'+m.bend,as2(m.stop.x)+' mm'+(m.stop.travelling?' → '+as2(m.stop.targetX)+' mm':'')+' · '+(m.stop.source==='por-pliegue'?'X particular':'X general')+' · NO CNC'],
    ['Distancia punta–pie trancha',setup.ramBottomOffset==null?'Desconocida':as2(setup.ramBottomOffset)+' mm introducidos'],
    ['Y geométrica',as2(motion?.punchY??m.punchTipY)+' mm · NO CNC'],
    ['Avisos nominales',String(m.interferences.problems.length)]

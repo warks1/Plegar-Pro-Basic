@@ -18,7 +18,7 @@
   // make a stationary matrix or gauge appear to move during animation.
   const cameraKey=JSON.stringify([p,c.step,c.width,c.yaw,c.elevation,c.visible]);
   if(c.cameraKey!==cameraKey){
-   const limits=[0,.22,.5,.78,1].map(t=>{
+   const limits=[0,.06,.12,.22,.5,.78,1].map(t=>{
     const x=K.frame(p,c.step,t).scene;
     return M.bounds(T.assemble(M.build(x,c.width),x,c.visible),c.yaw,c.elevation);
    });
@@ -51,7 +51,7 @@
   c.host.querySelector('.p3-sweep-marker').innerHTML=sweep.rows.filter(row=>row.minimum?.mm<=sweep.nearMm).map(row=>`<i title="Muestra ${row.percent.toFixed(1)} %: distancia nominal ${row.minimum.mm.toFixed(2)} mm" style="left:${row.percent}%"></i>`).join('');
   c.host.querySelector('[data-p3="scan-export"]').disabled=false;
   c.host.querySelector('.p3-state').textContent=`Pliegue ${s.bend} · fase ${f.phase} · avance de conformado ${Math.round(f.formingProgress*100)} % · espesor ${s.thickness} mm · V${s.dieOpening} · punzón ${s.punchAngle}° · tope X ${s.stop.x} mm · ${combined.faces.length} caras ilustrativas`;
-  c.host.querySelector('.p3-kinematics').textContent=`FASE: ${f.phase.toUpperCase()} · Punzón Y nominal ${f.punchY.toFixed(2)} mm · holgura de retirada ${f.punchLift.toFixed(2)} mm · ángulo representado ${f.angle.toFixed(1)}° · matriz fija · tope nominal fijo. REPRODUCCIÓN SEGUIDA · recolocación física entre pasos no calculada. ${f.notice}. NO CNC / SIN VERIFICAR.`;
+  c.host.querySelector('.p3-kinematics').textContent=`FASE: ${f.phase.toUpperCase()} · Punzón Y nominal ${f.punchY.toFixed(2)} mm · holgura de retirada ${f.punchLift.toFixed(2)} mm · ángulo representado ${f.angle.toFixed(1)}° · matriz fija · ${f.backgaugeMotion.active?'TOPE X '+f.backgaugeMotion.fromX.toFixed(1)+' → '+f.backgaugeMotion.toX.toFixed(1)+' mm; posición '+s.stop.x.toFixed(1)+' mm':'tope X nominal fijo durante el plegado'}. REPRODUCCIÓN SEGUIDA · desplazamiento X ilustrativo, sin velocidades ni recolocación física de la chapa. ${f.notice}. NO CNC / SIN VERIFICAR.`;
   c.host.querySelector('.p3-width').value=String(c.width);
   c.host.querySelector('.p3-progress').value=String(Math.round(c.cycle*100));
   c.host.querySelector('.p3-step').textContent=`Paso ${s.step} / ${s.steps}`;

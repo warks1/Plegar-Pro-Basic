@@ -61,3 +61,41 @@ test('all positions have finite mesh and punch coordinates',()=>{
   assert.ok(Number.isFinite(f.punchY));
  }
 });
+
+test('Omega 1→2→4→3 interpola X entre golpes sin mover la chapa',()=>{
+ const omega={...part,sequence:[1,2,4,3],setup:{...part.setup,
+  backgaugeX:120,backgaugeByBend:[70,95,null,145]}};
+ const X=[70,95,145,120];
+ assert.equal(K.frame(omega,0,0).scene.stop.x,70);
+ for(let step=1;step<4;step++){
+  const prior=K.frame(omega,step-1,1),start=K.frame(omega,step,0);
+  const mid=K.frame(omega,step,.06),end=K.frame(omega,step,.12),bend=K.frame(omega,step,.5);
+  eps(prior.scene.stop.x,X[step-1]);eps(start.scene.stop.x,X[step-1]);
+  eps(mid.scene.stop.x,(X[step-1]+X[step])/2);
+  eps(end.scene.stop.x,X[step]);eps(bend.scene.stop.x,X[step]);
+  assert.equal(mid.phase,'reposicionamiento X');assert.equal(mid.backgaugeMotion.active,true);
+  assert.equal(end.phase,'aproximación');assert.equal(bend.phase,'plegado');
+  eps(start.punchLift,start.approachGap);eps(mid.punchLift,mid.approachGap);
+  eps(start.angle,0);eps(mid.angle,0);
+  assert.deepEqual(build(start.scene).vertices,build(mid.scene).vertices);
+  assert.equal(mid.backgaugeMotion.axisValidated,false);
+  assert.equal(mid.scene.interferences.backgaugeGap,Math.round((mid.scene.stop.x-mid.scene.wingRight.x)*1000)/1000);
+  assert.notDeepEqual(groupVertices(start,'gauge'),groupVertices(end,'gauge'));
+  assert.deepEqual(groupVertices(start,'die'),groupVertices(end,'die'));
+ }
+});
+test('No se inventa desplazamiento X si dos pliegues comparten el mismo tope',()=>{
+ const same={...part,sequence:[1,2,4,3],setup:{...part.setup,backgaugeX:120,backgaugeByBend:[80,80,80,80]}};
+ const q=K.frame(same,1,.06);
+ assert.equal(q.phase,'aproximación');assert.equal(q.scene.stop.travelling,false);
+ eps(q.scene.stop.x,80);assert.equal(q.backgaugeMotion.required,false);
+});
+test('Interpolar no desplaza ni altera las posiciones de tope guardadas por B',()=>{
+ const omega={...part,sequence:[1,2,4,3],setup:{...part.setup,
+  backgaugeX:120,backgaugeByBend:[70,95,null,145]}};
+ K.frame(omega,2,.06);
+ assert.deepEqual(omega.setup.backgaugeByBend,[70,95,null,145]);
+ const reordered={...omega,sequence:[4,1,3,2]};
+ assert.equal(K.frame(reordered,1,0).scene.stop.x,145);
+ assert.equal(K.frame(reordered,1,.12).scene.stop.x,70);
+});

@@ -34,3 +34,16 @@ test('zero angle contributes no bend deduction',()=>{
  const r=C.estimate({...P,angles:[0,90]},S);
  nearly(r.rows[0].deduction,0);
 });
+
+test('Tope X opcional por B mantiene valor general y valida rangos sin modificar entrada',()=>{
+ const source={...S,backgaugeX:120,backgaugeByBend:[null,95,null,70]};
+ const result=C.validateSetup(source);
+ assert.deepEqual(result.backgaugeByBend,[null,95,null,70]);
+ result.backgaugeByBend[1]=200;
+ assert.equal(source.backgaugeByBend[1],95);
+ assert.equal(C.validateSetup({...S}).backgaugeByBend,undefined);
+ assert.throws(()=>C.validateSetup({...S,backgaugeByBend:'95'}),/Tabla/);
+ assert.throws(()=>C.validateSetup({...S,backgaugeByBend:[0]}),/Tope X B1/);
+ assert.throws(()=>C.validateSetup({...S,backgaugeByBend:[10001]}),/Tope X B1/);
+ assert.throws(()=>C.validateSetup({...S,backgaugeByBend:Array(24).fill(null)}),/máximo 23/);
+});

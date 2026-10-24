@@ -95,8 +95,10 @@
    machineSetup:{dieHeight:setup.dieHeight??die.height??null,tableLeft:setup.tableLeft,tableRight:setup.tableRight,ramWidth:setup.ramWidth,ramBottomOffset:setup.ramBottomOffset},
    // 'depth' is nominal centreline descent from its START position, not CNC Y.
    depth:round(cy+t/2),punchTipY:round(cy-t/2),shoulderY,
-   stop:{x:setup.backgaugeX,y:round(-t/2),width:Math.max(2,t),top:round(-t/2-12),bottom:round(-t/2+4)},warnings,
-   note:'Perfil de la chapa con signo + arriba y − abajo. Los pliegues negativos se visualizan en el sistema de referencia de la pieza, NO en una orientación de amarre real: falta modelar volteo, recolocación y contacto físico con el punzón/matriz. Tope X estático y contornos nominales; NO certifica colisiones, fuerzas ni posicionamiento CNC.'
+   stop:{x:setup.backgaugeByBend?.[bend-1]??setup.backgaugeX,bend,
+    source:setup.backgaugeByBend?.[bend-1]!=null?'por-pliegue':'general',
+    y:round(-t/2),width:Math.max(2,t),top:round(-t/2-12),bottom:round(-t/2+4)},warnings,
+   note:'Perfil de la chapa con signo + arriba y − abajo. Los pliegues negativos se visualizan en el sistema de referencia de la pieza, NO en una orientación de amarre real: falta modelar volteo, recolocación y contacto físico con el punzón/matriz. Tope X nominal por B cuando se configura, fijo durante cada golpe sin simular la transición del eje; NO certifica colisiones, fuerzas ni posicionamiento CNC.'
   };
   output.toolProfiles=T.profiles(output);
   output.previous=P.calculate(piece,output);

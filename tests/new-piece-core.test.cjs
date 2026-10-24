@@ -97,3 +97,16 @@ test('Ri/K por pliegue se conservan al añadir y eliminar alas en el asistente 2
  assert.equal(withoutOverrides.bendOverrides,undefined,'perfiles antiguos siguen siendo compatibles');
  assert.equal(New.build(withoutOverrides).profile.bendOverrides,undefined);
 });
+
+test('Al crear pieza no hereda tope X de otra; editar y añadir/quitar conserva X por B',()=>{
+ const original={...source,width:240,setup:{...source.setup,backgaugeByBend:[70,95,null,145]}};
+ assert.equal(New.create(original).setup.backgaugeByBend,undefined);
+ const edited=New.clone(original);
+ edited.setup.backgaugeByBend[0]=80;
+ assert.equal(original.setup.backgaugeByBend[0],70);
+ const more=New.add(edited);
+ assert.deepEqual(more.setup.backgaugeByBend,[80,95,null,145,null]);
+ assert.deepEqual(New.remove(more).setup.backgaugeByBend,[80,95,null,145]);
+ assert.deepEqual(New.build(edited).profile.setup.backgaugeByBend,[80,95,null,145]);
+ assert.deepEqual(New.reposition(edited,4,1).setup.backgaugeByBend,[80,95,null,145]);
+});

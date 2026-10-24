@@ -12,12 +12,13 @@
   const setup=C.validateSetup(current?.setup);
   return {name:'Nueva pieza',material:materials.includes(current?.material)?current.material:'Acero S235JR',
    thickness:current?.thickness??2,width:Number.isFinite(width)?width:100,
-   segments:[100,100],angles:[90],sequence:[1],setup};
+   segments:[100,100],angles:[90],sequence:[1],setup:(()=>{const s={...setup};delete s.backgaugeByBend;return s;})()};
  }
  function clone(input){
   // Copiar también los parámetros locales: el borrador no debe modificar la pieza abierta.
   return {...input,segments:[...input.segments],angles:[...input.angles],
-    sequence:[...input.sequence],setup:{...input.setup},
+    sequence:[...input.sequence],setup:{...input.setup,
+     ...(input.setup.backgaugeByBend?{backgaugeByBend:[...input.setup.backgaugeByBend]}:{})},
     ...(input.bendOverrides!==undefined?{
       bendOverrides:input.bendOverrides.map(entry=>entry===null?null:{...entry})
     }:{})};
@@ -26,6 +27,7 @@
   if(draft.segments.length>=G.MAX_SEGMENTS)throw Error('Máximo '+G.MAX_SEGMENTS+' tramos.');
   const p=clone(draft);p.segments.push(100);p.angles.push(90);p.sequence.push(p.angles.length);
   if(p.bendOverrides!==undefined)p.bendOverrides.push({radius:null,kFactor:null});
+  if(p.setup.backgaugeByBend)p.setup.backgaugeByBend.push(null);
   return p;
  }
  function remove(draft){
@@ -33,6 +35,7 @@
   const p=clone(draft);p.segments.pop();p.angles.pop();
   p.sequence=p.sequence.filter(id=>id<=p.angles.length);
   if(p.bendOverrides!==undefined)p.bendOverrides.pop();
+  if(p.setup.backgaugeByBend)p.setup.backgaugeByBend.pop();
   return p;
  }
  function reposition(draft,bend,position){

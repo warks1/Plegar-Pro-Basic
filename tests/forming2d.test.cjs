@@ -73,3 +73,14 @@ test('validated numerical inputs and catalogs remain mandatory',()=>{
  for(const [s,pct] of [[-1,0],[0,1.001],[1,-.01],[4,0]])assert.throws(()=>scene(p,s,pct));
  assert.throws(()=>scene({...p,setup:{...p.setup,die:'nonexistent'}},0,.5));
 });
+
+test('X del tope pertenece a B1,B2,B3,B4 y no a la posición del golpe',()=>{
+ const setup={...p.setup,backgaugeX:120,backgaugeByBend:[70,95,null,145]};
+ const omega={...p,sequence:[1,2,4,3],setup};
+ assert.deepEqual(omega.sequence.map((_,i)=>scene(omega,i,.5).stop.x),[70,95,145,120]);
+ assert.deepEqual(omega.sequence.map((_,i)=>scene(omega,i,.5).stop.source),
+  ['por-pliegue','por-pliegue','por-pliegue','general']);
+ for(let i=0;i<4;i++)assert.equal(scene(omega,i,0).stop.x,scene(omega,i,1).stop.x);
+ const reversed={...omega,sequence:[4,1,3,2]};
+ assert.deepEqual(reversed.sequence.map((_,i)=>scene(reversed,i,.5).stop.x),[145,70,120,95]);
+});

@@ -34,7 +34,20 @@
   const ramWidth=optional('ramWidth',20,2000),ramBottomOffset=optional('ramBottomOffset',10,500);
   const backgaugeX=Number(s.backgaugeX);
   if(!Number.isFinite(backgaugeX)||backgaugeX<1||backgaugeX>10000)throw new Error('Posición nominal del tope X entre 1 y 10000 mm.');
-  return {radius,kFactor,punch:s.punch,die:s.die,backgaugeX,dimensionBasis,dieHeight,tableLeft,tableRight,ramWidth,ramBottomOffset};
+  // X por identificador B; null hereda el X general. Nunca por orden de ejecución.
+  let backgaugeByBend;
+  if(s.backgaugeByBend!=null){
+   if(!Array.isArray(s.backgaugeByBend)||s.backgaugeByBend.length>23)
+    throw Error('Tabla de posiciones del tope X inválida (máximo 23).');
+   backgaugeByBend=s.backgaugeByBend.map((x,i)=>{
+    if(x==null||x==='')return null;
+    if(typeof x!=='number'||!Number.isFinite(x)||x<1||x>10000)
+     throw Error('Tope X B'+(i+1)+' entre 1 y 10000 mm o vacío.');
+    return x;
+   });
+  }
+  return {radius,kFactor,punch:s.punch,die:s.die,backgaugeX,dimensionBasis,dieHeight,tableLeft,tableRight,ramWidth,ramBottomOffset,
+   ...(backgaugeByBend?{backgaugeByBend}:{})};
  }
  function estimate(profile,setupInput){
   const setup=validateSetup(setupInput);

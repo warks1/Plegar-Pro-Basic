@@ -209,3 +209,7 @@ Ajuste de presentación a pantalla completa sin franjas de imagen no ocupadas. S
 - Vista de perfil incluye tren superior (trancha, portapunzón, mordaza), punzón, matriz y portamatriz, mesa con estructura inferior y dedo/brazo/carro de tope trasero. La sección mantiene separadas partes que acompañan al punzón de las fijas y añade sus trazados al encuadre.
 - Módulo `machine-section2d.js` con cribado AABB de posibles proximidades por componente y texto de estado. La forma de amarres, máquina y topes es ILUSTRATIVA en ausencia de CAD contrastado; no valida ausencia de colisiones, contacto real ni CNC.
 - Pruebas en Chromium de componentes visibles, carrera vertical y estabilidad de mesa, junto con prueba unitaria de sección. Caché offline v76.
+
+## v77 — secuencia Omega (24 octubre 2026)
+- Los ejemplos Omega cargan B1→B2→B4→B3 por defecto. El planificador añade el candidato solicitado, con riesgos y datos ausentes visibles. El editor permite utilizar esta propuesta para estudiar la animación; nunca se aprueba CNC ni se supone libre de colisiones.
+- La recomendación automática conserva sus bloqueos de riesgos y medidas faltantes. Nuevas regresiones y pruebas de Chromium.

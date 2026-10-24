@@ -464,6 +464,7 @@ with sync_playwright() as pw:
   page.locator('#ed-quick-v').click()
   assert page.evaluate('PlegarEditor2D.getData().setup.die')=='v12-88'
   page.locator('#ed-example-gallery [data-example-id="omega"]').click()
+  assert page.evaluate('PlegarEditor2D.getData().sequence')==[1,2,4,3]
   page.locator('#ed-quick-height').fill('60')
   page.locator('#ed-quick-height').dispatch_event('change')
   assert page.evaluate('PlegarEditor2D.getData().setup.dieHeight')==60
@@ -482,6 +483,9 @@ with sync_playwright() as pw:
   assert 'Perfil omega' in page.locator('#ed-auto-plan').inner_text()
   assert 'H matriz 60 mm' in page.locator('#ed-auto-plan').inner_text()
   assert page.locator('#ed-apply-auto').count()==1
+  assert page.locator('#ed-omega-proposal').count()==1
+  page.locator('#ed-omega-proposal').click()
+  assert page.evaluate('PlegarEditor2D.getData().sequence')==[1,2,4,3]
   if page.locator('#ed-apply-auto').is_enabled():
    page.locator('#ed-apply-auto').click()
    assert sorted(page.evaluate('PlegarEditor2D.getData().sequence'))==[1,2,3,4]

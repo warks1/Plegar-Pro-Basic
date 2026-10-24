@@ -64,3 +64,5 @@ test('Ingeniería: señala cruces de alas no adyacentes y deja en paz una L senc
  const simple=S.get('escuadra-l').profile;
  assert.deepEqual(E.profileIntersections(simple),[]);
 });
+
+test('La Omega del catálogo carga B1-B2-B4-B3',()=>assert.deepEqual(S.get('perfil-omega').profile.sequence,[1,2,4,3]));

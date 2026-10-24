@@ -62,7 +62,9 @@
   const profile={...G.validate(source),setup:C.validateSetup(source.setup)},n=profile.angles.length;
   if(!Number.isInteger(beamWidth)||beamWidth<1||beamWidth>60||!Number.isInteger(limit)||limit<1||limit>10)throw Error('Límites de búsqueda inválidos.');
   const current=evaluate(profile,profile.sequence);
-  if(n>12)return {current,best:null,recommended:null,alternatives:[],searched:0,note:'Más de 12 pliegues: cálculo acotado no ejecutado. Revisar secuencia manualmente. NO CNC.'};
+  // Orden de estudio solicitado: se evalúa, no se certifica su seguridad.
+  const preferredOmega=hasOmega(profile)&&n===4?evaluate(profile,[1,2,4,3]):null;
+  if(n>12)return {current,best:null,recommended:null,preferredOmega,alternatives:[],searched:0,note:'Más de 12 pliegues: cálculo acotado no ejecutado. Revisar secuencia manualmente. NO CNC.'};
   let beam=[{sequence:[],score:0}],searched=0;
   for(let depth=0;depth<n;depth++){
    const next=[];
@@ -81,7 +83,7 @@
   // Un dato desconocido NO equivale a una holgura válida; no permitir
   // secuenciación automática cuando la mesa/trancha no están caracterizadas.
   const recommended=alternatives.find(candidate=>candidate.riskCount===0&&candidate.missingDimensions.length===0)||null;
-  return {current,best:alternatives[0]||null,recommended,alternatives,searched,
+  return {current,best:alternatives[0]||null,preferredOmega,recommended,alternatives,searched,
    note:'Órdenes candidatos por cribado discreto: la aplicación automática exige cero alertas modeladas y cotas locales de mesa/trancha completas. Aunque se hayan introducido cotas, faltan barridos continuos, verificación CAD de útiles y máquina, volteos y retirada. NINGÚN orden está validado para CNC.'};
  }
  return {step,evaluate,suggest};

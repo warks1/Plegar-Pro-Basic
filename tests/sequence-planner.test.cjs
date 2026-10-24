@@ -153,3 +153,8 @@ test('No se inventan dimensiones ni se cambian las cotas originales durante el c
   assert.equal(r.recommended.missingDimensions.length,0);
  }
 });
+
+test('La propuesta Omega 1,2,4,3 conserva riesgos y prohíbe CNC',()=>{
+ const r=P.suggest(omega);assert.deepEqual(r.preferredOmega.sequence,[1,2,4,3]);
+ assert.equal(r.preferredOmega.physicallyValidated,false);assert.equal(r.preferredOmega.cncApproved,false);
+});

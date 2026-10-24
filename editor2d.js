@@ -143,6 +143,7 @@ function render(){
   auto.innerHTML='<strong>ORDEN INTELIGENTE · CRIBADO NOMINAL (NO CNC)</strong>'+
    '<p>Matriz H: '+(height===null?'desconocida':fmt(height)+' mm')+' · Orden actual: '+result.current.sequence.join(' → ')+' · Puntuación '+fmt(result.current.score)+'</p>'+
    (best?'<p>Mejor candidato nominal: <b>'+best.sequence.join(' → ')+'</b> · puntuación '+fmt(best.score)+' · <strong>'+esc(best.status)+'</strong> · alertas '+best.riskCount+'.</p>':'<p>'+esc(result.note)+'</p>')+
+   (result.preferredOmega?'<p>OMEGA · secuencia para estudio: <b>1 → 2 → 4 → 3</b> · '+result.preferredOmega.riskCount+' alertas nominales. SIN VALIDAR COLISIONES. <button type="button" id="ed-omega-proposal">Usar propuesta en la simulación (NO CNC)</button></p>':'')+
    (!eligible&&best?'<p role="alert">Aplicación automática BLOQUEADA: '+
      (best.riskCount?'posibles interferencias modeladas ('+best.riskCount+'). ':'')+
      (unknown.length?'Faltan medidas locales: '+esc(unknown.join(', '))+'. ':'')+
@@ -342,6 +343,12 @@ function actions(event){
  }
  case 'ed-quick-v':{const wanted=8*state.thickness,selectedDie=C.DIES.filter(d=>d.angle===88).sort((a,b)=>Math.abs(a.opening-wanted)-Math.abs(b.opening-wanted))[0];if(selectedDie){edit(d=>{d.setup.die=selectedDie.id;});inform('Matriz orientativa '+selectedDie.name+' seleccionada. Confirmar compatibilidad antes de fabricar.');}return;}
  case 'ed-quick-sim':window.PlegarApp?.switchScreen('Simulación 3D');return;
+ case 'ed-omega-proposal':{
+  const proposal=window.PlegarSequencePlanner.suggest(state).preferredOmega;
+  if(!proposal){inform('No es una Omega de cuatro pliegues.');return;}
+  orderPick=0;orderUsed.clear();selected=proposal.sequence[0];edit(d=>{d.sequence=proposal.sequence.slice();});
+  inform('B1-B2-B4-B3 aplicado al modelo de simulación. Sin validación física de interferencias ni movimientos de tope. NO CNC.');return;
+ }
  case 'ed-apply-auto':{
   try{const advice=window.PlegarSequencePlanner.suggest(state),next=advice.recommended?.sequence;
    if(!next){inform('Aplicación automática bloqueada: faltan cotas locales de mesa/trancha o se han detectado posibles interferencias. Revisar antes de fabricar.');return;}

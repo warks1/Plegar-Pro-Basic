@@ -19,7 +19,7 @@
  function list(){return shapes.map(s=>({id:s.id,label:s.label,width:s.width,profile:{
   name:s.label+' (ejemplo)',material:'Acero S235JR',thickness:2,
   segments:[...s.segments],angles:[...s.angles],
-  sequence:s.angles.map((_,i)=>i+1),setup:{...setup}
+  sequence:s.id==='omega'?[1,2,4,3]:s.angles.map((_,i)=>i+1),setup:{...setup}
  }}));}
  function get(id){return list().find(s=>s.id===id)||null;}
  function thumb(item){

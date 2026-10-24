@@ -25,7 +25,7 @@
   ['bandeja-retornos','Bandeja con retornos',1.2,'Acero S235JR',290,[22,45,150,45,22],[-90,90,90,-90]]
  ];
  const valid=(s)=>{const [id,name,thickness,material,width,segments,angles]=s;
-  const profile=G.validate({name,material,thickness,segments,angles,sequence:angles.map((_,i)=>i+1)});
+  const profile=G.validate({name,material,thickness,segments,angles,sequence:id==='perfil-omega'?[1,2,4,3]:angles.map((_,i)=>i+1)});
   const die=thickness<=1.5?'v12-88':thickness<=2.1?'v16-88':'v24-88';
   return {id,name,width,thickness,material,profile:{...profile,setup:{radius:Math.max(1,thickness),kFactor:.33,punch:'p88-r1',die,backgaugeX:120}},kind:'example',note:'Plano geométrico de ejemplo, no documentación original ni plano CNC.'};
  };

@@ -22,3 +22,7 @@ test('las tarjetas 3D ofrecen botones táctiles y mantienen forma distintiva',()
  assert.match(markup,/example-gadget selected/);
  assert.equal(E.get('missing'),null);
 });
+
+test('La Omega 3D carga 1,2,4,3 como secuencia de estudio',()=>{
+ const p=E.get('omega').profile;assert.deepEqual(p.sequence,[1,2,4,3]);assert.deepEqual(p.angles,[-90,90,90,-90]);
+});

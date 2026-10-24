@@ -67,3 +67,6 @@
 .f2-zone-near{border-style:dashed;border-width:2px}
 .f2-machine-zones p{margin:7px 0;font-size:11px}
 @media(max-width:700px){.f2-zone-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:5px}}
+
+/* Botón para acercarse al área de la V y volver a la máquina completa. */
+.f2-view [data-f2-action="focus"][aria-pressed="true"]{border-color:#8bdcff;background:#166d8a}

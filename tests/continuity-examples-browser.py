@@ -517,6 +517,12 @@ with sync_playwright() as pw:
   if w<=1120:page.locator('#open-menu').click()
   page.locator('button.nav-item[data-screen="Simulación 2D"]').click()
   assert gesture('.f2-stage')['zoom']>1
+  scene_before=page.locator('.f2-camera-content').inner_html()
+  page.locator('[data-f2-action="focus"]').click()
+  assert page.locator('[data-f2-action="focus"]').get_attribute('aria-pressed')=='true'
+  assert page.locator('.f2-camera-content').inner_html()!=scene_before
+  page.locator('[data-f2-action="focus"]').click()
+  assert page.locator('[data-f2-action="focus"]').get_attribute('aria-pressed')=='false'
   assert page.locator('.f2-data-panel').is_visible()
   assert 'Ángulo' in page.locator('.f2-data-panel').inner_text()
   assert 'NO CALCULADA' in page.locator('.f2-data-panel').inner_text()

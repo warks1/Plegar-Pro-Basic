@@ -249,3 +249,8 @@ Ajuste de presentación a pantalla completa sin franjas de imagen no ocupadas. S
 - Antes se dibujaba el pie de trancha a una distancia fija desde la parte superior del punzón, incluso al indicar ramBottomOffset. Ahora se calcula desde la punta menos dicha cota, como en tooling3d.js.
 - La altura esquemática del cuerpo superior es 35 mm, no una cota oficial; la geometría del amarre sigue desconocida. Sin ramBottomOffset se muestra solo la silueta didáctica.
 - Nuevas pruebas de concordancia 2D/3D con tres distancias y tres progresos; caché v84.
+
+## v85 — final 2D de plano, no último golpe (24 octubre 2026)
+- La tarjeta Final y la pantalla de fin de secuencia dibujan los tramos y ángulos desde geometry2d.vertices, exactamente la geometría nominal de Planos y la vista final 3D. No utilizan la pieza colocada para el último golpe.
+- La vista de máquina se conserva en cada golpe con topes y amarres; al completar el ciclo se muestra un instante la pieza objetivo y el bucle vuelve a empezar. Seleccionar Inicio regresa al puesto de plegado.
+- Los vértices del dibujo final se contrastan en Chromium PC/móvil. Es un perfil teórico de vértices sin radio físico, amarre ni validación CNC. Caché offline v85.

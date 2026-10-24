@@ -2,10 +2,10 @@
  * Separa la geometría dibujada de las cotas introducidas y del cribado CNC.
  */
 (function(root,factory){
- const api=factory();
+ const api=factory(typeof module==='object'&&module.exports?require('./clearance2d.js'):root.PlegarClearance2D);
  if(typeof module==='object'&&module.exports)module.exports=api;
  else root.PlegarMachineSection2D=api;
-})(typeof globalThis!=='undefined'?globalThis:this,function(){
+})(typeof globalThis!=='undefined'?globalThis:this,function(Clearance){
  'use strict';
  const finite=n=>typeof n==='number'&&Number.isFinite(n)&&n>0;
  const pt=(x,y)=>({x,y});
@@ -75,21 +75,47 @@
   }
   return true;
  }
+
  function inspect(m,section=build(m)){
   const spans=[];
-  for(const side of ['left','right'])for(const item of m.assembly?.[side]?.items||[])
-   spans.push({a:item.from,b:item.to,side,status:item.status});
-  // El radio activo suele estar en contacto con las herramientas y se excluye
-  // aquí para no interpretar el conformado intencionado como un choque.
-  const hits=[];
-  for(const part of section.parts){
-   const b=bounds(part.points),near=spans.some(edge=>crosses(edge.a,edge.b,b,m.thickness/2));
-   if(near)hits.push({component:part.name,id:part.id,kind:'POSIBLE_PROXIMIDAD_EN_PROYECCIÓN',verified:false});
-  }
-  return {hits,checked:section.parts.map(part=>({id:part.id,name:part.name,
-   known:part.known,approximate:true,possibleOverlap:hits.some(hit=>hit.id===part.id)})),
-   physicallyValidated:false,cncApproved:false,continuousSweep:false,
-   note:'Cribado de proyección 2D, por cajas conservadoras: no representa penetración física comprobada. No se ha validado ninguna holgura de útiles, amarres, estructura o tope.'};
+  for(const side of ['left','right'])for(const edge of m.assembly?.[side]?.items||[])
+   spans.push({a:edge.from,b:edge.to,side,status:edge.status});
+  const checked=section.parts.map(part=>{
+   let gap=null;
+   for(const edge of spans){
+    const distance=Clearance.segmentPolygon(edge.a,edge.b,part.points)-m.thickness/2;
+    gap=gap===null?distance:Math.min(gap,distance);
+   }
+   const distanceMm=gap===null?null:Math.round(Math.max(0,gap)*1000)/1000;
+   return {id:part.id,name:part.name,known:part.known,approximate:true,
+    distanceMm,possibleOverlap:gap!==null&&gap<=0.05,samples:spans.length};
+  });
+  const hits=checked.filter(part=>part.possibleOverlap).map(part=>({
+   component:part.name,id:part.id,kind:'POSIBLE_PROXIMIDAD_EN_PROYECCIÓN',
+   distanceMm:part.distanceMm,verified:false
+  }));
+  return {hits,checked,physicallyValidated:false,cncApproved:false,continuousSweep:false,
+   method:'Distancia entre alas y contorno poligonal 2D con medio espesor nominal.',
+   note:'Proyección 2D sin volteo ni reposición física, contacto ni CAD de fabricante: no valida ausencia de colisiones.'};
  }
- return {build,inspect,bounds,crosses};
+ function sweep(profile,orderIndex,{intervals=20}={}){
+  if(!Number.isInteger(intervals)||intervals<2||intervals>60)throw Error('Muestreo de sección fuera de rango.');
+  const K=typeof module==='object'&&module.exports?require('./fold-kinematics.js'):window.PlegarFoldKinematics;
+  const first=new Map(),closest=new Map();
+  for(let i=0;i<=intervals;i++){
+   const fraction=i/intervals,frame=K.frame(profile,orderIndex,fraction),result=inspect(frame.scene);
+   for(const part of result.checked)if(part.distanceMm!==null){
+    const old=closest.get(part.id);
+    if(old===undefined||part.distanceMm<old)closest.set(part.id,part.distanceMm);
+   }
+   for(const hit of result.hits)if(!first.has(hit.id))first.set(hit.id,{
+    ...hit,cyclePercent:Math.round(100*fraction),phase:frame.phase,step:orderIndex+1
+   });
+  }
+  return {frames:intervals+1,hits:[...first.values()],
+   minimums:[...closest].map(([id,distanceMm])=>({id,distanceMm})),
+   physicallyValidated:false,cncApproved:false,continuousSweep:false,
+   note:'Muestreo discreto de proyección 2D; puede omitir choques entre muestras, fuera de plano o durante el volteo. NO CNC.'};
+ }
+ return {build,inspect,sweep,bounds,crosses};
 });

@@ -6,9 +6,10 @@
   typeof module==='object'&&module.exports?require('./geometry2d.js'):root.PlegarGeometry2D,
   typeof module==='object'&&module.exports?require('./bendcalc.js'):root.PlegarBendCalc,
   typeof module==='object'&&module.exports?require('./forming2d.js'):root.PlegarFormingGeometry,
-  typeof module==='object'&&module.exports?require('./machine-clearance.js'):root.PlegarMachineClearance);
+  typeof module==='object'&&module.exports?require('./machine-clearance.js'):root.PlegarMachineClearance,
+  typeof module==='object'&&module.exports?require('./machine-section2d.js'):root.PlegarMachineSection2D);
  if(typeof module==='object'&&module.exports)module.exports=api;else root.PlegarSequencePlanner=api;
-})(typeof globalThis!=='undefined'?globalThis:this,function(G,C,F,Clearance){
+})(typeof globalThis!=='undefined'?globalThis:this,function(G,C,F,Clearance,Section){
  'use strict';
  function hasOmega(profile){return Clearance.omegaPocket(profile)!==null;}
  function step(profile,chosen,id){
@@ -42,17 +43,32 @@
   return {bend:id,score:cost,issues,riskCodes,possibleCollision:riskCodes.length>0,scan};
  }
  function evaluate(profile,sequence){
-  let score=0;const rows=[],issues=[],riskCodes=[],unknown=new Set();
+  let score=0;const rows=[],issues=[],riskCodes=[],unknown=new Set(),projected=new Set();
   for(let i=0;i<sequence.length;i++){
    const r=step(profile,sequence.slice(0,i),sequence[i]);
    score+=r.score;
-   rows.push({position:i+1,bend:r.bend,score:r.score,issues:r.issues,riskCodes:r.riskCodes,possibleCollision:r.possibleCollision,tableGap:r.scan.tableGap,possibleRamContact:r.scan.possibleRamContact,possibleTableContact:r.scan.possibleTableContact,sampledFrames:r.scan.frames});
+   // Analizar el MISMO paso que se visualiza en el reproductor 2D.
+   // El cálculo proyectado no modifica la puntuación del buscador porque
+   // las formas de amarres/topes aún no son CAD dimensional verificado.
+   const taken=sequence.slice(0,i+1),remaining=profile.angles.map((_,idx)=>idx+1).filter(v=>!taken.includes(v));
+   const sample={...profile,sequence:[...taken,...remaining]},scene=F.scene(sample,i,1);
+   const audit=Section.inspect(scene);
+   const componentProximities=audit.hits.filter(hit=>!hit.expectedContact).map(hit=>hit.component);
+   const toolContacts=audit.hits.filter(hit=>hit.expectedContact).map(hit=>hit.component);
+   componentProximities.forEach(x=>projected.add(x));
+   rows.push({position:i+1,bend:r.bend,score:r.score,issues:r.issues,riskCodes:r.riskCodes,
+    possibleCollision:r.possibleCollision||componentProximities.length>0,
+    componentProximities,toolContacts,projectedGeometryVerified:false,
+    tableGap:r.scan.tableGap,possibleRamContact:r.scan.possibleRamContact,
+    possibleTableContact:r.scan.possibleTableContact,sampledFrames:r.scan.frames});
    for(const code of r.riskCodes)if(!riskCodes.includes(code))riskCodes.push(code);
    for(const dimension of r.scan.unknown)unknown.add(dimension);
    for(const msg of [...r.issues,...r.scan.alerts])if(!issues.includes(msg))issues.push(msg);
+   if(componentProximities.length)issues.push('Paso '+(i+1)+' B'+r.bend+': posible cruce en sección 2D con '+componentProximities.join(', ')+'. Dibujo sin cotas CAD verificadas.');
   }
   const missingDimensions=[...unknown];
   return {sequence:[...sequence],score:Math.round(score*100)/100,rows,issues,
+   projectedComponents:[...projected],projectedGeometryVerified:false,
    riskCodes,riskCount:rows.reduce((n,r)=>n+r.riskCodes.length,0),missingDimensions,
    status:riskCodes.length?'POSIBLES INTERFERENCIAS · REVISAR':
     missingDimensions.length?'MÁQUINA INCOMPLETA · NO APLICABLE':'CRIBADO NOMINAL · NO VERIFICADO',
@@ -82,9 +98,12 @@
   const alternatives=beam.slice(0,limit).map(item=>evaluate(profile,item.sequence));
   // Un dato desconocido NO equivale a una holgura válida; no permitir
   // secuenciación automática cuando la mesa/trancha no están caracterizadas.
-  const recommended=alternatives.find(candidate=>candidate.riskCount===0&&candidate.missingDimensions.length===0)||null;
+  // La detección de proximidad en secciones nominales puede ser conservadora,
+  // pero nunca se debe presentar como ausencia de choque al aplicar un orden.
+  const recommended=alternatives.find(candidate=>candidate.riskCount===0&&
+   candidate.missingDimensions.length===0&&candidate.projectedComponents.length===0)||null;
   return {current,best:alternatives[0]||null,preferredOmega,recommended,alternatives,searched,
-   note:'Órdenes candidatos por cribado discreto: la aplicación automática exige cero alertas modeladas y cotas locales de mesa/trancha completas. Aunque se hayan introducido cotas, faltan barridos continuos, verificación CAD de útiles y máquina, volteos y retirada. NINGÚN orden está validado para CNC.'};
+   note:'Órdenes candidatos por cribado discreto y 11 zonas de la sección 2D. El bloqueo automático también contempla posibles cruces proyectados con amarres, mesa y topes, sin interpretarlos como colisiones físicas confirmadas. Faltan CAD de útiles y máquina, volteos, topes calibrados y barridos continuos. NINGÚN orden está validado para CNC.'};
  }
  return {step,evaluate,suggest};
 });

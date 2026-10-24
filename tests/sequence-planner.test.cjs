@@ -158,3 +158,24 @@ test('La propuesta Omega 1,2,4,3 conserva riesgos y prohíbe CNC',()=>{
  const r=P.suggest(omega);assert.deepEqual(r.preferredOmega.sequence,[1,2,4,3]);
  assert.equal(r.preferredOmega.physicallyValidated,false);assert.equal(r.preferredOmega.cncApproved,false);
 });
+
+test('Secuencia Omega 1,2,4,3 detalla zonas de cada paso usando la misma escena 2D',()=>{
+ const Section=require('../machine-section2d.js'),sequence=[1,2,4,3];
+ const result=P.evaluate(omega,sequence);
+ assert.deepEqual(result.sequence,sequence);
+ assert.equal(result.rows.length,4);
+ assert.equal(result.projectedGeometryVerified,false);
+ const unique=new Set();
+ for(let i=0;i<result.rows.length;i++){
+  const chosen=sequence.slice(0,i+1),rest=[1,2,3,4].filter(x=>!chosen.includes(x));
+  const scene=F.scene({...omega,sequence:[...chosen,...rest]},i,1),scan=Section.inspect(scene);
+  const structure=scan.hits.filter(x=>!x.expectedContact).map(x=>x.component);
+  const tools=scan.hits.filter(x=>x.expectedContact).map(x=>x.component);
+  assert.deepEqual(result.rows[i].componentProximities,structure);
+  assert.deepEqual(result.rows[i].toolContacts,tools);
+  assert.equal(result.rows[i].projectedGeometryVerified,false);
+  structure.forEach(x=>unique.add(x));
+ }
+ assert.deepEqual(new Set(result.projectedComponents),unique);
+ assert.equal(result.cncApproved,false);
+});

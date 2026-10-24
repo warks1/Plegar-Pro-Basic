@@ -237,3 +237,10 @@ Ajuste de presentación a pantalla completa sin franjas de imagen no ocupadas. S
 - Corregido arco circular en `toolprofiles2d.js`: el tramo empieza en ángulo medio de punzón α y termina en π−α, enlazando con los flancos en puntos de tangencia. Antes se dibujaba un arco π/2±α, lo que deformaba especialmente los perfiles de 30°.
 - Se conserva el radio de punta y la cota nominal de altura de las espigas H100/H120/H150; no se introduce ninguna geometría CAD oficial ni se atribuye a fabricante.
 - Regresiones para 30° y 88°, radios R1/R2, punta y continuidad de flancos. Caché offline v82.
+
+
+## v83 — inspección 2D conectada con planificador Omega (24 octubre 2026)
+- El planificador revisa en cada paso B1/B2/B4/B3 la misma escena 2D que representa el motor de plegado y expone sus posibles proximidades estructurales (amarres, mesa, tope) por paso.
+- Los contactos de herramienta con chapa se separan de los posibles cruces no deseados; la herramienta no se declara en colisión por el hecho de formar. La clasificación conserva siempre **geometría proyectada sin verificar** y NO CNC.
+- Se evita ofrecer un orden como aplicable automáticamente si hay cruces nominales de la chapa con piezas de máquina, incluso cuando las cinco dimensiones de mesa/trancha están configuradas.
+- Nuevos ensayos de sincronización entre secuencia y escena. Caché offline v83.

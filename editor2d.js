@@ -144,7 +144,11 @@ function render(){
    '<p>Matriz H: '+(height===null?'desconocida':fmt(height)+' mm')+' · Orden actual: '+result.current.sequence.join(' → ')+' · Puntuación '+fmt(result.current.score)+'</p>'+
    (best?'<p>Mejor candidato nominal: <b>'+best.sequence.join(' → ')+'</b> · puntuación '+fmt(best.score)+' · <strong>'+esc(best.status)+'</strong> · alertas '+best.riskCount+'.</p>':'<p>'+esc(result.note)+'</p>')+
    (result.preferredOmega?'<p>OMEGA · secuencia para estudio: <b>1 → 2 → 4 → 3</b> · '+result.preferredOmega.riskCount+' alertas nominales. SIN VALIDAR COLISIONES. <button type="button" id="ed-omega-proposal">Usar propuesta en la simulación (NO CNC)</button></p>':'')+
+   (result.preferredOmega?'<p>Revisión de 11 zonas para Omega (sección ilustrativa): '+
+    esc(result.preferredOmega.rows.map(row=>'Paso '+row.position+' / B'+row.bend+': '+(row.componentProximities.join(', ')||'sin cruce estructural proyectado')).join(' · '))+
+    '. Los contactos de conformado con punzón/matriz no se consideran choque por sí solos. NO CNC.</p>':'')+
    (!eligible&&best?'<p role="alert">Aplicación automática BLOQUEADA: '+
+     (best.projectedComponents.length?'Proximidad proyectada en '+esc(best.projectedComponents.join(', '))+'. ':'')+
      (best.riskCount?'posibles interferencias modeladas ('+best.riskCount+'). ':'')+
      (unknown.length?'Faltan medidas locales: '+esc(unknown.join(', '))+'. ':'')+
      'Los candidatos nominales NO acreditan ausencia de colisiones.</p>':'')+

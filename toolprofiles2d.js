@@ -14,13 +14,20 @@
   const topHeight=Math.max(22,dieOpening*1.7,punchHeight||0);
   const centerY=punchTipY-r;
   const tx=r*Math.cos(alpha),ty=centerY+r*Math.sin(alpha);
-  const topY=punchTipY-topHeight,topX=tx+(ty-topY)*Math.tan(alpha);
-  const points=[pt(-topX,topY),pt(topX,topY),pt(tx,ty)];
+  // Un flanco que crece durante toda la altura crea un triángulo enorme.
+  // Representar una espiga recta y limitar la zona de flancos próximos a la punta.
+  // Longitud SOLO ilustrativa: NO sustituye perfil medido, DXF ni CAD de fabricante.
+  const topY=punchTipY-topHeight,flankHeight=Math.min(11,topHeight*.42);
+  const shoulderY=ty-flankHeight,shankHalf=tx+flankHeight*Math.tan(alpha);
+  const points=[pt(-shankHalf,topY),pt(shankHalf,topY),
+   pt(shankHalf,shoulderY),pt(tx,ty)];
   for(let i=1;i<=20;i++){
    const a=Math.PI/2-alpha+(2*alpha*i/20);
    points.push(pt(r*Math.cos(a),centerY+r*Math.sin(a)));
   }
-  return {outline:points,tipY:punchTipY,nose:r,angle:punchAngle};
+  points.push(pt(-shankHalf,shoulderY));
+  return {outline:points,tipY:punchTipY,nose:r,angle:punchAngle,
+   model:'espiga-recta-con-punta-nominal',verified:false};
  }
  function die({dieOpening,dieDepth,dieHeight}){
   const h=dieOpening/2,outer=h+Math.max(14,Math.min(40,dieOpening));

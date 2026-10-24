@@ -259,3 +259,10 @@ Ajuste de presentación a pantalla completa sin franjas de imagen no ocupadas. S
 - La plantilla de arranque del editor también utiliza B1→B2→B4→B3 (antes persistía B1→B2→B3→B4). Restablecer orden en una Omega de cuatro pliegues utiliza la propuesta de estudio; otras piezas conservan el orden ascendente. Las piezas guardadas manualmente NO se sobreescriben; pueden usar la propuesta o restablecer.
 - En seguimiento 2D se dibuja la distancia X proyectada desde el extremo del ala al tope, distinguida como SIN CONTACTO nominal, CONTACTO nominal o POSIBLE SOLAPE. No se desplaza automáticamente el tope y no se interpreta como contacto físico demostrado.
 - Pruebas de navegador móvil/escritorio y caché offline v86. No hay posicionamiento real de eje X ni orientación de volteos acreditada.
+
+
+## v87 — Topes X independientes para cada B (24 octubre 2026)
+- Programación 2D y Crear/Editar pieza permiten definir un X de tope para cada B. Vacío hereda el X general. Se guarda como setup.backgaugeByBend, de 1 a 10000 mm.
+- El motor de seguimiento usa la posición asociada al B activo, no a su puesto en la secuencia. Omega B1-B2-B4-B3 emplea X de B4 en el tercer golpe, manteniendo el tope nominal fijo durante el golpe.
+- Al crear pieza nueva no se heredan posiciones de la anterior. Editar y añadir/quitar alas conserva el emparejamiento; deshacer/rehacer y exportación JSON incluyen los valores.
+- NO se simula el recorrido físico del tope entre golpes ni se certifica contacto con chapa. NO CNC. Caché offline v87 y regresiones.

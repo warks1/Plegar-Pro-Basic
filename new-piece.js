@@ -62,7 +62,7 @@
     '<label>Longitud del ala (mm)<input data-np-length="'+i+'" type="number" min=".1" max="100000" step=".1" inputmode="decimal" required value="'+esc(length)+'"></label>'+
     (hasBend?'<label>Grados del pliegue<input data-np-angle="'+i+'" type="number" min=".1" max="179" step=".1" inputmode="decimal" required value="'+esc(Math.abs(angle))+'"></label>'+
      '<label>Sentido del pliegue<select data-np-direction="'+i+'"><option value="up"'+(angle>0?' selected':'')+'>↑ Arriba (+)</option><option value="down"'+(angle<0?' selected':'')+'>↓ Abajo (−)</option></select></label>'+
-     '<label>Orden de plegado<select data-np-position="'+bend+'">'+draft.sequence.map((id,j)=>'<option value="'+(j+1)+'"'+(id===bend?' selected':'')+'>Paso '+(j+1)+'</option>').join('')+'</select></label>':'')+
+     '<label>Orden de plegado<select data-np-position="'+bend+'">'+draft.sequence.map((id,j)=>'<option value="'+(j+1)+'"'+(id===bend?' selected':'')+'>Paso '+(j+1)+'</option>').join('')+'</select></label>'+'<label>Tope X B'+bend+' (mm) opcional<input data-np-gauge="'+i+'" type="number" min="1" max="10000" step="0.1" inputmode="decimal" placeholder="X general" value="'+esc(draft.setup.backgaugeByBend?.[i]??'')+'"></label>':'')+
    '</div>';
   }).join('');
  }
@@ -99,7 +99,12 @@
   }
   for(const el of dialog.querySelectorAll('[data-np-length]'))
    draft.segments[Number(el.dataset.npLength)]=Number(el.value);
-  for(const el of dialog.querySelectorAll('[data-np-angle]')){
+  for(const el of dialog.querySelectorAll('[data-np-gauge]')){
+    const i=Number(el.dataset.npGauge),raw=el.value.trim();
+    if(!draft.setup.backgaugeByBend)draft.setup.backgaugeByBend=Array(draft.angles.length).fill(null);
+    draft.setup.backgaugeByBend[i]=raw===''?null:Number(raw);
+   }
+   for(const el of dialog.querySelectorAll('[data-np-angle]')){
    const i=Number(el.dataset.npAngle),direction=dialog.querySelector('[data-np-direction="'+i+'"]')?.value;
    draft.angles[i]=(direction==='down'?-1:1)*Math.abs(Number(el.value));
   }
@@ -158,7 +163,11 @@
      draft.angles[i]=Math.sign(draft.angles[i]||1)*Math.abs(num(target.value));
     }else if(target.matches('[data-np-direction]')){
      draft.angles[i]=(target.value==='down'?-1:1)*Math.abs(draft.angles[i]);
-    }else if(target.matches('[data-np-position]')){
+    }else if(target.matches('[data-np-gauge]')){
+      const i=Number(target.dataset.npGauge),raw=target.value.trim();
+      if(!draft.setup.backgaugeByBend)draft.setup.backgaugeByBend=Array(draft.angles.length).fill(null);
+      draft.setup.backgaugeByBend[i]=raw===''?null:num(raw);
+     }else if(target.matches('[data-np-position]')){
      draft=Core.reposition(draft,num(target.dataset.npPosition),num(target.value));picked=[];
     }else if(target.matches('[data-np-field]')){
      const key=target.dataset.npField,value=target.value;

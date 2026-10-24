@@ -467,6 +467,14 @@ with sync_playwright() as pw:
   assert page.evaluate('PlegarEditor2D.getData().sequence')==[1,2,4,3]
   page.locator('#ed-order-reset').click()
   assert page.evaluate('PlegarEditor2D.getData().sequence')==[1,2,4,3], 'Restablecer no debe volver al orden antiguo de Omega'
+  page.locator('[data-ed-bend-gauge="3"]').fill('70')
+  page.locator('[data-ed-bend-gauge="3"]').dispatch_event('change')
+  assert page.evaluate('PlegarEditor2D.getData().setup.backgaugeByBend[3]')==70
+  assert page.evaluate('PlegarFormingGeometry.scene(PlegarEditor2D.getData(),2,.5).stop.x')==70
+  page.locator('[data-ed-bend-gauge="1"]').fill('95')
+  page.locator('[data-ed-bend-gauge="1"]').dispatch_event('change')
+  assert page.evaluate('PlegarFormingGeometry.scene(PlegarEditor2D.getData(),1,.5).stop.x')==95
+  assert page.evaluate('PlegarFormingGeometry.scene(PlegarEditor2D.getData(),3,.5).stop.x')==120
   page.locator('#ed-quick-height').fill('60')
   page.locator('#ed-quick-height').dispatch_event('change')
   assert page.evaluate('PlegarEditor2D.getData().setup.dieHeight')==60
@@ -532,6 +540,7 @@ with sync_playwright() as pw:
   for component in ['trancha','punzon','chapa','matriz','mesa','topes','amarre-punzon','mordaza','portamatriz','estructura-inferior','tope-carro','tope-brazo']:
    assert page.locator('.f2d-svg [data-component="'+component+'"]').count()==1,component
   assert '11 zonas modeladas' in page.locator('.f2-machine-zones').inner_text()
+  assert 'Tope B' in page.locator('.f2-data-panel').inner_text()
   assert page.locator('.f2-zone-grid .f2-zone').count()==11
   assert page.locator('.f2d-svg [data-component="indicador-tope"]').count()==1
   assert '21 posiciones' in page.locator('.f2-machine-zones').inner_text()

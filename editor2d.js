@@ -93,7 +93,8 @@ function renderDimensionTable(){
    '<td data-label="Giro (°)">'+(hasBend?'<input data-ed-program-angle="'+i+'" type="number" inputmode="decimal" min="-179" max="179" step="0.1" value="'+angle+'" aria-label="Ángulo firmado del pliegue '+bend+' en grados">':'—')+'</td>'+
    '<td data-label="Ri local (mm)">'+(hasBend?'<input data-ed-bend-radius="'+i+'" type="number" min="0.1" max="500" step="0.01" inputmode="decimal" placeholder="General" value="'+(state.bendOverrides?.[i]?.radius??'')+'" aria-label="Radio local del pliegue '+bend+' (vacío hereda Ri general)">':'—')+'</td>'+
    '<td data-label="K local">'+(hasBend?'<input data-ed-bend-k="'+i+'" type="number" min="0.2" max="0.6" step="0.001" inputmode="decimal" placeholder="General" value="'+(state.bendOverrides?.[i]?.kFactor??'')+'" aria-label="K local del pliegue '+bend+' (vacío hereda K general)">':'—')+'</td>'+
-   '<td data-label="Orden">'+(hasBend?'<select data-ed-program-position="'+bend+'" aria-label="Orden del pliegue '+bend+'">'+state.sequence.map((id,j)=>'<option value="'+(j+1)+'"'+(id===bend?' selected':'')+'>Paso '+(j+1)+'</option>').join('')+'</select>':'—')+'</td>'+
+   '<td data-label="Tope X B'+bend+'">'+(hasBend?'<input data-ed-bend-gauge="'+i+'" type="number" min="1" max="10000" step="0.1" inputmode="decimal" placeholder="X general" value="'+(state.setup.backgaugeByBend?.[i]??'')+'" aria-label="Tope X B'+bend+'; vacío hereda el X general">':'—')+'</td>'+
+    '<td data-label="Orden">'+(hasBend?'<select data-ed-program-position="'+bend+'" aria-label="Orden del pliegue '+bend+'">'+state.sequence.map((id,j)=>'<option value="'+(j+1)+'"'+(id===bend?' selected':'')+'>Paso '+(j+1)+'</option>').join('')+'</select>':'—')+'</td>'+
    '<td class="ed-dim-sum" data-label="Posición nominal">'+fmt(accumulated)+' mm</td></tr>';
  }).join('');
  const total=$('#ed-dimensions-total');
@@ -239,8 +240,8 @@ function layout(){return `<section class="editor2d" aria-label="Editor de progra
  <div class="ed-dimensions-heading"><strong>MEDIDAS DE LA PIEZA · EDITAR TRAMOS Y PLIEGUES</strong><span id="ed-dimensions-total"></span></div><div class="ed-new-piece-top"><button type="button" id="ed-create-piece">＋ Crear nueva pieza · configurar medidas y pliegues</button></div><div class="ed-library-buttons"><button type="button" id="ed-edit-piece">✎ Editar pieza actual</button><button type="button" id="ed-my-pieces">▤ Mis piezas</button><button type="button" id="ed-save-library">Guardar en Mis piezas</button></div>
  <p>Introduce la longitud de cada tramo, el ángulo firmado (−/+), y el orden de cada pliegue. Se actualizan automáticamente el dibujo, la vista 3D y las simulaciones. Los valores son nominales y deben verificarse con el plano real.</p>
  <div class="ed-dimensions-scroll" role="region" tabindex="0" aria-label="Tabla editable de medidas de plegado; desplazamiento horizontal en móvil">
- <table class="ed-dimensions-table"><thead><tr><th>Tramo</th><th>Longitud (mm)</th><th>Pliegue</th><th>Giro (°)</th><th>Ri local (mm)</th><th>K local</th><th>Orden</th><th>Posición acumulada*</th></tr></thead><tbody id="ed-dimensions-body"></tbody></table></div>
- <p class="ed-dimensions-foot">Ri/K locales: deja vacío para usar el valor general. El valor local se asocia al pliegue B, no a su puesto en la secuencia. Debes verificar el radio con una probeta. *Posición acumulada: suma de tramos introducidos, no medida real del desarrollo. Ángulo positivo/negativo indica el sentido nominal; la reorientación de la chapa no está validada.</p>
+ <table class="ed-dimensions-table"><thead><tr><th>Tramo</th><th>Longitud (mm)</th><th>Pliegue</th><th>Giro (°)</th><th>Ri local (mm)</th><th>K local</th><th>Tope X B (mm)</th><th>Orden</th><th>Posición acumulada*</th></tr></thead><tbody id="ed-dimensions-body"></tbody></table></div>
+ <p class="ed-dimensions-foot">Ri/K y X de tope locales: deja vacío para heredar el valor general. Se asocian al B, nunca al número de paso. Debes verificar el radio con una probeta. *Posición acumulada: suma de tramos introducidos, no medida real del desarrollo. Ángulo positivo/negativo indica el sentido nominal; la reorientación de la chapa no está validada.</p>
  <div class="ed-dimensions-actions"><button type="button" id="ed-dim-add">＋ Añadir tramo / pliegue</button><button type="button" id="ed-dim-remove">− Quitar último tramo</button><button type="button" id="ed-dim-view">Ver pliegues en el dibujo ↓</button></div>
  </section>
  <div class="ed-toolbar"><span class="ed-chip">EDITOR GEOMÉTRICO · v0.7</span><div class="ed-actions"><button type="button" id="ed-undo" aria-label="Deshacer">↶ Deshacer</button><button type="button" id="ed-redo" aria-label="Rehacer">↷ Rehacer</button><button type="button" id="ed-save">Guardar</button><label class="ed-plan-export-width">Ancho 3D (mm)<input id="ed-plan-width" type="number" min="1" max="5000" step="1" value="100" inputmode="decimal"/></label><button type="button" id="ed-save-plan">Crear y guardar plano 2D + 3D</button><button type="button" id="ed-export">Exportar JSON</button><label class="ed-import">Importar JSON<input type="file" id="ed-import" accept=".json,application/json" aria-label="Importar pieza JSON"></label></div></div>
@@ -300,6 +301,18 @@ if(el.id==='ed-table-left'){if(el.value.trim()===''){edit(d=>{d.setup.tableLeft=
  if(el.id==='ed-ram-offset'){if(el.value.trim()===''){edit(d=>{d.setup.ramBottomOffset=null;});return;}const v=readNumber(el,10,500);if(v!==null)edit(d=>{d.setup.ramBottomOffset=v;});return;}
  if(el.id==='ed-backgauge'){const v=readNumber(el,1,10000);if(v!==null)edit(d=>{d.setup.backgaugeX=v;});return;}
  if(el.id==='ed-thickness'){const v=readNumber(el,.1,100);if(v!==null)edit(d=>{d.thickness=v;});return;}
+ if(el.matches('[data-ed-bend-gauge]')){
+  const i=Number(el.dataset.edBendGauge);
+  if(!Number.isInteger(i)||i<0||i>=state.angles.length)return;
+  const raw=el.value.trim(),x=raw===''?null:readNumber(el,1,10000);
+  if(raw!==''&&x===null)return;
+  edit(d=>{
+   if(!d.setup.backgaugeByBend)d.setup.backgaugeByBend=d.angles.map(()=>null);
+   d.setup.backgaugeByBend[i]=x;
+  });
+  inform('Tope nominal X B'+(i+1)+' guardado. No garantiza contacto con chapa ni reproduce el desplazamiento del eje.');
+  return;
+ }
  if(el.matches('[data-ed-segment],[data-ed-program-segment]')){const v=readNumber(el,.1,100000);if(v!==null)edit(d=>{d.segments[Number(el.dataset.edSegment??el.dataset.edProgramSegment)]=v;});return;}
  if(el.matches('[data-ed-angle],[data-ed-program-angle]')){const v=readNumber(el,-179,179);if(v!==null)edit(d=>{d.angles[Number(el.dataset.edAngle??el.dataset.edProgramAngle)]=v;});return;}
   if(el.matches('[data-ed-bend-radius],[data-ed-bend-k]')){
@@ -371,8 +384,8 @@ function actions(event){
  case 'ed-plan-sim2d':if(planConfiguredId===planReference?.id)window.PlegarApp?.switchScreen('Simulación 2D');return;
  case 'ed-plan-sim3d':if(planConfiguredId===planReference?.id)window.PlegarApp?.switchScreen('Simulación 3D');return;
  case 'ed-dim-view':$('#ed-svg')?.scrollIntoView({behavior:'smooth',block:'center'});return;
- case 'ed-dim-add':case 'ed-add': if(state.segments.length>=G.MAX_SEGMENTS){inform('Máximo 24 tramos.');return;}edit(d=>{d.segments.push(60);d.angles.push(90);d.sequence.push(d.sequence.length+1);if(d.bendOverrides)d.bendOverrides.push({radius:null,kFactor:null});});break;
- case 'ed-dim-remove':case 'ed-remove': if(state.segments.length<=2)return;edit(d=>{d.segments.pop();d.angles.pop();d.sequence=d.sequence.filter(id=>id<=d.angles.length);if(d.bendOverrides)d.bendOverrides.pop();});break;
+ case 'ed-dim-add':case 'ed-add': if(state.segments.length>=G.MAX_SEGMENTS){inform('Máximo 24 tramos.');return;}edit(d=>{d.segments.push(60);d.angles.push(90);d.sequence.push(d.sequence.length+1);if(d.bendOverrides)d.bendOverrides.push({radius:null,kFactor:null});if(d.setup.backgaugeByBend)d.setup.backgaugeByBend.push(null);});break;
+ case 'ed-dim-remove':case 'ed-remove': if(state.segments.length<=2)return;edit(d=>{d.segments.pop();d.angles.pop();d.sequence=d.sequence.filter(id=>id<=d.angles.length);if(d.bendOverrides)d.bendOverrides.pop();if(d.setup.backgaugeByBend)d.setup.backgaugeByBend.pop();});break;
  case 'ed-undo':history('undo');break;
  case 'ed-redo':history('redo');break;
  case 'ed-up':case 'ed-down':{

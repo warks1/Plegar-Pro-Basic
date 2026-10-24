@@ -191,3 +191,10 @@ Ajuste de presentación a pantalla completa sin franjas de imagen no ocupadas. S
 - El arco activo conserva su signo y el recorrido de alas anteriores invierte apropiadamente el sentido al caminar a izquierda/derecha. Las 4 figuras L/U/Z/Omega se cotejan geométricamente contra el perfil final incluso al variar la secuencia.
 - Los pliegues negativos reflejan la **orientación de la pieza en su sistema geométrico**, no un montaje físicamente simulado. Para plegar sobre una matriz real hay que modelar giro/volteo, contacto y topes verificados; informes de holgura siguen **NO CNC / SIN VALIDAR**.
 - Refresco de caché offline v73. Conserva la interfaz aprobada.
+
+
+## Continuidad v74 — concordancia visual de sentidos (24 octubre 2026)
+- Después de fijar +arriba/−abajo en el motor, tres representaciones mantenían inversiones: Crear nueva pieza, Programación 2D y Planos PDF/SVG. Se corrigieron para que la orientación del 2D coincida con el 3D y con el signo del programa.
+- Los puntos de pliegue del formulario muestran flechas ↑/↓. El editor anuncia la orientación mediante etiquetas accesibles.
+- Pruebas automáticas sobre SVG exportados de +90°, −90°, +45°, −45° y comprobaciones Chromium en PC/móvil de programación y formulario; caché v74.
+- Simulación nominal; el volteo/recolocación física, geometría real de útiles, colisiones y CNC siguen sin validar.

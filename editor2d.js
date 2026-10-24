@@ -65,7 +65,7 @@ function draw(){
  const minY=Math.min(...points.map(p=>p.y)), maxY=Math.max(...points.map(p=>p.y));
  const scale=Math.min(600/Math.max(30,maxX-minX),322/Math.max(30,maxY-minY));
  const offX=(760-(maxX-minX)*scale)/2,offY=(460-(maxY-minY)*scale)/2;
- const cv=p=>({x:offX+(p.x-minX)*scale,y:offY+(maxY-p.y)*scale});
+ const cv=p=>({x:offX+(p.x-minX)*scale,y:offY+(p.y-minY)*scale});
  const coords=points.map(cv);
  const polylines=coords.map(p=>`${p.x.toFixed(2)},${p.y.toFixed(2)}`).join(' ');
  const labels=coords.slice(0,-1).map((p,i)=>{
@@ -74,7 +74,7 @@ function draw(){
  }).join('');
  const bends=coords.slice(1,-1).map((p,i)=>{
   const id=i+1,position=state.sequence.indexOf(i+1)+1;
-  return `<g data-ed-bend="${id}" class="ed-bend-point ${selected===id?'current':''} ${orderUsed.has(id)?'ed-order-chosen':''}" role="button" tabindex="0" aria-label="Pliegue ${id}, paso ${position}; toca para ordenar"><circle cx="${p.x.toFixed(2)}" cy="${p.y.toFixed(2)}" r="21"/><text x="${p.x.toFixed(2)}" y="${(p.y+4).toFixed(2)}" text-anchor="middle">${id}</text><text class="ed-order-small" x="${p.x.toFixed(2)}" y="${(p.y+34).toFixed(2)}" text-anchor="middle">Paso ${position}</text></g>`;
+  return `<g data-ed-bend="${id}" class="ed-bend-point ${selected===id?'current':''} ${orderUsed.has(id)?'ed-order-chosen':''}" role="button" tabindex="0" aria-label="Pliegue ${id}, ${state.angles[i]>0?'arriba':state.angles[i]<0?'abajo':'plano'}, paso ${position}; toca para ordenar"><circle cx="${p.x.toFixed(2)}" cy="${p.y.toFixed(2)}" r="21"/><text x="${p.x.toFixed(2)}" y="${(p.y+4).toFixed(2)}" text-anchor="middle">${id}</text><text class="ed-order-small" x="${p.x.toFixed(2)}" y="${(p.y+34).toFixed(2)}" text-anchor="middle">Paso ${position}</text></g>`;
  }).join('');
  $('#ed-svg').innerHTML=`<defs><pattern id="ed-grid" width="24" height="24" patternUnits="userSpaceOnUse"><path d="M 24 0 L 0 0 0 24" fill="none" stroke="#21445c" stroke-width=".8"/></pattern></defs><rect width="760" height="460" fill="url(#ed-grid)"/><polyline points="${polylines}" stroke="#031321" stroke-width="13" fill="none" stroke-linejoin="round" stroke-linecap="round"/><polyline points="${polylines}" stroke="#5bc8ff" stroke-width="7" fill="none" stroke-linejoin="round" stroke-linecap="round"/>${labels}${bends}`;
  $('#ed-total').textContent=`${fmt(G.totalLength(state))} mm nominales entre vértices`;

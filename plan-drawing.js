@@ -38,8 +38,9 @@
   const minX=Math.min(...pts.map(v=>v.x)),maxX=Math.max(...pts.map(v=>v.x));
   const minY=Math.min(...pts.map(v=>v.y)),maxY=Math.max(...pts.map(v=>v.y));
   const sx=720/Math.max(1,maxX-minX),sy=340/Math.max(1,maxY-minY),scale=Math.min(sx,sy,8);
-  const offX=450-(minX+maxX)/2*scale,offY=300+(minY+maxY)/2*scale;
-  const transform=v=>({x:offX+v.x*scale,y:offY-v.y*scale});
+  // G.vertices entrega coordenadas con Y de pantalla y +90° hacia arriba.
+  const offX=450-(minX+maxX)/2*scale,offY=300-(minY+maxY)/2*scale;
+  const transform=v=>({x:offX+v.x*scale,y:offY+v.y*scale});
   const view=pts.map(transform);
   const labels=p.segments.map((value,i)=>{const a=view[i],b=view[i+1],x=(a.x+b.x)/2,y=(a.y+b.y)/2-17;
    return `<text x="${x.toFixed(2)}" y="${y.toFixed(2)}" fill="#153c59" font-size="14" font-weight="bold" text-anchor="middle">${fmt(value)} mm</text>`;}).join('');

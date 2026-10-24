@@ -348,6 +348,13 @@ with sync_playwright() as pw:
   assert page.evaluate('JSON.stringify(PlegarEditor2D.getData())')==old
   # Alta completa de una pieza nueva desde 2D.
   page.locator('#ed-create-piece').click()
+  def sheet_y(selector):
+   pts=page.locator(selector).first.get_attribute('points').split()
+   return [float(pair.split(',')[1]) for pair in pts]
+  assert sheet_y('#np-drawing polyline[stroke="#65cfff"]')[2]<sheet_y('#np-drawing polyline[stroke="#65cfff"]')[1],'+90 debe subir'
+  page.locator('[data-np-direction="0"]').select_option('down')
+  assert sheet_y('#np-drawing polyline[stroke="#65cfff"]')[2]>sheet_y('#np-drawing polyline[stroke="#65cfff"]')[1],'-90 debe bajar'
+  page.locator('[data-np-direction="0"]').select_option('up')
   page.locator('[data-np-field="name"]').fill('Soporte nuevo desde 2D')
   page.locator('[data-np-field="name"]').dispatch_event('change')
   page.locator('[data-np-field="width"]').fill('250')
@@ -375,6 +382,7 @@ with sync_playwright() as pw:
   assert page.evaluate('PlegarEditor2D.getData().segments')==[40,85,60]
   assert page.evaluate('PlegarEditor2D.getData().angles')==[-90,90]
   assert page.evaluate('PlegarEditor2D.getData().sequence')==[2,1]
+  assert sheet_y('#ed-svg polyline[stroke="#5bc8ff"]')[2]>sheet_y('#ed-svg polyline[stroke="#5bc8ff"]')[1], 'Editor 2D ha invertido B1 negativo'
   assert page.evaluate('PlegarEditor2D.getWidth()')==250
   assert page.locator('#ed-dimensions-body tr').count()==3
   assert page.evaluate('PlegarPieceLibrary.list().length')==1

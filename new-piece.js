@@ -13,7 +13,7 @@
   const pts=G.vertices(draft),minX=Math.min(...pts.map(p=>p.x)),maxX=Math.max(...pts.map(p=>p.x)),
    minY=Math.min(...pts.map(p=>p.y)),maxY=Math.max(...pts.map(p=>p.y));
   const factor=Math.min(600/Math.max(25,maxX-minX),280/Math.max(25,maxY-minY),8);
-  const transform=p=>({x:380+(p.x-(minX+maxX)/2)*factor,y:225-(p.y-(minY+maxY)/2)*factor});
+  const transform=p=>({x:380+(p.x-(minX+maxX)/2)*factor,y:225+(p.y-(minY+maxY)/2)*factor});
   const points=pts.map(transform);
   const poly=points.map(p=>p.x.toFixed(2)+','+p.y.toFixed(2)).join(' ');
   const lengths=draft.segments.map((v,i)=>{
@@ -24,7 +24,7 @@
    const p=points[i+1],id=i+1,order=draft.sequence.indexOf(id)+1,active=picked.includes(id);
    return '<g data-np-touch="'+id+'" role="button" tabindex="0" aria-label="Elegir pliegue B'+id+' como siguiente paso" class="np-bend'+(active?' selected':'')+'">'+
     '<circle cx="'+p.x.toFixed(1)+'" cy="'+p.y.toFixed(1)+'" r="23"/>'+
-    '<text x="'+p.x.toFixed(1)+'" y="'+(p.y+5).toFixed(1)+'" text-anchor="middle">B'+id+'</text>'+
+    '<text x="'+p.x.toFixed(1)+'" y="'+(p.y+5).toFixed(1)+'" text-anchor="middle">B'+id+(angle>0?' ↑':' ↓')+'</text>'+
     '<text x="'+p.x.toFixed(1)+'" y="'+(p.y+39).toFixed(1)+'" text-anchor="middle" class="np-order-number">Paso '+order+'</text>'+
    '</g>';
   }).join('');

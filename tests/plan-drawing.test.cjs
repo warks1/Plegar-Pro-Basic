@@ -2,6 +2,7 @@
 const {test}=require('node:test');
 const assert=require('node:assert/strict');
 const Draw=require('../plan-drawing.js');
+const G=require('../geometry2d.js');
 const shape={
  name:'Pieza Omega & <ensayo>',material:'Acero S235JR',thickness:2,
  segments:[60,85,120,85,60],angles:[-90,90,90,-90],sequence:[3,1,4,2],
@@ -20,6 +21,24 @@ test('Planos: el mismo perfil produce dibujo 2D y proyección 3D acotada nominal
  assert.match(d.sheet,/viewBox="0 0 1800 600"/);
  assert.deepEqual(d.profile.sequence,shape.sequence);
  assert.deepEqual(d.profile.setup,shape.setup);
+});
+test('El plano exportado respeta el sentido de pliegue de la pieza geométrica',()=>{
+ const pointsFromSvg=svg=>{
+  const match=svg.match(/<polyline points="([^"]+)"/);
+  assert.ok(match,'Sin polilínea del perfil');
+  return match[1].split(' ').map(pair=>pair.split(',').map(Number));
+ };
+ for(const angle of [90,-90,45,-45]){
+  const p={...shape,segments:[45,80],angles:[angle],sequence:[1]};
+  const original=G.vertices(p),rendered=pointsFromSvg(Draw.create(p,{width:100}).svg2d);
+  const dir=(a,b)=>Math.atan2(-(b[1]-a[1]),b[0]-a[0]);
+  for(let i=0;i<p.segments.length;i++){
+   const src=dir([original[i].x,original[i].y],[original[i+1].x,original[i+1].y]);
+   const shown=dir(rendered[i],rendered[i+1]);
+   assert.ok(Math.abs(src-shown)<1e-3,`Pliegue ${angle} invertido en el SVG`);
+  }
+  assert.equal(Math.sign(rendered[2][1]-rendered[1][1]),-Math.sign(angle));
+ }
 });
 test('Planos: malla geométrica tiene espesor y ancho, vértices finitos',()=>{
  const d=Draw.create(shape,{width:234});

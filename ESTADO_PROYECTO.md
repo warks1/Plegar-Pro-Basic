@@ -204,3 +204,8 @@ Ajuste de presentación a pantalla completa sin franjas de imagen no ocupadas. S
 - Las tarjetas 3D de la pieza objetivo y la miniatura del paso final ya NO se construyen reusando la chapa orientada por el último golpe de la cinemática. Utilizan el mismo perfil validado y la misma malla de Planos, de modo que la geometría nominal final es independiente de la secuencia.
 - La vista del golpe en máquina sigue separada, con sus limitaciones de recolocación física y contacto; no se confunde con la referencia geométrica final.
 - Las pruebas comparan mallas exactas de Planos/vista previa y estabilidad de L, U, Z y Omega cuando se invierte el orden. Caché offline v75. No CNC.
+
+## v76 — vista lateral 2D más completa (24 octubre 2026)
+- Vista de perfil incluye tren superior (trancha, portapunzón, mordaza), punzón, matriz y portamatriz, mesa con estructura inferior y dedo/brazo/carro de tope trasero. La sección mantiene separadas partes que acompañan al punzón de las fijas y añade sus trazados al encuadre.
+- Módulo `machine-section2d.js` con cribado AABB de posibles proximidades por componente y texto de estado. La forma de amarres, máquina y topes es ILUSTRATIVA en ausencia de CAD contrastado; no valida ausencia de colisiones, contacto real ni CNC.
+- Pruebas en Chromium de componentes visibles, carrera vertical y estabilidad de mesa, junto con prueba unitaria de sección. Caché offline v76.

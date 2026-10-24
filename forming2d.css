@@ -56,3 +56,7 @@
 .f2-steps .f2-step.f2-tile.selected{background:#0b4162;border:2px solid #28b5fb;box-shadow:0 0 0 1px #349ef87d}
 @media(max-width:800px){.f2-layout{grid-template-columns:minmax(0,1fr);padding:6px}.f2-data-panel dl{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px 8px}.f2-data-panel dl>div{min-width:0}.f2-data-panel{padding:9px}.f2-tile{width:132px!important}}
 @media(max-width:470px){.f2-data-panel dl{grid-template-columns:repeat(2,minmax(0,1fr))}.f2-steps .f2-step.f2-tile{width:115px!important;min-width:115px!important}.f2-loop-control{font-size:10px}}
+
+/* Sección de máquina / revisión conservadora por componentes */
+.f2-machine-zones{padding:10px 13px;background:#112c40;color:#def0fa;font-size:12px;line-height:1.6;border-top:1px solid #3e6e84;overflow-wrap:anywhere}
+@media(max-width:700px){.f2-machine-zones{font-size:11px}}

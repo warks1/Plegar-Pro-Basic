@@ -61,10 +61,10 @@ function harness() {
   return { trigger, state, caches, stores, seen };
 }
 
-test('installs an offline page and cache version v75', async () => {
+test('installs an offline page and cache version v76', async () => {
   const h = harness();
   await h.trigger('install');
-  assert.ok(h.stores.has('plegar-pro-forming2d-v75'));
+  assert.ok(h.stores.has('plegar-pro-forming2d-v76'));
   assert.ok(await h.caches.match(home));
   assert.ok(await h.caches.match(scope+'machine-references.js'),'Ficha de máquina disponible sin conexión');
   assert.ok(await h.caches.match(scope+'settings.js'),'Preferencias disponibles offline');
@@ -74,6 +74,7 @@ test('installs an offline page and cache version v75', async () => {
   assert.ok(await h.caches.match(scope+'tool-dxf-3d.js'),'Visor geométrico tridimensional disponible sin conexión');
   assert.ok(await h.caches.match(scope+'tool-fit-audit.js'),'Inspector de compatibilidad nominal disponible offline');
   assert.ok(await h.caches.match(scope+'tool-fit-audit.css'),'Estilos del inspector de montaje disponibles offline');
+  assert.ok(await h.caches.match(scope+'machine-section2d.js'),'Sección de máquina disponible sin conexión');
   assert.ok(await h.caches.match(scope+'tool-dxf-import.css'),'Importación métrica accesible offline');
   assert.ok(await h.caches.match(scope+'manufacturer-drawings.js'),'Planos didácticos de utillaje disponibles sin conexión');
   assert.ok(await h.caches.match(scope+'manufacturer-catalog.css'),'Vista de utillaje sin conexión');

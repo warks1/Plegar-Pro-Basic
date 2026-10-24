@@ -2,32 +2,19 @@
    Muestra una aproximación con radio, no controla una plegadora. */
 (function(){
 'use strict';
-const Model=window.PlegarFormingGeometry,K=()=>window.PlegarFoldKinematics,TL=()=>window.PlegarSequenceTimeline;
+const Model=window.PlegarFormingGeometry,K=()=>window.PlegarFoldKinematics,TL=()=>window.PlegarSequenceTimeline,Section=window.PlegarMachineSection2D;
 const as2=n=>Number(n).toLocaleString('es-ES',{maximumFractionDigits:2});
 let active=null;
 const finite=n=>typeof n==='number'&&Number.isFinite(n)&&n>0;
 const rect=(x1,y1,x2,y2)=>[{x:x1,y:y1},{x:x2,y:y1},{x:x2,y:y2},{x:x1,y:y2}];
 const path=pts=>pts.map((p,i)=>(i?'L':'M')+p.x.toFixed(3)+' '+p.y.toFixed(3)).join(' ')+' Z';
-function machineOutlines(m){
- const cfg=m.machineSetup||{},die=m.toolProfiles.die.outline,punch=m.toolProfiles.punch.outline;
- const dieBottom=Math.max(...die.map(p=>p.y)),outside=Math.max(...die.map(p=>Math.abs(p.x)));
- const punchTop=Math.min(...punch.map(p=>p.y));
- // Si falta una medida, el cuerpo se muestra únicamente como silhouette didáctica.
- // La presencia gráfica jamás hace pasar un valor de representación por cota de colisión.
- const tableLeft=finite(cfg.tableLeft)?cfg.tableLeft:outside+Math.max(12,m.dieOpening);
- const tableRight=finite(cfg.tableRight)?cfg.tableRight:outside+Math.max(12,m.dieOpening);
- const tableY=dieBottom+1.5,tableDepth=Math.max(12,m.dieOpening*.55);
- const table=rect(-Math.max(outside,tableLeft),tableY,Math.max(outside,tableRight),tableY+tableDepth);
- const ramHalf=finite(cfg.ramWidth)?cfg.ramWidth/2:Math.max(12,m.dieOpening*1.2);
- const ramBottom=finite(cfg.ramBottomOffset)?m.punchTipY-cfg.ramBottomOffset:punchTop-1.5;
- const ram=rect(-ramHalf,ramBottom-Math.max(14,m.dieOpening*.8),ramHalf,ramBottom);
- return {table,ram,tableMeasured:finite(cfg.dieHeight)&&finite(cfg.tableLeft)&&finite(cfg.tableRight),
-  ramMeasured:finite(cfg.ramWidth)&&finite(cfg.ramBottomOffset)};
-}
+// La sección ampliada separa máquina superior, mesa, portaherramientas y topes.
+function machineOutlines(m){return Section.build(m);}
+
 function extents(m){
  const bodies=machineOutlines(m);
  const pts=[...m.assembly.contour,...m.toolProfiles.die.outline,...m.toolProfiles.punch.outline,
- ...bodies.ram,...bodies.table,
+ ...bodies.parts.flatMap(part=>part.points),
  {x:m.stop.x,y:m.stop.top},{x:m.stop.x+m.stop.width,y:m.stop.bottom}];
  return [Math.min(...pts.map(v=>v.x)),Math.max(...pts.map(v=>v.x)),Math.min(...pts.map(v=>v.y)),Math.max(...pts.map(v=>v.y))];
 }
@@ -55,19 +42,27 @@ function svg(m,zoom,bounds){
  <defs><pattern id="f2d-grid" width="20" height="20" patternUnits="userSpaceOnUse"><path d="M20 0V20H0" fill="none" stroke="#193a55" stroke-width=".7"/></pattern><linearGradient id="f2d-metal" x1="0" y1="0" x2="1" y2="0"><stop stop-color="#435970"/><stop offset=".48" stop-color="#b8d2e9"/><stop offset="1" stop-color="#364a60"/></linearGradient><linearGradient id="f2d-sheet" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#e0f5ff"/><stop offset="1" stop-color="#38b6ed"/></linearGradient></defs>
  <rect width="900" height="480" fill="#071a29"/><rect width="900" height="480" fill="url(#f2d-grid)"/>
  <g transform="translate(440 250) scale(${s.toFixed(5)}) translate(${-centreX.toFixed(5)} ${-centreY.toFixed(5)})">
- <path data-component="mesa" d="${path(bodies.table)}" fill="#716985" fill-opacity="${bodies.tableMeasured?'1':'.52'}" stroke="#baa6d1" stroke-width=".8"/>
- <path data-component="trancha" d="${path(bodies.ram)}" fill="#5d7186" fill-opacity="${bodies.ramMeasured?'1':'.6'}" stroke="#c3d4e3" stroke-width=".8"/>
- <path data-component="matriz" d="${dieOutline}" fill="#744047" stroke="#d2767b" stroke-width=".7"/>
+ <!-- Siluetas de amarres y estructura NOMINALES; sus cotas no están certificadas. -->
+ <path data-component="estructura-inferior" d="${path(bodies.lowerBody)}" fill="#53637a" fill-opacity=".70" stroke="#bdcde1" stroke-width="1"/>
+ <path data-component="mesa" d="${path(bodies.table)}" fill="#8d7eaa" fill-opacity="${bodies.tableMeasured?'1':'.72'}" stroke="#e0d0f5" stroke-width="1"/>
+ <path data-component="portamatriz" d="${path(bodies.dieHolder)}" fill="#657889" stroke="#d5e7f5" stroke-width="1"/>
+ <path data-component="trancha" d="${path(bodies.ram)}" fill="#75879b" fill-opacity="${bodies.ramMeasured?'1':'.72'}" stroke="#cbddec" stroke-width="1"/>
+ <path data-component="amarre-punzon" d="${path(bodies.upperHolder)}" fill="#a5afba" stroke="#ecf5fd" stroke-width="1"/>
+ <path data-component="mordaza" d="${path(bodies.parts.find(part=>part.id==='mordaza').points)}" fill="#49596b" stroke="#cfdfeb" stroke-width=".8"/>
+ <path data-component="matriz" d="${dieOutline}" fill="#744047" stroke="#e3a4aa" stroke-width=".8"/>
  <path d="M ${-half} 0 L 0 ${m.dieDepth} L ${half} 0" stroke="#b7d8ee" stroke-width=".9" fill="none"/>
- <path data-component="punzon" d="${punchOutline}" fill="url(#f2d-metal)" stroke="#d0e5f4" stroke-width=".9"/>
+ <path data-component="punzon" d="${punchOutline}" fill="url(#f2d-metal)" stroke="#eaf5ff" stroke-width="1.2"/>
+ <path data-component="tope-carro" d="${path(bodies.carriage)}" fill="#526479" stroke="#bbd2d9" stroke-width="1"/>
+ <path data-component="tope-brazo" d="${path(bodies.arm)}" fill="#617f85" stroke="#a6e9c9" stroke-width="1"/>
  ${wholePaths}
  ${hingeLabels}
  <path d="${line}" stroke="#081526" stroke-width="${m.thickness+1.6}" fill="none" stroke-linejoin="round" stroke-linecap="round"/>
  <path data-component="chapa" d="${line}" stroke="url(#f2d-sheet)" stroke-width="${m.thickness}" fill="none" stroke-linejoin="round" stroke-linecap="round"/>
  <g stroke="#f8bf56" stroke-width=".6" fill="#f8bf56"><circle cx="${-half}" cy="0" r=".9"/><circle cx="${half}" cy="0" r=".9"/></g>
  <circle cx="0" cy="${m.center.y}" r="1.1" fill="#ffb754"/>
- <rect data-component="topes" x="${m.stop.x}" y="${m.stop.top}" width="${m.stop.width}" height="${m.stop.bottom-m.stop.top}" rx="1" fill="${overlap?'#dc7770':'#53ae81'}" stroke="#afe7c1" stroke-width=".4"/>
- <path d="M ${m.stop.x+m.stop.width/2} ${m.stop.top} v -15 h ${Math.max(5,m.dieOpening/3)}" stroke="#ddab4b" stroke-width="1.4" fill="none"/>
+ <path data-component="topes" d="${path(bodies.finger)}" fill="#50e4a7" stroke="#d0ffe7" stroke-width="1"/>
+ <text x="${m.stop.x+5}" y="${m.stop.top-9}" font-size="5" fill="#cbffe6">TOPE X</text>
+ <text x="${-Math.max(20,m.dieOpening*1.2)}" y="${m.toolProfiles.punch.outline[0].y-12}" font-size="5" fill="#d6efff">AMARRE · ILUSTRATIVO</text>
  <path d="M ${-half} ${dimension} V ${dimension-3} M ${half} ${dimension} V ${dimension-3} M ${-half} ${dimension-1.5} H ${half}" stroke="#67bce9" stroke-width=".6" fill="none" stroke-dasharray="1.5 1"/>
  </g>
  <rect x="14" y="16" width="290" height="92" rx="7" fill="#0b2941" stroke="#2b678b"/>
@@ -122,6 +117,10 @@ function render(){
  const motion=ctl.mode==='cycle'?K().frame(data,ctl.currentStep,ctl.progress):null;
  const m=motion?motion.scene:Model.scene(data,ctl.currentStep,ctl.progress);
  ctl.host.querySelector('.f2-camera-content').innerHTML=svg(m,ctl.zoom,ctl.bounds);
+ const proximity=Section.inspect(m),zones=ctl.host.querySelector('.f2-machine-zones');
+ if(zones)zones.textContent='SECCIÓN 2D · 9 zonas modeladas: estructura superior, portapunzón, mordaza, portamatriz, mesa, estructura inferior, dedo, brazo y carro de tope. '+
+  (proximity.hits.length?'Posibles proximidades proyectadas: '+proximity.hits.map(x=>x.component).join(', ')+'. ':'Sin proximidades observadas en la proyección; esto NO descarta choque real. ')+
+  'Los amarres, la estructura y los topes no disponen de CAD calibrado. NO CNC.';
  const label=ctl.host.querySelector('.f2-step-label');label.textContent=`Paso ${m.step} de ${m.steps} · pliegue ${m.bend} · ${as2(m.turn)}°`;
  ctl.host.querySelector('.f2-progress').textContent=`${Math.round(ctl.progress*100)} %`;
  const slider=ctl.host.querySelector('.f2-range');slider.value=String(Math.round(ctl.progress*100));
@@ -196,7 +195,7 @@ function mount(host,getData,getSelection=()=>1,onSelect=()=>{}){
  <div class="f2-title"><div><strong>SEGUIMIENTO DE PLEGADO · PERFIL</strong><small>Punzón superior · matriz V inferior · tope posterior · chapa</small></div><span>PERFIL GEOMÉTRICO v0.39</span></div>
  <div class="f2-layout"><div class="f2-stage" aria-label="Mueve la simulación 2D con un dedo y usa dos dedos para cambiar el zoom"><div class="f2-camera-content"></div></div><aside class="f2-data-panel" aria-label="Datos de operación nominal"><h3>DATOS</h3><dl class="f2-data-values"></dl><small>Geometría ilustrativa. Sin fuerzas calculadas ni trayectorias certificadas.</small></aside></div><div class="f2-toolbar"><strong class="f2-step-label"></strong><div class="f2-controls"><button type="button" data-f2-action="previous">← Anterior</button><button type="button" data-f2-action="play">▶ Reproducir sin pausas</button><button type="button" data-f2-action="mode" aria-pressed="false">☐ Ciclo completo</button><button type="button" data-f2-action="next">Siguiente →</button><button type="button" data-f2-action="reset">Reiniciar</button><label class="f2-loop-control"><input class="f2-loop" type="checkbox" checked> Repetir secuencia</label><button type="button" data-f2-action="zoom-out" aria-label="Reducir zoom">−</button><button type="button" data-f2-action="zoom-in" aria-label="Ampliar zoom">+</button></div></div>
  <div class="f2-cycle-state" role="status" aria-label="Fase cinemática 2D"></div><div class="f2-slider"><label for="f2-range">Avance del ciclo o conformado</label><input id="f2-range" class="f2-range" type="range" min="0" max="100" step="1" value="0"><output class="f2-progress" for="f2-range">0 %</output></div>
- <div class="f2-steps" aria-label="Orden de plegado"></div><div class="f2-prior-summary" role="status"></div><div class="f2-nominal" role="status"></div><ul class="f2-notes"></ul></section>`;
+ <div class="f2-steps" aria-label="Orden de plegado"></div><div class="f2-machine-zones" role="status" aria-label="Componentes de máquina y proximidades"></div><div class="f2-prior-summary" role="status"></div><div class="f2-nominal" role="status"></div><ul class="f2-notes"></ul></section>`;
  active.touchCamera=window.PlegarTouchView.attach(host.querySelector('.f2-stage'),host.querySelector('.f2-camera-content'));
   host.onclick=e=>{
   const ctl=active;if(!ctl||ctl.host!==host)return;

@@ -84,7 +84,7 @@
   if(setup.radius<punch.nose-1e-8){
    warnings.push('Radio interior supuesto inferior al radio nominal de punta del punzón.');
   }
-  if(turn<0)warnings.push('B'+bend+' '+turn+'°: requiere VOLTEO previo de chapa. Se muestra la orientación nominal ya preparada sobre la matriz V; el giro, agarre, retirada y recolocación reales no están calculados. NO CNC.');
+  if(turn<0)warnings.push('Pliegue negativo B'+bend+' '+turn+'°: requiere VOLTEO previo de chapa. Se muestra la orientación nominal ya preparada sobre la matriz V; el giro, agarre, retirada y recolocación reales no están calculados. NO CNC.');
   if(angle>150)warnings.push('Pliegue superior a 150°: aproximación fuera de su aplicación habitual.');
   const output={
    bend,orderIndex,step:orderIndex+1,steps:piece.sequence.length,progress,turn,

@@ -35,7 +35,8 @@ function verify(m,step,progress){
  assert.equal(vectors.length,m.segments.length,m.name);
  for(let i=0;i<m.angles.length;i++){
   const expected=i+1===active?m.angles[i]*progress:completed.has(i+1)?m.angles[i]:0;
-  near(delta(vectors[i],vectors[i+1]),expected);
+  // La vista de máquina necesita la orientación local tras el volteo supuesto.
+  near(delta(vectors[i],vectors[i+1]),expected*s.mountSign);
  }
  near(s.signedAngle,m.angles[active-1]*progress);
  assert.ok(build(s,140).vertices.every(v=>[v.x,v.y,v.z].every(Number.isFinite)));
@@ -60,14 +61,18 @@ test('los cuatro perfiles acaban con la misma orientación relativa de alas que 
   const directions=straightDirections(s);
   const points=G.vertices(m),planned=points.slice(1).map((p,i)=>heading(points[i],p));
   assert.equal(directions.length,planned.length);
-  const offset=delta(planned[0],directions[0]);
-  for(let i=0;i<directions.length;i++) near(delta(planned[i],directions[i]),offset);
+  const installedDirections=planned.map(angle=>angle*s.mountSign);
+  const offset=delta(installedDirections[0],directions[0]);
+  for(let i=0;i<directions.length;i++) near(delta(installedDirections[i],directions[i]),offset);
  }
 });
 test('pliegue negativo cambia curvatura pero mantiene aviso de recolocación física pendiente',()=>{
  const up=scene(model(shapes[0]),0,1);
  const down=scene({...model(shapes[0]),angles:[-90]},0,1);
  assert.ok(up.wingRight.y<up.center.y);
- assert.ok(down.wingRight.y>down.center.y);
- assert.ok(down.warnings.some(w=>w.includes('recolocación')));
+ assert.ok(down.wingRight.y<down.center.y,'La chapa no atraviesa la V cuando el ángulo es -90°');
+ assert.equal(down.mountSign,-1);
+ assert.equal(down.requiresTurnover,true);
+ assert.ok(down.warnings.some(w=>w.includes('VOLTEO')));
+ assert.equal(down.signedAngle,-90);
 });

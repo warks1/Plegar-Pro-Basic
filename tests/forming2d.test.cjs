@@ -84,3 +84,29 @@ test('X del tope pertenece a B1,B2,B3,B4 y no a la posición del golpe',()=>{
  const reversed={...omega,sequence:[4,1,3,2]};
  assert.deepEqual(reversed.sequence.map((_,i)=>scene(reversed,i,.5).stop.x),[145,70,120,95]);
 });
+
+test('Omega reproduce exactamente B1 -90, B2 +90, B4 -90, B3 +90 sin reordenar los giros',()=>{
+ const omega={...p,sequence:[1,2,4,3]};
+ const expected=[{bend:1,turn:-90},{bend:2,turn:90},{bend:4,turn:-90},{bend:3,turn:90}];
+ const observed=omega.sequence.map((_,step)=>{
+  const result=scene(omega,step,1);
+  return {bend:result.bend,turn:result.turn};
+ });
+ assert.deepEqual(observed,expected);
+ const K=require('../fold-kinematics.js');
+ for(let i=0;i<omega.sequence.length;i++){
+  const frame=K.frame(omega,i,.78);
+  assert.equal(frame.scene.bend,expected[i].bend,'Paso de máquina diferente de ID de pliegue');
+  assert.equal(frame.scene.turn,expected[i].turn,'Giro no corresponde a B');
+  assert.equal(frame.scene.signedAngle,expected[i].turn,'El sentido dibujado no coincide con el signo programado');
+  assert.equal(frame.phase,'retirada');
+ }
+});
+test('Cambiar solo sentido de B4 conserva orden y sentido de otros pliegues',()=>{
+ const original={...p,sequence:[1,2,4,3],angles:[-90,90,90,-90]};
+ const changed={...original,angles:[...original.angles]};
+ changed.angles[3]=90;
+ assert.deepEqual(changed.sequence,original.sequence);
+ assert.deepEqual(changed.sequence.map((_,i)=>scene(changed,i,1).turn),[-90,90,90,90]);
+ assert.deepEqual(original.angles,[-90,90,90,-90]);
+});

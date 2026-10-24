@@ -189,6 +189,12 @@ function render(){
  const label=ctl.host.querySelector('.f2-step-label');label.textContent=ctl.showFinal?`Paso ${m.step} de ${m.steps} · PIEZA FINAL DEL PLANO`:`Paso ${m.step} de ${m.steps} · B${m.bend} · ${m.turn>0?'+':''}${as2(m.turn)}° (${m.turn<0?'abajo':'arriba'})`;
  const orderLabel=ctl.host.querySelector('.f2-order-live');
  if(orderLabel)orderLabel.textContent='Orden ejecutado: '+order.map((id,i)=>(i===ctl.currentStep&&!ctl.showFinal?'▶ ':'')+'B'+id+' ('+(data.angles[id-1]>0?'+':'')+as2(data.angles[id-1])+'°)').join(' → ');
+ const omega=ctl.host.querySelector('[data-f2-action="omega"]');
+ if(omega){
+  const applicable=window.PlegarMachineClearance?.omegaPocket?.(data)!=null;
+  omega.hidden=!applicable;
+  omega.disabled=!applicable||order.join(',')==='1,2,4,3';
+ }
  const program=ctl.host.querySelector('.f2-program-controls');
  if(program){
   const signed=data.angles[m.bend-1],magnitude=program.querySelector('[data-f2-angle]');
@@ -272,7 +278,7 @@ function mount(host,getData,getSelection=()=>1,onSelect=()=>{}){
  loop:window.PlegarSettings?.get?.().repeat!==false,holdUntil:null,selfSelecting:false,cameraKey:null,bounds:null,tilesKey:null};
  host.innerHTML=`<section class="f2-view" aria-label="Seguimiento cinemático 2D de plegado">
  <div class="f2-title"><div><strong>SEGUIMIENTO DE PLEGADO · PERFIL</strong><small>Punzón superior · matriz V inferior · tope posterior · chapa</small></div><span>PERFIL GEOMÉTRICO v0.39</span></div>
- <div class="f2-layout"><div class="f2-stage" aria-label="Mueve la simulación 2D con un dedo y usa dos dedos para cambiar el zoom"><div class="f2-camera-content"></div></div><aside class="f2-data-panel" aria-label="Datos de operación nominal"><h3>DATOS</h3><dl class="f2-data-values"></dl><small>Geometría ilustrativa. Sin fuerzas calculadas ni trayectorias certificadas.</small></aside></div><div class="f2-toolbar"><strong class="f2-step-label"></strong><div class="f2-controls"><button type="button" data-f2-action="previous">← Anterior</button><button type="button" data-f2-action="play">▶ Reproducir sin pausas</button><button type="button" data-f2-action="mode" aria-pressed="false">☐ Ciclo completo</button><button type="button" data-f2-action="next">Siguiente →</button><button type="button" data-f2-action="reset">Reiniciar</button><button type="button" data-f2-action="focus" aria-pressed="false">⌕ Detalle del pliegue</button><label class="f2-loop-control"><input class="f2-loop" type="checkbox" checked> Repetir secuencia</label><button type="button" data-f2-action="zoom-out" aria-label="Reducir zoom">−</button><button type="button" data-f2-action="zoom-in" aria-label="Ampliar zoom">+</button></div></div>
+ <div class="f2-layout"><div class="f2-stage" aria-label="Mueve la simulación 2D con un dedo y usa dos dedos para cambiar el zoom"><div class="f2-camera-content"></div></div><aside class="f2-data-panel" aria-label="Datos de operación nominal"><h3>DATOS</h3><dl class="f2-data-values"></dl><small>Geometría ilustrativa. Sin fuerzas calculadas ni trayectorias certificadas.</small></aside></div><div class="f2-toolbar"><strong class="f2-step-label"></strong><div class="f2-controls"><button type="button" data-f2-action="previous">← Anterior</button><button type="button" data-f2-action="play">▶ Reproducir sin pausas</button><button type="button" data-f2-action="mode" aria-pressed="false">☐ Ciclo completo</button><button type="button" data-f2-action="next">Siguiente →</button><button type="button" data-f2-action="reset">Reiniciar</button><button type="button" data-f2-action="omega" class="f2-omega-btn" hidden aria-label="Cargar orden Omega B1, B2, B4, B3 para estudio; no certificado CNC">Omega · 1 → 2 → 4 → 3</button><button type="button" data-f2-action="focus" aria-pressed="false">⌕ Detalle del pliegue</button><label class="f2-loop-control"><input class="f2-loop" type="checkbox" checked> Repetir secuencia</label><button type="button" data-f2-action="zoom-out" aria-label="Reducir zoom">−</button><button type="button" data-f2-action="zoom-in" aria-label="Ampliar zoom">+</button></div></div>
  <div class="f2-order-live" role="status" aria-label="Orden real de ejecución en 2D"></div><div class="f2-program-controls" role="group" aria-label="Editar giro y orden del pliegue directamente en simulación 2D"><strong class="f2-edit-label"></strong><label>Grados (sin signo)<input data-f2-angle type="number" inputmode="decimal" min="0" max="179" step="0.1" aria-label="Grados sin signo del pliegue activo"></label><label>Sentido<select data-f2-direction aria-label="Sentido del pliegue activo"><option value="up">↑ Arriba (+)</option><option value="down">↓ Abajo (−)</option></select></label><label>Orden del pliegue<select data-f2-position aria-label="Posición del pliegue activo en la secuencia"></select></label><small>Estos valores se guardan en el programa 2D/3D. Los pliegues negativos requieren una recolocación de chapa aún NO representada.</small></div><div class="f2-cycle-state" role="status" aria-label="Fase cinemática 2D"></div><div class="f2-slider"><label for="f2-range">Avance del ciclo o conformado</label><input id="f2-range" class="f2-range" type="range" min="0" max="100" step="1" value="0"><output class="f2-progress" for="f2-range">0 %</output></div>
  <div class="f2-steps" aria-label="Orden de plegado"></div><div class="f2-machine-zones" role="status" aria-label="Componentes de máquina y proximidades"></div><div class="f2-prior-summary" role="status"></div><div class="f2-nominal" role="status"></div><ul class="f2-notes"></ul></section>`;
  active.touchCamera=window.PlegarTouchView.attach(host.querySelector('.f2-stage'),host.querySelector('.f2-camera-content'));
@@ -288,6 +294,16 @@ function mount(host,getData,getSelection=()=>1,onSelect=()=>{}){
   }
   const action=e.target.closest('[data-f2-action]')?.dataset.f2Action;
   if(!action)return;
+  if(action==='omega'){
+   const data=ctl.getData();
+   if(window.PlegarMachineClearance?.omegaPocket?.(data)==null)return;
+   halt();ctl.holdUntil=null;ctl.progress=0;ctl.showFinal=false;ctl.currentStep=0;
+   if(window.PlegarEditor2D?.setSequence?.([1,2,4,3])){
+    ctl.onSelect(1);
+    render();
+   }
+   return;
+  }
   if(action==='mode'){halt();ctl.showFinal=false;ctl.mode=ctl.mode==='bend'?'cycle':'bend';ctl.progress=0;ctl.holdUntil=null;render();return;}
   if(action==='play'){
    if(ctl.timer!==null){halt();render();return;}

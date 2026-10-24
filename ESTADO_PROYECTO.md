@@ -227,3 +227,7 @@ Ajuste de presentación a pantalla completa sin franjas de imagen no ocupadas. S
 ## v80 — once zonas de inspección (24 octubre 2026)
 - Punzón y matriz incluidos junto a las nueve zonas estructurales en la inspección y el muestreo 2D. Se diferencia expresamente contacto nominal de conformado de una posible interferencia; ninguno supone choque real certificado.
 - El cálculo de proximidad emplea perfiles 2D aproximados y permanece NO CNC. Pruebas actualizadas y caché v80.
+
+## v81 — alternar detalle del pliegue y máquina completa (24 octubre 2026)
+- En seguimiento 2D se añade un botón de acercamiento a la V que mantiene centro y escala estables durante el ciclo y permite regresar a la vista completa. En modo detalle quedan recortados elementos lejanos deliberadamente; el recuadro independiente sigue mostrando el X nominal del tope.
+- Control y gestos táctiles conservados, prueba Chromium escritorio/móvil y caché v81. Vista ilustrativa, NO CNC.

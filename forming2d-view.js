@@ -172,6 +172,7 @@ function render(){
    ['Matriz',setup.die||'No elegida'],['Espesor',as2(data.thickness)+' mm'],
    ['Material',data.material||'Sin especificar'],['Fuerza actual','NO CALCULADA'],
    ['Ángulo',as2(m.signedAngle)+'°'],
+   ['Distancia punta–pie trancha',setup.ramBottomOffset==null?'Desconocida':as2(setup.ramBottomOffset)+' mm introducidos'],
    ['Y geométrica',as2(motion?.punchY??m.punchTipY)+' mm · NO CNC'],
    ['Avisos nominales',String(m.interferences.problems.length)]
   ];

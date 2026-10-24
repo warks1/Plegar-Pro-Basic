@@ -30,7 +30,11 @@
    [punchHalf-1,tipTop+3],[punchHalf-1,tipTop],[1-punchHalf,tipTop],
    [1-punchHalf,tipTop+3],[-punchHalf-3,tipTop+3],
    [-punchHalf-5,tipTop-3],[-clampHalf,tipTop-7]);
-  const upperBeam=rectangle(-ramHalf,tipTop-49,ramHalf,tipTop-15);
+  // Misma referencia Y que los prismas 3D: distancia desde punta de punzón.
+  // Si se desconoce, se representa una silueta didáctica.
+  const ramBottom=finite(cfg.ramBottomOffset)?m.punchTipY-cfg.ramBottomOffset:tipTop-15;
+  const upperBeam=rectangle(-ramHalf,ramBottom-35,ramHalf,ramBottom);
+  const toolToRamNominalGapMm=Math.round(((tipTop-15)-ramBottom)*1000)/1000;
   const clampJaw=rectangle(-Math.max(5,punchHalf/3),tipTop-8,Math.max(5,punchHalf/3),tipTop);
   const dieHolder=poly([-dieHalf-3,dieBottom+2],[dieHalf+3,dieBottom+2],
    [dieHalf+7,dieBottom+13],[-dieHalf-7,dieBottom+13]);
@@ -64,6 +68,8 @@
   return {ram:upperBeam,table,parts,dieHolder,upperHolder,lowerBody,finger,arm,carriage,
    tableMeasured:finite(cfg.tableLeft)&&finite(cfg.tableRight)&&finite(cfg.dieHeight),
    ramMeasured:finite(cfg.ramWidth)&&finite(cfg.ramBottomOffset),
+   ramDatumKnown:finite(cfg.ramBottomOffset),
+   ramBottom,toolToRamNominalGapMm,holderGeometryVerified:false,
    projected:true,verified:false};
  }
  function crosses(a,b,box,r=0){

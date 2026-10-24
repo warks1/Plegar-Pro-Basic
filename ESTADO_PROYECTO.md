@@ -244,3 +244,8 @@ Ajuste de presentación a pantalla completa sin franjas de imagen no ocupadas. S
 - Los contactos de herramienta con chapa se separan de los posibles cruces no deseados; la herramienta no se declara en colisión por el hecho de formar. La clasificación conserva siempre **geometría proyectada sin verificar** y NO CNC.
 - Se evita ofrecer un orden como aplicable automáticamente si hay cruces nominales de la chapa con piezas de máquina, incluso cuando las cinco dimensiones de mesa/trancha están configuradas.
 - Nuevos ensayos de sincronización entre secuencia y escena. Caché offline v83.
+
+## v84 — geometría Y de trancha sincronizada entre 2D y 3D (24 octubre 2026)
+- Antes se dibujaba el pie de trancha a una distancia fija desde la parte superior del punzón, incluso al indicar ramBottomOffset. Ahora se calcula desde la punta menos dicha cota, como en tooling3d.js.
+- La altura esquemática del cuerpo superior es 35 mm, no una cota oficial; la geometría del amarre sigue desconocida. Sin ramBottomOffset se muestra solo la silueta didáctica.
+- Nuevas pruebas de concordancia 2D/3D con tres distancias y tres progresos; caché v84.

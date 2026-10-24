@@ -53,3 +53,28 @@ test('Amarre superior sigue siendo independiente del nuevo perfil de punzón',()
  assert.ok(punch[1].y<st.upperHolder.at(-1).y+100,'Cuerpo de punzón acotado y separado');
  assert.equal(st.verified,false);
 });
+
+test('Distancia punta-pie de trancha aplicada en 2D y coincidente con el prisma 3D',()=>{
+ const Tool3D=require('../tooling3d.js');
+ for(const offset of [55,100,140]){
+  const p={...model,setup:{...model.setup,ramWidth:95,ramBottomOffset:offset,dieHeight:60,tableLeft:180,tableRight:180}};
+  for(const progress of [0,.5,1]){
+   const scene=F.scene(p,0,progress),section=V.build(scene);
+   const lowerEdge=section.ram[2].y,expected=scene.punchTipY-offset;
+   assert.ok(Math.abs(lowerEdge-expected)<1e-7,'Distancia 2D incorrecta');
+   assert.equal(section.ramDatumKnown,true);
+   assert.equal(section.ramMeasured,true);
+   assert.equal(section.holderGeometryVerified,false);
+   const prism=Tool3D.prisms({width:100,thickness:scene.thickness},scene).find(x=>x.group==='ram');
+   assert.ok(prism);
+   assert.ok(Math.abs(prism.outline[2].y-lowerEdge)<1e-7,'Desfase 2D/3D');
+  }
+ }
+});
+test('Si no hay cota de trancha solo se dibuja la silueta esquemática',()=>{
+ const section=V.build(F.scene(model,0,.3));
+ assert.equal(section.ramDatumKnown,false);
+ assert.equal(section.ramMeasured,false);
+ assert.equal(section.holderGeometryVerified,false);
+ assert.ok(Number.isFinite(section.ramBottom));
+});

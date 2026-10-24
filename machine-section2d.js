@@ -80,7 +80,13 @@
   const spans=[];
   for(const side of ['left','right'])for(const edge of m.assembly?.[side]?.items||[])
    spans.push({a:edge.from,b:edge.to,side,status:edge.status});
-  const checked=section.parts.map(part=>{
+  // Comprobar también las herramientas, sin confundir contacto esperado
+  // durante el plegado con una colisión no deseada.
+  const toolZones=[
+   {id:'punzon',name:'Punzón (contacto previsto)',points:m.toolProfiles.punch.outline,known:false,expectedContact:true},
+   {id:'matriz',name:'Matriz (apoyo previsto)',points:m.toolProfiles.die.outline,known:false,expectedContact:true}
+  ];
+  const checked=[...toolZones,...section.parts].map(part=>{
    let gap=null;
    for(const edge of spans){
     const distance=Clearance.segmentPolygon(edge.a,edge.b,part.points)-m.thickness/2;
@@ -88,11 +94,12 @@
    }
    const distanceMm=gap===null?null:Math.round(Math.max(0,gap)*1000)/1000;
    return {id:part.id,name:part.name,known:part.known,approximate:true,
+    expectedContact:part.expectedContact===true,
     distanceMm,possibleOverlap:gap!==null&&gap<=0.05,samples:spans.length};
   });
   const hits=checked.filter(part=>part.possibleOverlap).map(part=>({
-   component:part.name,id:part.id,kind:'POSIBLE_PROXIMIDAD_EN_PROYECCIÓN',
-   distanceMm:part.distanceMm,verified:false
+   component:part.name,id:part.id,kind:part.expectedContact?'CONTACTO_O_PROXIMIDAD_DE_HERRAMIENTA':'POSIBLE_PROXIMIDAD_EN_PROYECCIÓN',
+   expectedContact:part.expectedContact,distanceMm:part.distanceMm,verified:false
   }));
   return {hits,checked,physicallyValidated:false,cncApproved:false,continuousSweep:false,
    method:'Distancia entre alas y contorno poligonal 2D con medio espesor nominal.',

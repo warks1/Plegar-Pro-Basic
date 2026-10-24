@@ -133,14 +133,14 @@ function render(){
  if(zones){
   const checked=proximity.checked.map(part=>'<span class="f2-zone'+(part.possibleOverlap?' f2-zone-near':'')+
    '" title="Modelo 2D nominal; no es plano CAD verificado">'+part.name+' · '+
-   (part.distanceMm===null?'sin tramo analizable':part.possibleOverlap?'posible cruce 2D':part.distanceMm.toFixed(1)+' mm aprox.')+'</span>').join('');
+   (part.distanceMm===null?'sin tramo analizable':part.possibleOverlap?(part.expectedContact?'contacto previsto o posible solape':'posible cruce 2D'):part.distanceMm.toFixed(1)+' mm aprox.')+'</span>').join('');
   const first=ctl.sectionSweep.hits.slice(0,4).map(hit=>hit.component+' · '+hit.phase+' '+hit.cyclePercent+' %').join('; ');
-  zones.innerHTML='<strong>SECCIÓN 2D · 9 zonas modeladas · NO CNC</strong>'+
+  zones.innerHTML='<strong>SECCIÓN 2D · 11 zonas modeladas · NO CNC</strong>'+
    '<p>Posición actual: '+(proximity.hits.length?'posibles cruces de contornos: '+proximity.hits.map(x=>x.component).join(', '):'sin cruce observado en esta proyección')+
    '. Ausencia de cruces NO implica seguridad.</p><div class="f2-zone-grid">'+checked+'</div>'+
    '<p>Muestreo del golpe ('+ctl.sectionSweep.frames+' posiciones): '+
    (first?'primeras proximidades: '+first:'sin cruce en las posiciones muestreadas')+
-   '. No es barrido continuo ni considera el volteo físico de la chapa.</p>';
+   '. El contacto del punzón y la matriz con la chapa puede ser intencionado. Sin barrido continuo ni volteo real.</p>';
  }
  const label=ctl.host.querySelector('.f2-step-label');label.textContent=`Paso ${m.step} de ${m.steps} · pliegue ${m.bend} · ${as2(m.turn)}°`;
  ctl.host.querySelector('.f2-progress').textContent=`${Math.round(ctl.progress*100)} %`;

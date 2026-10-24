@@ -544,6 +544,19 @@ with sync_playwright() as pw:
   assert page.locator('.f2-tile[data-f2-step="start"]').count()==1
   assert page.locator('.f2-tile[data-f2-step="final"]').count()==1
   assert page.locator('.f2-loop').is_checked()
+  # El último botón debe enseñar el perfil nominal final del plano, no la
+  # posición local del último golpe bajo la trancha.
+  page.locator('.f2-tile[data-f2-step="final"]').click()
+  assert page.locator('.f2d-svg[data-f2-final="true"]').count()==1
+  actual=page.locator('.f2d-svg[data-f2-final] [data-component="chapa-final"]').get_attribute('points').split()
+  expected=page.evaluate("""() => PlegarGeometry2D.vertices(PlegarEditor2D.getData()).map(p=>[p.x,p.y])""")
+  assert len(actual)==len(expected)
+  for pair,point in zip(actual,expected):
+   xx,yy=map(float,pair.split(','))
+   assert abs(xx-point[0])<.0001 and abs(yy-point[1])<.0001
+  assert page.locator('.f2d-svg [data-component="punzon"]').count()==0
+  page.locator('.f2-tile[data-f2-step="start"]').click()
+  assert page.locator('.f2d-svg[data-f2-final="true"]').count()==0
   page.locator('[data-f2-action="play"]').click()
   page.wait_for_function("""() => document.querySelector('.f2-step-label')?.textContent.includes('Paso 2 de 2') &&
    document.querySelector('.f2-progress')?.textContent.includes('100 %')""",timeout=12000)

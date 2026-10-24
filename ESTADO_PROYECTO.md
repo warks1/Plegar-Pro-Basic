@@ -223,3 +223,7 @@ Ajuste de presentación a pantalla completa sin franjas de imagen no ocupadas. S
 - Se abandona el triángulo que crecía de punta a cabeza durante toda la altura del punzón. El perfil nominal incluye una espiga recta y un corto flanco de punta 30°/88° redondeada, con dimensiones de estudio explícitamente NO VERIFICADAS.
 - Un punzón H100 y otro H150 mantienen ancho transversal superior análogo en la representación, en vez de multiplicarlo por la altura. Se mantienen selección de herramienta y radio programados. No se incorpora ni se atribuye una geometría oficial de fabricante.
 - Pruebas de perfil, amarre y cache v79; la inspección sigue siendo nominal y NO CNC.
+
+## v80 — once zonas de inspección (24 octubre 2026)
+- Punzón y matriz incluidos junto a las nueve zonas estructurales en la inspección y el muestreo 2D. Se diferencia expresamente contacto nominal de conformado de una posible interferencia; ninguno supone choque real certificado.
+- El cálculo de proximidad emplea perfiles 2D aproximados y permanece NO CNC. Pruebas actualizadas y caché v80.

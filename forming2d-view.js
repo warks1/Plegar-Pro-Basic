@@ -74,7 +74,8 @@ function svg(m,zoom,bounds){
  </g>
  <rect x="14" y="16" width="290" height="92" rx="7" fill="#0b2941" stroke="#2b678b"/>
  <text x="27" y="36" font-size="12" fill="#96c6e4">PLEGADO ACTIVO · ${m.bend} / ${m.steps}</text>
- <text x="27" y="59" font-size="18" font-weight="bold" fill="#e0f3ff">${as2(m.signedAngle)}° / ${as2(m.turn)}°</text>
+ <text x="27" y="59" font-size="18" font-weight="bold" fill="#e0f3ff">${m.signedAngle>0?'+':''}${as2(m.signedAngle)}° / ${m.turn>0?'+':''}${as2(m.turn)}°</text>
+ ${m.requiresTurnover?'<text data-component="aviso-volteo" x="27" y="91" fill="#ffcf85" font-size="11" font-weight="bold">NEGATIVO: REQUIERE VOLTEAR CHAPA · NO SIMULADO</text>':''}
  <text x="27" y="77" font-size="11" fill="#93b9d4">Radio interior supuesto: ${as2(m.insideRadius)} mm</text>
  <text x="27" y="94" font-size="11" fill="#93b9d4">Espesor ${as2(m.thickness)} mm · V${m.dieOpening} · P${m.punchAngle}°</text>
  <g data-component="indicador-tope" transform="translate(685 45)" aria-label="Detalle auxiliar del tope nominal, no a escala">
@@ -214,6 +215,7 @@ function render(){
  ctl.host.querySelector('.f2-cycle-state').textContent=ctl.showFinal?'FIN DEL PROGRAMA · Pieza objetivo desde el plano. No representa la última posición de la prensa ni verifica colisiones.':motion
   ? `FASE: ${motion.phase.toUpperCase()} · ${motion.backgaugeMotion.active?'TOPE X '+as2(motion.backgaugeMotion.fromX)+' → '+as2(motion.backgaugeMotion.toX)+' mm · posición '+as2(m.stop.x)+' mm · ':''}Punzón Y nominal ${as2(motion.punchY)} mm · retirada ${as2(motion.punchLift)} mm. ${motion.notice}. Movimiento de ejes y recolocación reales NO calculados. NO CNC.`
   : 'MODO CONFORMADO · avance angular sin aproximación ni retirada. Activa Ciclo completo para ver las tres fases.';
+ if(m.requiresTurnover)ctl.host.querySelector('.f2-cycle-state').textContent+=' · B'+m.bend+' '+m.turn+'° exige VOLTEO PREVIO: retirada, giro y recolocación no simulados.';
  ctl.host.querySelector('[data-f2-action="previous"]').disabled=ctl.currentStep===0;
  ctl.host.querySelector('[data-f2-action="next"]').disabled=ctl.currentStep>=order.length-1;
  const loopBox=ctl.host.querySelector('.f2-loop');if(loopBox)loopBox.checked=ctl.loop;
@@ -228,6 +230,7 @@ function render(){
    ['Matriz',setup.die||'No elegida'],['Espesor',as2(data.thickness)+' mm'],
    ['Material',data.material||'Sin especificar'],['Fuerza actual','NO CALCULADA'],
    ['Ángulo',as2(m.signedAngle)+'°'],
+   ['Orientación',m.requiresTurnover?'VOLTEO previo sin simular':'Montaje nominal'],
    ['Tope B'+m.bend,as2(m.stop.x)+' mm'+(m.stop.travelling?' → '+as2(m.stop.targetX)+' mm':'')+' · '+(m.stop.source==='por-pliegue'?'X particular':'X general')+' · NO CNC'],
    ['Distancia punta–pie trancha',setup.ramBottomOffset==null?'Desconocida':as2(setup.ramBottomOffset)+' mm introducidos'],
    ['Y geométrica',as2(motion?.punchY??m.punchTipY)+' mm · NO CNC'],

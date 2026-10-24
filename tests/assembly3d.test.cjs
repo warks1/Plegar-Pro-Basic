@@ -56,3 +56,10 @@ test('invalid 3D dimensions and projection parameters fail clearly',()=>{
  assert.throws(()=>project(build(m),NaN));
  assert.throws(()=>project(build(m),0,20,0));
 });
+
+test('Malla 3D del pliegue negativo mantiene alas elevadas sobre V',()=>{
+ const s=scene({...model,sequence:[1,2,4,3]},0,1);
+ assert.ok(s.wingLeft.y<s.center.y && s.wingRight.y<s.center.y);
+ assert.equal(s.requiresTurnover,true);
+ assert.ok(build(s,100).vertices.every(p=>Number.isFinite(p.y)));
+});

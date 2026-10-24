@@ -110,3 +110,19 @@ test('Cambiar solo sentido de B4 conserva orden y sentido de otros pliegues',()=
  assert.deepEqual(changed.sequence.map((_,i)=>scene(changed,i,1).turn),[-90,90,90,90]);
  assert.deepEqual(original.angles,[-90,90,90,-90]);
 });
+
+test('B1 -90°, montaje sobre V con alas arriba y volteo advertido, el signo del plano permanece',()=>{
+ const n=scene({...p,sequence:[1,2,4,3]},0,1);
+ const pos=scene({...p,angles:[90,90,90,-90],sequence:[1,2,4,3]},0,1);
+ assert.equal(n.turn,-90);assert.equal(n.signedAngle,-90);
+ assert.equal(n.mountSign,-1);assert.equal(n.orientationVerified,false);
+ assert.equal(n.requiresTurnover,true);
+ near(n.shoulderY,0);near(n.wingLeft.y,pos.wingLeft.y);near(n.wingRight.y,pos.wingRight.y);
+ assert.ok(n.wingLeft.y<n.center.y && n.wingRight.y<n.center.y);
+ assert.ok(n.warnings.some(x=>x.includes('VOLTEO')));
+});
+test('Omega en secuencia B1-B2-B4-B3 preserva los cuatro signos de plano y montaje',()=>{
+ const m={...p,sequence:[1,2,4,3]};
+ assert.deepEqual(m.sequence.map((_,i)=>{const z=scene(m,i,1);return [z.bend,z.turn,z.mountSign];}),
+ [[1,-90,-1],[2,90,1],[4,-90,-1],[3,90,1]]);
+});

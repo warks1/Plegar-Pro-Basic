@@ -99,3 +99,10 @@ test('Interpolar no desplaza ni altera las posiciones de tope guardadas por B',(
  assert.equal(K.frame(reordered,1,0).scene.stop.x,145);
  assert.equal(K.frame(reordered,1,.12).scene.stop.x,70);
 });
+
+test('Secuencia negativa reproduce golpe sobre V con advertencia de volteo previo, no negativo bajo matriz',()=>{
+ const f=K.frame({...part,sequence:[1,2,4,3]},0,.78);
+ assert.equal(f.scene.signedAngle,-90);assert.equal(f.scene.requiresTurnover,true);
+ assert.ok(f.scene.wingLeft.y<f.scene.center.y&&f.scene.wingRight.y<f.scene.center.y);
+ assert.match(f.notice,/volteo/);
+});

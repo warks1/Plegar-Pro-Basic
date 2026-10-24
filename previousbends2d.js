@@ -16,7 +16,7 @@
   for (const side of ['left','right']){
    const backwards=side==='left';
    const origin=backwards?m.wingLeft:m.wingRight;
-   const halfSigned=(m.signedAngle??Math.sign(m.turn||1)*m.currentAngle)*Math.PI/360;
+   const halfSigned=(m.machineAngle??m.currentAngle)*Math.PI/360;
    let direction=backwards?(-Math.PI+halfSigned):(-halfSigned);
    // Skip the current bend and use only joints ALREADY formed in order.
    let j=backwards?m.bend-1:m.bend+1;
@@ -25,7 +25,7 @@
    let iter=0;
    while(j>=1&&j<=profile.angles.length&&iter++<profile.angles.length){
     if(!completed.has(j))break;
-    const angle=profile.angles[j-1];
+    const angle=profile.angles[j-1]*(m.mountSign||1);
     direction+=(backwards?1:-1)*rad(angle);
     const length=profile.segments[backwards?j-1:j];
     const from=points[points.length-1];
@@ -36,7 +36,7 @@
    }
    if(included.length)paths.push({side,points,bends:included});
   }
-  return {paths,completed:[...ids],note:'Alas previas dibujadas como bisagras agudas en un plano y sin recolocar la pieza, ni simular trayectorias CNC o cambios de apoyo. Solo cribado ilustrativo.'};
+  return {paths,completed:[...ids],note:'Alas previas nominales sin recolocar físicamente la pieza: el montaje de -90° presupone volteo no simulado. Cribado ilustrativo, NO CNC.'};
  }
  return {calculate};
 });

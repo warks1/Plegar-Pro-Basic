@@ -72,3 +72,10 @@ test('Punzón genérico 88° usa espiga recta, no triángulo desde toda su altur
  assert.ok(Math.abs(narrow.outline[1].x-shorter.outline[1].x)<1e-8,'Mayor altura no ensancha el punzón sin límite');
  assert.equal(narrow.verified,false);
 });
+
+test('Alas previas de un negativo utilizan montaje nominal y no lo consideran volteo real',()=>{
+ const s=scene({...p,angles:[90,-90]},1,.5);
+ assert.equal(s.mountSign,-1);
+ assert.ok(s.previous.paths.some(q=>q.bends.includes(1)));
+ assert.match(s.previous.note,/sin recolocar físicamente/);
+});

@@ -576,6 +576,8 @@ with sync_playwright() as pw:
   assert page.evaluate('PlegarEditor2D.getData().angles[1]')==-90
   assert '-90' in page.locator('.f2-step-label').inner_text()
   assert page.evaluate('PlegarFoldKinematics.frame(PlegarEditor2D.getData(),0,.7).scene.turn')==-90
+  assert page.evaluate('PlegarFoldKinematics.frame(PlegarEditor2D.getData(),0,.78).scene.wingLeft.y < PlegarFoldKinematics.frame(PlegarEditor2D.getData(),0,.78).scene.center.y')
+  assert page.locator('.f2d-svg [data-component="aviso-volteo"]').count()==1
   page.locator('[data-f2-angle]').fill('110')
   page.locator('[data-f2-angle]').dispatch_event('change')
   assert page.evaluate('PlegarEditor2D.getData().angles[1]')==-110

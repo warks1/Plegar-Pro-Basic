@@ -294,3 +294,10 @@ Ajuste de presentación a pantalla completa sin franjas de imagen no ocupadas. S
 - Se migra automáticamente SOLO la demostración local intacta cuyo nombre, material, espesor, tramos, ángulos, parámetros y orden coincidan exactamente con los del antiguo ejemplo. Se actualiza a B1-B2-B4-B3.
 - No se modifican piezas editadas por el usuario (nombre, parámetros, cotas, signos o secuencias personalizadas). Se comprueba en navegador tanto el caso de migración como que las piezas personalizadas permanecen intactas. Caché v91.
 - La migración no certifica colisiones. La reproducción de volteos físicos sigue pendiente. NO CNC.
+
+
+## v92 — montaje negativo con matriz V y coherencia de reordenación (24 octubre 2026)
+- -90° conserva su signo en el PLANO, pero el dibujo de máquina no invierte la chapa hacia abajo contra la matriz; se representa la chapa previamente volteada en el montaje hipotético, con alas elevándose con el punzón superior y matriz V inferior.
+- Las alas previas se orientan con referencia local del montaje nominal. El volteo, amarre y recolocación reales NO se han simulado y ninguna vista es una garantía frente a colisiones.
+- El selector de orden 3D mueve B al puesto elegido, desplazando los otros, igual que Programación 2D (antes intercambiaba posiciones). El ángulo permanece asociado al B.
+- Regresiones unitarias de la Omega -90/+90, malla y navegador 2D/3D, caché v92. NO CNC.

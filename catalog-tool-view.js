@@ -34,7 +34,7 @@
  }
  function rootPages(){return typeof globalThis!=='undefined'?globalThis.PlegarCatalogPages||[]:[];}
  function cardArt(tool){return section(tool)?'<div class="mfg-dual">'+svg(tool)+svg(tool,'3d')+'</div>'+images(tool):images(tool);}
- function gallery(){return '<details class="catalog-originals"><summary>Páginas originales que has enviado ('+rootPages().length+')</summary><div class="catalog-pages">'+rootPages().map(p=>'<a href="'+esc(p.src)+'" target="_blank" rel="noopener"><img src="'+esc(p.src)+'" loading="lazy" alt="'+esc(p.label)+'"><span>'+esc(p.label)+'</span></a>').join('')+'</div></details>';}
+ function gallery(){return '<details class="catalog-originals" open><summary>Fotografías originales de tus catálogos ('+rootPages().length+' páginas) · abrir / cerrar</summary><div class="catalog-pages">'+rootPages().map(p=>'<a href="'+esc(p.src)+'" target="_blank" rel="noopener"><img src="'+esc(p.src)+'" loading="lazy" alt="'+esc(p.label)+'"><span>'+esc(p.label)+'</span></a>').join('')+'</div></details>';}
  function mount(host){
   const input=host.querySelector('[data-catalog-search]'),count=host.querySelector('[data-catalog-count]'),cards=[...host.querySelectorAll('[data-catalog-tool]')];
   if(!input)return;

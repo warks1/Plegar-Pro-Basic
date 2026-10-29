@@ -43,6 +43,27 @@
   }
   return half/Math.tan(rad(tool.angle/2));
  }
+ // V se interpreta como intersección teórica de flancos con la cara superior.
+ // Solo las matrices de barra con un radio simétrico documentado.
+ function shoulders(d){
+  if(!['22.804','22.806','22.808','22.810','22.812','22.816','22.820','22.825','22.308','22.310','22.312','22.316','22.320','22.325'].includes(d.code))return null;
+  if(d.profileFamily!=='block-v'||!Number.isFinite(d.shoulderRadius)||d.shoulderRadius<=0||d.printedRadii?.length>1)return null;
+  const r=d.shoulderRadius,alpha=rad(d.angle/2),sweep=Math.PI/2-alpha;
+  const trim=r*Math.tan(sweep/2),half=d.opening/2;
+  if(trim>(d.bodyWidth-d.opening)/2||trim*Math.cos(alpha)>dieDepth(d))return null;
+  const right={x:half+trim,y:r},left={x:-right.x,y:r};
+  const arc=Array.from({length:25},(_,i)=>{const a=-Math.PI/2+sweep*i/24;return pt(left.x+r*Math.cos(a),left.y+r*Math.sin(a));});
+  return {radius:r,trim,sweep,left,right,leftArc:arc,rightArc:arc.slice().reverse().map(p=>pt(-p.x,p.y)),openingConvention:'intersección teórica de flancos'};
+ }
+ function shoulderSupport(d,beta,R,t){
+  const s=shoulders(d);if(!s||beta<0||beta>s.sweep+1e-10)return null;
+  const right=pt(s.right.x-s.radius*Math.sin(beta),s.right.y-s.radius*Math.cos(beta));
+  // Tangencia entre el círculo del hombro y la cara inferior de la chapa.
+  const centerX=right.x-t/2*Math.sin(beta);
+  if(centerX<R*Math.sin(beta)-1e-9)return null;
+  const cy=s.right.y+Math.tan(beta)*s.right.x-(s.radius+t/2)/Math.cos(beta)-R*(1/Math.cos(beta)-1);
+  return {cy,left:pt(-right.x,right.y),right,centerX};
+ }
  function catalogDie(model){
   const d=model.dieCatalogTool,v=model.dieOpening,depth=model.dieDepth,body=Math.max(d.bodyWidth||v+40,v+2);
   if(d.grooves?.length){
@@ -68,11 +89,13 @@
   }
   if(d.profileFamily==='block-v'){
    const half=v/2,flat=Math.min(d.rootFlatWidth||0,v*.75),cut=dieDepth({...d,opening:v});
+   const shoulder=shoulders({...d,opening:v});
    const notch=flat>0?[pt(-half,0),pt(-flat/2,cut),pt(flat/2,cut),pt(half,0)]:[pt(-half,0),pt(0,cut),pt(half,0)];
-   const outline=[pt(-body/2,0),...notch,pt(body/2,0)];
+   const channel=shoulder?[...shoulder.leftArc,...notch.slice(1,-1),...shoulder.rightArc]:notch;
+   const outline=[pt(-body/2,0),...channel,pt(body/2,0)];
    if(d.footWidth){const foot=d.footWidth/2,y=Math.max(0,d.height-10);outline.push(pt(body/2,y),pt(foot,y),pt(foot,d.height),pt(-foot,d.height),pt(-foot,y),pt(-body/2,y));}
    else outline.push(pt(body/2,d.height),pt(-body/2,d.height));
-   return {outline,opening:v,depth:cut,shoulderRadius:d.shoulderRadius||null,geometry:'bloque AMADA con canal V reconstruido desde cotas',
+   return {outline,opening:v,depth:cut,shoulders:shoulder,shoulderRadius:d.shoulderRadius||null,geometry:'bloque AMADA con canal V reconstruido desde cotas',
     model:'sección extruida · sin CAD',verified:false,source:d.source,
     dimensions:{angle:d.angle,height:d.height,length:d.length,availableLengths:d.availableLengths,bodyWidth:d.bodyWidth,
      shoulderRadius:d.shoulderRadius,vRootRadius:d.vRootRadius,rootFlatWidth:d.rootFlatWidth,footWidth:d.footWidth,capacityTonPerM:d.capacityTonPerM}};
@@ -120,7 +143,7 @@
   return {outline:[pt(-outer,0),pt(-h,0),pt(0,dieDepth),pt(h,0),pt(outer,0),pt(outer,bottom),pt(-outer,bottom)],opening:dieOpening,depth:dieDepth};
  }
  function profiles(model){return {punch:punch(model),die:die(model)};}
- return {punch,die,profiles,dieDepth};
+ return {punch,die,profiles,dieDepth,shoulders,shoulderSupport};
 });
 
 

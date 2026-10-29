@@ -48,7 +48,9 @@
   // Nominally position the sheet on BOTH V shoulders using the local tangent
   // slope and a half-thickness offset. This is NOT a calculated force/contact.
   const shoulderAngle=(half<tangentX && R>0)?Math.asin(Math.min(1,half/R)):beta;
-  const cy= -relativeY(half,beta,R)-(t/2)*Math.cos(shoulderAngle);
+  const support=T.shoulderSupport(die,beta,R,t);
+  const cy=support?support.cy:-relativeY(half,beta,R)-(t/2)*Math.cos(shoulderAngle);
+  if(T.shoulders(die)&&!support)warnings.push('El contacto sale del arco del hombro o alcanza la curva de chapa: apoyo nominal provisional.');
   // El signo del plano (+/-) no cambia el sentido de deformación sobre la
   // matriz V. Para un -90° se necesita voltear la chapa ANTES del golpe.
   // No se considera resuelta la cinemática del volteo o la sujeción.
@@ -67,9 +69,9 @@
    arc.push({x:round(R*Math.sin(a)),y:sheetY(cy-R*(1-Math.cos(a)))});
   }
   const centerline=[wingLeft,...arc,wingRight];
-  const shoulderY=round(cy+relativeY(half,beta,R)+(t/2)*Math.cos(shoulderAngle));
+  const shoulderY=support?0:round(cy+relativeY(half,beta,R)+(t/2)*Math.cos(shoulderAngle));
   // A shoulder beyond the modeled end of an adjacent leg cannot support it.
-  if(wingLeft.x>-half+1e-7||wingRight.x<half-1e-7){
+  if(wingLeft.x>-(support?.centerX??half)+1e-7||wingRight.x<(support?.centerX??half)-1e-7){
    warnings.push('Un ala nominal no alcanza el hombro de la V en este perfil aislado.');
   }
   if(cy+t/2>dieDepth+1e-6){
@@ -92,7 +94,7 @@
    targetAngle:Math.abs(turn),currentAngle:angle,signedAngle:round(turn*progress),
    mountSign,machineAngle,sheetSign,requiresTurnover:turn<0,orientationVerified:false,
    left,right,center,wingLeft,wingRight,
-   tangentLeft,tangentRight,centerline,dieOpening:die.opening,dieDepth,
+   tangentLeft,tangentRight,centerline,shoulderContacts:support?{left:support.left,right:support.right}:null,dieOpening:die.opening,dieDepth,
    punchAngle:punch.angle,punchNose:punch.nose,punchHeight:punch.height,dieAngle:die.angle,dieHeight:setup.dieHeight??die.height,thickness:t,
    insideRadius:setup.radius,centreRadius:R,tangentSetback,tangentX,
    machineSetup:{machineId:setup.machineId,backgaugeMode:setup.backgaugeMode,dieHeight:setup.dieHeight??die.height??null,tableLeft:setup.tableLeft,tableRight:setup.tableRight,ramWidth:setup.ramWidth,ramBottomOffset:setup.ramBottomOffset},

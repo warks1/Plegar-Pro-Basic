@@ -61,10 +61,10 @@ function harness() {
   return { trigger, state, caches, stores, seen };
 }
 
-test('installs an offline page and cache version v110', async () => {
+test('installs an offline page and cache version v111', async () => {
   const h = harness();
   await h.trigger('install');
-  assert.ok(h.stores.has('plegar-pro-forming2d-v110'));
+  assert.ok(h.stores.has('plegar-pro-forming2d-v111'));
   assert.ok(await h.caches.match(home));
   assert.ok(await h.caches.match(scope+'machine-references.js'),'Ficha de máquina disponible sin conexión');
   assert.ok(await h.caches.match(scope+'settings.js'),'Preferencias disponibles offline');
@@ -110,5 +110,6 @@ test('known static resources are cached but private PDFs are not', async () => {
   assert.equal(await h.caches.match(doc), undefined);
   assert.equal(h.seen.length, 1);
 });
+
 
 

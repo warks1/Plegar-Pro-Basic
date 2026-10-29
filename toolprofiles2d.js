@@ -12,7 +12,7 @@
  function catalogPunch(model){
   const p=model.punchCatalogTool,h=p.height||195,body=p.bodyWidth||30,shank=p.mountingWidth||20,top=model.punchTipY-h;
   const neckTop=top+Math.min(40,h*.22),taperTop=model.punchTipY-Math.min(42,h*.22),reach=p.reach||0;
-  const tipHalf=Math.max(p.nose||.6,Math.min(18,(taperTop-model.punchTipY)*Math.tan(rad(p.angle/2)))),shoulder=body/2;
+  const tipHalf=Math.max(p.nose||.6,Math.min(18,(model.punchTipY-taperTop)*Math.tan(rad(p.angle/2)))),shoulder=body/2;
   const outline=p.profileFamily==='gooseneck'?
    // The catalog reach is dimensioned from the tool centreline toward one side;
    // it is not an offset of the whole tool. Keep the asymmetric swan-neck form.
@@ -105,3 +105,4 @@
  function profiles(model){return {punch:punch(model),die:die(model)};}
  return {punch,die,profiles};
 });
+

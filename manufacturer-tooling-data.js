@@ -177,19 +177,19 @@
  ])amadaStandardDies.push(Object.freeze({id:'amada-d-'+code,kind:'die',brand:'AMADA / PROMECAM',manufacturer:'AMADA / PROMECAM',
   name:'AMADA / PROMECAM · matriz V'+opening+' · 88° · H60 · '+code,code,opening,angle:88,height:60,length:835,
   availableLengths:[835,415,805],bodyWidth:width,shoulderRadius:outerRadius,vRootRadius:null,capacityTonPerM:100,
-  keyWidth:null,keyHeight:null,profileFamily:'block-v',source:amadaSource,geometryCertified:false,
+  keyWidth:null,keyHeight:null,footWidth:width>14?14:null,profileFamily:'block-v',source:amadaSource,geometryCertified:false,
   dimensionsNote:'Matriz de barra H60 mm · longitudes 835/415 mm y fraccionado 805 mm; el radio interior no está especificado en la página.'}));
  // Página 41: matrices AMADA de barra con garganta de 30°.
  const page41=[
   ['22.306',6,14,.6,[1,.6],0,35,14],['22.308',8,18,.8,[.8],2,35,14],['22.310',10,24,1,[1],2,50,14],
-  ['22.312',12,24,1.5,[1.5],2,40,18],['22.316',16,30,2,[2],5,45,14],['22.320',20,35,2.5,[2.5],5,50,14],['22.325',25,45,3,[3],8,50,14]
+  ['22.312',12,24,1.5,[1.5],2,40,14],['22.316',16,30,2,[2],5,45,14],['22.320',20,35,2.5,[2.5],5,50,14],['22.325',25,45,3,[3],8,50,14]
  ];
  for(const [code,opening,width,radius,printedRadii,flat,capacity,footWidth] of page41)amadaStandardDies.push(Object.freeze({
   id:'amada-d-'+code,kind:'die',brand:'AMADA / PROMECAM',manufacturer:'AMADA / PROMECAM',
-  name:'AMADA / PROMECAM · matriz V'+opening+' · 30° · H60 · '+code,code,opening,angle:30,height:60,length:835,
+  name:'AMADA / PROMECAM · matriz V'+opening+' · 30° · H'+(code==='22.312'?74:60)+' · '+code,code,opening,angle:30,height:code==='22.312'?74:60,length:835,
   availableLengths:[835,415,805],bodyWidth:width,shoulderRadius:radius,vRootRadius:null,printedRadii:Object.freeze(printedRadii),
   rootFlatWidth:flat,footWidth,capacityTonPerM:capacity,keyWidth:null,keyHeight:null,profileFamily:'block-v',source:amadaSource,
-  geometryCertified:false,dimensionsNote:'Matriz de barra H60 mm · longitudes 835/415 mm y fraccionado 805 mm. Transición inferior reconstruida donde no está acotada.'
+  geometryCertified:false,dimensionsNote:'Matriz de barra H'+(code==='22.312'?74:60)+' mm · longitudes 835/415 mm y fraccionado 805 mm. Transición inferior reconstruida donde no está acotada.'
  }));
 
  const accessories=Object.freeze([
@@ -207,3 +207,4 @@
  ]);
  return {source,MECOS_CATALOG_URL,PUNCHES:Object.freeze([...punches,...amadaPunches]),DIES:Object.freeze([...dies,...amadaDies,...amadaStandardDies]),ACCESSORIES:accessories};
 });
+

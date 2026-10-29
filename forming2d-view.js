@@ -54,7 +54,7 @@ function svg(m,zoom,bounds){
  <path data-component="portamatriz" d="${path(bodies.dieHolder)}" fill="#657889" stroke="#d5e7f5" stroke-width="1"/>
  <path data-component="trancha" d="${path(bodies.ram)}" fill="${hit.has('estructura-superior')?'#f04452':'#75879b'}" fill-opacity="${bodies.ramMeasured?'1':'.72'}" stroke="#cbddec" stroke-width="1"/>
  <path data-component="amarre-punzon" d="${path(bodies.upperHolder)}" fill="#a5afba" stroke="#ecf5fd" stroke-width="1"/>
- <path data-component="mordaza" d="${path(bodies.parts.find(part=>part.id==='mordaza').points)}" fill="#49596b" stroke="#cfdfeb" stroke-width=".8"/>
+ <path data-component="mordaza" d="${path(bodies.parts.find(part=>part.id==='mordaza')?.points||[])}" fill="#49596b" stroke="#cfdfeb" stroke-width=".8"/>
  <path data-component="matriz" d="${dieOutline}" fill="${hit.has('matriz')?'#f04452':'#744047'}" stroke="#e3a4aa" stroke-width=".8"/>
  <path d="M ${-half} 0 L 0 ${m.dieDepth} L ${half} 0" stroke="#b7d8ee" stroke-width=".9" fill="none"/>
  <path data-component="punzon" d="${punchOutline}" fill="${hit.has('punzon')?'#f04452':'url(#f2d-metal)'}" stroke="#eaf5ff" stroke-width="1.2"/>

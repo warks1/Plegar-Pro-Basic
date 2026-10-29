@@ -55,7 +55,9 @@ test('Contacto de punta previsto se distingue de choque de un ala remota',()=>{
  const local=S.inspect(s).checked.find(x=>x.id==='punzon');
  assert.equal(local.expectedContact,true);assert.equal(local.possibleOverlap,true);
  const y=s.punchTipY-50;
- s.assembly.left.items.push({from:{x:-5,y},to:{x:5,y},status:'realizado'});
+ // Cruzar el cuerpo de la pata de cabra: el hueco de su garganta NO es metal.
+ const xs=s.toolProfiles.punch.outline.map(p=>p.x);
+ s.assembly.left.items.push({from:{x:Math.min(...xs)-10,y},to:{x:Math.max(...xs)+10,y},status:'realizado'});
  const remote=S.inspect(s).checked.find(x=>x.id==='punzon');
  assert.equal(remote.expectedContact,false);assert.equal(remote.remoteOverlap,true);
 });

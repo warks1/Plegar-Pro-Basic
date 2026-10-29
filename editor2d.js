@@ -23,7 +23,7 @@ function migrateDefaultOmega(p){
   JSON.stringify(v.segments)===JSON.stringify(oldDemo.segments)&&
   JSON.stringify(v.angles)===JSON.stringify(oldDemo.angles)&&
   JSON.stringify(v.sequence)===JSON.stringify(oldDemo.sequence)&&
-  JSON.stringify(v.setup)===JSON.stringify(oldDemo.setup)&&
+  JSON.stringify({...v.setup,machineId:null})===JSON.stringify({...oldDemo.setup,machineId:null})&&
   JSON.stringify(v.bendOverrides??null)===JSON.stringify(oldDemo.bendOverrides??null);
  return untouched?{...v,sequence:[1,2,4,3]}:v;
 }

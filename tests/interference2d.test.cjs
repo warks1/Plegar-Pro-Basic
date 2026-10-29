@@ -46,8 +46,9 @@ test('geometría V patológica se clasifica solo como potencial penetración',()
 test('todos los resultados de barrido numérico son finitos y conservan contrato',()=>{
  for (const die of ['v6-88','v16-88','v32-88']) for (const pct of [0,.1,.5,.9,1]) {
   const m=scene({...p,setup:{...p.setup,die}},0,pct);
-  assert.ok(Number.isFinite(m.interferences.maxDiePenetration));
-  assert.ok(Number.isFinite(m.interferences.backgaugeGap));
+  assert.equal(m.interferences.maxDiePenetration,null,'no inventar profundidad de penetración sin CAD');
+  assert.ok(Array.isArray(m.interferences.dieOverlapSegments));
+  assert.ok(m.interferences.backgaugeGap===null||Number.isFinite(m.interferences.backgaugeGap));
   assert.ok(Array.isArray(m.interferences.problems));
  }
 });

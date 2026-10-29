@@ -504,7 +504,9 @@ with sync_playwright() as pw:
   page.locator('[data-ed-bend-gauge="1"]').fill('95')
   page.locator('[data-ed-bend-gauge="1"]').dispatch_event('change')
   assert page.evaluate('PlegarFormingGeometry.scene(PlegarEditor2D.getData(),1,.5).stop.x')==95
-  assert page.evaluate('PlegarFormingGeometry.scene(PlegarEditor2D.getData(),3,.5).stop.x')==85
+  position=page.evaluate("""() => {const p=PlegarEditor2D.getData(),g=PlegarBendCalc.backgaugeTarget(p,4,p.setup),m=PlegarFormingGeometry.scene(p,3,.5);return {mode:p.setup.backgaugePositionMode,table:p.setup.backgaugeByBend||[],nominal:g,actual:m.stop,sequence:p.sequence};}""")
+  print('DIAGNOSTICO TOPE B4',position,flush=True)
+  assert position['actual']['x']==85
   page.locator('#ed-quick-height').fill('60')
   page.locator('#ed-quick-height').dispatch_event('change')
   assert page.evaluate('PlegarEditor2D.getData().setup.dieHeight')==60

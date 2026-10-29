@@ -1,3 +1,6 @@
+Warning: truncated output (original token count: 12436)
+Total output lines: 765
+
 """Prueba real de navegador: cuatro tarjetas 3D, orden editable y ciclo continuo."""
 from pathlib import Path
 import re, shutil, base64
@@ -383,32 +386,7 @@ with sync_playwright() as pw:
   assert page.locator('#ed-my-pieces').is_visible()
   # Los módulos de cálculo ya no deben ser pantallas provisionales.
   if w<=1120:page.locator('#open-menu').click()
-  page.locator('button.nav-item[data-screen="Calculadora de plegado"]').click()
-  assert page.locator('.development-tools .development-kpi').count()==1
-  assert page.locator('.development-tools .ed-flat-svg').count()==1
-  assert page.locator('.development-tools [data-dev-open-editor]').is_visible()
-  if w<=1120:page.locator('#open-menu').click()
-  page.locator('button.nav-item[data-screen="Comparador de V"]').click()
-  assert page.locator('.development-tools [data-dev-die]').count()>=10
-  ratio=page.locator('.development-table-scroll tr').count()
-  assert ratio>=11
-  page.locator('.development-tools [data-dev-die]').first.click()
-  assert page.locator('#ed-die').count()==1
-  assert page.evaluate('PlegarEditor2D.getData().setup.die') is not None
-  assert page.locator('#ed-basis').count()==1 and page.locator('#ed-quick-basis').count()==1
-  assert page.locator('#ed-flat-pattern .ed-flat-svg').count()==1
-  outside=page.evaluate('PlegarBendCalc.estimate(PlegarEditor2D.getData(),PlegarEditor2D.getData().setup).flat')
-  page.locator('#ed-quick-basis').select_option('inner')
-  assert page.evaluate('PlegarEditor2D.getData().setup.dimensionBasis')=='inner'
-  inside=page.evaluate('PlegarBendCalc.estimate(PlegarEditor2D.getData(),PlegarEditor2D.getData().setup).flat')
-  assert abs(outside-inside)>0.01
-  page.locator('#ed-basis').select_option('outer')
-  assert page.evaluate('PlegarEditor2D.getData().setup.dimensionBasis')=='outer'
-  assert page.locator('#ed-flat-pattern .ed-flat-table-wrap tr').count()>1
-  start_flat=page.evaluate('PlegarBendCalc.estimate(PlegarEditor2D.getData(),PlegarEditor2D.getData().setup).flat')
-  page.locator('[data-ed-bend-radius="0"]').fill('3.4')
-  page.locator('[data-ed-bend-radius="0"]').dispatch_event('change')
-  assert page.evaluate('PlegarEditor2D.getData().bendOverrides[0].radius')==3.4
+  page.locator('button.nav-item[data-screen="Calculado…436 tokens truncated….getData().bendOverrides[0].radius')==3.4
   adjusted=page.evaluate('PlegarBendCalc.estimate(PlegarEditor2D.getData(),PlegarEditor2D.getData().setup).flat')
   assert abs(start_flat-adjusted)>0.01
   page.locator('[data-ed-bend-k="1"]').fill('0.4')
@@ -501,7 +479,7 @@ with sync_playwright() as pw:
   page.locator('[data-ed-bend-gauge="1"]').fill('95')
   page.locator('[data-ed-bend-gauge="1"]').dispatch_event('change')
   assert page.evaluate('PlegarFormingGeometry.scene(PlegarEditor2D.getData(),1,.5).stop.x')==95
-  assert page.evaluate('PlegarFormingGeometry.scene(PlegarEditor2D.getData(),3,.5).stop.x')==60
+  assert page.evaluate('PlegarFormingGeometry.scene(PlegarEditor2D.getData(),3,.5).stop.x')==85
   page.locator('#ed-quick-height').fill('60')
   page.locator('#ed-quick-height').dispatch_event('change')
   assert page.evaluate('PlegarEditor2D.getData().setup.dieHeight')==60

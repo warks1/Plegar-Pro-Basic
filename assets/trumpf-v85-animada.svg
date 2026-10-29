@@ -1,0 +1,96 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 660" role="img" aria-labelledby="title desc">
+  <title id="title">TRUMPF TrumaBend V85 plegando chapa</title>
+  <desc id="desc">Ilustración frontal animada de la plegadora completa: la trancha baja, pliega una chapa y vuelve a subir.</desc>
+  <defs>
+    <linearGradient id="bg" x2="0" y2="1"><stop stop-color="#102b43"/><stop offset="1" stop-color="#061522"/></linearGradient>
+    <linearGradient id="white" x2="0" y2="1"><stop stop-color="#fff"/><stop offset=".48" stop-color="#dce5e9"/><stop offset="1" stop-color="#aebdc5"/></linearGradient>
+    <linearGradient id="blue" x2="1" y2=".25"><stop stop-color="#07528c"/><stop offset=".48" stop-color="#0879bd"/><stop offset="1" stop-color="#064477"/></linearGradient>
+    <linearGradient id="ramBlue" x2="0" y2="1"><stop stop-color="#0c83c6"/><stop offset=".65" stop-color="#08619d"/><stop offset="1" stop-color="#063c68"/></linearGradient>
+    <linearGradient id="sheet" x2="0" y2="1"><stop stop-color="#ffe6a0"/><stop offset="1" stop-color="#efa930"/></linearGradient>
+    <filter id="glow"><feGaussianBlur stdDeviation="8"/></filter>
+    <filter id="shadow" x="-.2" y="-.4" width="1.4" height="2"><feGaussianBlur stdDeviation="9"/></filter>
+  </defs>
+  <rect width="1200" height="660" rx="18" fill="url(#bg)"/>
+  <path d="M0 530H1200" stroke="#1b3a51" stroke-width="2"/>
+  <ellipse cx="602" cy="584" rx="447" ry="22" fill="#000" opacity=".36" filter="url(#shadow)"/>
+  <ellipse cx="600" cy="417" rx="145" ry="48" fill="#ffc04d" opacity=".12" filter="url(#glow)"/>
+
+  <!-- Machine frame and complete lower cabinet -->
+  <path d="M128 154h104v350h-92l-12-26zM968 154h104l-12 324-15 26h-77z" fill="url(#blue)" stroke="#72b9e2" stroke-opacity=".55" stroke-width="3"/>
+  <path d="M142 182h23v286h-23M1035 182h23v286h-23" fill="#8cc7e5" opacity=".18"/>
+  <path d="M197 474h806v72q0 17-18 17H215q-18 0-18-17z" fill="url(#white)" stroke="#f3f7f8" stroke-width="3"/>
+  <path d="M216 499h769v37H216z" fill="#d1dce1"/>
+  <path d="M216 504h769" stroke="#fff" stroke-width="3" opacity=".85"/>
+  <path d="M255 547h70v27h-70zM879 547h70v27h-70z" fill="#657781"/>
+  <path d="M243 572h95v14h-95zM866 572h95v14h-95z" rx="4" fill="#273b47"/>
+  <path d="M338 554h528" stroke="#80939d" stroke-width="2"/>
+  <circle cx="600" cy="516" r="4" fill="#77909c"/>
+
+  <!-- Fixed top cover -->
+  <path d="M91 83q0-20 24-20h970q24 0 24 20v99H91z" fill="url(#white)" stroke="#fff" stroke-width="3"/>
+  <path d="M108 161h984v17H108z" fill="#b8c7ce"/>
+  <rect x="433" y="83" width="74" height="57" rx="4" fill="#07589a"/>
+  <path d="M443 93h54v37h-54z" fill="#0786c8"/>
+  <text x="470" y="78" text-anchor="middle" font-family="Arial,sans-serif" font-size="17" font-weight="700" fill="#12334a">TRUMPF</text>
+  <text x="534" y="127" font-family="Arial,sans-serif" font-size="42" font-weight="700" letter-spacing="1" fill="#1769a4">TrumaBend V85</text>
+  <path d="M122 144h119" stroke="#fff" stroke-width="3" opacity=".8"/>
+  <circle cx="1070" cy="119" r="13" fill="#9aaab1" stroke="#667984" stroke-width="3"/>
+
+  <!-- Side guards / blue shoulders -->
+  <path d="M170 180h78v272h-78zM952 180h78v272h-78z" fill="#0a4f80" stroke="#4288b3" stroke-width="2"/>
+  <path d="M183 195h51v240h-51zM966 195h51v240h-51z" fill="#0873ac" opacity=".42"/>
+  <path d="M205 212v190M995 212v190" stroke="#70b9d9" stroke-opacity=".55" stroke-width="4"/>
+  <rect x="179" y="444" width="62" height="13" rx="4" fill="#9fb4bf"/>
+  <rect x="959" y="444" width="62" height="13" rx="4" fill="#9fb4bf"/>
+
+  <!-- Control pendant -->
+  <path d="M43 226h62q10 0 10 10v162q0 10-10 10H43z" fill="url(#white)" stroke="#cbd8dd" stroke-width="3"/>
+  <path d="M52 238h45v59H52z" fill="#112d43" stroke="#5e788a" stroke-width="2"/>
+  <rect x="59" y="245" width="31" height="40" rx="2" fill="#0f79ac"/>
+  <path d="M64 253h21M64 260h16M64 267h19M64 274h11" stroke="#bcecff" stroke-width="2"/>
+  <circle cx="66" cy="318" r="6" fill="#29bd7b"/><circle cx="87" cy="318" r="6" fill="#f3bb45"/>
+  <path d="M61 343h28M61 355h28M61 367h18" stroke="#82959e" stroke-width="4" stroke-linecap="round"/>
+  <path d="M107 260h28v9h-28M107 360h28v9h-28" fill="#b6c4cb"/>
+
+  <!-- Moving upper beam, clamp, segmented punch and nose -->
+  <g id="ram-moving">
+    <path d="M222 177h756v45H222z" fill="url(#ramBlue)" stroke="#64b5df" stroke-width="3"/>
+    <path d="M240 185h720v8H240z" fill="#a5def4" opacity=".65"/>
+    <path d="M240 211h720v9H240z" fill="#063e6b"/>
+    <path d="M255 222h690v25H255z" fill="#ccd8dd" stroke="#f4f7f8" stroke-width="2"/>
+    <path d="M265 226h670v7H265z" fill="#fff" opacity=".75"/>
+    <g fill="#738790" stroke="#eaf1f3" stroke-width="1">
+      <path d="M270 247h78v24h-78zM352 247h78v24h-78zM434 247h78v24h-78zM516 247h78v24h-78zM598 247h78v24h-78zM680 247h78v24h-78zM762 247h78v24h-78zM844 247h78v24h-78z"/>
+    </g>
+    <path d="M276 271h640v14H276z" fill="#273f4c"/>
+    <path d="M581 285h38l-7 25h-24z" fill="#b5c4ca" stroke="#eff4f5" stroke-width="2"/>
+    <path d="M588 310h24l-12 26z" fill="#edf3f4" stroke="#fff" stroke-width="2"/>
+    <path d="M591 315h18" stroke="#fff" stroke-width="2" opacity=".9"/>
+  </g>
+
+  <!-- Fixed lower table, die and sheet -->
+  <path d="M205 395h790v34H205z" fill="url(#white)" stroke="#f2f6f7" stroke-width="3"/>
+  <path d="M223 399h754v8H223z" fill="#fff" opacity=".85"/>
+  <path d="M536 395h128v35H536z" fill="#526c7a" stroke="#b6c7cf" stroke-width="2"/>
+  <path d="M565 395l35 24 35-24" fill="none" stroke="#293e49" stroke-width="10" stroke-linejoin="round"/>
+  <path d="M565 394l35 22 35-22" fill="none" stroke="#d6e1e5" stroke-width="3" stroke-linejoin="round"/>
+  <path d="M600 416v-7" stroke="#ffc24d" stroke-width="4"/>
+  <path d="M348 391H600" fill="none" stroke="url(#sheet)" stroke-width="8" stroke-linecap="round"/>
+  <path id="sheet-right" d="M600 391H862" fill="none" stroke="url(#sheet)" stroke-width="8" stroke-linecap="round"/>
+  <circle cx="600" cy="391" r="5" fill="#fff2c6"/>
+  <path d="M196 430h808" stroke="#82959e" stroke-width="4"/>
+
+  <!-- Subtle cycle indicator -->
+  <g font-family="Arial,sans-serif" fill="#b8d4e3">
+    <circle cx="1081" cy="605" r="4" fill="#38d49a"/>
+    <text x="1068" y="628" text-anchor="end" font-size="12" letter-spacing="1.6">CICLO DE PLEGADO</text>
+    <text x="1150" y="628" text-anchor="end" font-size="11" opacity=".65">VISTA DECORATIVA · NO A ESCALA</text>
+  </g>
+  <style>
+    #ram-moving{transform-box:view-box;transform-origin:0 0;animation:ram-stroke 3.8s cubic-bezier(.45,0,.55,1) infinite}
+    #sheet-right{transform-box:view-box;transform-origin:600px 391px;animation:sheet-fold 3.8s cubic-bezier(.45,0,.55,1) infinite}
+    @keyframes ram-stroke{0%,20%,100%{transform:translateY(0)}39%,54%{transform:translateY(55px)}75%{transform:translateY(0)}}
+    @keyframes sheet-fold{0%,20%,100%{transform:translate(600px,391px) rotate(0deg)}39%,54%{transform:translate(600px,391px) rotate(-72deg)}75%{transform:translate(600px,391px) rotate(0deg)}}
+    @media(prefers-reduced-motion:reduce){#ram-moving,#sheet-right{animation:none}}
+  </style>
+</svg>

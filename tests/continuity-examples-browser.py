@@ -303,6 +303,9 @@ with sync_playwright() as pw:
   assert page.locator('.mfg-card').count()>=40
   assert page.locator('.mfg-card .mfg-warning').count()>=20
   assert page.locator('.mfg-card [data-tool-set]').count()==0
+  # Las familias genéricas se guardan en un desplegable para dar prioridad a las fichas originales.
+  if not page.locator('[data-mfg-filter="brand"]').is_visible():
+   page.locator('details:has(#manufacturer-catalog) > summary').click()
   page.locator('[data-mfg-filter="brand"]').select_option('Bystronic')
   assert page.locator('.mfg-card').count()>=4
   assert page.locator('.mfg-card').first.locator('strong').inner_text().startswith('Bystronic')

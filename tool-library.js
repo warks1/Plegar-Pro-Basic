@@ -25,12 +25,13 @@
   if(tool.kind==='adapter')return 'Código '+tool.code+' · carrera '+tool.stroke+' mm · fuerza de bloqueo '+tool.clampingForceKg+' kg a '+tool.clampingPressureBar+' bar · '+tool.installation+' · geometría no acotada para simulación.';
   if(tool.kind==='accessory')return 'Código '+tool.code+(tool.length?' · L '+tool.length+' mm':'')+(tool.heightOptions?' · alturas indicadas '+tool.heightOptions.join(' / ')+' mm':'')+(tool.dimensionsNote?' · '+tool.dimensionsNote:'')+' · geometría no acotada para simulación.';
   const d=tool.kind==='punch'?'Ángulo '+tool.angle+'° · '+(tool.nose?'radio R'+tool.nose+' mm':'radio sin cota'):
-   tool.grooves?'Doble canal '+tool.grooves.map(g=>'V'+g.opening+' · '+g.angle+'° · R'+g.radius+' · posición '+g.offset+' mm').join(' / '):'V '+tool.opening+' mm · ángulo '+tool.angle+'° · '+(tool.shoulderRadius?'hombro R'+tool.shoulderRadius+' mm':'');
+   tool.grooves?'Doble canal '+tool.grooves.map(g=>'V'+g.opening+' · '+g.angle+'° · R'+g.radius+' · posición '+g.offset+' mm').join(' / '):'V '+tool.opening+' mm · ángulo '+tool.angle+'° · '+(tool.shoulderRadius?'radio exterior R'+tool.shoulderRadius+' mm':'')+(tool.vRootRadius?' · radio interior R'+tool.vRootRadius+' mm':'');
   const dims=tool.manufacturer?
    ['H '+tool.height+' mm','cota de cuerpo '+(tool.bodyWidth??'sin cota')+' mm',tool.kind==='punch'?'ancho de amarre '+tool.mountingWidth+' mm':null,
     tool.kind==='punch'&&tool.reach?'alcance '+tool.reach+' mm':null,tool.kind==='punch'&&tool.b?'b '+tool.b+' mm':null,
     tool.availableLengths?'longitudes '+tool.availableLengths.join('/ ')+' mm':'L '+tool.length+' mm',tool.sectionedLength&&!tool.availableLengths?'fraccionado L'+tool.sectionedLength+' mm':null,
-   tool.capacityTonPerM?tool.capacityTonPerM+' T/m':null,tool.kind==='die'&&tool.keyWidth?'espiga '+tool.keyWidth+'×'+tool.keyHeight+' mm':null].filter(Boolean).join(' · '):
+    tool.capacityTonPerM?tool.capacityTonPerM+' T/m':null,tool.kind==='die'&&tool.keyWidth?'espiga '+tool.keyWidth+'×'+tool.keyHeight+' mm':null,
+    tool.stemWidth?'alma '+tool.stemWidth+' mm · base '+tool.baseWidth+'×'+tool.baseHeight+' mm':null].filter(Boolean).join(' · '):
    (tool.height?'altura nominal H'+tool.height+' mm':'altura no documentada');
   return d+' · '+dims+' · '+tool.source.title+' · CONTORNO NO CAD';
  }

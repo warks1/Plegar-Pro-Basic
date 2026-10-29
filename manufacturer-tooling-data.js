@@ -9,7 +9,7 @@
 })(typeof globalThis!=='undefined'?globalThis:this,function(){
  'use strict';
  const source=Object.freeze({type:'catalog-photo',title:'Catálogo WILA–TRUMPF · páginas 45–55 aportadas por Toni',url:null,version:'páginas 45–55',verified:false,note:'Cotas copiadas de las fotografías del catálogo. Los contornos no acotados por completo son reconstrucciones de la silueta impresa, no CAD del fabricante.'});
- const amadaSource=Object.freeze({type:'catalog-photo',title:'Catálogo AMADA–PROMECAM · páginas 13–26 aportadas por Toni',url:null,version:'páginas 13–26',verified:false,note:'Cotas copiadas de las fotografías del catálogo. Las siluetas no acotadas por completo son reconstrucciones de la sección impresa, no CAD del fabricante.'});
+ const amadaSource=Object.freeze({type:'catalog-photo',title:'Catálogo AMADA–PROMECAM · páginas 13–39 aportadas por Toni',url:null,version:'páginas 13–39',verified:false,note:'Cotas copiadas de las fotografías del catálogo. Las siluetas no acotadas por completo son reconstrucciones de la sección impresa, no CAD del fabricante.'});
  const accessorySource=Object.freeze({type:'catalog-photo',title:'Catálogo de utillaje · páginas 4 y 82 aportadas por Toni',url:null,version:'páginas 4 y 82',verified:false,note:'Ficha documental. Las páginas no aportan sección y cotas suficientes para generar una geometría 3D fiable.'});
  const punch=(code,angle,nose,height,capacity,bodyWidth,reach=0,b= null)=>Object.freeze({
   id:'wila-p-'+code+(b?'-b'+b:''),kind:'punch',brand:'WILA / TRUMPF',manufacturer:'WILA / TRUMPF',
@@ -120,6 +120,55 @@
  ];
  for(const row of multiRows)amadaDie(...row);
 
+ const amadaStandardDies=[];
+ function amadaStandardDie(code,opening,angle,height,stemWidth,outerRadius,rootRadius,capacity=100,extra={}){
+  const codeLabel=code==='P31-V6-90-CODIGO-ILEGIBLE'?'código ilegible en foto · p31 V6/90°':code==='P32-V12-88-CODIGO-ILEGIBLE'?'código ilegible en foto · p32 V12/88°':code;
+  amadaStandardDies.push(Object.freeze({id:'amada-d-'+code,kind:'die',brand:'AMADA / PROMECAM',manufacturer:'AMADA / PROMECAM',
+   name:'AMADA / PROMECAM · matriz V'+opening+' · '+angle+'° · H'+height+' · '+codeLabel,code:codeLabel,opening,angle,height,
+   length:835,availableLengths:[835,415,805],bodyWidth:extra.bodyWidth||60,stemWidth,baseWidth:extra.baseWidth||60,baseHeight:extra.baseHeight||18,
+   shoulderRadius:outerRadius,vRootRadius:rootRadius,capacityTonPerM:capacity,keyWidth:null,keyHeight:null,
+   profileFamily:extra.profileFamily||'t-base',source:amadaSource,geometryCertified:false,
+   dimensionsNote:'Perfil de matriz AMADA con longitudes 835/415 mm y fraccionado 805 mm.'}));
+ }
+ function amadaBlockDie(code,opening,angle,height,width,outerRadius,rootRadius,capacity=100){
+  amadaStandardDies.push(Object.freeze({id:'amada-d-'+code,kind:'die',brand:'AMADA / PROMECAM',manufacturer:'AMADA / PROMECAM',
+   name:'AMADA / PROMECAM · matriz V'+opening+' · '+angle+'° · H'+height+' · '+code,code,opening,angle,height,
+   length:835,availableLengths:[835,415,805],bodyWidth:width,shoulderRadius:outerRadius,vRootRadius:rootRadius,
+   capacityTonPerM:capacity,keyWidth:null,keyHeight:null,profileFamily:'block-v',source:amadaSource,geometryCertified:false,
+   dimensionsNote:'Bloque de matriz · longitudes 835/415 mm y fraccionado 805 mm.'}));
+ }
+ // Página 30: matrices de bloque y grandes aperturas.
+ amadaBlockDie('20.680',80,60,115,115,6,6,100);
+ amadaBlockDie('20.484',32,45,80,60,4,4,100);
+ amadaStandardDie('20.440',40,45,75,60,4,4,100,{bodyWidth:75,baseWidth:60,baseHeight:20});
+ amadaStandardDie('20.380',80,45,145,60,6,6,100,{bodyWidth:145,baseWidth:60,baseHeight:20});
+ amadaBlockDie('20.494',18,30,60,60,2,2,100);
+ amadaBlockDie('20.325',25,30,60,60,3,3,100);
+ // Páginas 31–39: familia AMADA de base 60×18 mm, alturas H80 y H120.
+ const standardRows=[
+  // H80, 90°.
+  ['P31-V6-90-CODIGO-ILEGIBLE',6,90,80,14,.4,.5,100],['20.258',8,90,80,14,.5,.5,100],['20.244',10,90,80,18,.6,.5,100],['20.245',12,90,80,18,.8,.5,100],['20.246',16,90,80,24,1,.5,100],
+  // H80, 88°.
+  ['20.806',6,88,80,14,.8,.5,100],['20.808',8,88,80,14,1,.5,100],['20.810',10,88,80,18,1.2,.5,100],['P32-V12-88-CODIGO-ILEGIBLE',12,88,80,18,1.5,.5,100],['20.327',16,88,80,24,2,1.5,100],['20.310',20,88,80,30,2.5,1,100],['20.309',25,88,80,35,3,1,100],
+  // H80, 60°.
+  ['20.297',6,60,80,14,.4,.5,60],['20.298',8,60,80,14,.5,.5,60],['20.299',10,60,80,18,.6,.5,60],['20.300',12,60,80,18,.8,.5,60],['20.301',16,60,80,24,1.6,.5,60],['20.308',20,60,80,30,2,1,60],['20.311',25,60,80,35,3,1,60],
+  // H80, 45°.
+  ['20.328',6,45,80,14,.6,.8,50],['20.329',8,45,80,18,.8,.8,50],['20.330',10,45,80,18,1,.8,50],['20.331',12,45,80,24,1.5,.8,40],['20.332',16,45,80,24,2,1.5,50],['20.333',20,45,80,30,2.5,1.5,50],['20.334',25,45,80,35,3,1.5,50],
+  // H80, 30°.
+  ['20.317',6,30,80,14,.6,1,35],['20.318',8,30,80,18,.8,1,35],['20.319',10,30,80,24,1,1,50],['20.320',12,30,80,24,1.5,1,40],['20.321',16,30,80,30,2,1.5,45],['20.322',20,30,80,35,2.5,1.5,50],['20.323',25,30,80,40,3,1.5,50],
+  // H120, 90°.
+  ['20.361',6,90,120,14,.4,.5,100],['20.362',8,90,120,14,.5,.5,100],['20.363',10,90,120,18,.6,.5,100],['20.364',12,90,120,18,.8,.5,100],['20.381',16,90,120,24,1,.5,100],
+  // H120, 88°.
+  ['21.806',6,88,120,14,.8,.5,100],['21.808',8,88,120,14,1,.5,100],['21.810',10,88,120,18,1.2,.5,100],['20.382',12,88,120,18,1.5,.5,100],['20.383',16,88,120,24,2,1.5,100],['20.384',20,88,120,30,2.5,1,100],['20.385',25,88,120,35,3,1,100],
+  // H120, 60°.
+  ['20.386',6,60,120,14,.4,.5,60],['20.387',8,60,120,14,.5,.5,60],['20.388',10,60,120,18,.6,.5,60],['20.389',12,60,120,18,.8,.5,60],['20.390',16,60,120,24,1.6,.7,60],['20.391',20,60,120,30,2,1,60],['20.392',25,60,120,35,3,1,60],
+  // H120, 45°.
+  ['20.393',6,45,120,14,.6,1,35],['20.394',8,45,120,18,.8,.8,50],['20.395',10,45,120,18,1,.8,50],['20.396',12,45,120,24,1.5,.8,50],['20.397',16,45,120,24,2,1.5,50],['20.398',20,45,120,30,2.5,1.5,50],['20.399',25,45,120,35,3,1.5,50],
+  // H120, 30°.
+  ['20.351',6,30,120,18,.6,1,35],['20.352',8,30,120,18,.8,1,35],['20.353',10,30,120,24,1,1,50],['20.354',12,30,120,24,1.5,1,40],['20.401',16,30,120,30,2,1.5,45],['20.402',20,30,120,35,2.5,1.5,50],['20.403',25,30,120,40,3,1.5,50]
+ ];
+ for(const row of standardRows)amadaStandardDie(...row);
+
  const accessories=Object.freeze([
   Object.freeze({id:'clark-single-50.650',kind:'adapter',manufacturer:'CLARK / WILA',code:'50.650',name:'Adaptador neumático CLARK · simple',stroke:4,clampingPressureBar:10,clampingForceKg:700,installation:'frontal / vertical',source:accessorySource}),
   Object.freeze({id:'clark-double-50.651',kind:'adapter',manufacturer:'CLARK / WILA',code:'50.651',name:'Adaptador neumático CLARK · doble',stroke:4,clampingPressureBar:10,clampingForceKg:700,installation:'frontal / vertical',source:accessorySource}),
@@ -132,5 +181,5 @@
    ['20.316','Soporte AMADA para matriz · 20.316','ancho 60 mm · altura 39 mm · asiento 20 mm']
   ].map(([code,name,dimensionsNote])=>Object.freeze({id:'amada-support-'+code,kind:'accessory',manufacturer:'AMADA / PROMECAM',code,name,dimensionsNote,source:amadaSource}))
  ]);
- return {source,PUNCHES:Object.freeze([...punches,...amadaPunches]),DIES:Object.freeze([...dies,...amadaDies]),ACCESSORIES:accessories};
+ return {source,PUNCHES:Object.freeze([...punches,...amadaPunches]),DIES:Object.freeze([...dies,...amadaDies,...amadaStandardDies]),ACCESSORIES:accessories};
 });

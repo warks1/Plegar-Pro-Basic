@@ -35,7 +35,7 @@
   const turn=piece.angles[bend-1],angle=Math.abs(turn)*progress,beta=rad(angle/2);
   const half=die.opening/2,left=piece.segments[bend-1],right=piece.segments[bend];
   const t=piece.thickness,R=setup.radius+t/2;
-  const dieDepth=half/Math.tan(rad(die.angle/2));
+  const dieDepth=T.dieDepth(die);
   const tangentSetback=R*Math.tan(beta),tangentX=R*Math.sin(beta);
   const warnings=[];
   const leftStraight=Math.max(0,left-tangentSetback),rightStraight=Math.max(0,right-tangentSetback);
@@ -119,4 +119,5 @@
  }
  return {scene};
 });
+
 

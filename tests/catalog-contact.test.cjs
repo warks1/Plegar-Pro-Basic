@@ -1,0 +1,16 @@
+const {test}=require('node:test'),assert=require('node:assert/strict');
+const T=require('../toolprofiles2d.js'),D=require('../manufacturer-tooling-data.js'),V=require('../catalog-tool-view.js');
+const close=(a,b)=>assert.ok(Math.abs(a-b)<1e-7,`${a} != ${b}`);
+test('todos los punzones de catálogo tienen contacto central y radio nominal',()=>{
+ for(const tool of D.PUNCHES){const tipY=37.25,p=T.punch({punchCatalogTool:tool,punchTipY:tipY});const lowest=Math.max(...p.outline.map(p=>p.y));close(lowest,tipY);const contact=p.outline.filter(p=>Math.abs(p.y-tipY)<1e-8);assert.equal(contact.length,1,tool.code);close(contact[0].x,0);close(Math.min(...p.outline.map(p=>p.y)),tipY-tool.height);
+ const r=tool.nose??.6,alpha=tool.angle*Math.PI/360,tx=r*Math.cos(alpha),ty=tipY-r+r*Math.sin(alpha);assert.ok(p.outline.some(p=>Math.abs(p.x-tx)<1e-8&&Math.abs(p.y-ty)<1e-8));assert.ok(p.outline.every(p=>Number.isFinite(p.x)&&Number.isFinite(p.y)));assert.equal(p.verified,false);
+ }
+});
+test('los flancos de punta son tangentes al radio y respetan el ángulo',()=>{for(const tool of D.PUNCHES){const p=T.punch({punchCatalogTool:tool,punchTipY:0}),a=p.outline[5],b=p.outline[6],r=tool.nose??.6;close((a.x-b.x)*(b.x)+(a.y-b.y)*(b.y+r),0);close((a.x-b.x)/(b.y-a.y),Math.tan(tool.angle*Math.PI/360));}});
+test('página 41 conserva fondos planos, altura74 y anchura de pie14',()=>{for(const code of ['22.308','22.310','22.312','22.316','22.320','22.325']){const d=D.DIES.find(d=>d.code===code),p=T.die({dieCatalogTool:d,dieOpening:d.opening,dieDepth:T.dieDepth(d)});const expected=(d.opening-d.rootFlatWidth)/2/Math.tan(Math.PI/12);close(p.depth,expected);assert.ok(p.outline.some(p=>p.x===-d.rootFlatWidth/2&&p.y===expected));assert.ok(p.outline.some(p=>p.x===d.rootFlatWidth/2&&p.y===expected));close(Math.max(...p.outline.map(p=>p.y)),d.height);assert.equal(d.footWidth,14);}assert.equal(D.DIES.find(d=>d.code==='22.312').height,74);});
+test('página40 no inventa radio de fondo y conserva dimensiones',()=>{for(const d of D.DIES.filter(d=>/^22\.8/.test(d.code))){const p=T.die({dieCatalogTool:d,dieOpening:d.opening,dieDepth:T.dieDepth(d)});assert.equal(p.dimensions.vRootRadius,null);close(p.depth,d.opening/2/Math.tan(d.angle*Math.PI/360));close(Math.max(...p.outline.map(p=>p.x))-Math.min(...p.outline.map(p=>p.x)),d.bodyWidth);}});
+test('ficha2D y extrusión3D consumen el mismo contorno corregido',()=>{for(const tool of [...D.PUNCHES,...D.DIES]){assert.ok(V.section(tool).length>=3);assert.ok(V.svg(tool).includes(tool.code));assert.ok(V.svg(tool,'3d').includes('3D'));}assert.match(V.svg(D.DIES.find(d=>d.code==='22.312')),/Pie 14/);});
+test('simulación usa la profundidad del fondo plano que dibuja',()=>{
+ const F=require('../forming2d.js');const profile={name:'Prueba',material:'Acero S235JR',thickness:1,segments:[80,80],angles:[90],sequence:[1],setup:{die:'amada-d-22.325',punch:D.PUNCHES[0].id,radius:2,kFactor:.33}};
+ for(const progress of [0,.25,.5,1]){const scene=F.scene(profile,0,progress);close(scene.dieDepth,T.dieDepth(D.DIES.find(d=>d.code==='22.325')));close(scene.toolProfiles.die.depth,scene.dieDepth);close(Math.max(...scene.toolProfiles.punch.outline.map(p=>p.y)),scene.punchTipY);}
+});

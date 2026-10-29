@@ -5,14 +5,14 @@
  const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
  function section(tool){
   if(tool.kind==='punch')return T.punch({punchCatalogTool:tool,punchTipY:0,punchHeight:tool.height,punchAngle:tool.angle,punchNose:tool.nose,dieOpening:16}).outline;
-  if(tool.kind==='die')return T.die({dieCatalogTool:tool,dieOpening:tool.opening,dieDepth:tool.opening/2/Math.tan(tool.angle*Math.PI/360),dieHeight:tool.height}).outline;
+  if(tool.kind==='die')return T.die({dieCatalogTool:tool,dieOpening:tool.opening,dieDepth:T.dieDepth(tool),dieHeight:tool.height}).outline;
   return null;
  }
  const path=ps=>ps.map((p,i)=>(i?'L':'M')+p.x.toFixed(3)+' '+p.y.toFixed(3)).join(' ')+' Z';
  function svg(tool,view='2d'){
   const points=section(tool);if(!points)return '';
   const minX=Math.min(...points.map(p=>p.x)),maxX=Math.max(...points.map(p=>p.x)),minY=Math.min(...points.map(p=>p.y)),maxY=Math.max(...points.map(p=>p.y));
-  const scale=Math.min(130/Math.max(1,maxX-minX),130/Math.max(1,maxY-minY));
+  const scale=Math.min(130/Math.max(1,maxX-minX),115/Math.max(1,maxY-minY));
   const ps=points.map(p=>({x:90+(p.x-(minX+maxX)/2)*scale,y:25+(p.y-minY)*scale}));
   const front=path(ps),dx=view==='3d'?26:0,dy=view==='3d'?-12:0;
   let shape='';
@@ -21,7 +21,12 @@
    for(let i=0;i<ps.length;i++){const a=ps[i],b=ps[(i+1)%ps.length];shape+='<path d="M'+a.x+' '+a.y+'L'+b.x+' '+b.y+'L'+(b.x+dx)+' '+(b.y+dy)+'L'+(a.x+dx)+' '+(a.y+dy)+'Z" fill="#46677d" stroke="#8cb5c9" stroke-width=".4"/>';}
   }
   shape+='<path d="'+front+'" fill="'+(tool.kind==='punch'?'#b2c7d6':'#81aebe')+'" stroke="#e0f3ff" stroke-width="1"/>';
-  return '<svg class="catalog-section" viewBox="0 0 240 195" role="img" aria-label="'+esc(tool.code||tool.id)+' '+view.toUpperCase()+' · sección de simulación"><rect width="240" height="195" rx="8" fill="#061a29"/><text x="10" y="14" fill="#92d7ff" font-size="10">'+view.toUpperCase()+' · '+esc(tool.code||tool.id)+'</text>'+shape+'<text x="172" y="72" fill="#d5efff" font-size="10">H '+esc(tool.height??'—')+'</text><text x="172" y="89" fill="#d5efff" font-size="10">'+(tool.kind==='die'?'V '+tool.opening:'R '+tool.nose)+'</text><text x="172" y="106" fill="#d5efff" font-size="10">'+tool.angle+'°</text><text x="10" y="178" fill="#b3cbdc" font-size="9">Cotas en mm · '+esc(tool.profileFamily||'paramétrico')+'</text><text x="10" y="190" fill="#edc991" font-size="8">Detalles sin cota: reconstrucción provisional</text></svg>';
+  if(view==='2d'){
+   const left=90-(maxX-minX)*scale/2,right=90+(maxX-minX)*scale/2,bottom=25+(maxY-minY)*scale;
+   shape+='<g stroke="#6ed5ff" stroke-width=".7" fill="none"><path d="M'+(left-8)+' 25 H'+(left-17)+' V'+bottom+' H'+(left-8)+' M'+left+' '+(bottom+5)+' V'+(bottom+12)+' H'+right+' V'+(bottom+5)+'"/></g>';
+   shape+='<text x="90" y="'+(bottom+22)+'" text-anchor="middle" fill="#bfeaff" font-size="9">Ancho total '+esc((maxX-minX).toFixed(2))+'</text>';
+  }
+  return '<svg class="catalog-section" viewBox="0 0 240 195" role="img" aria-label="'+esc(tool.code||tool.id)+' '+view.toUpperCase()+' · sección de simulación"><rect width="240" height="195" rx="8" fill="#061a29"/><text x="10" y="14" fill="#92d7ff" font-size="10">'+view.toUpperCase()+' · '+esc(tool.code||tool.id)+'</text>'+shape+'<text x="172" y="72" fill="#d5efff" font-size="10">H '+esc(tool.height??'—')+'</text><text x="172" y="89" fill="#d5efff" font-size="10">'+(tool.kind==='die'?'V '+tool.opening:'R '+tool.nose)+'</text><text x="172" y="106" fill="#d5efff" font-size="10">'+tool.angle+'°</text><text x="172" y="123" fill="#d5efff" font-size="9">'+(tool.kind==='die'?'R hombro '+esc(tool.shoulderRadius??'—'):'B '+esc(tool.bodyWidth??'—'))+'</text><text x="172" y="140" fill="#d5efff" font-size="9">'+(tool.footWidth?'Pie '+esc(tool.footWidth):'')+'</text><text x="10" y="178"  fill="#b3cbdc" font-size="9">Cotas en mm · '+esc(tool.profileFamily||'paramétrico')+'</text><text x="10" y="190" fill="#edc991" font-size="8">'+(tool.kind==='die'?'Radios de hombro pendientes de modelar':'Cuerpo provisional · punta nominal')+'</text></svg>';
  }
  function images(tool){
   const pages=rootPages().filter(p=>p.codes.includes(tool.code));
@@ -40,3 +45,4 @@
  }
  return {section,svg,cardArt,gallery,mount};
 });
+

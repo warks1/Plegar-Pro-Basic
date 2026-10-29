@@ -11,20 +11,37 @@
  const pt=(x,y)=>({x,y});
  function catalogPunch(model){
   const p=model.punchCatalogTool,h=p.height||195,body=p.bodyWidth||30,shank=p.mountingWidth||20,top=model.punchTipY-h;
-  const neckTop=top+Math.min(40,h*.22),taperTop=model.punchTipY-Math.min(42,h*.22),reach=p.reach||0;
-  const tipHalf=Math.max(p.nose||.6,Math.min(18,(model.punchTipY-taperTop)*Math.tan(rad(p.angle/2)))),shoulder=body/2;
-  const outline=p.profileFamily==='gooseneck'?
-   // The catalog reach is dimensioned from the tool centreline toward one side;
-   // it is not an offset of the whole tool. Keep the asymmetric swan-neck form.
-   [pt(-shank/2,top),pt(shank/2,top),pt(shank/2,neckTop),pt(shoulder,neckTop),
-    pt(shoulder,taperTop),pt(tipHalf,model.punchTipY),pt(-tipHalf,model.punchTipY),
-    pt(-reach,taperTop+Math.min(18,h*.08)),pt(-reach,neckTop),pt(-shoulder,neckTop)]:
-   [pt(-shank/2,top),pt(shank/2,top),pt(shank/2,neckTop),pt(shoulder,neckTop),pt(shoulder,taperTop),
-    pt(tipHalf,model.punchTipY),pt(-tipHalf,model.punchTipY),pt(-shoulder,taperTop),pt(-shoulder,neckTop),pt(-shank/2,neckTop)];
-  return {outline,tipY:model.punchTipY,nose:p.nose||.6,angle:p.angle,
-   geometry:'silueta reconstruida del catálogo WILA–TRUMPF',model:'perfil extruido · sin CAD',verified:false,
+  const neckTop=top+Math.min(40,h*.22),reach=p.reach||0,shoulder=body/2;
+  const alpha=rad(p.angle/2),r=p.nose??.6,centerY=model.punchTipY-r;
+  const tx=r*Math.cos(alpha),ty=centerY+r*Math.sin(alpha);
+  // El radio es tangente a ambos flancos. La punta toca en (0, tipY),
+  // no en una cara plana cuyo ancho dependía de la altura del punzón.
+  const flankHeight=Math.max(0,Math.min(42,h*.22,(shoulder-tx)/Math.tan(alpha)));
+  const taperY=ty-flankHeight,taperHalf=tx+flankHeight*Math.tan(alpha);
+  const outline=[pt(-shank/2,top),pt(shank/2,top),pt(shank/2,neckTop),pt(shoulder,neckTop),pt(shoulder,taperY),pt(taperHalf,taperY),pt(tx,ty)];
+  const noseSegments=32;
+  for(let i=1;i<=noseSegments;i++){
+   const a=alpha+(Math.PI-2*alpha)*i/noseSegments;
+   outline.push(pt(r*Math.cos(a),centerY+r*Math.sin(a)));
+  }
+  outline.push(pt(-taperHalf,taperY));
+  if(p.profileFamily==='gooseneck')outline.push(pt(-reach,taperY-Math.min(18,h*.08)),pt(-reach,neckTop),pt(-shoulder,neckTop));
+  else outline.push(pt(-shoulder,taperY),pt(-shoulder,neckTop));
+  outline.push(pt(-shank/2,neckTop));
+  // El cuerpo y la transición al cuello siguen siendo aproximados cuando
+  // el catálogo no proporciona todas sus cotas. No certificar colisiones.
+  return {outline,tipY:model.punchTipY,nose:r,angle:p.angle,
+   geometry:'punta circular tangente a flancos; cuerpo reconstruido del catálogo',model:'perfil extruido · sin CAD',verified:false,
    source:p.source,dimensions:{height:p.height,length:p.length,sectionedLength:p.sectionedLength,bodyWidth:p.bodyWidth,
-    mountingWidth:p.mountingWidth,angle:p.angle,nose:p.nose,capacityTonPerM:p.capacityTonPerM}};
+    mountingWidth:p.mountingWidth,angle:p.angle,nose:r,capacityTonPerM:p.capacityTonPerM}};
+ }
+ function dieDepth(tool){
+  const half=tool.opening/2;
+  if(tool.profileFamily==='block-v'){
+   const flat=Math.min(tool.rootFlatWidth||0,tool.opening*.75);
+   return Math.min((tool.height||60)-2,(half-flat/2)/Math.tan(rad(tool.angle/2)));
+  }
+  return half/Math.tan(rad(tool.angle/2));
  }
  function catalogDie(model){
   const d=model.dieCatalogTool,v=model.dieOpening,depth=model.dieDepth,body=Math.max(d.bodyWidth||v+40,v+2);
@@ -50,15 +67,15 @@
      stemWidth:d.stemWidth,baseWidth:d.baseWidth,baseHeight:d.baseHeight,vRootRadius:d.vRootRadius,shoulderRadius:d.shoulderRadius,capacityTonPerM:d.capacityTonPerM}};
   }
   if(d.profileFamily==='block-v'){
-   const half=v/2,flat=Math.min(d.rootFlatWidth||0,v*.75),root=Math.min(d.vRootRadius||.5,half*.2),cut=Math.min((d.height||60)-2,(half-flat/2)/Math.tan(rad(d.angle/2)));
-   const notch=flat>0?[pt(-half,0),pt(-flat/2,cut),pt(flat/2,cut),pt(half,0)]:[pt(-half,0),pt(-root,cut-root),pt(0,cut),pt(root,cut-root),pt(half,0)];
+   const half=v/2,flat=Math.min(d.rootFlatWidth||0,v*.75),cut=dieDepth({...d,opening:v});
+   const notch=flat>0?[pt(-half,0),pt(-flat/2,cut),pt(flat/2,cut),pt(half,0)]:[pt(-half,0),pt(0,cut),pt(half,0)];
    const outline=[pt(-body/2,0),...notch,pt(body/2,0)];
    if(d.footWidth){const foot=d.footWidth/2,y=Math.max(0,d.height-10);outline.push(pt(body/2,y),pt(foot,y),pt(foot,d.height),pt(-foot,d.height),pt(-foot,y),pt(-body/2,y));}
    else outline.push(pt(body/2,d.height),pt(-body/2,d.height));
-   return {outline,opening:v,depth,shoulderRadius:d.shoulderRadius||null,geometry:'bloque AMADA con canal V reconstruido desde cotas',
+   return {outline,opening:v,depth:cut,shoulderRadius:d.shoulderRadius||null,geometry:'bloque AMADA con canal V reconstruido desde cotas',
     model:'sección extruida · sin CAD',verified:false,source:d.source,
     dimensions:{angle:d.angle,height:d.height,length:d.length,availableLengths:d.availableLengths,bodyWidth:d.bodyWidth,
-     vRootRadius:d.vRootRadius,rootFlatWidth:d.rootFlatWidth,footWidth:d.footWidth,capacityTonPerM:d.capacityTonPerM}};
+     shoulderRadius:d.shoulderRadius,vRootRadius:d.vRootRadius,rootFlatWidth:d.rootFlatWidth,footWidth:d.footWidth,capacityTonPerM:d.capacityTonPerM}};
   }
   const half=v/2,total=d.height||120,key=d.keyWidth||13,keyH=d.keyHeight||20,root=Math.max(0,Math.min(d.shoulderRadius||.6,v*.15));
   const rootHalf=Math.min(root,v*.1),bodyBottom=total-keyH;
@@ -103,6 +120,7 @@
   return {outline:[pt(-outer,0),pt(-h,0),pt(0,dieDepth),pt(h,0),pt(outer,0),pt(outer,bottom),pt(-outer,bottom)],opening:dieOpening,depth:dieDepth};
  }
  function profiles(model){return {punch:punch(model),die:die(model)};}
- return {punch,die,profiles};
+ return {punch,die,profiles,dieDepth};
 });
+
 

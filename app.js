@@ -139,8 +139,8 @@ function renderModule(name){
    el.classList.remove('module-editor','module-forming','module-piece3d');
    el.innerHTML='<div id="tool-dxf-panel" aria-label="Importar perfiles reales DXF de utillaje"></div>'+
     '<div id="manufacturer-catalog" aria-label="Biblioteca por fabricante"></div>'+
-    '<details class="mfg-internal"><summary>Herramientas genéricas del simulador · seleccionar punzón o matriz</summary>'+
-    '<p>Las fichas anteriores son documentales. Este catálogo interno de herramientas paramétricas NO representa las geometrías del fabricante.</p>'+
+    '<details class="mfg-internal"><summary>Utillaje WILA–TRUMPF y perfiles paramétricos · seleccionar punzón o matriz</summary>'+
+    '<p>Incluye las cotas visibles de las páginas 45–54 del catálogo fotografiado. Selecciona un útil y abre Simulación 2D/3D para ver el perfil extruido. Las cotas publicadas se conservan; las siluetas exteriores sin acotar por completo son reconstrucciones, no CAD del fabricante ni validación de colisiones.</p>'+
     '<div class="module-tiles">'+[...lib.PUNCHES,...lib.DIES].map(tool=>
      '<div class="module-tile"><strong>'+escapeHtml(tool.name)+'</strong><p>'+escapeHtml(lib.details(tool))+
      '</p><button type="button" data-tool-set="'+tool.kind+':'+tool.id+'">Seleccionar '+(tool.kind==='die'?'matriz':'punzón')+' nominal</button></div>').join('')+'</div></details>';
@@ -206,13 +206,13 @@ function updateToolCard(kind,id){
  const rows=[...document.querySelectorAll('.tool-specs > div')];
  if(rows.length<7)return;
  const values=[
-  id,
+  tool.code||id,
   kind==='die'?tool.opening.toFixed(2)+' mm':'No aplica · punzón',
   tool.angle+'°',
   tool.height===null?'No documentada':tool.height.toFixed(2)+' mm',
-  'No documentado',
-  kind==='punch'?'R'+tool.nose+' mm':'No documentado',
-  'No validada'
+  tool.bodyWidth?tool.bodyWidth.toFixed(2)+' mm':'No acotado',
+  kind==='punch'?'R'+tool.nose+' mm':tool.shoulderRadius?'R'+tool.shoulderRadius+' mm':'No acotado',
+  tool.capacityTonPerM?tool.capacityTonPerM+' T/m · catálogo':'No indicada'
  ];
  rows.forEach((row,i)=>{const dd=row.querySelector('dd');if(dd)dd.textContent=values[i]||'—';});
 }

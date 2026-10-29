@@ -9,7 +9,37 @@
  'use strict';
  const rad=n=>n*Math.PI/180;
  const pt=(x,y)=>({x,y});
- function punch({punchAngle,punchNose,punchTipY,dieOpening,punchHeight}){
+ function catalogPunch(model){
+  const p=model.punchCatalogTool,h=p.height||195,body=p.bodyWidth||30,shank=p.mountingWidth||20,top=model.punchTipY-h;
+  const neckTop=top+Math.min(40,h*.22),taperTop=model.punchTipY-Math.min(42,h*.22),reach=p.reach||0;
+  const tipHalf=Math.max(p.nose||.6,Math.min(18,(taperTop-model.punchTipY)*Math.tan(rad(p.angle/2)))),shoulder=body/2;
+  const outline=p.profileFamily==='gooseneck'?
+   // The catalog reach is dimensioned from the tool centreline toward one side;
+   // it is not an offset of the whole tool. Keep the asymmetric swan-neck form.
+   [pt(-shank/2,top),pt(shank/2,top),pt(shank/2,neckTop),pt(shoulder,neckTop),
+    pt(shoulder,taperTop),pt(tipHalf,model.punchTipY),pt(-tipHalf,model.punchTipY),
+    pt(-reach,taperTop+Math.min(18,h*.08)),pt(-reach,neckTop),pt(-shoulder,neckTop)]:
+   [pt(-shank/2,top),pt(shank/2,top),pt(shank/2,neckTop),pt(shoulder,neckTop),pt(shoulder,taperTop),
+    pt(tipHalf,model.punchTipY),pt(-tipHalf,model.punchTipY),pt(-shoulder,taperTop),pt(-shoulder,neckTop),pt(-shank/2,neckTop)];
+  return {outline,tipY:model.punchTipY,nose:p.nose||.6,angle:p.angle,
+   geometry:'silueta reconstruida del catálogo WILA–TRUMPF',model:'perfil extruido · sin CAD',verified:false,
+   source:p.source,dimensions:{height:p.height,length:p.length,sectionedLength:p.sectionedLength,bodyWidth:p.bodyWidth,
+    mountingWidth:p.mountingWidth,angle:p.angle,nose:p.nose,capacityTonPerM:p.capacityTonPerM}};
+ }
+ function catalogDie(model){
+  const d=model.dieCatalogTool,v=model.dieOpening,depth=model.dieDepth,body=Math.max(d.bodyWidth||v+40,v+2);
+  const half=v/2,total=d.height||120,key=d.keyWidth||13,keyH=d.keyHeight||20,root=Math.max(0,Math.min(d.shoulderRadius||.6,v*.15));
+  const rootHalf=Math.min(root,v*.1),bodyBottom=total-keyH;
+  const outline=[pt(-body/2,0),pt(-half,0),pt(-rootHalf,depth-root),pt(0,depth),pt(rootHalf,depth-root),pt(half,0),
+   pt(body/2,0),pt(body/2,bodyBottom),pt(key/2,bodyBottom),pt(key/2,total),pt(-key/2,total),pt(-key/2,bodyBottom),pt(-body/2,bodyBottom)];
+  return {outline,opening:v,depth,shoulderRadius:d.shoulderRadius||null,
+   geometry:'sección simétrica reconstruida del catálogo WILA–TRUMPF',model:'perfil extruido · sin CAD',verified:false,
+   dimensions:{angle:d.angle,height:d.height,length:d.length,sectionedLength:d.sectionedLength,bodyWidth:d.bodyWidth,
+    opening:d.opening,shoulderRadius:d.shoulderRadius,keyWidth:d.keyWidth,keyHeight:d.keyHeight,capacityTonPerM:d.capacityTonPerM}};
+ }
+ function punch(model){
+  if(model.punchCatalogTool?.manufacturer)return catalogPunch(model);
+  const {punchAngle,punchNose,punchTipY,dieOpening,punchHeight}=model;
   const alpha=rad(punchAngle/2),r=punchNose;
   const topHeight=Math.max(22,dieOpening*1.7,punchHeight||0);
   const centerY=punchTipY-r;
@@ -33,7 +63,9 @@
    geometry:'flancos-rectos-tangentes-a-radio',
    model:'espiga-recta-con-punta-nominal',verified:false};
  }
- function die({dieOpening,dieDepth,dieHeight}){
+ function die(model){
+  if(model.dieCatalogTool?.manufacturer)return catalogDie(model);
+  const {dieOpening,dieDepth,dieHeight}=model;
   const h=dieOpening/2,outer=h+Math.max(14,Math.min(40,dieOpening));
   const bottom=Math.max(dieDepth+22,32,dieHeight||0);
   return {outline:[pt(-outer,0),pt(-h,0),pt(0,dieDepth),pt(h,0),pt(outer,0),pt(outer,bottom),pt(-outer,bottom)],opening:dieOpening,depth:dieDepth};

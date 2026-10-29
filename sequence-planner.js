@@ -103,7 +103,7 @@
   const recommended=alternatives.find(candidate=>candidate.riskCount===0&&
    candidate.missingDimensions.length===0&&candidate.projectedComponents.length===0)||null;
   return {current,best:alternatives[0]||null,preferredOmega,recommended,alternatives,searched,
-   note:'Órdenes candidatos por cribado discreto y 11 zonas de la sección 2D. El bloqueo automático también contempla posibles cruces proyectados con amarres, mesa y topes, sin interpretarlos como colisiones físicas confirmadas. Faltan CAD de útiles y máquina, volteos, topes calibrados y barridos continuos. NINGÚN orden está validado para CNC.'};
+   note:'Órdenes candidatos por cribado discreto y zonas modeladas de la sección 2D. El bloqueo automático también contempla posibles cruces proyectados con amarres, mesa y topes, sin interpretarlos como colisiones físicas confirmadas. Faltan CAD de útiles y máquina, volteos, topes calibrados y barridos continuos. NINGÚN orden está validado para CNC.'};
  }
  return {step,evaluate,suggest};
 });

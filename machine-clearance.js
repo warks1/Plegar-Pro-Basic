@@ -83,12 +83,14 @@
   if(V.selected(scene.machineSetup)){
    const Section=typeof module==='object'&&module.exports?require('./machine-section2d.js'):window.PlegarMachineSection2D;
    const scan=Section.inspect(scene),vg=V.geometry(scene),hits=scan.hits.filter(h=>!h.expectedContact);
+   const pocket=omegaPocket(profile),constraints=[];
+   if(pocket!==null&&scene.dieHeight!==null&&pocket>scene.dieHeight)constraints.push('Perfil omega: profundidad nominal de paredes '+pocket.toFixed(1)+' mm > H matriz '+scene.dieHeight+' mm. Revisar orientación y posible choque con mesa/trancha.');
    const unknown=['Rebajes de amarre y bastidor completo','Posición Z/anchura de dedos'];
    if(vg.mountingAssumed)unknown.push('Montaje punta-trancha supuesto: altura de punzón + 30 mm');
    if(vg.punchHeightAssumed)unknown.push('Altura del punzón sin cota: se usa su silueta nominal');
    return {dieHeight:scene.dieHeight,tableGap:null,possibleTableContact:hits.some(h=>h.id==='mesa'),
     possibleRamContact:hits.some(h=>h.id==='estructura-superior'),hits,unknown,rects:[],details:scan.checked,
-    alerts:[...hits.map(h=>h.component+': posible interferencia de sección'),...unknown],
+    alerts:[...constraints,...hits.map(h=>h.component+': posible interferencia de sección'),...unknown],
     physicallyValidated:false,cncApproved:false,geometryVerified:false,machineId:V.id};
   }
   const env=envelope(profile,scene),pieces=segments(scene),alerts=[],hits=[];

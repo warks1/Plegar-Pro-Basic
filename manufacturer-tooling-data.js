@@ -9,7 +9,7 @@
 })(typeof globalThis!=='undefined'?globalThis:this,function(){
  'use strict';
  const source=Object.freeze({type:'catalog-photo',title:'Catálogo WILA–TRUMPF · páginas 45–55 aportadas por Toni',url:null,version:'páginas 45–55',verified:false,note:'Cotas copiadas de las fotografías del catálogo. Los contornos no acotados por completo son reconstrucciones de la silueta impresa, no CAD del fabricante.'});
- const amadaSource=Object.freeze({type:'catalog-photo',title:'Catálogo AMADA–PROMECAM · páginas 13–39 aportadas por Toni',url:null,version:'páginas 13–39',verified:false,note:'Cotas copiadas de las fotografías del catálogo. Las siluetas no acotadas por completo son reconstrucciones de la sección impresa, no CAD del fabricante.'});
+ const amadaSource=Object.freeze({type:'catalog-photo',title:'Catálogo AMADA–PROMECAM · páginas 13–40 aportadas por Toni',url:null,version:'páginas 13–40',verified:false,note:'Cotas copiadas de las fotografías del catálogo. Las siluetas no acotadas por completo son reconstrucciones de la sección impresa, no CAD del fabricante.'});
  const accessorySource=Object.freeze({type:'catalog-photo',title:'Catálogo de utillaje · páginas 4 y 82 aportadas por Toni',url:null,version:'páginas 4 y 82',verified:false,note:'Ficha documental. Las páginas no aportan sección y cotas suficientes para generar una geometría 3D fiable.'});
  const punch=(code,angle,nose,height,capacity,bodyWidth,reach=0,b= null)=>Object.freeze({
   id:'wila-p-'+code+(b?'-b'+b:''),kind:'punch',brand:'WILA / TRUMPF',manufacturer:'WILA / TRUMPF',
@@ -168,6 +168,15 @@
   ['20.351',6,30,120,18,.6,1,35],['20.352',8,30,120,18,.8,1,35],['20.353',10,30,120,24,1,1,50],['20.354',12,30,120,24,1.5,1,40],['20.401',16,30,120,30,2,1.5,45],['20.402',20,30,120,35,2.5,1.5,50],['20.403',25,30,120,40,3,1.5,50]
  ];
  for(const row of standardRows)amadaStandardDie(...row);
+ // Página 40: matrices de barra AMADA compactas, H60, ángulo 88°.
+ for(const [code,opening,outerRadius,width] of [
+  ['22.804',4,.6,14],['22.806',6,.8,14],['22.808',8,1,14],['22.810',10,1.2,18],
+  ['22.812',12,1.5,18],['22.816',16,2,24],['22.820',20,2,30],['22.825',25,3,35]
+ ])amadaStandardDies.push(Object.freeze({id:'amada-d-'+code,kind:'die',brand:'AMADA / PROMECAM',manufacturer:'AMADA / PROMECAM',
+  name:'AMADA / PROMECAM · matriz V'+opening+' · 88° · H60 · '+code,code,opening,angle:88,height:60,length:835,
+  availableLengths:[835,415,805],bodyWidth:width,shoulderRadius:outerRadius,vRootRadius:null,capacityTonPerM:100,
+  keyWidth:null,keyHeight:null,profileFamily:'block-v',source:amadaSource,geometryCertified:false,
+  dimensionsNote:'Matriz de barra H60 mm · longitudes 835/415 mm y fraccionado 805 mm; el radio interior no está especificado en la página.'}));
 
  const accessories=Object.freeze([
   Object.freeze({id:'clark-single-50.650',kind:'adapter',manufacturer:'CLARK / WILA',code:'50.650',name:'Adaptador neumático CLARK · simple',stroke:4,clampingPressureBar:10,clampingForceKg:700,installation:'frontal / vertical',source:accessorySource}),

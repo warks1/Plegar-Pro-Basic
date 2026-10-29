@@ -61,7 +61,7 @@
   const override=setup.backgaugeByBend?.[bendId-1];
   if(override!=null)return {x:override,source:'por-pliegue'};
   if(setup.backgaugePositionMode==='wing')return {x:profile.segments[bendId],source:'ala contigua'};
-  return {x:setup.backgaugeX,source:'manual'};
+  return {x:setup.backgaugeX,source:'general'};
  }
  function estimate(profile,setupInput){
   const setup=validateSetup(setupInput);

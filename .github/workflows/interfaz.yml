@@ -23,4 +23,6 @@ jobs:
             python -m playwright install --with-deps chromium
           fi
       - name: Probar secuencia 2D/3D y cuatro gadgets
-        run: python tests/continuity-examples-browser.py
+        run: |
+          python tests/critical-2d-browser.py
+          python tests/continuity-examples-browser.py

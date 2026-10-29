@@ -50,12 +50,15 @@
      stemWidth:d.stemWidth,baseWidth:d.baseWidth,baseHeight:d.baseHeight,vRootRadius:d.vRootRadius,shoulderRadius:d.shoulderRadius,capacityTonPerM:d.capacityTonPerM}};
   }
   if(d.profileFamily==='block-v'){
-   const half=v/2,root=Math.min(d.vRootRadius||.5,half*.2),cut=Math.min((d.height||60)-2,half/Math.tan(rad(d.angle/2)));
-   const outline=[pt(-body/2,0),pt(-half,0),pt(-root,cut-root),pt(0,cut),pt(root,cut-root),pt(half,0),pt(body/2,0),pt(body/2,d.height),pt(-body/2,d.height)];
+   const half=v/2,flat=Math.min(d.rootFlatWidth||0,v*.75),root=Math.min(d.vRootRadius||.5,half*.2),cut=Math.min((d.height||60)-2,(half-flat/2)/Math.tan(rad(d.angle/2)));
+   const notch=flat>0?[pt(-half,0),pt(-flat/2,cut),pt(flat/2,cut),pt(half,0)]:[pt(-half,0),pt(-root,cut-root),pt(0,cut),pt(root,cut-root),pt(half,0)];
+   const outline=[pt(-body/2,0),...notch,pt(body/2,0)];
+   if(d.footWidth){const foot=d.footWidth/2,y=Math.max(0,d.height-10);outline.push(pt(body/2,y),pt(foot,y),pt(foot,d.height),pt(-foot,d.height),pt(-foot,y),pt(-body/2,y));}
+   else outline.push(pt(body/2,d.height),pt(-body/2,d.height));
    return {outline,opening:v,depth,shoulderRadius:d.shoulderRadius||null,geometry:'bloque AMADA con canal V reconstruido desde cotas',
     model:'sección extruida · sin CAD',verified:false,source:d.source,
     dimensions:{angle:d.angle,height:d.height,length:d.length,availableLengths:d.availableLengths,bodyWidth:d.bodyWidth,
-     vRootRadius:d.vRootRadius,capacityTonPerM:d.capacityTonPerM}};
+     vRootRadius:d.vRootRadius,rootFlatWidth:d.rootFlatWidth,footWidth:d.footWidth,capacityTonPerM:d.capacityTonPerM}};
   }
   const half=v/2,total=d.height||120,key=d.keyWidth||13,keyH=d.keyHeight||20,root=Math.max(0,Math.min(d.shoulderRadius||.6,v*.15));
   const rootHalf=Math.min(root,v*.1),bodyBottom=total-keyH;

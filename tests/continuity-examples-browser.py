@@ -742,8 +742,8 @@ with sync_playwright() as pw:
   page.locator('#calc-close').click()
   assert not page.locator('.calculator-panel').evaluate("(el)=>el.classList.contains('calculator-collapsed')")
   page.locator('#tool-tabs [data-tab="Punzones"]').click()
-  page.locator('#tool-select').select_option('punch:p30-r1')
-  assert page.evaluate('PlegarEditor2D.getData().setup.punch')=='p30-r1'
+  page.locator('#tool-select').select_option('punch:wila-p-15.700')
+  assert page.evaluate('PlegarEditor2D.getData().setup.punch')=='wila-p-15.700'
   page.locator('#tool-tabs [data-tab="Matrices"]').click()
   page.locator('#tool-select').select_option('die:v24-88')
   assert page.evaluate('PlegarEditor2D.getData().setup.die')=='v24-88'

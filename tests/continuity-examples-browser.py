@@ -504,9 +504,10 @@ with sync_playwright() as pw:
   page.locator('[data-ed-bend-gauge="1"]').fill('95')
   page.locator('[data-ed-bend-gauge="1"]').dispatch_event('change')
   assert page.evaluate('PlegarFormingGeometry.scene(PlegarEditor2D.getData(),1,.5).stop.x')==95
-  position=page.evaluate("""() => {const p=PlegarEditor2D.getData(),g=PlegarBendCalc.backgaugeTarget(p,4,p.setup),m=PlegarFormingGeometry.scene(p,3,.5);return {mode:p.setup.backgaugePositionMode,table:p.setup.backgaugeByBend||[],nominal:g,actual:m.stop,sequence:p.sequence};}""")
-  print('DIAGNOSTICO TOPE B4',position,flush=True)
-  assert position['actual']['x']==85
+  position=page.evaluate("""() => {const p=PlegarEditor2D.getData(),id=p.sequence[3],g=PlegarBendCalc.backgaugeTarget(p,id,p.setup),m=PlegarFormingGeometry.scene(p,3,.5);return {bend:id,thickness:p.thickness,nominal:g,actual:m.stop,sequence:p.sequence};}""")
+  assert position['bend']==3 and position['nominal']['x']==85
+  # El tope real de dibujo usa la cara exterior de chapa, no el eje central: 85 + e/2.
+  assert abs(position['actual']['x']-(position['nominal']['x']+position['thickness']/2))<.05,position
   page.locator('#ed-quick-height').fill('60')
   page.locator('#ed-quick-height').dispatch_event('change')
   assert page.evaluate('PlegarEditor2D.getData().setup.dieHeight')==60

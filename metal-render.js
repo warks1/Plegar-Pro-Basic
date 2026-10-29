@@ -43,7 +43,7 @@
   const length=Math.hypot(n.x,n.y,n.z)||1;
   return {x:n.x/length,y:n.y/length,z:n.z/length};
  }
- function polygon(mesh,f,prefix,{material='',highlightPrior=false}={}){
+ function polygon(mesh,f,prefix,{material='',highlightPrior=false,collisionGroups=[]}={}){
   const group=f.group||'sheet',face=mesh.faces[f.index],n=normal(mesh,face);
   const main=lights.reduce((acc,l)=>acc+Math.max(0,n.x*l.x+n.y*l.y+n.z*l.z)*l.s,0);
   const brightness=clamp(.43+main*.38,.34,1.22);
@@ -58,7 +58,8 @@
   const edge={sheet:'#f0f6fa',punch:'#8cdbff',die:'#9aabba',gauge:'#a0e9ad',ram:'#bfd2e8',table:'#a2b5c7'}[group]||'#8393a0';
   const points=f.points.map(point).join(' ');
   const attr=' data-group="'+group+'" data-status="'+status+'" points="'+points+'"';
-  const base=thin?'url(#'+prefix+'-edge)':group==='sheet'?'url(#'+prefix+'-metal)':'url(#'+prefix+'-'+group+')';
+  const collision=collisionGroups.includes(group);
+  const base=collision?'#f04452':thin?'url(#'+prefix+'-edge)':group==='sheet'?'url(#'+prefix+'-metal)':'url(#'+prefix+'-'+group+')';
   const selected=highlightPrior&&status==='completed';
   return '<polygon'+attr+' fill="'+base+'" stroke="'+edge+'" stroke-width="'+(thin?'1.2':'.8')+'" stroke-opacity=".8" stroke-linejoin="round"/>'+
    '<polygon points="'+points+'" fill="'+(selected?'#c88c54':shaded)+'" fill-opacity="'+(selected?'.34':group==='sheet'?'.22':'.16')+'"/>'+

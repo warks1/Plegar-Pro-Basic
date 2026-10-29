@@ -54,11 +54,11 @@ with sync_playwright() as pw:
     el.dispatchEvent(new MouseEvent('dblclick',{bubbles:true,cancelable:true}));
     return {zoom,reset:Number(el.dataset.touchScale),hasCamera:!!el.querySelector('.touch-camera-content,.p3-camera-content,.f2-camera-content')};
    }""",selector)
-  assert page.locator('.home-machine-photo').is_visible()
+  assert page.locator('.home-machine-photo').is_hidden()
   assert 'nominal NO CNC' in page.locator('.calc-output strong').inner_text()
   assert page.locator('.calc-fields input[readonly]').count()==4
-  assert page.locator('#realistic-option').get_attribute('aria-pressed')=='true'
-  assert page.locator('#home-machine-cad').is_hidden()
+  assert page.locator('#realistic-option').get_attribute('aria-pressed')=='false'
+  assert page.locator('#home-machine-cad').is_visible()
   main_gesture=gesture('#home-machine-3d')
   assert main_gesture['zoom']>1 and main_gesture['reset']==1 and main_gesture['hasCamera']
   prev_gesture=gesture('#home-preview-3d')
@@ -70,7 +70,7 @@ with sync_playwright() as pw:
   page.locator('#views').click()
   assert page.locator('#home-view-menu').is_visible()
   assert page.locator('#views').get_attribute('aria-expanded')=='true'
-  page.locator('[data-home-view="profile"]').click()
+  page.locator('[data-home-view="iso"]').click()
   assert page.locator('#home-view-menu').is_hidden()
   assert page.locator('#home-machine-cad').inner_html()!=before_view
   assert page.locator('#home-stage-readout').is_visible()
@@ -110,33 +110,23 @@ with sync_playwright() as pw:
   if w<=1120:page.locator('#open-menu').click()
   page.locator('button.nav-item[data-screen="Máquinas"]').click()
   assert page.locator('.machine-reference').is_visible()
-  img=page.locator('.machine-photo-reference img')
-  assert img.is_visible()
-  assert img.get_attribute('src')=='assets/bystronic-frontal-referencia.svg'
-  # El ensayo usa page.set_content(about:blank): no hay servidor de activos relativos.
-  # Comprobar el SVG real como XML y cargarlo en el navegador mediante data URL.
-  svgbytes=(ROOT/'assets/bystronic-frontal-referencia.svg').read_bytes()
-  ElementTree.fromstring(svgbytes)
-  embedded='data:image/svg+xml;base64,'+base64.b64encode(svgbytes).decode('ascii')
-  img.evaluate('(el,uri)=>{el.loading="eager";el.src=uri;}',embedded)
-  page.wait_for_function("""() => {
-   const img=document.querySelector('.machine-photo-reference img');
-   return img&&img.complete&&img.naturalWidth>0;
-  }""",timeout=9000)
-  assert 'No equivale a plano oficial' in page.locator('.machine-photo-reference figcaption').inner_text()
-  assert '925 mm' in page.locator('.machine-reference').inner_text()
-  assert '200 mm' in page.locator('.machine-reference').inner_text()
-  assert page.locator('.machine-reference').locator('a[href*="bystronic-ep-ii-31-100"]').count()==1
-  assert 'pendientes' in page.locator('.machine-reference').inner_text()
-  # Introducir cotas manuales NO convierte los 925/200 mm del anuncio en geometría.
-  for key,value in [('dieHeight','60'),('tableLeft','180'),('tableRight','160'),('ramWidth','95'),('ramBottomOffset','110')]:
+  assert 'TRUMPF TrumaBend V85' in page.locator('.machine-reference').inner_text()
+  assert '2040 mm' in page.locator('.machine-reference').inner_text()
+  assert '3900 mm' in page.locator('.machine-reference').inner_text()
+  assert page.evaluate('PlegarEditor2D.getData().setup.machineId')=='trumpf-v85'
+  page.locator('[data-v85-stop]').select_option('support')
+  page.locator('[data-machine-v85]').click()
+  assert page.evaluate('PlegarEditor2D.getData().setup.backgaugeMode')=='support'
+  page.locator('[data-v85-stop]').select_option('stop')
+  page.locator('[data-machine-v85]').click()
+  # Ajustar el montaje sin alterar las cotas copiadas de la pantalla.
+  for key,value in [('dieHeight','60'),('ramBottomOffset','110')]:
    page.locator(f'[data-machine-measure="{key}"]').fill(value)
   page.locator('[data-machine-save]').click()
   assert page.evaluate('PlegarEditor2D.getData().setup.dieHeight')==60
-  assert page.evaluate('PlegarEditor2D.getData().setup.ramWidth')==95
-  assert page.evaluate('PlegarEditor2D.getData().setup.tableRight')==160
-  assert page.locator('[data-machine-measure="tableLeft"]').input_value()=='180'
-  for key in ['dieHeight','tableLeft','tableRight','ramWidth','ramBottomOffset']:
+  assert page.evaluate('PlegarEditor2D.getData().setup.ramBottomOffset')==110
+  assert page.evaluate('PlegarMachineV85.data.table.L3')==25.25
+  for key in ['dieHeight','ramBottomOffset']:
    page.locator(f'[data-machine-measure="{key}"]').fill('')
   page.locator('[data-machine-save]').click()
   assert page.evaluate('PlegarEditor2D.getData().setup.ramWidth') is None
@@ -598,9 +588,9 @@ with sync_playwright() as pw:
   # La vista de perfil debe mostrar las seis piezas con colores y movimiento real del carro nominal.
   for component in ['trancha','punzon','chapa','matriz','mesa','topes','amarre-punzon','mordaza','portamatriz','estructura-inferior','tope-carro','tope-brazo']:
    assert page.locator('.f2d-svg [data-component="'+component+'"]').count()==1,component
-  assert '11 zonas modeladas' in page.locator('.f2-machine-zones').inner_text()
+  assert 'TRUMPF V85' in page.locator('.f2-machine-zones').inner_text()
   assert 'Tope B' in page.locator('.f2-data-panel').inner_text()
-  assert page.locator('.f2-zone-grid .f2-zone').count()==11
+  assert page.locator('.f2-zone-grid .f2-zone').count()==5
   assert page.locator('.f2d-svg [data-component="indicador-tope"]').count()==1
   assert '21 posiciones' in page.locator('.f2-machine-zones').inner_text()
   assert page.locator('.f2d-svg [data-component="separacion-tope"]').count()==1
@@ -610,7 +600,7 @@ with sync_playwright() as pw:
   page.locator('.f2-range').evaluate("(el)=>{el.value='60';el.dispatchEvent(new Event('input',{bubbles:true}));}")
   assert page.locator('.f2d-svg [data-component="mesa"]').get_attribute('d')==mesa_antes
   assert page.locator('.f2d-svg [data-component="trancha"]').get_attribute('d')!=trancha_antes
-  assert 'PARCIALMENTE SIN COTAS' in page.locator('.f2d-svg').text_content()
+  assert 'sección reconstruida' in page.locator('.f2d-svg').text_content()
   page.locator('[data-f2-action="reset"]').click()
   assert page.locator('.f2-tile svg').count()==4
   assert page.locator('.f2-tile[data-f2-step="start"]').count()==1

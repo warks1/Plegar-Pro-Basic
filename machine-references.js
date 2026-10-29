@@ -43,7 +43,7 @@
    ['ramWidth','Anchura local de trancha','Anchura de la parte inferior de trancha que pueda interferir con la chapa',20,2000],
    ['ramBottomOffset','Separación punta-trancha','Distancia vertical desde punta de punzón a cara inferior de trancha',10,500]
   ];
-  return fields.map(([id,label,detail,min,max])=>{
+  return fields.filter(([id])=>setup.machineId!=='trumpf-v85'||['dieHeight','ramBottomOffset'].includes(id)).map(([id,label,detail,min,max])=>{
    const val=setup?.[id],value=val===null||val===undefined||val===''?'':Number(val);
    const printable=value===''||!Number.isFinite(value)?'':String(value);
    return '<label class="machine-measurement-field"><span>'+label+' (mm)</span>'+
@@ -54,6 +54,8 @@
  }
  function html(setup={}){
   const r=validateMachineRef(reference);
+  const V=typeof module==='object'&&module.exports?require('./machine-v85.js'):window.PlegarMachineV85;
+  if(setup.machineId==='trumpf-v85')return V.html().replace('value="'+(setup.backgaugeMode||'stop')+'"','value="'+(setup.backgaugeMode||'stop')+'" selected')+'<section class="machine-measurement-editor"><h3>Ajustar montaje del programa</h3><p>La distancia punta-trancha vacía usa altura nominal de punzón + 30 mm. Confirmar el plano de inserción. Los alcances rectangulares no sustituyen el perfil V85.</p><div class="machine-measurement-fields">'+inputRows(setup)+'</div><button type="button" data-machine-save>Guardar medidas en el programa activo</button></section>';
   return '<section class="machine-reference" aria-label="Datos de plegadora Bystronic de 2006">'+
    '<h2>Bystronic EP II 31-100 · Año 2006</h2>'+
    '<figure class="machine-photo-reference"><img src="assets/bystronic-frontal-referencia.svg" loading="lazy" alt="Vista frontal esquemática basada en la fotografía enviada: laterales rojos, trancha superior, amarres, mesa y topes; sin cotas ni CAD comprobado">'+

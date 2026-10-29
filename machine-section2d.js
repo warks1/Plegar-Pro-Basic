@@ -16,6 +16,20 @@
  function build(m){
   if(!m?.toolProfiles?.punch?.outline?.length||!m?.toolProfiles?.die?.outline?.length||!m?.stop)
    throw Error('La vista de máquina necesita perfiles de punzón, matriz y tope.');
+  const V=typeof module==='object'&&module.exports?require('./machine-v85.js'):window.PlegarMachineV85;
+  const vg=V.geometry(m);
+  if(vg){
+   const tiny=[],empty=[];
+   const parts=[
+    {id:'estructura-superior',name:'Trancha TRUMPF V85',points:vg.ramDisplay,collisionPoints:vg.ram,known:true},
+    {id:'mesa',name:'Mesa TRUMPF V85',points:vg.tableDisplay,collisionPoints:vg.table,known:true},
+    {id:'tope-dedo',name:'Tope '+(m.machineSetup.backgaugeMode==='support'?'Support':'Stop'),points:vg.finger,known:true},
+    {id:'mordaza',name:'Amarre pendiente de definir',points:tiny,known:false,excluded:true}
+   ];
+   return {ram:vg.ramDisplay,table:vg.tableDisplay,parts,dieHolder:tiny,upperHolder:tiny,lowerBody:empty,
+    finger:vg.finger,arm:empty,carriage:empty,tableMeasured:true,ramMeasured:true,ramDatumKnown:!vg.mountingAssumed,
+    ramBottom:vg.bottom,toolToRamNominalGapMm:0,holderGeometryVerified:false,projected:true,verified:false,v85:vg};
+  }
   const cfg=m.machineSetup||{},punch=m.toolProfiles.punch.outline,die=m.toolProfiles.die.outline;
   const tipTop=Math.min(...punch.map(p=>p.y)),dieBottom=Math.max(...die.map(p=>p.y));
   const punchHalf=Math.max(...punch.map(p=>Math.abs(p.x))),dieHalf=Math.max(...die.map(p=>Math.abs(p.x)));
@@ -92,19 +106,24 @@
    {id:'punzon',name:'Punzón (contacto previsto)',points:m.toolProfiles.punch.outline,known:false,expectedContact:true},
    {id:'matriz',name:'Matriz (apoyo previsto)',points:m.toolProfiles.die.outline,known:false,expectedContact:true}
   ];
-  const checked=[...toolZones,...section.parts].map(part=>{
-   let gap=null;
+  // Incluir alas activas y arco completo también en el primer pliegue.
+  const line=m.centerline||[];
+  for(let i=1;i<line.length;i++)spans.push({a:line[i-1],b:line[i],side:'active',status:'actif'});
+  const checked=[...toolZones,...section.parts.filter(p=>!p.excluded)].map(part=>{
+   let gap=null,remoteGap=null;
    for(const edge of spans){
-    const distance=Clearance.segmentPolygon(edge.a,edge.b,part.points)-m.thickness/2;
+    const distance=Clearance.segmentPolygon(edge.a,edge.b,(part.collisionPoints||part.points))-m.thickness/2;
     gap=gap===null?distance:Math.min(gap,distance);
+    if(edge.side!=='active')remoteGap=remoteGap===null?distance:Math.min(remoteGap,distance);
    }
    const distanceMm=gap===null?null:Math.round(Math.max(0,gap)*1000)/1000;
    return {id:part.id,name:part.name,known:part.known,approximate:true,
-    expectedContact:part.expectedContact===true,
+    expectedContact:part.expectedContact===true&&!(remoteGap!==null&&remoteGap<=0.05),
+    remoteOverlap:part.expectedContact===true&&remoteGap!==null&&remoteGap<=0.05,
     distanceMm,possibleOverlap:gap!==null&&gap<=0.05,samples:spans.length};
   });
   const hits=checked.filter(part=>part.possibleOverlap).map(part=>({
-   component:part.name,id:part.id,kind:part.expectedContact?'CONTACTO_O_PROXIMIDAD_DE_HERRAMIENTA':'POSIBLE_PROXIMIDAD_EN_PROYECCIÓN',
+   component:part.remoteOverlap?part.name.replace(' (contacto previsto)','').replace(' (apoyo previsto)','')+' · ala ajena al contacto local':part.name,id:part.id,kind:part.expectedContact?'CONTACTO_O_PROXIMIDAD_DE_HERRAMIENTA':'POSIBLE_PROXIMIDAD_EN_PROYECCIÓN',
    expectedContact:part.expectedContact,distanceMm:part.distanceMm,verified:false
   }));
   return {hits,checked,physicallyValidated:false,cncApproved:false,continuousSweep:false,

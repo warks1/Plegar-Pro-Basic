@@ -27,8 +27,10 @@
   }
   const projection=M.project(combined,c.yaw,c.elevation,c.zoom,c.cameraBounds);
   const rendering=window.PlegarMetalRender;
+  const sectionScan=window.PlegarMachineSection2D.inspect(s),groupMap={'estructura-superior':'ram',mesa:'table',punzon:'punch',matriz:'die','tope-dedo':'gauge'};
+  const collisionGroups=sectionScan.hits.filter(h=>!h.expectedContact).map(h=>groupMap[h.id]).filter(Boolean);
   const visibleFaces=projection.faces.filter(q=>!(q.group==='sheet'&&q.status==='pending'&&!c.showPending));
-  const polys=rendering.polys(combined,{faces:visibleFaces},'pp-live-metal',{material:p.material,highlightPrior:c.highlightPrior});
+  const polys=rendering.polys(combined,{faces:visibleFaces},'pp-live-metal',{material:p.material,highlightPrior:c.highlightPrior,collisionGroups});
   c.host.querySelector('.p3-camera-content').innerHTML=`<svg viewBox="0 0 900 480" class="p3-svg" role="img" aria-label="Cinemática ilustrativa del plegado con movimiento del punzón y deformación nominal de la chapa">${rendering.defs('pp-live-metal')}${rendering.background('pp-live-metal')}${polys}<text x="16" y="30" fill="#a1d9f1" font-size="13">CICLO 3D · PASO ${s.step}/${s.steps} · ${f.phase.toUpperCase()} · ÁNGULO ${Math.round(f.scene.signedAngle*10)/10}°</text><text x="16" y="454" fill="#eec48c" font-size="12">Ancho ${c.width} mm · ${s.requiresTurnover?'GIRO NEGATIVO: VOLTEO PREVIO NO SIMULADO':'MONTAJE NOMINAL'} · NO CNC</text></svg>`;
   const names={punch:'Punzón',die:'Matriz',gauge:'Tope',table:'Mesa (cotas)',ram:'Trancha (cotas)'};
   for(const key of Object.keys(names)){
@@ -46,7 +48,7 @@
   const pct=x=>x.percent.toFixed(1)+' %';
   const first=sweep.firstNear?`Primera proximidad observada: ${pct(sweep.firstNear)}, ${sweep.firstNear.tool}, segmento ${sweep.firstNear.segment}.`:'Ninguna proximidad observada en los instantes evaluados.';
   const machine=window.PlegarMachineClearance.inspect(p,s);
-  c.host.querySelector('.p3-machine-envelope').textContent='MÁQUINA · Matriz H '+(machine.dieHeight===null?'no introducida':machine.dieHeight+' mm')+' · '+(machine.possibleTableContact?'POSIBLE CONTACTO MESA. ':'')+(machine.possibleRamContact?'POSIBLE CONTACTO TRANCHA. ':'')+(machine.unknown.length?'Faltan cotas: '+machine.unknown.join(', ')+'. ':'')+'Perfil rectangular orientativo: sin CAD real ni seguridad CNC.';
+  c.host.querySelector('.p3-machine-envelope').textContent=(s.machineSetup.machineId==='trumpf-v85'?'TRUMPF V85 · ':'MÁQUINA · ')+(s.punchContact?s.punchContact.state+' · separación '+s.punchContact.gapMm.toFixed(2)+' mm · ':'')+'Matriz H '+(machine.dieHeight===null?'no introducida':machine.dieHeight+' mm')+' · '+(machine.possibleTableContact?'POSIBLE CONTACTO MESA. ':'')+(machine.possibleRamContact?'POSIBLE CONTACTO TRANCHA. ':'')+(machine.unknown.length?'Faltan cotas: '+machine.unknown.join(', ')+'. ':'')+(machine.machineId==='trumpf-v85'?'TRUMPF V85 · Contornos de sección según pantallas Cybelec; montaje y amarres pendientes.':'Perfil rectangular orientativo: sin CAD real ni seguridad CNC.');
   c.host.querySelector('.p3-sweep').textContent=`MUESTREO DEL CICLO · ${sweep.frames} posiciones, ${sweep.checkedPairs} pares. ${sweep.verdict}. ${first} ${sweep.minimum?`Mínimo observado ${sweep.minimum.mm.toFixed(2)} mm en ${pct(sweep.minimum)}.`:'Sin alas anteriores evaluables.'} Instante próximo al cursor ${pct(observed)}: ${observed.status}. NO constituye barrido continuo ni certificación de colisiones. NO CNC / SIN VERIFICAR.`;
   c.host.querySelector('.p3-sweep-marker').innerHTML=sweep.rows.filter(row=>row.minimum?.mm<=sweep.nearMm).map(row=>`<i title="Muestra ${row.percent.toFixed(1)} %: distancia nominal ${row.minimum.mm.toFixed(2)} mm" style="left:${row.percent}%"></i>`).join('');
   c.host.querySelector('[data-p3="scan-export"]').disabled=false;

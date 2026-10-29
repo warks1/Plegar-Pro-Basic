@@ -94,7 +94,7 @@
    tangentLeft,tangentRight,centerline,dieOpening:die.opening,dieDepth,
    punchAngle:punch.angle,punchNose:punch.nose,punchHeight:punch.height,dieAngle:die.angle,dieHeight:setup.dieHeight??die.height,thickness:t,
    insideRadius:setup.radius,centreRadius:R,tangentSetback,tangentX,
-   machineSetup:{dieHeight:setup.dieHeight??die.height??null,tableLeft:setup.tableLeft,tableRight:setup.tableRight,ramWidth:setup.ramWidth,ramBottomOffset:setup.ramBottomOffset},
+   machineSetup:{machineId:setup.machineId,backgaugeMode:setup.backgaugeMode,dieHeight:setup.dieHeight??die.height??null,tableLeft:setup.tableLeft,tableRight:setup.tableRight,ramWidth:setup.ramWidth,ramBottomOffset:setup.ramBottomOffset},
    // 'depth' is nominal centreline descent from its START position, not CNC Y.
    depth:round(cy+t/2),punchTipY:round(cy-t/2),shoulderY,
    stop:{x:setup.backgaugeByBend?.[bend-1]??setup.backgaugeX,bend,

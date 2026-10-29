@@ -153,7 +153,7 @@ function renderModule(name){
   window.PlegarSettings.mount($('#module-sample'));return;
  }else if(name==='Acerca de'){
   content='<div class="module-tile"><h2>Plegar Pro Basic</h2><p>Geometría, cálculo orientativo y simulación de plegado. Sin control CNC ni certificación de colisiones.</p>'+
-   '<p>Preferencias guardadas en este navegador. Las cotas de la Bystronic de 2006 son de una unidad anunciada, sin confirmar la identidad de la tuya.</p>'+
+   '<p>Preferencias guardadas en este navegador. Máquina principal: TRUMPF V85 con cotas de tus pantallas Cybelec.</p>'+
    '<button data-screen="Ajustes">Abrir preferencias</button> <button data-screen="Máquinas">Ver máquinas</button></div>';
  }else if(name==='Calculadora de plegado'||name==='Comparador de V'){
   const profile=window.PlegarEditor2D?.getData();
@@ -219,9 +219,13 @@ function updateToolCard(kind,id){
 
 // Delegación: navegación y selecciones. Todas las superficies que actúan son botones reales.
 document.addEventListener('click',event=>{
+ if(event.target.closest('[data-machine-v85]')){
+  window.PlegarEditor2D.setMachineEnvelope({machineId:'trumpf-v85',backgaugeMode:document.querySelector('[data-v85-stop]')?.value||'stop'});
+  toast('TRUMPF V85 aplicada al programa activo.');return;
+ }
  if(event.target.closest('[data-machine-save]')){
   const fields=[...document.querySelectorAll('.machine-measurement-editor [data-machine-measure]')],values={};
-  if(fields.length!==5){toast('Faltan campos de medida de máquina.');return;}
+  if(fields.length!==(window.PlegarEditor2D.getData().setup.machineId==='trumpf-v85'?2:5)){toast('Faltan campos de medida de máquina.');return;}
   for(const field of fields)values[field.dataset.machineMeasure]=field.value.trim()===''?null:Number(field.value);
   try{
    if(!window.PlegarEditor2D?.setMachineEnvelope(values))throw Error('No se pudo guardar el programa activo.');

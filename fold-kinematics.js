@@ -51,6 +51,8 @@
   scene.punchTipY=punchTipY;
   scene.toolProfiles={...scene.toolProfiles,punch:{...scene.toolProfiles.punch,
    outline:scene.toolProfiles.punch.outline.map(p=>({x:p.x,y:p.y-lift}))}};
+  scene.punchContact={gapMm:rounded(Math.max(0,scene.center.y-scene.thickness/2-punchTipY)),
+   state:lift>0.05?'separado':'contacto geométrico nominal',verified:false};
   const physicalAxis=scene.turn<0?'Requiere volteo o recolocación de chapa no calculada':'Orientación de chapa nominal ilustrativa';
   const backgaugeMotion={fromX:xPrevious,toX:xTarget,x,progress:hasTravel?ratio:1,
    active:moving,required:hasTravel,axisValidated:false,completed:!moving,

@@ -33,6 +33,14 @@
    {group:'die',outline:scene.toolProfiles.die.outline,z0:-margin,z1:sheet.width+margin},
    {group:'gauge',outline:[{x:g.x,y:g.top},{x:g.x+g.width,y:g.top},{x:g.x+g.width,y:g.bottom},{x:g.x,y:g.bottom}],z0:Math.max(0,(sheet.width-gaugeDepth)/2),z1:Math.min(sheet.width,(sheet.width+gaugeDepth)/2)}
   ];
+  const V=typeof module==='object'&&module.exports?require('./machine-v85.js'):window.PlegarMachineV85;
+  const vg=V.geometry(scene);
+  if(vg){
+   bodies[2].outline=vg.finger;
+   bodies.push({group:'ram',outline:vg.ram,renderOutline:vg.ramDisplay,z0:vg.z0,z1:vg.z1,renderZ0:-margin,renderZ1:sheet.width+margin});
+   bodies.push({group:'table',outline:vg.table,renderOutline:vg.tableDisplay,z0:vg.z0,z1:vg.z1,renderZ0:-margin,renderZ1:sheet.width+margin});
+   return bodies;
+  }
   const cfg=scene.machineSetup||{},outer=Math.max(...scene.toolProfiles.die.outline.map(p=>Math.abs(p.x)));
   const rectangle=(xmin,ymin,xmax,ymax)=>[{x:xmin,y:ymin},{x:xmax,y:ymin},{x:xmax,y:ymax},{x:xmin,y:ymax}];
   if(cfg.dieHeight!==null&&Number.isFinite(cfg.dieHeight)){
@@ -54,7 +62,7 @@
   const out={vertices:sheet.vertices.map(v=>({...v})),faces:sheet.faces.map(f=>({...f,ids:[...f.ids],group:'sheet'})),width:sheet.width,thickness:sheet.thickness,groups:{sheet:1,punch:0,die:0,gauge:0,table:0,ram:0}};
   for(const d of descriptors){
    if(visible[d.group]===false)continue;
-   const mesh=extrude(d.outline,d.z0,d.z1,d.group),offset=out.vertices.length;
+   const mesh=extrude(d.renderOutline||d.outline,d.renderZ0??d.z0,d.renderZ1??d.z1,d.group),offset=out.vertices.length;
    out.vertices.push(...mesh.vertices);
    out.faces.push(...mesh.faces.map(f=>({...f,ids:f.ids.map(i=>i+offset)})));
    out.groups[d.group]=1;

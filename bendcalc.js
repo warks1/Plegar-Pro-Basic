@@ -46,7 +46,11 @@
     return x;
    });
   }
-  return {radius,kFactor,punch:s.punch,die:s.die,backgaugeX,dimensionBasis,dieHeight,tableLeft,tableRight,ramWidth,ramBottomOffset,
+  const machineId=s.machineId==null?'generic':s.machineId;
+  if(!['generic','trumpf-v85'].includes(machineId))throw Error('Máquina desconocida.');
+  const backgaugeMode=s.backgaugeMode||'stop';
+  if(!['stop','support'].includes(backgaugeMode))throw Error('Modo de tope desconocido.');
+  return {machineId,backgaugeMode,radius,kFactor,punch:s.punch,die:s.die,backgaugeX,dimensionBasis,dieHeight,tableLeft,tableRight,ramWidth,ramBottomOffset,
    ...(backgaugeByBend?{backgaugeByBend}:{})};
  }
  function estimate(profile,setupInput){

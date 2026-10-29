@@ -8,7 +8,7 @@ const C = window.PlegarBendCalc;
 const L = window.PlegarToolLibrary;
 const REF = window.PlegarManufacturerReferences;
 let sourceFilter="all", sourceSelected=null;
-const fromEditor = source => ({...G.validate(source),setup:C.validateSetup(source.setup)});
+const fromEditor = source => ({...G.validate(source),setup:C.validateSetup({...source.setup,machineId:source.setup?.machineId||'trumpf-v85'})});
 const STORAGE='plegarpro-editor2d-v1';
 const $ = selector => document.querySelector(selector);
 const esc = value => String(value).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -519,12 +519,12 @@ function setSequence(next){orderPick=0;orderUsed.clear();return edit(d=>{d.seque
   return saved;
  }
 function setMachineEnvelope(values){
- const keys=['dieHeight','tableLeft','tableRight','ramWidth','ramBottomOffset'];
+ const keys=['dieHeight','tableLeft','tableRight','ramWidth','ramBottomOffset','machineId','backgaugeMode'];
  if(!values||typeof values!=='object'||Array.isArray(values))throw Error('Medidas de máquina no válidas.');
  if(Object.keys(values).some(key=>!keys.includes(key)))throw Error('Campo de geometría de máquina desconocido.');
  // Validar la configuración completa antes de alterar el programa o el historial.
  const next=C.validateSetup({...state.setup,...values});
- return edit(d=>{for(const key of keys)d.setup[key]=next[key];});
+ return edit(d=>{for(const key of keys)if(key in values)d.setup[key]=next[key];});
 }
 function setPunch(id){if(!C.PUNCHES.some(d=>d.id===id))throw Error('Punzón no reconocido.');return edit(d=>{d.setup.punch=id;});}
 function setDie(id){if(!C.DIES.some(d=>d.id===id))throw Error('Matriz no reconocida.');return edit(d=>{d.setup.die=id;});}

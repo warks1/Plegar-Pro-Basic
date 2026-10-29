@@ -3,7 +3,7 @@ const {test}=require('node:test'),assert=require('node:assert/strict');
 const Settings=require('../settings.js');
 test('Los ajustes ofrecen valores reales tipados, sin CNC ni módulos ficticios',()=>{
  const d=Settings.DEFAULT;
- assert.equal(d.theme,'dark');assert.equal(d.homeView,'photo');assert.equal(d.repeat,true);
+ assert.equal(d.theme,'dark');assert.equal(d.homeView,'cad');assert.equal(d.repeat,true);
  const html=Settings.html();
  for(const field of ['theme','accent','density','textScale','reducedMotion','homeView',
   'camera','speed','repeat','exportResolution','startupScreen'])

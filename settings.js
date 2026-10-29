@@ -10,7 +10,7 @@
  const KEY='plegarpro-settings-v1';
  const DEFAULT=Object.freeze({
   theme:'dark',accent:'blue',density:'normal',textScale:'100',
-  reducedMotion:false,homeView:'photo',camera:'iso',
+  reducedMotion:false,homeView:'cad',camera:'profile',
   repeat:true,speed:'1',exportResolution:'2160',startupScreen:'Inicio'
  });
  const OPTIONS=Object.freeze({

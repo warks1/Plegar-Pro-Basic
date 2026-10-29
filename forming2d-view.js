@@ -41,6 +41,7 @@ function svg(m,zoom,bounds){
  const wholePaths=[...m.assembly.left.items,...m.assembly.right.items].map(v=>`<line x1="${v.from.x}" y1="${v.from.y}" x2="${v.to.x}" y2="${v.to.y}" stroke="${v.status==='realizado'?'#fea478':'#71b5ed'}" stroke-width="${m.thickness}" stroke-dasharray="${v.status==='realizado'?'2 1.4':'none'}" stroke-linecap="round"/>`).join('');
  const hingeLabels=m.assembly.hinges.map(v=>`<circle cx="${v.point.x}" cy="${v.point.y}" r="1.1" fill="${v.status==='realizado'?'#ffc37f':'#a1cceb'}"/>`).join('');
  const bodies=machineOutlines(m);
+ const scan=Section.inspect(m,bodies),hit=new Set(scan.hits.filter(x=>!x.expectedContact).map(x=>x.id));
  const overlap=m.interferences.problems.length>0;
  const warn=m.warnings.length?'#efb06e':'#59ceff';
  return `<svg class="f2d-svg" viewBox="0 0 900 480" role="img" aria-label="Vista lateral esquemática de punzón, matriz y chapa con zona curva tangente. No es una simulación física ni una verificación de colisiones.">
@@ -49,14 +50,14 @@ function svg(m,zoom,bounds){
  <g transform="translate(440 250) scale(${s.toFixed(5)}) translate(${-centreX.toFixed(5)} ${-centreY.toFixed(5)})">
  <!-- Siluetas de amarres y estructura NOMINALES; sus cotas no están certificadas. -->
  <path data-component="estructura-inferior" d="${path(bodies.lowerBody)}" fill="#53637a" fill-opacity=".70" stroke="#bdcde1" stroke-width="1"/>
- <path data-component="mesa" d="${path(bodies.table)}" fill="#8d7eaa" fill-opacity="${bodies.tableMeasured?'1':'.72'}" stroke="#e0d0f5" stroke-width="1"/>
+ <path data-component="mesa" d="${path(bodies.table)}" fill="${hit.has('mesa')?'#f04452':'#8d7eaa'}" fill-opacity="${bodies.tableMeasured?'1':'.72'}" stroke="#e0d0f5" stroke-width="1"/>
  <path data-component="portamatriz" d="${path(bodies.dieHolder)}" fill="#657889" stroke="#d5e7f5" stroke-width="1"/>
- <path data-component="trancha" d="${path(bodies.ram)}" fill="#75879b" fill-opacity="${bodies.ramMeasured?'1':'.72'}" stroke="#cbddec" stroke-width="1"/>
+ <path data-component="trancha" d="${path(bodies.ram)}" fill="${hit.has('estructura-superior')?'#f04452':'#75879b'}" fill-opacity="${bodies.ramMeasured?'1':'.72'}" stroke="#cbddec" stroke-width="1"/>
  <path data-component="amarre-punzon" d="${path(bodies.upperHolder)}" fill="#a5afba" stroke="#ecf5fd" stroke-width="1"/>
  <path data-component="mordaza" d="${path(bodies.parts.find(part=>part.id==='mordaza').points)}" fill="#49596b" stroke="#cfdfeb" stroke-width=".8"/>
- <path data-component="matriz" d="${dieOutline}" fill="#744047" stroke="#e3a4aa" stroke-width=".8"/>
+ <path data-component="matriz" d="${dieOutline}" fill="${hit.has('matriz')?'#f04452':'#744047'}" stroke="#e3a4aa" stroke-width=".8"/>
  <path d="M ${-half} 0 L 0 ${m.dieDepth} L ${half} 0" stroke="#b7d8ee" stroke-width=".9" fill="none"/>
- <path data-component="punzon" d="${punchOutline}" fill="url(#f2d-metal)" stroke="#eaf5ff" stroke-width="1.2"/>
+ <path data-component="punzon" d="${punchOutline}" fill="${hit.has('punzon')?'#f04452':'url(#f2d-metal)'}" stroke="#eaf5ff" stroke-width="1.2"/>
  <path data-component="tope-carro" d="${path(bodies.carriage)}" fill="#526479" stroke="#bbd2d9" stroke-width="1"/>
  <path data-component="tope-brazo" d="${path(bodies.arm)}" fill="#617f85" stroke="#a6e9c9" stroke-width="1"/>
  ${wholePaths}
@@ -64,7 +65,7 @@ function svg(m,zoom,bounds){
  <path d="${line}" stroke="#081526" stroke-width="${m.thickness+1.6}" fill="none" stroke-linejoin="round" stroke-linecap="round"/>
  <path data-component="chapa" d="${line}" stroke="url(#f2d-sheet)" stroke-width="${m.thickness}" fill="none" stroke-linejoin="round" stroke-linecap="round"/>
  <g stroke="#f8bf56" stroke-width=".6" fill="#f8bf56"><circle cx="${-half}" cy="0" r=".9"/><circle cx="${half}" cy="0" r=".9"/></g>
- <circle cx="0" cy="${m.center.y}" r="1.1" fill="#ffb754"/>
+ <circle data-component="contacto-punta" cx="0" cy="${m.punchTipY}" r="1.3" fill="${m.punchContact?.state==='contacto geométrico nominal'?'#5cffb1':'#ffb754'}"/>
  ${m.stop.travelling?'<line data-component="recorrido-tope" x1="'+m.stop.previousX+'" y1="'+(m.stop.top-4)+'" x2="'+m.stop.targetX+'" y2="'+(m.stop.top-4)+'" stroke="#ffe38e" stroke-width=".9" stroke-dasharray="3 2"/>':''}
  <line data-component="separacion-tope" x1="${m.wingRight.x}" y1="${m.wingRight.y}" x2="${m.stop.x}" y2="${m.wingRight.y}" stroke="#ebd48e" stroke-width=".7" stroke-dasharray="2 2" aria-label="Proyección horizontal del extremo de chapa al tope"/>
  <path data-component="topes" d="${path(bodies.finger)}" fill="#50e4a7" stroke="#d0ffe7" stroke-width="1"/>
@@ -90,7 +91,7 @@ function svg(m,zoom,bounds){
  <text x="885" y="450" text-anchor="end" font-size="11" fill="${warn}">Descenso estimado del eje: ${as2(m.depth)} mm</text>
  <text x="15" y="433" font-size="11" fill="${m.interferences.backgaugeGap>0.05?'#ffd29e':m.interferences.backgaugeGap<-.05?'#ff9d9d':'#acffdd'}">TOPE X · ${m.interferences.backgaugeGap>0.05?'SIN CONTACTO nominal':m.interferences.backgaugeGap<-.05?'POSIBLE SOLAPE':'CONTACTO nominal'} · ${as2(m.interferences.backgaugeGap)} mm en proyección</text>
  <text x="15" y="455" font-size="11" fill="#c8d5df">Trancha gris · Punzón acero · Chapa azul · Matriz granate · Mesa violeta · Topes verdes.</text>
- <text x="15" y="471" font-size="10" fill="#ffd49e">Mesa / trancha ${bodies.tableMeasured&&bodies.ramMeasured?'con cotas introducidas':'PARCIALMENTE SIN COTAS · esquemas'} · NO CNC</text>
+ <text x="15" y="471" font-size="10" fill="#ffd49e">Mesa / trancha ${bodies.v85?'V85 · sección reconstruida · montaje '+(bodies.v85.mountingAssumed?'supuesto':'introducido'):bodies.tableMeasured&&bodies.ramMeasured?'con cotas introducidas':'PARCIALMENTE SIN COTAS · esquemas'} · NO CNC</text>
  </svg>`;
 }
 
@@ -180,8 +181,8 @@ function render(){
    '" title="Modelo 2D nominal; no es plano CAD verificado">'+part.name+' · '+
    (part.distanceMm===null?'sin tramo analizable':part.possibleOverlap?(part.expectedContact?'contacto previsto o posible solape':'posible cruce 2D'):part.distanceMm.toFixed(1)+' mm aprox.')+'</span>').join('');
   const first=ctl.sectionSweep.hits.slice(0,4).map(hit=>hit.component+' · '+hit.phase+' '+hit.cyclePercent+' %').join('; ');
-  zones.innerHTML='<strong>SECCIÓN 2D · 11 zonas modeladas · NO CNC</strong>'+
-   '<p>Posición actual: '+(proximity.hits.length?'posibles cruces de contornos: '+proximity.hits.map(x=>x.component).join(', '):'sin cruce observado en esta proyección')+
+  zones.innerHTML='<strong>SECCIÓN 2D · '+(m.machineSetup.machineId==='trumpf-v85'?'TRUMPF V85 · ':'')+proximity.checked.length+' zonas modeladas · NO CNC</strong>'+
+   '<p>Punzón: '+(m.punchContact?m.punchContact.state+' · separación '+as2(m.punchContact.gapMm)+' mm':'contacto nominal del modelo')+'. Rojo: interferencia con partes ajenas al contacto local.</p><p>Posición actual: '+(proximity.hits.length?'posibles cruces de contornos: '+proximity.hits.map(x=>x.component).join(', '):'sin cruce observado en esta proyección')+
    '. Ausencia de cruces NO implica seguridad.</p><div class="f2-zone-grid">'+checked+'</div>'+
    '<p>Muestreo del golpe ('+ctl.sectionSweep.frames+' posiciones): '+
    (first?'primeras proximidades: '+first:'sin cruce en las posiciones muestreadas')+

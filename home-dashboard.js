@@ -79,7 +79,7 @@ function setMode(mode){
   if(button){button.setAttribute('aria-pressed',String(pressed));button.classList.toggle('selected',pressed);}
  }
  const label=$('#home-scene-label');if(label)label.textContent=state.mode==='photo'
-  ?'FOTOGRAFÍA REAL DE REFERENCIA · PARA ANIMAR ELIGE CINEMÁTICA 3D'
+  ?'REFERENCIA HISTÓRICA BYSTRONIC · NO ES LA TRUMPF V85 ACTIVA'
   :'CINEMÁTICA GEOMÉTRICA EN MOVIMIENTO · NO CONTROL CNC NI MÁQUINA CALIBRADA';
 }
 function draw(){

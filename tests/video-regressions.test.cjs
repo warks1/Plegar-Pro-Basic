@@ -25,3 +25,17 @@ test('Inicio mantiene centro fijo al arrastrar y ampliar',()=>{
  assert.deepEqual(api.getState(),{scale:1,x:0,y:0});api.zoomBy(2,350,250);
  assert.deepEqual(api.getState(),{scale:2,x:0,y:0});
 });
+
+test('el pellizco amplía la cámara centrada, y doble toque restaura el zoom',()=>{
+ const handlers=new Map();
+ const surface={dataset:{},clientWidth:400,clientHeight:300,
+  addEventListener:(k,v)=>handlers.set(k,v),removeEventListener:k=>handlers.delete(k),
+  getBoundingClientRect:()=>({left:0,top:0,width:400,height:300})};
+ const api=Touch.attach(surface,{style:{}},{allowPan:false});
+ const fire=(type,id,x)=>handlers.get(type)({pointerType:'touch',pointerId:id,button:0,clientX:x,clientY:150,cancelable:true,preventDefault:()=>{}});
+ fire('pointerdown',1,100);fire('pointerdown',2,200);fire('pointermove',2,260);
+ assert.ok(api.getState().scale>1,'Dos dedos deben poder ampliar incluso sin pan');
+ assert.equal(api.getState().x,0);assert.equal(api.getState().y,0);
+ handlers.get('dblclick')({cancelable:true,preventDefault:()=>{}});
+ assert.deepEqual(api.getState(),{scale:1,x:0,y:0});api.destroy();
+});

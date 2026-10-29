@@ -65,6 +65,7 @@
 .touch-camera-content,.p3-camera-content,.f2-camera-content{width:100%;height:100%;transform-origin:center center;will-change:transform}
 .home-machine-3d{position:absolute;inset:0;min-height:0!important;width:100%;height:100%}
 .home-machine-3d .touch-camera-content{position:relative}
+#home-machine-3d{touch-action:pan-y;cursor:default;overscroll-behavior:auto}
 .home-machine-3d .home-machine-photo{position:absolute;inset:0;display:block;width:100%;height:100%;object-fit:cover;pointer-events:none;transform:none;transition:none}
 .home-machine-3d .home-machine-photo[hidden],.home-machine-3d #home-machine-cad[hidden]{display:none!important}
 .home-machine-3d #home-machine-cad{position:absolute;inset:0;pointer-events:none}
@@ -213,3 +214,6 @@
 .machine-photo-reference figcaption{color:#f5c68b;font-size:11px;line-height:1.5;padding:8px 5px 3px}
 /* Foto frontal real de la TRUMPF V85: mostrar la máquina completa en el visor. */
 .home-machine-3d .home-machine-photo{object-fit:contain;background:#123047}
+
+
+.app-copyright{position:fixed;bottom:0;left:0;right:0;text-align:center;font-size:10px;line-height:18px;background:#061524;color:#b9c8da;z-index:24;pointer-events:none}.statusbar{margin-bottom:18px}@media(max-width:700px){.app-copyright{bottom:calc(64px + env(safe-area-inset-bottom,0px))}.shell{padding-bottom:100px}}

@@ -39,6 +39,7 @@
    bodies[2].outline=vg.finger;
    bodies.push({group:'ram',outline:vg.ram,renderOutline:vg.ramDisplay,z0:vg.z0,z1:vg.z1,renderZ0:-margin,renderZ1:sheet.width+margin});
    bodies.push({group:'table',outline:vg.table,renderOutline:vg.tableDisplay,z0:vg.z0,z1:vg.z1,renderZ0:-margin,renderZ1:sheet.width+margin});
+   bodies.push({group:'ram',outline:vg.upperHolder,z0:-margin,z1:sheet.width+margin});
    return bodies;
   }
   const cfg=scene.machineSetup||{},outer=Math.max(...scene.toolProfiles.die.outline.map(p=>Math.abs(p.x)));
@@ -71,3 +72,4 @@
  }
  return {extrude,prisms,assemble};
 });
+

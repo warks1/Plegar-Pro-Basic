@@ -139,12 +139,12 @@ function renderModule(name){
    el.classList.remove('module-editor','module-forming','module-piece3d');
    el.innerHTML='<section class="mecos-source-card" aria-label="Fuente y revisión semanal del catálogo MECOS"><div><span class="mecos-source-kicker">FUENTE PRINCIPAL · PUNZONES Y MATRICES</span><h2>Catálogo de utillaje MECOS</h2><p>Los punzones seleccionables del programa proceden de las páginas del catálogo MECOS aportadas. Se conserva el fabricante impreso en cada referencia. La revisión semanal detecta novedades y prepara sus cotas e imagen para incorporarlas tras validar la lectura.</p><small>La lectura de dibujos escaneados puede ser ambigua: las cotas nuevas se revisan antes de entrar en la simulación.</small></div><a href="https://www.mecos.es/files/productos/utillaje-plegadora/MECOS-Catalogo-General-de-Utillaje-2022.pdf" target="_blank" rel="noopener noreferrer">Abrir catálogo MECOS ↗</a></section>'+
     '<div id="tool-dxf-panel" aria-label="Importar perfiles reales DXF de utillaje"></div>'+
-    '<div id="manufacturer-catalog" aria-label="Biblioteca por fabricante"></div>'+
-    '<details class="mfg-internal"><summary>Utillaje WILA–TRUMPF, AMADA–PROMECAM y adaptadores · catálogo</summary>'+
+    
+    '<details class="mfg-internal" open><summary>Utillaje WILA–TRUMPF, AMADA–PROMECAM y adaptadores · catálogo</summary>'+
     '<p>Incluye las cotas legibles de las páginas MECOS WILA–TRUMPF 45–55, AMADA–PROMECAM 13–41 y adaptadores 4/82 fotografiadas. Selecciona un punzón o matriz para cargarlo en el programa y verlo en Simulación 2D/3D. Los útiles con geometría insuficientemente acotada quedan como ficha documental. Las siluetas reconstruidas no son CAD del fabricante ni validación de colisiones.</p>'+
     '<div class="module-tiles">'+[...lib.PUNCHES,...lib.DIES,...(lib.ACCESSORIES||[])].map(tool=>
      '<div class="module-tile"><strong>'+escapeHtml(tool.name)+'</strong><p>'+escapeHtml(lib.details(tool))+
-     '</p>'+(tool.kind==='punch'||tool.kind==='die'?'<button type="button" data-tool-set="'+tool.kind+':'+tool.id+'">Cargar '+(tool.kind==='die'?'matriz':'punzón')+' en el programa</button>':'<small>Referencia de catálogo · cotas/contorno insuficientes para simular</small>')+'</div>').join('')+'</div></details>';
+     '</p>'+(tool.kind==='punch'||tool.kind==='die'?'<button type="button" data-tool-set="'+tool.kind+':'+tool.id+'">Cargar '+(tool.kind==='die'?'matriz':'punzón')+' en el programa</button>':'<small>Referencia de catálogo · cotas/contorno insuficientes para simular</small>')+'</div>').join('')+'</div></details><details><summary>Otras familias documentales · esquemas genéricos</summary><div id="manufacturer-catalog" aria-label="Familias documentales"></div></details>';
    window.PlegarToolDXF?.mount($('#tool-dxf-panel'));
    catalog.mount($('#manufacturer-catalog'));
    return;
@@ -378,3 +378,4 @@ function linkProjectPlan(i,profile,width){
  }catch{return false;}
 }
 window.PlegarApp={switchScreen,linkProjectPlan,getProjects:()=>projects.map(p=>({...p}))};
+

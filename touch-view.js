@@ -17,11 +17,11 @@
   return {scale,x:focal.x-centre.x-q*(focal.x-centre.x-state.x),
    y:focal.y-centre.y-q*(focal.y-centre.y-state.y)};
  }
- function attach(surface,content,{minZoom=.7,maxZoom=4}={}){
+ function attach(surface,content,{minZoom=.7,maxZoom=4,allowPan=true}={}){
   if(!surface||!content)throw Error('Se necesita la superficie y la capa del visor.');
   const pointers=new Map();let state={scale:1,x:0,y:0},gesture=null,lastTap=0,lastTapPoint=null,hadMotion=false,hadMultiple=false,origin=null;
-  const bound=s=>({...s,x:clamp(s.x,-surface.clientWidth*Math.max(1,s.scale),surface.clientWidth*Math.max(1,s.scale)),
-   y:clamp(s.y,-surface.clientHeight*Math.max(1,s.scale),surface.clientHeight*Math.max(1,s.scale))});
+  const bound=s=>({...s,x:!allowPan?0:clamp(s.x,-surface.clientWidth*Math.max(1,s.scale),surface.clientWidth*Math.max(1,s.scale)),
+   y:!allowPan?0:clamp(s.y,-surface.clientHeight*Math.max(1,s.scale),surface.clientHeight*Math.max(1,s.scale))});
   function render(){
    content.style.transform='translate3d('+state.x.toFixed(2)+'px,'+state.y.toFixed(2)+'px,0) scale('+state.scale.toFixed(4)+')';
    content.style.transformOrigin='center center';
@@ -37,6 +37,7 @@
    else gesture=null;
   }
   function down(e){
+   if(!allowPan)return;
    if(e.pointerType==='mouse'&&e.button!==0)return;
    const p={x:e.clientX,y:e.clientY};pointers.set(e.pointerId,p);
    if(pointers.size===1){origin=p;hadMotion=false;hadMultiple=false;}else hadMultiple=true;

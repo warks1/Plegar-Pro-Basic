@@ -228,7 +228,7 @@ function render(){
  const pane=ctl.host.querySelector('.f2-data-values'),setup=data.setup||{};
  if(pane){
   const values=[
-   ['Máquina','Modelo por confirmar'],['Punzón',setup.punch||'No elegido'],
+   ['Máquina',setup.machineId==='trumpf-v85'?'TRUMPF TrumaBend V85':'Modelo por confirmar'],['Punzón',setup.punch||'No elegido'],
    ['Matriz',setup.die||'No elegida'],['Espesor',as2(data.thickness)+' mm'],
    ['Material',data.material||'Sin especificar'],['Fuerza actual','NO CALCULADA'],
    ['Ángulo',as2(m.signedAngle)+'°'],
@@ -365,3 +365,4 @@ function mount(host,getData,getSelection=()=>1,onSelect=()=>{}){
 function refresh(){const ctl=active;if(!ctl||ctl.selfSelecting)return;halt();ctl.showFinal=false;let next=ctl.getData().sequence.indexOf(ctl.getSelection());if(next>=0)ctl.currentStep=next;render();}
 window.PlegarForming2D={mount,destroy,refresh};
 })();
+

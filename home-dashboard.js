@@ -272,7 +272,7 @@ function init(){
  $('#timeline').addEventListener('input',e=>seek(e.target.value));
  const steps=$('#steps');steps.addEventListener('click',e=>{const b=e.target.closest('[data-home-step]');if(b){e.stopPropagation();seek(b.dataset.homeStep);}});
  const list=$('#projects');list.addEventListener('click',e=>{const b=e.target.closest('[data-project]');if(b){e.stopPropagation();selectProject(Number(b.dataset.project));}});
- machineGestures=window.PlegarTouchView.attach($('#home-machine-3d'),$('#home-machine-camera'));
+ machineGestures=window.PlegarTouchView.attach($('#home-machine-3d'),$('#home-machine-camera'),{allowPan:false});
  previewGestures=window.PlegarTouchView.attach($('#home-preview-3d'),$('#home-preview-camera'));
  applySettings();
  const obs=new MutationObserver(()=>{if(visible())sync();else stop();});obs.observe($('#summary-cards'),{attributes:true,attributeFilter:['hidden']});
@@ -284,3 +284,4 @@ function init(){
 window.PlegarHomeDashboard={init,sync,stop,applySettings,projectRows,projectThumb,selectProject};
 init();
 })();
+

@@ -24,9 +24,9 @@
     {id:'estructura-superior',name:'Trancha TRUMPF V85',points:vg.ramDisplay,collisionPoints:vg.ram,known:true},
     {id:'mesa',name:'Mesa TRUMPF V85',points:vg.tableDisplay,collisionPoints:vg.table,known:true},
     {id:'tope-dedo',name:'Tope '+(m.machineSetup.backgaugeMode==='support'?'Support':'Stop'),points:vg.finger,known:true},
-    {id:'mordaza',name:'Amarre pendiente de definir',points:tiny,known:false,excluded:true}
+    {id:'portapunzon',name:'Portaútil nominal V85',points:vg.upperHolder,known:false}
    ];
-   return {ram:vg.ramDisplay,table:vg.tableDisplay,parts,dieHolder:tiny,upperHolder:tiny,lowerBody:empty,
+   return {ram:vg.ramDisplay,table:vg.tableDisplay,parts,dieHolder:tiny,upperHolder:vg.upperHolder,lowerBody:empty,
     finger:vg.finger,arm:empty,carriage:empty,tableMeasured:true,ramMeasured:true,ramDatumKnown:!vg.mountingAssumed,
     ramBottom:vg.bottom,toolToRamNominalGapMm:0,holderGeometryVerified:false,projected:true,verified:false,v85:vg};
   }
@@ -60,7 +60,7 @@
    [-Math.max(tableLeft,dieHalf+8)+22,dieBottom+80]);
   const x=m.stop.x, top=m.stop.top,bottom=m.stop.bottom;
   const fingerHalf=Math.max(1.2,Math.min(m.stop.width,4));
-  const finger=rectangle(x-fingerHalf,top,x+fingerHalf,bottom);
+  const finger=rectangle(x,top,x+fingerHalf,bottom);
   const arm=poly([x+fingerHalf,top+2],[x+fingerHalf+Math.max(12,m.dieOpening),top+2],
    [x+fingerHalf+Math.max(19,m.dieOpening+10),top-7],
    [x+fingerHalf+Math.max(24,m.dieOpening+16),top-7],
@@ -151,3 +151,4 @@
  }
  return {build,inspect,sweep,bounds,crosses};
 });
+

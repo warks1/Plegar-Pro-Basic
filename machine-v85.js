@@ -29,6 +29,10 @@
   // Contorno exterior reconstruido. Rebajes de amarre aún no verificados.
   const ram=[{x:-r.L2,y:top},{x:r.L2,y:top},{x:r.L2,y:shoulder},
    {x:r.L9,y:shoulder},{x:r.L9,y:bottom-r.L4},{x:r.L6,y:bottom}, {x:-r.L2,y:bottom}];
+  const punchTop=Math.min(...m.toolProfiles.punch.outline.map(q=>q.y));
+  // Portaútil nominal: une la trancha y la espiga; se mueve con el punzón.
+  // Su sección exacta sigue pendiente del plano de amarre.
+  const upperHolder=rect(-14,Math.min(bottom,punchTop),14,punchTop+2);
   const dieBottom=Math.max(...m.toolProfiles.die.outline.map(q=>q.y));
   // Apoyo nominal: base de matriz en el fondo del canal L7 de la mesa.
   const tableTop=dieBottom-t.L7,step=tableTop+t.L2,base=step+t.L1;
@@ -36,13 +40,13 @@
    {x:-t.L6/2,y:dieBottom},{x:t.L6/2,y:dieBottom},{x:t.L6/2,y:tableTop},
    {x:t.L4,y:tableTop},{x:t.L4,y:step},{x:t.L5/2,y:step},
    {x:t.L5/2,y:base},{x:-t.L5/2,y:base},{x:-t.L5/2,y:step},{x:-t.L3,y:step}];
-  const s=cfg.backgaugeMode==='support'?data.support:data.stop,x=m.stop.x,by=m.stop.y+s.L5;
-  const finger=[{x:x-s.L6,y:by},{x,y:by-s.L4+s.L5},{x:x+s.L5,y:by-s.L4},
+  const s=cfg.backgaugeMode==='support'?data.support:data.stop,x=m.stop.x,by=m.stop.y+(m.thickness||2)/2+2;
+  const finger=[{x:x-s.L6,y:by},{x:x-s.L6,y:by-2},{x,y:by-2},{x,y:by-s.L4+s.L5},{x:x+s.L5,y:by-s.L4},
    {x:x+s.L1,y:by-s.L4},{x:x+s.L1,y:by-s.L3},{x:x+s.L2,y:by-s.L3},{x:x+s.L2,y:by}];
   // Vista de trabajo recortada; el cribado utiliza los contornos completos.
   const ramDisplay=ram.map(q=>({...q,y:Math.max(q.y,bottom-240)}));
   const tableDisplay=table.map(q=>({...q,y:Math.min(q.y,dieBottom+160)}));
-  return {ram,table,finger,ramDisplay,tableDisplay,bottom,offset,
+  return {ram,table,finger,upperHolder,ramDisplay,tableDisplay,bottom,offset,
    z0:0,z1:data.width,mountingAssumed:!Number.isFinite(cfg.ramBottomOffset),
    punchHeightAssumed:!Number.isFinite(m.punchHeight),
    contourVerified:false,dimensionsSource:data.source};
@@ -59,3 +63,4 @@
  }
  return {id,data,selected,setup,geometry,html,rect};
 });
+

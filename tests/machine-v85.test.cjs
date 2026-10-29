@@ -25,14 +25,14 @@ test('Trancha sigue a la punta; mesa y dedo fijos durante el golpe',()=>{
  const a=frame(0,0).scene,b=frame(0,.6).scene,ga=V.geometry(a),gb=V.geometry(b);
  assert.deepEqual(ga.table,gb.table);assert.deepEqual(ga.finger,gb.finger);
  ga.ram.forEach((q,i)=>{close(gb.ram[i].x,q.x);close(gb.ram[i].y-q.y,b.punchTipY-a.punchTipY);});
- close(ga.offset,130);assert.equal(ga.mountingAssumed,true);
+ close(ga.offset,a.punchHeight+V.data.toolWorkingDistance);assert.equal(ga.mountingAssumed,true);
  const explicit=F.frame({...profile,setup:{...profile.setup,ramBottomOffset:155}},0,.5).scene;
  close(V.geometry(explicit).offset,155);assert.equal(V.geometry(explicit).mountingAssumed,false);
 });
-test('Un punzón sin altura no se convierte por error en una altura cero',()=>{
+test('Un punzón legado resuelve la altura publicada sin fingir que es cero',()=>{
  const s=F.frame({...profile,setup:{...profile.setup,punch:'p88-r1'}},0,.5).scene,g=V.geometry(s);
- assert.ok(g.offset>50);assert.equal(g.punchHeightAssumed,true);
- assert.ok(C.inspect(profile,s).unknown.some(x=>x.includes('Altura del punzón')));
+ assert.ok(g.offset>50);assert.equal(g.punchHeightAssumed,false);
+ assert.ok(!C.inspect(profile,s).unknown.some(x=>x.includes('Altura del punzón')));
 });
 test('Los contornos físicos 2D coinciden con los prismas 3D y mantienen 2040 mm',()=>{
  const s=frame(2,.6).scene,g=V.geometry(s),section=S.build(s),prisms=T.prisms({width:100,thickness:2},s);

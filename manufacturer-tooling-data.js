@@ -9,7 +9,7 @@
 })(typeof globalThis!=='undefined'?globalThis:this,function(){
  'use strict';
  const source=Object.freeze({type:'catalog-photo',title:'Catálogo WILA–TRUMPF · páginas 45–55 aportadas por Toni',url:null,version:'páginas 45–55',verified:false,note:'Cotas copiadas de las fotografías del catálogo. Los contornos no acotados por completo son reconstrucciones de la silueta impresa, no CAD del fabricante.'});
- const amadaSource=Object.freeze({type:'catalog-photo',title:'Catálogo AMADA–PROMECAM · páginas 13–20 aportadas por Toni',url:null,version:'páginas 13–20',verified:false,note:'Cotas copiadas de las fotografías del catálogo. Las siluetas no acotadas por completo son reconstrucciones de la sección impresa, no CAD del fabricante.'});
+ const amadaSource=Object.freeze({type:'catalog-photo',title:'Catálogo AMADA–PROMECAM · páginas 13–26 aportadas por Toni',url:null,version:'páginas 13–26',verified:false,note:'Cotas copiadas de las fotografías del catálogo. Las siluetas no acotadas por completo son reconstrucciones de la sección impresa, no CAD del fabricante.'});
  const accessorySource=Object.freeze({type:'catalog-photo',title:'Catálogo de utillaje · páginas 4 y 82 aportadas por Toni',url:null,version:'páginas 4 y 82',verified:false,note:'Ficha documental. Las páginas no aportan sección y cotas suficientes para generar una geometría 3D fiable.'});
  const punch=(code,angle,nose,height,capacity,bodyWidth,reach=0,b= null)=>Object.freeze({
   id:'wila-p-'+code+(b?'-b'+b:''),kind:'punch',brand:'WILA / TRUMPF',manufacturer:'WILA / TRUMPF',
@@ -92,15 +92,45 @@
   // Página 19.
   ['10.136',60,6,65,100,36],['10.517',60,.8,80,25,26],['11.710',60,5,115,100,32],['11.720',60,10,115,100,32],['11.750',60,.8,135,70,26],['11.134',45,.6,66.3,80,26],['11.102',45,1,65.2,80,26],
   // Página 20, ángulos 35° y 30°.
-  ['11.103',35,.6,86,70,26],['11.104',35,1.5,86,70,26],['11.600',35,.8,90,70,26],['10.514',30,.6,80,50,26],['10.515',30,.6,140,50,26],['10.511',30,3,80,100,27],['11.528',30,3,104,100,27],['11.530',30,5,104,100,27]
+  ['11.103',35,.6,86,70,26],['11.104',35,1.5,86,70,26],['11.600',35,.8,90,70,26],['10.514',30,.6,80,50,26],['10.515',30,.6,140,50,26],['10.511',30,3,80,100,27],['11.528',30,3,104,100,27],['11.530',30,5,104,100,27],
+  // Página 21.
+  ['11.158',30,.6,80,100,26],['11.258',30,.6,104,100,26],['11.810',30,1,200,50,26],['11.514',30,.6,104,50,26],['11.780',30,.5,135,80,26],['11.540',26,.8,117,100,26]
  ];
  for(const row of amadaRows)amadaPunch(...row);
+
+ const amadaDies=[];
+ function amadaDie(code,width,height,angle,openings,radii,offsets,capacity=100){
+  const grooves=openings.map((opening,i)=>Object.freeze({opening,angle,radius:radii[i],offset:offsets[i]}));
+  amadaDies.push(Object.freeze({id:'amada-d-'+code,kind:'die',brand:'AMADA / PROMECAM',manufacturer:'AMADA / PROMECAM',
+   name:'AMADA / PROMECAM · matriz multicanal '+code,code,opening:openings[0],angle,height,length:835,availableLengths:[835,415,805],
+   bodyWidth:width,shoulderRadius:radii[0],capacityTonPerM:capacity,grooves:Object.freeze(grooves),keyWidth:null,keyHeight:null,
+   profileFamily:'multi-v',source:amadaSource,geometryCertified:false,
+   dimensionsNote:'Sección de doble canal · longitudes de catálogo 835/415 mm y fraccionado estándar 805 mm.'}));
+ }
+ // Páginas 24–26: dos canales en una misma sección, cotas de posición desde el extremo izquierdo.
+ const multiRows=[
+  ['20.295',55,26,90,[4,7],[.3,.5],[4,48],100],['20.202',55,26,90,[6,10],[.4,.6],[6,45],100],['20.203',55,26,90,[8,12],[.5,.8],[8,45],100],
+  ['21.202',55,26,88,[6,10],[.8,1.2],[6,45],100],['20.338',55,26,88,[8,12],[1,1.5],[8,45],100],['20.204',55,26,88,[12,20],[2.75,3],[10,40],100],
+  ['20.296',55,26,88,[14,18],[2.75,3],[11,42],100],['20.205',55,26,88,[16,25],[2.75,3],[12,38.5],100],['20.235',55,26,60,[6,10],[.4,.6],[6,45],60],
+  ['20.229',55,26,60,[8,12],[.5,.8],[8,45],60],['20.230',55,26,60,[12,20],[.8,1.5],[10,40],60],['20.267',55,26,60,[16,20],[1.6,2],[12,40],60],
+  ['20.418',50,46,30,[8,12],[.8,1.5],[9.5,35.5],40],
+  ['20.275',34.5,46,90,[4,7],[.3,.5],[3.5,29.5],80],['20.276',37,46,90,[6,10],[.4,.6],[4.5,30.5],80],['20.277',39,46,90,[8,12],[.5,.8],[5.5,31.5],80],
+  ['21.276',37,46,88,[6,10],[.8,1.2],[4.5,30.5],80],['20.339',39,46,88,[8,12],[1,1.5],[5.5,31.5],80],['20.278',45,46,88,[14,18],[1.25,1.5],[8.5,34.5],80],
+  ['20.279',45.5,46,88,[12,20],[.8,1.75],[7.5,33.5],80],['20.280',50,46,88,[16,25],[1.5,1.75],[9.5,35.5],80],['20.478',50,46,30,[8,12],[.8,1.5],[9.5,35.5],40]
+ ];
+ for(const row of multiRows)amadaDie(...row);
 
  const accessories=Object.freeze([
   Object.freeze({id:'clark-single-50.650',kind:'adapter',manufacturer:'CLARK / WILA',code:'50.650',name:'Adaptador neumático CLARK · simple',stroke:4,clampingPressureBar:10,clampingForceKg:700,installation:'frontal / vertical',source:accessorySource}),
   Object.freeze({id:'clark-double-50.651',kind:'adapter',manufacturer:'CLARK / WILA',code:'50.651',name:'Adaptador neumático CLARK · doble',stroke:4,clampingPressureBar:10,clampingForceKg:700,installation:'frontal / vertical',source:accessorySource}),
   Object.freeze({id:'punch-800.000',kind:'accessory',manufacturer:'WILA / TRUMPF',code:'800.000',name:'Punzón de plegado/aplastado · conjunto 800.000',length:150,heightOptions:[59,67,100],profileDocumented:true,source:accessorySource}),
-  ...['60.680','60.681','60.682','60.683'].map(code=>Object.freeze({id:'holder-'+code,kind:'accessory',manufacturer:'WILA / TRUMPF',code,name:'Soporte inferior para conjunto 800.000 · '+code,source:accessorySource}))
+  ...['60.680','60.681','60.682','60.683'].map(code=>Object.freeze({id:'holder-'+code,kind:'accessory',manufacturer:'WILA / TRUMPF',code,name:'Soporte inferior para conjunto 800.000 · '+code,source:accessorySource})),
+  ...[
+   ['20.200','Soporte AMADA para matriz · 20.200','ancho 60 mm · altura 34 mm · asiento 20 mm'],
+   ['20.201','Soporte AMADA para matriz · 20.201','ancho 60 mm · altura 55 mm · asiento 35 mm'],
+   ['20.306','Soporte AMADA para matriz · 20.306','ancho 60 mm · altura 75 mm · asiento 55 mm'],
+   ['20.316','Soporte AMADA para matriz · 20.316','ancho 60 mm · altura 39 mm · asiento 20 mm']
+  ].map(([code,name,dimensionsNote])=>Object.freeze({id:'amada-support-'+code,kind:'accessory',manufacturer:'AMADA / PROMECAM',code,name,dimensionsNote,source:amadaSource}))
  ]);
- return {source,PUNCHES:Object.freeze([...punches,...amadaPunches]),DIES:Object.freeze(dies),ACCESSORIES:accessories};
+ return {source,PUNCHES:Object.freeze([...punches,...amadaPunches]),DIES:Object.freeze([...dies,...amadaDies]),ACCESSORIES:accessories};
 });

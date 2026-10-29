@@ -28,6 +28,18 @@
  }
  function catalogDie(model){
   const d=model.dieCatalogTool,v=model.dieOpening,depth=model.dieDepth,body=Math.max(d.bodyWidth||v+40,v+2);
+  if(d.grooves?.length){
+   const height=d.height||46,outline=[pt(-body/2,0)];
+   for(const g of d.grooves){
+    const cx=-body/2+g.offset,half=g.opening/2,root=Math.min(g.radius||.4,half*.2),grooveDepth=Math.min(height-2,half/Math.tan(rad(g.angle/2)));
+    outline.push(pt(cx-half,0),pt(cx-root,grooveDepth-root),pt(cx,grooveDepth),pt(cx+root,grooveDepth-root),pt(cx+half,0));
+   }
+   outline.push(pt(body/2,0),pt(body/2,height),pt(-body/2,height));
+   return {outline,opening:v,depth,shoulderRadius:d.shoulderRadius||null,
+    geometry:'doble canal AMADA reconstruido desde cotas de catálogo',model:'sección extruida · sin CAD',verified:false,source:d.source,
+    dimensions:{angle:d.angle,height:d.height,length:d.length,availableLengths:d.availableLengths,bodyWidth:d.bodyWidth,
+     grooves:d.grooves,capacityTonPerM:d.capacityTonPerM}};
+  }
   const half=v/2,total=d.height||120,key=d.keyWidth||13,keyH=d.keyHeight||20,root=Math.max(0,Math.min(d.shoulderRadius||.6,v*.15));
   const rootHalf=Math.min(root,v*.1),bodyBottom=total-keyH;
   const outline=[pt(-body/2,0),pt(-half,0),pt(-rootHalf,depth-root),pt(0,depth),pt(rootHalf,depth-root),pt(half,0),

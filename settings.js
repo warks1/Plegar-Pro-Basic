@@ -10,13 +10,13 @@
  const KEY='plegarpro-settings-v1';
  const DEFAULT=Object.freeze({
   theme:'dark',accent:'blue',density:'normal',textScale:'100',
-  reducedMotion:false,homeView:'cad',camera:'profile',
+  reducedMotion:false,homeView:'photo',camera:'profile',
   repeat:true,speed:'1',exportResolution:'2160',startupScreen:'Inicio'
  });
  const OPTIONS=Object.freeze({
   theme:['dark','light','contrast'],accent:['blue','cyan','amber'],
   density:['normal','compact'],textScale:['90','100','110','125'],
-  homeView:['cad'],camera:['iso','profile','front','top'],
+  homeView:['photo'],camera:['iso','profile','front','top'],
   speed:['0.5','1','2'],exportResolution:['1080','1440','2160'],
   startupScreen:['Inicio','Proyectos','Programación 2D','Simulación 3D']
  });
@@ -96,7 +96,7 @@
     field('textScale','Escala de la interfaz','Amplía o reduce visualmente la aplicación. En móvil, comprueba el desplazamiento.',[['90','90 %'],['100','100 %'],['110','110 %'],['125','125 %']])+
     toggle('reducedMotion','Reducir animaciones decorativas','Evita animaciones CSS innecesarias; no altera los controles de reproducción de plegado.'))+
    section('Simulación, reproducción y exportación',
-    field('homeView','Vista inicial','La portada abre con la TRUMPF TrumaBend V85 configurada.',[['cad','TRUMPF V85 · Cinemática 3D']])+
+    field('homeView','Vista inicial','La portada abre con la foto real de tu TRUMPF TrumaBend V85.',[['photo','Foto real · TRUMPF V85']])+
     field('camera','Cámara inicial','Orientación al abrir una simulación.',[['iso','Isométrica'],['profile','Perfil lateral'],['front','Frontal'],['top','Superior']])+
     field('speed','Velocidad predeterminada','Aplicable al reproductor de Inicio y Simulación 3D.',[['0.5','0,5×'],['1','1×'],['2','2×']])+
     field('exportResolution','Resolución PNG','Tamaño de las imágenes exportadas desde la simulación vectorial.',[['1080','Full HD · 1920 × 1080'],['1440','QHD · 2560 × 1440'],['2160','UHD · 3840 × 2160']])+

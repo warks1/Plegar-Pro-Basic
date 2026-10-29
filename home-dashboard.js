@@ -2,7 +2,7 @@
 (function(){
 'use strict';
 const H=()=>window.PlegarHome3D,E=()=>window.PlegarExamples3D,Editor=()=>window.PlegarEditor2D,TL=()=>window.PlegarSequenceTimeline;
-const $=s=>document.querySelector(s),state={step:1,cycle:0,width:100,zoom:1,yaw:38,elevation:24,previewZoom:1,previewYaw:38,raf:null,last:null,paint:null,cameraKey:'',camera:null,profileKey:'',maximized:false,mode:'cad',loop:true,holdUntil:null};
+const $=s=>document.querySelector(s),state={step:1,cycle:0,width:100,zoom:1,yaw:38,elevation:24,previewZoom:1,previewYaw:38,raf:null,last:null,paint:null,cameraKey:'',camera:null,profileKey:'',maximized:false,mode:'photo',loop:true,holdUntil:null};
 let machineGestures=null,previewGestures=null;
 const Sample=()=>window.PlegarSampleLibrary;
 function program(){return Editor()?.getData();}
@@ -45,9 +45,9 @@ function applySettings(){
  if(cameras[prefs.camera]){
   [state.yaw,state.elevation]=cameras[prefs.camera];state.cameraKey='';
  }
- // La portada siempre abre con la máquina principal configurada: TRUMPF V85.
- // La foto archivada sólo queda accesible como referencia manual.
- setMode('cad');
+ // La portada enseña la foto real de la TRUMPF V85 aportada por el propietario.
+ // La cinemática geométrica queda disponible con el control correspondiente.
+ setMode('photo');
  draw();
 }
 function stop(){
@@ -76,12 +76,14 @@ function setMode(mode){
  if(cad)cad.hidden=state.mode!=='cad';
  const readout=$('#home-stage-readout');if(readout)readout.hidden=state.mode!=='cad';
  const legend=$('#home-part-legend');if(legend)legend.hidden=state.mode!=='cad';
+ const tools=$('.stage-tools');if(tools)tools.hidden=state.mode!=='cad';
+ const axes=$('.axis-legend');if(axes)axes.hidden=state.mode!=='cad';
  const imgButton=$('#realistic-option'),modelButton=$('#home-view-model');
  for(const [button,pressed] of [[imgButton,state.mode==='photo'],[modelButton,state.mode==='cad']]){
   if(button){button.setAttribute('aria-pressed',String(pressed));button.classList.toggle('selected',pressed);}
  }
  const label=$('#home-scene-label');if(label)label.textContent=state.mode==='photo'
-  ?'REFERENCIA HISTÓRICA BYSTRONIC · NO ES LA TRUMPF V85 ACTIVA'
+  ?'FOTOGRAFÍA REAL DE LA TRUMPF TRUMABEND V85 · CINEMÁTICA 3D DISPONIBLE'
   :'CINEMÁTICA GEOMÉTRICA EN MOVIMIENTO · NO CONTROL CNC NI MÁQUINA CALIBRADA';
 }
 function draw(){

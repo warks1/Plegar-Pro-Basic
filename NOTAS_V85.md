@@ -14,7 +14,7 @@ Transcripción de cuatro fotografías de pantallas Cybelec del propietario (IMG_
 
 ## Comportamiento
 
-La portada abre con la cinemática de la TRUMPF V85, sin depender de preferencias antiguas que mostraban la foto Bystronic archivada. El perfil lateral sigue como cámara predeterminada. La referencia Bystronic queda rotulada como referencia anterior; la tarjeta de máquina activa usa un esquema frontal de la V85.
+La portada abre con la fotografía frontal de la TRUMPF TrumaBend V85 aportada por el propietario. La cinemática geométrica del plegado se abre con el botón «Cinemática 3D»; su cámara predeterminada es el perfil lateral. El modelo sigue siendo geométrico y utiliza las cotas indicadas en este documento.
 
 La vista lateral representa la pieza completa, pliegues previos y pendientes, matriz fija y punzón/trancha solidarios en aproximación, plegado y retirada. Se indica la separación nominal punta/chapa. La sección reconstruida de mesa, trancha y dedo sustituye las envolventes rectangulares de la V85 en el cribado 2D, y alimenta los prismas 3D. La visualización recorta las zonas lejanas de trancha/mesa para mostrar el golpe; los cálculos conservan los contornos completos. Se marca en rojo una posible interferencia, distinguiendo el contacto local previsto con el punzón y los apoyos de matriz de un ala remota que toca esas herramientas.
 

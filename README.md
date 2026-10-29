@@ -1,6 +1,6 @@
 # Actualización 29/10/2026 · TRUMPF V85 principal
 
-Se configuran las cotas de las pantallas Cybelec aportadas por el propietario, los modos Stop/Support y los contornos reconstruidos de mesa/trancha en 2D y prismas 3D. La simulación distingue contacto local del punzón e interferencias de otras alas, con resaltado rojo. Inicio abre la cinemática en perfil por defecto; conserva preferencias explícitas.
+Se configuran las cotas de las pantallas Cybelec aportadas por el propietario, los modos Stop/Support y los contornos reconstruidos de mesa/trancha en 2D y prismas 3D. La portada muestra la foto de la TRUMPF V85 del taller; «Cinemática 3D» abre el ciclo geométrico en perfil lateral.
 
 **[Datos, interpretación del montaje y límites actuales](NOTAS_V85.md).** El montaje punta-trancha y los rebajes de amarre aún necesitan confirmación. El volteo/retirada real entre pliegues y las colisiones industriales no están resueltos. 387 pruebas Node locales superadas; navegador local no disponible. Revisar GitHub Actions para el commit actual.
 

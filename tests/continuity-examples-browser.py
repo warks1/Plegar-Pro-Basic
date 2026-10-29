@@ -54,10 +54,12 @@ with sync_playwright() as pw:
     el.dispatchEvent(new MouseEvent('dblclick',{bubbles:true,cancelable:true}));
     return {zoom,reset:Number(el.dataset.touchScale),hasCamera:!!el.querySelector('.touch-camera-content,.p3-camera-content,.f2-camera-content')};
    }""",selector)
-  assert page.locator('.home-machine-photo').is_hidden()
+  assert page.locator('.home-machine-photo').is_visible()
   assert 'nominal NO CNC' in page.locator('.calc-output strong').inner_text()
   assert page.locator('.calc-fields input[readonly]').count()==4
-  assert page.locator('#realistic-option').get_attribute('aria-pressed')=='false'
+  assert page.locator('#realistic-option').get_attribute('aria-pressed')=='true'
+  assert page.locator('#home-machine-cad').is_hidden()
+  page.locator('#home-view-model').click()
   assert page.locator('#home-machine-cad').is_visible()
   main_gesture=gesture('#home-machine-3d')
   assert main_gesture['zoom']>1 and main_gesture['reset']==1 and main_gesture['hasCamera']
@@ -717,7 +719,7 @@ with sync_playwright() as pw:
   assert page.evaluate('document.documentElement.dataset.ppAccent')=='amber'
   page.locator('[data-pp-setting="reducedMotion"]').check()
   assert page.evaluate('document.documentElement.dataset.ppMotion')=='reduced'
-  for key,value in [('camera','profile'),('homeView','cad'),('speed','2'),('exportResolution','1080')]:
+  for key,value in [('camera','profile'),('homeView','photo'),('speed','2'),('exportResolution','1080')]:
    page.locator('[data-pp-setting="'+key+'"]').select_option(value)
   page.locator('[data-pp-setting="repeat"]').uncheck()
   assert page.evaluate("JSON.parse(localStorage.getItem('plegarpro-settings-v1')).repeat")==False

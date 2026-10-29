@@ -211,3 +211,5 @@
 .machine-photo-reference{margin:12px 0;padding:8px;border:1px solid #466d87;border-radius:9px;background:#091d2b}
 .machine-photo-reference img{display:block;max-width:100%;width:100%;height:auto;aspect-ratio:12/7;object-fit:contain;border-radius:7px;background:#142432}
 .machine-photo-reference figcaption{color:#f5c68b;font-size:11px;line-height:1.5;padding:8px 5px 3px}
+/* Foto frontal real de la TRUMPF V85: mostrar la máquina completa en el visor. */
+.home-machine-3d .home-machine-photo{object-fit:contain;background:#123047}

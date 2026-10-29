@@ -15,7 +15,7 @@
  const accessorySource=Object.freeze({type:'catalog-photo',supplier:'MECOS',title:'MECOS · catálogo de utillaje · páginas 4 y 82 aportadas',url:MECOS_CATALOG_URL,website:'https://www.mecos.es/plegado/',version:'catálogo general ED22 + fotos aportadas',verified:false,note:'Ficha documental. Las páginas no aportan sección y cotas suficientes para generar una geometría 3D fiable.'});
  const punch=(code,angle,nose,height,capacity,bodyWidth,reach=0,b= null)=>Object.freeze({
   id:'wila-p-'+code+(b?'-b'+b:''),kind:'punch',brand:'WILA / TRUMPF',manufacturer:'WILA / TRUMPF',
-  name:'WILA / TRUMPF · punzón '+code+(b?' · b '+b+' mm':''),code,angle,nose,height,length:500,sectionedLength:550,
+  name:'WILA / TRUMPF · punzón '+code+(reach?' · pata de cabra / cuello de cisne':'')+(b?' · b '+b+' mm':''),code,angle,nose,height,length:500,sectionedLength:550,
   capacityTonPerM:capacity,mountingWidth:20,bodyWidth,reach,b,profileFamily:reach?'gooseneck':'straight',source,
   geometryCertified:false,dimensionsNote:'Longitud publicada: 500 mm; versión fraccionada: 550 mm.'});
  const punches=[
@@ -69,7 +69,7 @@
  function amadaPunch(code,angle,nose,height,capacity,profileReach=26,profileFamily='gooseneck'){
   const lengths=[835,415,805];
   amadaPunches.push(Object.freeze({id:'amada-p-'+code,kind:'punch',brand:'AMADA / PROMECAM',manufacturer:'AMADA / PROMECAM',
-   name:'AMADA / PROMECAM · punzón '+code,code,angle,nose,height,length:835,availableLengths:lengths,sectionedLength:805,
+   name:'AMADA / PROMECAM · punzón '+code+(profileFamily==='gooseneck'?' · pata de cabra / cuello de cisne':''),code,angle,nose,height,length:835,availableLengths:lengths,sectionedLength:805,
    capacityTonPerM:capacity,mountingWidth:13,bodyWidth:profileReach,reach:profileReach,profileFamily,source:amadaSource,
    geometryCertified:false,dimensionsNote:'Longitudes de catálogo: 835 mm, 415 mm y fraccionado estándar 805 mm.'}));
  }

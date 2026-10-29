@@ -11,7 +11,7 @@
  const LIB=typeof module==='object'&&module.exports?require('./tool-library.js'):window.PlegarToolLibrary;
  if(!LIB)throw new Error('Biblioteca de herramientas no cargada.');
  const {PUNCHES,DIES}=LIB;
- const DEFAULT_SETUP=Object.freeze({radius:2,kFactor:0.33,punch:'p88-r1',die:'v16-88',backgaugeX:120,backgaugePositionMode:'manual',dimensionBasis:'outer',dieHeight:null,tableLeft:null,tableRight:null,ramWidth:null,ramBottomOffset:null});
+ const DEFAULT_SETUP=Object.freeze({radius:2,kFactor:0.33,punch:'p88-r1',die:'v16-88',backgaugeX:120,backgaugePositionMode:'wing',dimensionBasis:'outer',dieHeight:null,tableLeft:null,tableRight:null,ramWidth:null,ramBottomOffset:null});
  function lookup(list,id){return list.find(item=>item.id===id);}
  function validateSetup(source){
   const s={...DEFAULT_SETUP,...source};
@@ -34,7 +34,8 @@
   const ramWidth=optional('ramWidth',20,2000),ramBottomOffset=optional('ramBottomOffset',10,500);
   const backgaugeX=Number(s.backgaugeX);
   if(!Number.isFinite(backgaugeX)||backgaugeX<1||backgaugeX>10000)throw new Error('Posición nominal del tope X entre 1 y 10000 mm.');
-  const backgaugePositionMode=s.backgaugePositionMode||'manual';
+  const backgaugePositionMode=source?.backgaugePositionMode||
+   (source&&Object.prototype.hasOwnProperty.call(source,'backgaugeX')?'manual':'wing');
   if(!['wing','manual'].includes(backgaugePositionMode))throw Error('Modo de posicionamiento X del tope desconocido.');
   // X por identificador B; null hereda el X general. Nunca por orden de ejecución.
   let backgaugeByBend;

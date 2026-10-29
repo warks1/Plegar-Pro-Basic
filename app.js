@@ -28,9 +28,9 @@ const descriptions = {
  'Materiales':'Materiales de muestra. Propiedades mecánicas y espesores pendientes de validación.',
  'Máquinas':'Catálogo de plegadoras, ejes y configuraciones. Aún sin gemelos digitales calibrados.',
  'Producción':'Flujo de órdenes y estados de fabricación. Pendiente de conectar a datos reales.',
- 'Agenda':'Planificación de trabajo y recordatorios. Vista de navegación inicial.',
+ 'Agenda':'Trabajos de taller, fechas, operarios y estados. Guardado local con copia de seguridad.',
  'Calculadora de plegado':'Formulario de cálculo listo visualmente. No genera desarrollos hasta validar el motor.',
- 'Curva perfecta':'Módulo de curvado progresivo. Requiere algoritmos y parámetros reales de máquina.',
+ 'Curva perfecta':'Curvado progresivo: desarrollo, marcas de golpe y animación geométrica del perfil.',
  'Comparador de V':'Comparación de matrices según espesor y geometría. Motor pendiente.',
  'Ajustes':'Preferencias funcionales, accesibilidad, simulación, navegación y copias locales.',
  'Acerca de':'Plegar Pro — nueva base de interfaz para AMS Engineering.'
@@ -88,6 +88,7 @@ function closeMenu(){ $('#sidebar').classList.remove('open');$('#sidebar-curtain
 function toggleMenu(){const opened=$('#sidebar').classList.toggle('open');$('#sidebar-curtain').classList.toggle('open',opened);}
 function switchScreen(name){
  if(['Simulación 2D','Simulación 3D','Programación 3D'].includes(name)&&window.PlegarEditor2D?.getPlanReference()&&!window.PlegarEditor2D.isPlanConfigured()){name='Programación 2D';toast('Define primero las medidas del perfil del plano seleccionado para habilitar su simulación.');}
+ window.PlegarWorkshop?.destroy();
  window.PlegarPlans?.destroy();
  window.PlegarForming2D?.destroy();
  window.PlegarPiece3DView?.destroy();
@@ -102,7 +103,9 @@ function switchScreen(name){
 function renderModule(name){
  $('#module-title').textContent=name;$('#module-subtitle').textContent=descriptions[name]||'Módulo del nuevo Plegar Pro.';
  let content='';
- $('#module-sample').classList.remove('module-piece3d');
+ $('#module-sample').classList.remove('module-piece3d','module-workshop');
+ if(name==='Agenda'){window.PlegarWorkshop.agenda($('#module-sample'),projects);return;}
+ if(name==='Curva perfecta'){window.PlegarWorkshop.curve($('#module-sample'));return;}
  if(name==='Planos'){
    $('#module-sample').classList.remove('module-editor','module-forming','module-piece3d');
    $('#module-sample').innerHTML='';
@@ -162,8 +165,6 @@ function renderModule(name){
   const profile=window.PlegarEditor2D?.getData();
   try{content=window.PlegarDevelopmentTools.html(name==='Comparador de V'?'comparison':'calculator',profile,{width:window.PlegarEditor2D.getWidth()});}
   catch(error){content='<div class="module-tile"><strong>Cálculo no disponible</strong><p>'+escapeHtml(error.message)+'</p><button data-screen="Programación 2D">Revisar parámetros de plegado</button></div>';}
- }else if(name==='Curva perfecta'){
-  content='<div class="module-tile"><strong>Curva perfecta · pendiente de modelización</strong><p>La sucesión de golpes requiere radios, material, capacidad y utillaje físico verificado. No se proporcionarán ángulos de máquina sin datos contrastados.</p><button data-screen="Programación 2D">Abrir Programa 2D</button></div>';
  }else{
  content=`<div class="module-tile"><strong>Diseño del módulo preparado</strong><p>Este módulo está identificado en el mapa maestro. Su implementación funcional corresponde a una fase posterior.</p></div>`;
  }
@@ -380,5 +381,6 @@ function linkProjectPlan(i,profile,width){
  }catch{return false;}
 }
 window.PlegarApp={switchScreen,linkProjectPlan,getProjects:()=>projects.map(p=>({...p}))};
+
 
 

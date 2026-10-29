@@ -25,10 +25,21 @@ with sync_playwright() as pw:
    if path!='splash.js':page.evaluate((ROOT/path).read_text(encoding='utf-8'))
   page.evaluate("PlegarApp.switchScreen('Programación 2D')")
   editor=page.evaluate("""() => {const el=document.querySelector('#ed-svg'),r=el.getBoundingClientRect();return {polyline:el.querySelectorAll('polyline').length,markup:el.innerHTML.length,width:r.width,height:r.height,visible:!!(r.width&&r.height),error:document.querySelector('#editor-status')?.textContent,inline:!!document.querySelector('#ed-forming .f2d-svg')}}""")
+  assert page.locator('#ed-tool-drawings svg.catalog-section').count()>=2,'No se muestran secciones de utillaje 2D/3D'
+  assert 'pata de cabra' in page.locator('#ed-tool-drawings').inner_text().lower(),'Falta nombre de pata de cabra'
   page.evaluate("PlegarApp.switchScreen('Simulación 2D')")
   simulation=page.evaluate("""() => {const el=document.querySelector('.f2-camera-content'),stage=document.querySelector('.f2-stage'),svg=el?.querySelector('svg'),r=stage?.getBoundingClientRect();return {svg:!!svg,svgLength:svg?.outerHTML.length||0,width:r?.width||0,height:r?.height||0,datum:document.querySelector('.f2-data-values')?.textContent||'',controls:document.querySelectorAll('[data-f2-action]').length}}""")
   print('AUDITORÍA VISOR 2D',w,json.dumps({'editor':editor,'sim':simulation,'errors':errors[-10:]},ensure_ascii=False),flush=True)
   assert editor['visible'] and editor['polyline']>=2 and editor['markup']>100, 'Editor sin dibujo'
   assert simulation['svg'] and simulation['width']>50 and simulation['height']>50 and simulation['datum'], 'Simulación 2D en blanco'
+  before=page.locator('.f2d-svg [data-component="punzon"]').get_attribute('d')
+  page.locator('.f2-range').evaluate("(el)=>{el.value='60';el.dispatchEvent(new Event('input',{bubbles:true}));}")
+  after=page.locator('.f2d-svg [data-component="punzon"]').get_attribute('d')
+  assert before!=after,'El punzón no se mueve al avanzar la simulación 2D'
+  page.locator('[data-f2-action="reset"]').click()
+  page.locator('[data-f2-action="play"]').click()
+  assert 'Pausar' in page.locator('[data-f2-action="play"]').inner_text(),'El reproductor 2D no se inicia'
+  page.locator('[data-f2-action="play"]').click()
+  assert not errors,errors[-5:]
   context.close()
  browser.close()

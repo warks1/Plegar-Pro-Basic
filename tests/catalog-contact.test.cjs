@@ -6,11 +6,24 @@ test('todos los punzones de catálogo tienen contacto central y radio nominal',(
  const r=tool.nose??.6,alpha=tool.angle*Math.PI/360,tx=r*Math.cos(alpha),ty=tipY-r+r*Math.sin(alpha);assert.ok(p.outline.some(p=>Math.abs(p.x-tx)<1e-8&&Math.abs(p.y-ty)<1e-8));assert.ok(p.outline.every(p=>Number.isFinite(p.x)&&Number.isFinite(p.y)));assert.equal(p.verified,false);
  }
 });
-test('los flancos de punta son tangentes al radio y respetan el ángulo',()=>{for(const tool of D.PUNCHES){const p=T.punch({punchCatalogTool:tool,punchTipY:0}),a=p.outline[5],b=p.outline[6],r=tool.nose??.6;close((a.x-b.x)*(b.x)+(a.y-b.y)*(b.y+r),0);close((a.x-b.x)/(b.y-a.y),Math.tan(tool.angle*Math.PI/360));}});
+test('los flancos de punta son tangentes al radio y respetan el ángulo',()=>{for(const tool of D.PUNCHES){const p=T.punch({punchCatalogTool:tool,punchTipY:0}),r=tool.nose??.6,alpha=tool.angle*Math.PI/360,idx=p.outline.findIndex(v=>Math.abs(v.x-r*Math.cos(alpha))<1e-8&&Math.abs(v.y-(-r+r*Math.sin(alpha)))<1e-8);assert.ok(idx>0,tool.code);const a=p.outline[idx-1],b=p.outline[idx];close((a.x-b.x)*(b.x)+(a.y-b.y)*(b.y+r),0);close((a.x-b.x)/(b.y-a.y),Math.tan(alpha));}});
 test('página 41 conserva fondos planos, altura74 y anchura de pie14',()=>{for(const code of ['22.308','22.310','22.312','22.316','22.320','22.325']){const d=D.DIES.find(d=>d.code===code),p=T.die({dieCatalogTool:d,dieOpening:d.opening,dieDepth:T.dieDepth(d)});const expected=(d.opening-d.rootFlatWidth)/2/Math.tan(Math.PI/12);close(p.depth,expected);assert.ok(p.outline.some(p=>p.x===-d.rootFlatWidth/2&&p.y===expected));assert.ok(p.outline.some(p=>p.x===d.rootFlatWidth/2&&p.y===expected));close(Math.max(...p.outline.map(p=>p.y)),d.height);assert.equal(d.footWidth,14);}assert.equal(D.DIES.find(d=>d.code==='22.312').height,74);});
 test('página40 no inventa radio de fondo y conserva dimensiones',()=>{for(const d of D.DIES.filter(d=>/^22\.8/.test(d.code))){const p=T.die({dieCatalogTool:d,dieOpening:d.opening,dieDepth:T.dieDepth(d)});assert.equal(p.dimensions.vRootRadius,null);close(p.depth,d.opening/2/Math.tan(d.angle*Math.PI/360));close(Math.max(...p.outline.map(p=>p.x))-Math.min(...p.outline.map(p=>p.x)),d.bodyWidth);}});
 test('ficha2D y extrusión3D consumen el mismo contorno corregido',()=>{for(const tool of [...D.PUNCHES,...D.DIES]){assert.ok(V.section(tool).length>=3);assert.ok(V.svg(tool).includes(tool.code));assert.ok(V.svg(tool,'3d').includes('3D'));}assert.match(V.svg(D.DIES.find(d=>d.code==='22.312')),/Pie 14/);});
 test('simulación usa la profundidad del fondo plano que dibuja',()=>{
  const F=require('../forming2d.js');const profile={name:'Prueba',material:'Acero S235JR',thickness:1,segments:[80,80],angles:[90],sequence:[1],setup:{die:'amada-d-22.325',punch:D.PUNCHES[0].id,radius:2,kFactor:.33}};
  for(const progress of [0,.25,.5,1]){const scene=F.scene(profile,0,progress);close(scene.dieDepth,T.dieDepth(D.DIES.find(d=>d.code==='22.325')));close(scene.toolProfiles.die.depth,scene.dieDepth);close(Math.max(...scene.toolProfiles.punch.outline.map(p=>p.y)),scene.punchTipY);}
+});
+
+test('punzones pata de cabra usan garganta cóncava, no el contorno recto genérico',()=>{
+ const tools=D.PUNCHES.filter(v=>v.profileFamily==='gooseneck');assert.ok(tools.length>=10);
+ for(const tool of tools){
+  const p=T.punch({punchCatalogTool:tool,punchTipY:0});
+  assert.match(p.geometry,/pata de cabra/);
+  assert.ok(p.outline.length>38,tool.code);
+  assert.ok(p.outline.some(v=>v.x<-tool.mountingWidth/2-5),tool.code);
+  assert.equal(p.verified,false);
+ }
+ const straight=D.PUNCHES.find(v=>v.profileFamily==='straight');assert.ok(straight);
+ assert.doesNotMatch(T.punch({punchCatalogTool:straight,punchTipY:0}).geometry,/pata de cabra/);
 });

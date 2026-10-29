@@ -6,17 +6,13 @@
  const OFFICIAL=typeof module==='object'&&module.exports?require('./manufacturer-tooling-data.js'):window.PlegarManufacturerToolData;
  if(!OFFICIAL)throw new Error('Catálogo WILA–TRUMPF no cargado.');
  const source=Object.freeze({type:'internal-parametric',title:'Plegar Pro Plus · modelo geométrico interno',url:null,version:'v0.12',verified:false,note:'Sin planos oficiales, tolerancias ni referencias verificadas.'});
- const punch=(id,angle,nose,height=null)=>Object.freeze({id,kind:'punch',name:'Punzón genérico '+angle+'° · punta R'+nose+(height?' · H'+height+' mm':''),angle,nose,height,manufacturer:null,source});
  const die=(v,angle,height=null)=>Object.freeze({id:'v'+v+'-'+angle,kind:'die',name:'Matriz genérica V'+v+' · '+angle+'°'+(height?' · H'+height+' mm':''),opening:v,angle,height,manufacturer:null,source});
- const GENERIC_PUNCHES=Object.freeze([
-  punch('p88-r1',88,1),punch('p88-r2',88,2),punch('p30-r1',30,1),punch('p30-r2',30,2),
-  punch('p30-r1-h100',30,1,100),punch('p30-r1-h120',30,1,120),punch('p30-r1-h150',30,1,150),punch('p88-r2-h100',88,2,100)
- ]);
  const GENERIC_DIES=Object.freeze([
   ...[6,8,10,12,16,22,24,32,35,40,50].map(v=>die(v,88)),
   ...[6,10,12,16,22,24,32,35,40,50].map(v=>die(v,30,50))
  ]);
- const PUNCHES=Object.freeze([...GENERIC_PUNCHES,...OFFICIAL.PUNCHES]);
+ // En el selector solo aparecen punzones identificados en el catálogo MECOS.
+ const PUNCHES=Object.freeze([...OFFICIAL.PUNCHES]);
  const DIES=Object.freeze([...GENERIC_DIES,...OFFICIAL.DIES]);
  const ACCESSORIES=OFFICIAL.ACCESSORIES||Object.freeze([]);
  function get(kind,id){const list=kind==='punch'?PUNCHES:kind==='die'?DIES:null;return list?.find(t=>t.id===id)||null;}
@@ -39,7 +35,9 @@
   const records=[...PUNCHES,...DIES],seen=new Set();
   for(const tool of records){
    if(seen.has(tool.id))throw Error('Herramienta duplicada.');seen.add(tool.id);
-   if(!tool.source||tool.source.verified!==false||tool.source.url!==null)throw Error('Origen de utillaje inconsistente.');
+   if(!tool.source||tool.source.verified!==false)throw Error('Origen de utillaje inconsistente.');
+   if(tool.kind==='punch'&&(tool.source.supplier!=='MECOS'||!/^https:\/\/www\.mecos\.es\//.test(tool.source.url||'')))throw Error('El punzón debe proceder del catálogo MECOS.');
+   if(tool.manufacturer&&!/^https:\/\/www\.mecos\.es\//.test(tool.source.url||''))throw Error('Referencia sin enlace al catálogo MECOS.');
    if(![null,'WILA / TRUMPF','AMADA / PROMECAM'].includes(tool.manufacturer))throw Error('Fabricante de herramienta desconocido.');
    if(!(tool.angle>0&&tool.angle<180))throw Error('Ángulo inválido.');
    if((tool.kind==='punch'&&!(tool.nose>0))||(tool.kind==='die'&&!(tool.opening>0)))throw Error('Dimensión inválida.');

@@ -11,10 +11,14 @@
  const LIB=typeof module==='object'&&module.exports?require('./tool-library.js'):window.PlegarToolLibrary;
  if(!LIB)throw new Error('Biblioteca de herramientas no cargada.');
  const {PUNCHES,DIES}=LIB;
- const DEFAULT_SETUP=Object.freeze({radius:2,kFactor:0.33,punch:'p88-r1',die:'v16-88',backgaugeX:120,backgaugePositionMode:'wing',dimensionBasis:'outer',dieHeight:null,tableLeft:null,tableRight:null,ramWidth:null,ramBottomOffset:null});
+ const DEFAULT_SETUP=Object.freeze({radius:2,kFactor:0.33,punch:'amada-p-11.101',die:'v16-88',backgaugeX:120,backgaugePositionMode:'wing',dimensionBasis:'outer',dieHeight:null,tableLeft:null,tableRight:null,ramWidth:null,ramBottomOffset:null});
+ const LEGACY_PUNCHES=Object.freeze({'p88-r1':'amada-p-11.101','p88-r2':'amada-p-11.101','p30-r1':'amada-p-11.158','p30-r2':'amada-p-11.158','p30-r1-h100':'amada-p-11.528','p30-r1-h120':'amada-p-11.810','p30-r1-h150':'amada-p-11.780','p88-r2-h100':'amada-p-11.230'});
  function lookup(list,id){return list.find(item=>item.id===id);}
  function validateSetup(source){
   const s={...DEFAULT_SETUP,...source};
+  // Migración de proyectos antiguos: el selector nuevo solo ofrece referencias
+  // de punzón documentadas en el catálogo MECOS.
+  if(LEGACY_PUNCHES[s.punch])s.punch=LEGACY_PUNCHES[s.punch];
   const radius=Number(s.radius),kFactor=Number(s.kFactor);
   if(!Number.isFinite(radius)||radius<0.1||radius>500)throw new Error('Radio interior estimado entre 0,1 y 500 mm.');
   if(!Number.isFinite(kFactor)||kFactor<0.2||kFactor>0.6)throw new Error('Factor K entre 0,2 y 0,6.');

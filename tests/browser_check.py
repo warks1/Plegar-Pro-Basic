@@ -55,7 +55,7 @@ with sync_playwright() as p:
   assert '120 mm' in page.locator('#ed-ref-dimensions').inner_text()
   assert 'AGA13061' in page.locator('#ed-ref-family').inner_text()
   assert page.locator('#ed-ref-link').get_attribute('href').startswith('https://www.amada.de/')
-  assert page.locator('#ed-punch').input_value()=='p88-r1'
+  assert page.locator('#ed-punch').input_value()=='amada-p-11.101'
   page.locator('#ed-ref-filter').select_option('die')
   assert page.locator('#ed-ref-item option').count()==2
   assert 'AMADA' in page.locator('#ed-ref-family').inner_text()
@@ -295,7 +295,7 @@ with sync_playwright() as p:
   assert page.locator('#ed-backgauge').input_value()=='30'
   assert 'Tope X 30' in page.locator('#ed-forming .f2-nominal').inner_text()
   assert 'Tope:' in page.locator('#ed-forming .f2-notes').inner_text()
-  page.locator('#ed-punch').select_option('p30-r1-h120')
+  page.locator('#ed-punch').select_option('amada-p-11.810')
   assert 'H120 mm' in page.locator('#ed-tool-punch').inner_text()
   page.locator('#ed-die').select_option('v6-88')
   assert 'V/e' in page.locator('#ed-calc-warnings').inner_text()
@@ -303,7 +303,7 @@ with sync_playwright() as p:
   assert page.locator('#ed-die').input_value()=='v16-88'
   page.locator('#ed-redo').click()
   assert page.locator('#ed-die').input_value()=='v6-88'
-  assert page.locator('#ed-punch').input_value()=='p30-r1-h120'
+  assert page.locator('#ed-punch').input_value()=='amada-p-11.810'
   assert 'SIN VERIFICAR' in page.locator('#ed-tool-punch').inner_text()
   print('steps',tag,flush=True)
   page.locator('#ed-add').click()
@@ -320,7 +320,7 @@ with sync_playwright() as p:
   assert page.locator('#ed-total').inner_text().startswith('476 mm')
   assert page.locator('#ed-radius').input_value()=='3'
   assert page.locator('#ed-die').input_value()=='v6-88'
-  assert page.locator('#ed-punch').input_value()=='p30-r1-h120'
+  assert page.locator('#ed-punch').input_value()=='amada-p-11.810'
   assert 'SIN VERIFICAR' in page.locator('#ed-tool-punch').inner_text()
   assert page.locator('#ed-backgauge').input_value()=='30'
   assert page.locator('.f2-step').count()==5

@@ -28,7 +28,7 @@ test('matriz New AFH V16 especifica el radio de hombro y no el radio interior de
 });
 test('catálogo de fabricante no modifica la lista simulable ni las selecciones antiguas',()=>{
  assert.equal(L.PUNCHES.length,8);assert.equal(L.DIES.length,21);
- assert.equal(C.validateSetup().punch,'p88-r1');assert.equal(C.validateSetup().die,'v16-88');
+ assert.equal(C.validateSetup().punch,'amada-p-11.101');assert.equal(C.validateSetup().die,'v16-88');
  assert.equal(L.get('die','amada-mt508-v8-30-415'),null);
  assert.equal(R.get('v16-88'),null);
  assert.equal(R.list('punch').length,3);assert.equal(R.list('die').length,2);

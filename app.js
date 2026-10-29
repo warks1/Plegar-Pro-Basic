@@ -24,7 +24,7 @@ const descriptions = {
  'Programación 3D':'Previsualización 3D geométrica derivada del editor 2D, sin edición CAD en volumen.',
  'Simulación 2D':'Vista cinemática local de perfil sincronizada con Programación 2D, sin física ni colisiones verificadas.',
  'Simulación 3D':'Cinemática ilustrativa 3D de descenso del punzón y plegado de chapa; no simula fuerzas ni seguridad de máquina.',
- 'Utillaje':'Biblioteca visual de punzones, matrices y adaptadores. Las fichas deberán verificarse con datos de fabricante.',
+ 'Utillaje':'Biblioteca de utillaje del catálogo MECOS. Los punzones del programa proceden de las referencias MECOS documentadas.',
  'Materiales':'Materiales de muestra. Propiedades mecánicas y espesores pendientes de validación.',
  'Máquinas':'Catálogo de plegadoras, ejes y configuraciones. Aún sin gemelos digitales calibrados.',
  'Producción':'Flujo de órdenes y estados de fabricación. Pendiente de conectar a datos reales.',
@@ -137,10 +137,11 @@ function renderModule(name){
   else{
    const el=$('#module-sample');
    el.classList.remove('module-editor','module-forming','module-piece3d');
-   el.innerHTML='<div id="tool-dxf-panel" aria-label="Importar perfiles reales DXF de utillaje"></div>'+
+   el.innerHTML='<section class="mecos-source-card" aria-label="Fuente y revisión semanal del catálogo MECOS"><div><span class="mecos-source-kicker">FUENTE PRINCIPAL · PUNZONES Y MATRICES</span><h2>Catálogo de utillaje MECOS</h2><p>Los punzones seleccionables del programa proceden de las páginas del catálogo MECOS aportadas. Se conserva el fabricante impreso en cada referencia. La revisión semanal detecta novedades y prepara sus cotas e imagen para incorporarlas tras validar la lectura.</p><small>La lectura de dibujos escaneados puede ser ambigua: las cotas nuevas se revisan antes de entrar en la simulación.</small></div><a href="https://www.mecos.es/files/productos/utillaje-plegadora/MECOS-Catalogo-General-de-Utillaje-2022.pdf" target="_blank" rel="noopener noreferrer">Abrir catálogo MECOS ↗</a></section>'+
+    '<div id="tool-dxf-panel" aria-label="Importar perfiles reales DXF de utillaje"></div>'+
     '<div id="manufacturer-catalog" aria-label="Biblioteca por fabricante"></div>'+
     '<details class="mfg-internal"><summary>Utillaje WILA–TRUMPF, AMADA–PROMECAM y adaptadores · catálogo</summary>'+
-    '<p>Incluye las cotas legibles de las páginas WILA–TRUMPF 45–55, AMADA–PROMECAM 13–41 y adaptadores 4/82 fotografiadas. Selecciona un punzón o matriz para cargarlo en el programa y verlo en Simulación 2D/3D. Los útiles con geometría insuficientemente acotada quedan como ficha documental. Las siluetas reconstruidas no son CAD del fabricante ni validación de colisiones.</p>'+
+    '<p>Incluye las cotas legibles de las páginas MECOS WILA–TRUMPF 45–55, AMADA–PROMECAM 13–41 y adaptadores 4/82 fotografiadas. Selecciona un punzón o matriz para cargarlo en el programa y verlo en Simulación 2D/3D. Los útiles con geometría insuficientemente acotada quedan como ficha documental. Las siluetas reconstruidas no son CAD del fabricante ni validación de colisiones.</p>'+
     '<div class="module-tiles">'+[...lib.PUNCHES,...lib.DIES,...(lib.ACCESSORIES||[])].map(tool=>
      '<div class="module-tile"><strong>'+escapeHtml(tool.name)+'</strong><p>'+escapeHtml(lib.details(tool))+
      '</p>'+(tool.kind==='punch'||tool.kind==='die'?'<button type="button" data-tool-set="'+tool.kind+':'+tool.id+'">Cargar '+(tool.kind==='die'?'matriz':'punzón')+' en el programa</button>':'<small>Referencia de catálogo · cotas/contorno insuficientes para simular</small>')+'</div>').join('')+'</div></details>';

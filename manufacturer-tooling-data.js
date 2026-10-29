@@ -1,5 +1,6 @@
-/* Cotas transcritas de las páginas 45–55 del catálogo WILA–TRUMPF fotografiado
- * por el propietario. Dimensiones en mm, salvo capacidad (T/m).
+/* Cotas transcritas de catálogos MECOS aportados por el propietario.
+ * MECOS es la fuente/proveedor; se conserva la marca impresa de cada útil.
+ * Dimensiones en mm, salvo capacidad (T/m).
  * El contorno exterior no está acotado por completo en todas las referencias;
  * los modelos 2D/3D reproducen la sección publicada y dejan esa limitación visible.
  */
@@ -8,9 +9,10 @@
  else root.PlegarManufacturerToolData=api;
 })(typeof globalThis!=='undefined'?globalThis:this,function(){
  'use strict';
- const source=Object.freeze({type:'catalog-photo',title:'Catálogo WILA–TRUMPF · páginas 45–55 aportadas por Toni',url:null,version:'páginas 45–55',verified:false,note:'Cotas copiadas de las fotografías del catálogo. Los contornos no acotados por completo son reconstrucciones de la silueta impresa, no CAD del fabricante.'});
- const amadaSource=Object.freeze({type:'catalog-photo',title:'Catálogo AMADA–PROMECAM · páginas 13–41 aportadas por Toni',url:null,version:'páginas 13–41',verified:false,note:'Cotas copiadas de las fotografías del catálogo. Las siluetas no acotadas por completo son reconstrucciones de la sección impresa, no CAD del fabricante.'});
- const accessorySource=Object.freeze({type:'catalog-photo',title:'Catálogo de utillaje · páginas 4 y 82 aportadas por Toni',url:null,version:'páginas 4 y 82',verified:false,note:'Ficha documental. Las páginas no aportan sección y cotas suficientes para generar una geometría 3D fiable.'});
+ const MECOS_CATALOG_URL='https://www.mecos.es/files/productos/utillaje-plegadora/MECOS-Catalogo-General-de-Utillaje-2022.pdf';
+ const source=Object.freeze({type:'catalog-photo',supplier:'MECOS',title:'MECOS · catálogo de utillaje para plegadora · páginas WILA–TRUMPF 45–55',url:MECOS_CATALOG_URL,website:'https://www.mecos.es/plegado/',version:'catálogo general ED22 + fotos aportadas',verified:false,note:'Cotas transcritas de las páginas del catálogo MECOS aportadas por el propietario. La marca original de cada referencia se conserva. Los contornos no acotados por completo son reconstrucciones, no CAD del fabricante.'});
+ const amadaSource=Object.freeze({type:'catalog-photo',supplier:'MECOS',title:'MECOS · catálogo de utillaje para plegadora · páginas AMADA–PROMECAM 13–41',url:MECOS_CATALOG_URL,website:'https://www.mecos.es/plegado/',version:'catálogo general ED22 + fotos aportadas',verified:false,note:'Cotas transcritas de las páginas del catálogo MECOS aportadas por el propietario. Las siluetas no acotadas por completo son reconstrucciones de la sección impresa, no CAD del fabricante.'});
+ const accessorySource=Object.freeze({type:'catalog-photo',supplier:'MECOS',title:'MECOS · catálogo de utillaje · páginas 4 y 82 aportadas',url:MECOS_CATALOG_URL,website:'https://www.mecos.es/plegado/',version:'catálogo general ED22 + fotos aportadas',verified:false,note:'Ficha documental. Las páginas no aportan sección y cotas suficientes para generar una geometría 3D fiable.'});
  const punch=(code,angle,nose,height,capacity,bodyWidth,reach=0,b= null)=>Object.freeze({
   id:'wila-p-'+code+(b?'-b'+b:''),kind:'punch',brand:'WILA / TRUMPF',manufacturer:'WILA / TRUMPF',
   name:'WILA / TRUMPF · punzón '+code+(b?' · b '+b+' mm':''),code,angle,nose,height,length:500,sectionedLength:550,
@@ -203,5 +205,5 @@
   ].map(([code,name,dimensionsNote])=>Object.freeze({id:'amada-support-'+code,kind:'accessory',manufacturer:'AMADA / PROMECAM',code,name,dimensionsNote,source:amadaSource}))
   ,Object.freeze({id:'amada-holder-22.010',kind:'accessory',manufacturer:'AMADA / PROMECAM',code:'22.010',name:'Soporte AMADA para matriz de 30° · 22.010',dimensionsNote:'ancho base 60 mm · ancho de sujeción 14 mm · altura total 115.5 mm · cotas verticales marcadas 50 y 51.5 mm',source:amadaSource})
  ]);
- return {source,PUNCHES:Object.freeze([...punches,...amadaPunches]),DIES:Object.freeze([...dies,...amadaDies,...amadaStandardDies]),ACCESSORIES:accessories};
+ return {source,MECOS_CATALOG_URL,PUNCHES:Object.freeze([...punches,...amadaPunches]),DIES:Object.freeze([...dies,...amadaDies,...amadaStandardDies]),ACCESSORIES:accessories};
 });

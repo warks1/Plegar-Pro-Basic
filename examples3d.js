@@ -9,7 +9,7 @@
  if(typeof module==='object'&&module.exports)module.exports=api;else root.PlegarExamples3D=api;
 })(typeof globalThis!=='undefined'?globalThis:this,function(G,D,M,R){
  'use strict';
- const setup={radius:2,kFactor:.33,punch:'p88-r1',die:'v16-88',backgaugeX:120};
+ const setup={radius:2,kFactor:.33,punch:'amada-p-11.101',die:'v16-88',backgaugeX:120};
  const shapes=[
   {id:'l',label:'Escuadra L',width:100,segments:[80,60],angles:[90]},
   {id:'u',label:'Canal U',width:130,segments:[55,100,55],angles:[90,90]},

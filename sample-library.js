@@ -27,7 +27,7 @@
  const valid=(s)=>{const [id,name,thickness,material,width,segments,angles]=s;
   const profile=G.validate({name,material,thickness,segments,angles,sequence:id==='perfil-omega'?[1,2,4,3]:angles.map((_,i)=>i+1)});
   const die=thickness<=1.5?'v12-88':thickness<=2.1?'v16-88':'v24-88';
-  return {id,name,width,thickness,material,profile:{...profile,setup:{radius:Math.max(1,thickness),kFactor:.33,punch:'p88-r1',die,backgaugeX:120}},kind:'example',note:'Plano geométrico de ejemplo, no documentación original ni plano CNC.'};
+  return {id,name,width,thickness,material,profile:{...profile,setup:{radius:Math.max(1,thickness),kFactor:.33,punch:'amada-p-11.101',die,backgaugeX:120}},kind:'example',note:'Plano geométrico de ejemplo, no documentación original ni plano CNC.'};
  };
  function list(){return sampleData.map(valid);}
  function get(id){return list().find(p=>p.id===id)||null;}
@@ -41,7 +41,7 @@
   const segments=Array.from({length:n+1},(_,i)=>i===0||i===n?65:100);
   const angles=Array.from({length:n},(_,i)=>i%2===0?90:-90);
   const profile={...G.validate({name:String(name||'Pieza sin nombre'),material:'Acero S235JR',thickness:t,segments,angles,sequence:angles.map((_,i)=>i+1)}),
-   setup:{radius:Math.max(.5,t),kFactor:.33,punch:'p88-r1',die:t<=1.5?'v12-88':t<=2.1?'v16-88':'v24-88',backgaugeX:120}};
+   setup:{radius:Math.max(.5,t),kFactor:.33,punch:'amada-p-11.101',die:t<=1.5?'v12-88':t<=2.1?'v16-88':'v24-88',backgaugeX:120}};
   return {id:null,name:profile.name,width:100,profile,kind:'draft',note:'BORRADOR AUTOMÁTICO: medidas y ángulos no proceden del plano original. Verificar antes de usar.'};
  }
  function drawing(id){const sample=get(id);if(!sample)throw Error('Pieza de ejemplo no encontrada.');return D.create(sample.profile,{width:sample.width});}

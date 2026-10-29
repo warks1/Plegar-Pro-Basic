@@ -60,6 +60,7 @@ with sync_playwright() as pw:
   assert page.locator('#realistic-option').get_attribute('aria-pressed')=='true'
   assert page.locator('#home-machine-cad').is_hidden()
   page.locator('#home-view-model').click()
+  assert page.locator('.home-machine-photo').is_hidden()
   assert page.locator('#home-machine-cad').is_visible()
   main_gesture=gesture('#home-machine-3d')
   assert main_gesture['zoom']>1 and main_gesture['reset']==1 and main_gesture['hasCamera']
@@ -724,7 +725,8 @@ with sync_playwright() as pw:
   page.locator('[data-pp-setting="repeat"]').uncheck()
   assert page.evaluate("JSON.parse(localStorage.getItem('plegarpro-settings-v1')).repeat")==False
   page.locator('#module-view .module-top [data-screen="Inicio"]').click()
-  assert page.locator('#home-machine-cad').is_visible()
+  assert page.locator('.home-machine-photo').is_visible()
+  assert page.locator('#home-machine-cad').is_hidden()
   assert not page.locator('#home-loop').is_checked()
   assert page.locator('#speed').input_value()=='550'
   page.locator('#calc-close').click()

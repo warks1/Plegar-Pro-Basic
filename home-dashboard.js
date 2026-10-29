@@ -83,7 +83,7 @@ function setMode(mode){
   if(button){button.setAttribute('aria-pressed',String(pressed));button.classList.toggle('selected',pressed);}
  }
  const label=$('#home-scene-label');if(label)label.textContent=state.mode==='photo'
-  ?'BOSQUEJO ANIMADO · TRUMPF TRUMABEND V85 COMPLETA · CICLO DE PLEGADO'
+  ?'FOTOGRAFÍA REAL DE LA TRUMPF TRUMABEND V85 · CINEMÁTICA 3D DISPONIBLE'
   :'CINEMÁTICA GEOMÉTRICA EN MOVIMIENTO · NO CONTROL CNC NI MÁQUINA CALIBRADA';
 }
 function draw(){

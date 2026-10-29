@@ -27,3 +27,7 @@ Faltan plano de amarre, montaje de cada útil, posición/anchura Z de dedos, bas
 ## Validación
 
 387 pruebas Node locales superadas; comprobación de sintaxis JavaScript y diferencias sin errores. Navegador local no disponible y descarga de Chromium fallida; la revisión visual local no se ha realizado. Se actualiza el ensayo de navegador de GitHub Actions para V85 y cámara de perfil; su resultado debe comprobarse para el commit publicado. Inicio usa cinemática y cámara de perfil por defecto; conserva preferencias explícitas del usuario.
+
+## Continuación del 29/10/2026
+
+La vista de cada ciclo reconstruye ahora todo el perfil desde la secuencia: conserva giros concluidos aunque no sean vecinos del pliegue activo y mantiene planos los pendientes. La sección V85 puede revisar esas alas remotas durante el golpe. Los dobleces anteriores siguen representados con bisagras agudas y el cambio de máquina entre pasos aún no interpola retirada, giro y recolocación física.

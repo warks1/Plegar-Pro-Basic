@@ -1,4 +1,4 @@
-/* Plegar Pro Plus v0.89 — shared 2D/3D illustrative kinematics.
+/* Plegar Pro Plus v0.90 — shared 2D/3D illustrative kinematics.
  * Preparation of backgauge X between nominal bends, approach, forming and retract.
  * NOT an actual axis trajectory, sheet turnover or verified collision sequence.
  */
@@ -10,6 +10,7 @@
  'use strict';
  const G=typeof require==='function'?require('./forming2d.js'):window.PlegarFormingGeometry;
  const I=typeof require==='function'?require('./interference2d.js'):window.PlegarInterference2D;
+ const Pose=typeof require==='function'?require('./sequence-pose.js'):window.PlegarSequencePose;
  const clamp=n=>Math.max(0,Math.min(1,n));
  const smooth=n=>{const x=clamp(n);return x*x*(3-2*x);};
  const PREP_END=.12,APPROACH=.22,FORM_END=.78;
@@ -42,6 +43,10 @@
    lift=gap*smooth((t-FORM_END)/(1-FORM_END));
   }
   const scene=G.scene(profile,step,formingProgress);
+  // Reconstruir la pieza entera con todas las curvas ejecutadas. El antiguo
+  // ensamblaje local omitía pliegues no contiguos al B activo (p. ej. Omega 1-2-4-3).
+  scene.assembly=Pose.assemble(profile,step,formingProgress,scene);
+  scene.interferences=I.inspect(scene);
   // El tope móvil se comparte con herramientas 2D, malla 3D y cribado.
   // No desplazar la chapa para hacer coincidir artificialmente ambos bordes.
   scene.stop={...scene.stop,x,previousX:xPrevious,targetX:xTarget,
@@ -61,7 +66,7 @@
    punchY:punchTipY,dieY:0,punchLift:lift,approachGap:gap,
    partMoved:formingProgress>0,partFormed:formingProgress>=1,
    scene,backgaugeMotion,notice:physicalAxis,
-   warning:'CINEMÁTICA ILUSTRATIVA: X interpolado entre golpes y punzón levantado; la chapa NO se retira, voltea ni recoloca físicamente. Sin servo real, fuerzas, recorrido verificado, seguridad CNC ni colisiones certificadas.'};
+   warning:'CINEMÁTICA ILUSTRATIVA: conserva los pliegues ya ejecutados en una pose nominal para el B activo. El movimiento real de retirada, volteo y recolocación entre golpes aún no está modelado. Sin servo real, fuerzas, recorrido verificado, seguridad CNC ni colisiones certificadas.'};
  }
  return {frame,phases:{backgaugeEnd:PREP_END,approachEnd:APPROACH,formingEnd:FORM_END}};
 });

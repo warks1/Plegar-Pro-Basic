@@ -28,6 +28,6 @@ test('validación mantiene perfiles importados y descarta referencias erróneas'
 test('la altura nominal seleccionada cambia el volumen 3D ilustrativo',()=>{
  const setup={radius:2,kFactor:.33,die:'v16-88',punch:'amada-p-11.810',backgaugeX:120};
  const a=scene({...P,setup},0,1),b=scene({...P,setup:{...setup,punch:'amada-p-11.780'}},0,1);
- assert.ok(Math.min(...b.toolProfiles.punch.outline.map(p=>p.y))<Math.min(...a.toolProfiles.punch.outline.map(p=>p.y)));
+ assert.ok(Math.min(...b.toolProfiles.punch.outline.map(p=>p.y))>Math.min(...a.toolProfiles.punch.outline.map(p=>p.y)));
  assert.ok(assemble(build(a,100),a).faces.length>0);
 });

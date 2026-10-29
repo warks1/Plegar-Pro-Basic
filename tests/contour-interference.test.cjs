@@ -1,0 +1,14 @@
+const {test}=require('node:test'),assert=require('node:assert/strict');
+const C=require('../clearance2d.js'),F=require('../forming2d.js'),I=require('../interference2d.js'),D=require('../manufacturer-tooling-data.js');
+const box=(x,y,w,h)=>[{x,y},{x:x+w,y},{x:x+w,y:y+h},{x,y:y+h}];
+const line=(x1,y1,x2,y2)=>[{x:x1,y:y1},{x:x2,y:y2}];
+const hit=(l,p,t=1)=>C.sheetPolygonOverlaps(l,t,p).length>0;
+test('apoyo de cara y de extremo no es penetración',()=>{assert.equal(hit(line(-2,-.5,12,-.5),box(0,0,10,10)),false);assert.equal(hit(line(-5,5,0,5),box(0,0,10,10)),false);});
+test('detecta espesor de ala vertical sin cruce de su eje',()=>{assert.equal(hit(line(-.2,2,-.2,8),box(0,0,10,10)),true);});
+test('detecta cruce entre muestras, contención y polígonos coincidentes',()=>{assert.ok(hit(line(-10,5,20,5),box(0,0,10,10)));assert.ok(hit(line(2,5,8,5),box(0,0,10,10)));assert.ok(hit(line(-10,0,10,0),box(-1,-.2,2,.4)));assert.ok(C.sheetPolygonOverlaps(line(0,0,10,0),1,box(0,-.5,10,1),0).length);});
+test('hueco cóncavo de matriz no se rellena como envolvente convexa',()=>{const die=[{x:-5,y:0},{x:-2,y:0},{x:-1,y:5},{x:1,y:5},{x:2,y:0},{x:5,y:0},{x:5,y:10},{x:-5,y:10}];assert.equal(hit(line(-.5,3,.5,3),die,.2),false);assert.ok(hit(line(-.5,5.2,.5,5.2),die,.2));});
+test('tolerancia ignora ruido pero detecta penetración mayor y valida entradas',()=>{assert.equal(hit(line(-1,-.49,11,-.49),box(0,0,10,10)),false);assert.ok(hit(line(-1,-.3,11,-.3),box(0,0,10,10)));assert.throws(()=>C.sheetPolygonOverlaps(line(0,0,1,1),-1,box(0,0,10,10)));});
+function scene(code,progress){return F.scene({name:'Prueba',material:'Acero S235JR',thickness:1,segments:[80,80],angles:[90],sequence:[1],setup:{die:'amada-d-'+code,punch:D.PUNCHES[0].id,radius:2,kFactor:.33}},0,progress);}
+test('hombros redondeados no producen alertas de matriz durante apoyo nominal',()=>{for(const code of ['22.325','22.825'])for(const p of [0,.25,.5,.75,1])assert.equal(scene(code,p).interferences.problems.some(p=>p.code==='DIE_ENVELOPE'),false);});
+test('matriz comprueba también el perfil completo de alas previas',()=>{const s=scene('22.325',0);s.assembly={contour:line(-5,50,5,50)};assert.ok(I.inspect(s).problems.some(p=>p.code==='DIE_ENVELOPE'));});
+test('tope detecta ala vertical, respeta apoyo frontal y señala colocación detrás',()=>{const s=scene('22.325',0);s.machineSetup={machineId:'test'};s.stop={x:100,top:0,bottom:10,width:10};s.assembly={contour:line(99.8,2,99.8,8)};assert.equal(I.inspect(s).backgaugeState,'interferencia');s.assembly={contour:line(90,5,100,5)};assert.equal(I.inspect(s).backgaugeState,'contacto nominal');s.assembly={contour:line(120,5,130,5)};const r=I.inspect(s);assert.equal(r.backgaugeState,'detrás del tope');assert.ok(r.problems.some(p=>p.code==='BACKGAUGE_WRONG_SIDE'));assert.equal(r.problems.some(p=>p.code==='BACKGAUGE_OVERLAP'),false);});

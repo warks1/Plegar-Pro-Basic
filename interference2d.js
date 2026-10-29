@@ -9,7 +9,6 @@
  'use strict';
  const EPS=0.05;
  const Clearance=typeof require==='function'?require('./clearance2d.js'):window.PlegarClearance2D;
- const clamp=(a,b,c)=>Math.max(b,Math.min(c,a));
  // Extremo trasero del espesor de chapa dentro de la altura del dedo.
  // Se consideran todas las alas, incluidas las que no tocan el pliegue activo.
  function rearExtent(model){
@@ -34,50 +33,32 @@
  }
  function inspect(model){
   const problems=[];
-  const half=model.dieOpening/2,depth=model.dieDepth,t=model.thickness;
+  const t=model.thickness;
   const stop=model.stop;
   const rear=rearExtent(model);
   const tipGap=rear===null?null:stop.x-rear;
-  let backgaugeState='separado';
-  // Backgauge is an idealized upright 2D rectangle behind the RIGHT flank.
-  // Check sheet centreline at multiple locations, projected to the gauge face.
-  // Detect only substantive overlap, not a simple butt contact at the edge.
+  let backgaugeState=rear===null?'sin borde a altura del dedo':'separado';
   const contactLine=model.assembly?.contour||model.centerline;
-  if(tipGap!==null && tipGap < -EPS && contactLine.length>1){
-   const xProbe=stop.x+Math.min(0.3,stop.width/2);
-   for(let k=0;k<contactLine.length-1;k++){
-    const a=contactLine[k],b=contactLine[k+1];
-    if(Math.min(a.x,b.x)-EPS<=xProbe && xProbe<=Math.max(a.x,b.x)+EPS && Math.abs(a.x-b.x)>1e-9){
-     const u=(xProbe-a.x)/(b.x-a.x);
-     const y=a.y+(b.y-a.y)*u;
-     if(y+t/2>stop.top+EPS && y-t/2<stop.bottom-EPS){
-      backgaugeState='interferencia';
-      problems.push({code:'BACKGAUGE_OVERLAP',component:'Tope',message:'Posible solapamiento 2D de la chapa con el tope nominal. Revisar eje X y posición vertical del tope.'});
-      break;
-     }
-    }
-   }
-  }
-  if(tipGap!==null&&backgaugeState!=='interferencia'&&Math.abs(tipGap)<=EPS)backgaugeState='contacto nominal';
-  // Die V boundary: within |x| <= V/2, tool material lies BELOW the
-  // idealized descending V face. Outside the shoulders, material starts y=0.
-  // Nominal centreline + half thickness is a deliberately conservative check.
-  let maxDiePenetration=0;
-  for(const p of model.centerline){
-   const face=(Math.abs(p.x)<half)?depth*(1-Math.abs(p.x)/half):0;
-   const penetration=p.y+t/2-face;
-   if(penetration>maxDiePenetration)maxDiePenetration=penetration;
-  }
-  if(maxDiePenetration>Math.max(0.3,t*0.12)){
-   problems.push({code:'DIE_ENVELOPE',component:'Matriz',message:'La envolvente nominal de chapa invade el perfil simplificado de la matriz V. Comprobación conservadora: podría ser un falso positivo.'});
-  }
+  const machine=typeof require==='function'?require('./machine-v85.js'):window.PlegarMachineV85;
+  const machineGeometry=machine?.geometry(model);
+  const gaugePolygon=machineGeometry?.finger||[{x:stop.x,y:stop.top},{x:stop.x+stop.width,y:stop.top},{x:stop.x+stop.width,y:stop.bottom},{x:stop.x,y:stop.bottom}];
+  const gaugeHits=Clearance.sheetPolygonOverlaps(contactLine,t,gaugePolygon,EPS);
+  if(gaugeHits.length){
+   backgaugeState='interferencia';
+   problems.push({code:'BACKGAUGE_OVERLAP',component:'Tope',message:'El espesor del perfil de chapa invade el contorno del tope representado. Revisar posición X, altura y orientación.'});
+  }else if(tipGap!==null&&tipGap < -EPS){
+   backgaugeState='detrás del tope';
+   problems.push({code:'BACKGAUGE_WRONG_SIDE',component:'Tope',message:'Hay chapa detrás de la cara frontal del tope a su altura. Revisar la colocación; no se ha detectado cruce con su contorno.'});
+  }else if(tipGap!==null&&Math.abs(tipGap)<=EPS)backgaugeState='contacto nominal';
+  const dieHits=Clearance.sheetPolygonOverlaps(contactLine,t,model.toolProfiles.die.outline,EPS);
+  if(dieHits.length)problems.push({code:'DIE_ENVELOPE',component:'Matriz',message:'El espesor del perfil de chapa invade el contorno de la matriz representada. Revisar geometría, apoyo y pliegues previos.'});
   const flangeClearances=[];
   for(const path of model.previous?.paths||[]){
    // Check only the EXTRA segment after each already folded hinge.
    // No swept-volume path is checked, and these are sharp centre-lines.
    const polyline=path.points;
    const toolPolys=[['Punzón',model.toolProfiles.punch.outline],['Matriz',model.toolProfiles.die.outline],
-    ['Tope',[{x:stop.x,y:stop.top},{x:stop.x+stop.width,y:stop.top},{x:stop.x+stop.width,y:stop.bottom},{x:stop.x,y:stop.bottom}]]];
+    ['Tope',gaugePolygon]];
    for(const [name,polygon] of toolPolys){
     const d=Clearance.polylinePolygon(polyline,polygon);
     if(!Number.isFinite(d))continue;
@@ -89,10 +70,11 @@
   const result={status:problems.length?'revisar':'sin alertas geométricas',problems,flangeClearances,priorBendsEvaluated:model.previous?.paths?.flatMap(p=>p.bends)||[],
 
    backgaugeState,backgaugeGap:tipGap===null?null:Math.round(tipGap*1000)/1000,backgaugeRearX:rear,
-   maxDiePenetration:Math.round(maxDiePenetration*1000)/1000,
-   disclosure:'Cribado NO certificado. Alas previas solo como bisagras planas idealizadas: no se modelan reposicionamiento, colisiones barridas, radios reales anteriores, deformación, sólidos CAD, ejes CNC ni el entorno 3D. La ausencia de alertas NO demuestra seguridad.'};
+   maxDiePenetration:null,dieOverlapSegments:dieHits,backgaugeOverlapSegments:gaugeHits,contactTolerance:Math.min(EPS,t/4),
+   disclosure:'Cruces de franjas de espesor con los contornos representados, tolerancia máxima 0,05 mm. Sin resolución de uniones entre franjas ni profundidad exacta de penetración. Cribado NO certificado. Alas previas solo como bisagras planas idealizadas: no se modelan reposicionamiento, colisiones barridas, radios reales anteriores, deformación, sólidos CAD, ejes CNC ni el entorno 3D. La ausencia de alertas NO demuestra seguridad.'};
   return result;
  }
  return {inspect,rearExtent};
 });
+
 

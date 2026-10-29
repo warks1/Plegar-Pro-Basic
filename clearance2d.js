@@ -31,5 +31,41 @@
  function polylinePolygon(points,poly){let gap=Infinity;
   for(let i=1;i<points.length;i++)gap=Math.min(gap,segmentPolygon(points[i-1],points[i],poly));return gap;
  }
- return {pointSegment,segmentPolygon,polylinePolygon,inPolygon};
+ // Interior estricto: una arista compartida es apoyo, no penetración.
+ function strictInside(p,poly){
+  if(!inPolygon(p,poly))return false;
+  return poly.every((a,i)=>pointSegment(p,a,poly[(i+1)%poly.length])>EPS);
+ }
+ function polygonsOverlap(a,b){
+  if(a.some(p=>strictInside(p,b))||b.some(p=>strictInside(p,a)))return true;
+  for(let i=0;i<a.length;i++)for(let j=0;j<b.length;j++){
+   const p=a[i],r=sub(a[(i+1)%a.length],p),q=b[j],s=sub(b[(j+1)%b.length],q),den=cross(r,s);
+   if(Math.abs(den)<=EPS)continue;
+   const t=cross(sub(q,p),s)/den,u=cross(sub(q,p),r)/den;
+   if(t>EPS&&t<1-EPS&&u>EPS&&u<1-EPS)return true;
+  }
+  // Colineales superpuestos pueden tener todos sus vértices en el borde.
+  for(const [poly,other] of [[a,b],[b,a]])for(let i=0;i<poly.length;i++){
+   const p=poly[i],q=poly[(i+1)%poly.length];
+   if(strictInside({x:(p.x+q.x)/2,y:(p.y+q.y)/2},other))return true;
+  }
+  // Caso idéntico/contención con todos los bordes coincidentes (a es convexo).
+  const center={x:a.reduce((s,p)=>s+p.x,0)/a.length,y:a.reduce((s,p)=>s+p.y,0)/a.length};
+  return strictInside(center,a)&&strictInside(center,b);
+ }
+ function sheetPolygonOverlaps(line,thickness,polygon,tolerance=.05){
+  if(!Array.isArray(line)||line.length<2||!polygon||polygon.length<3)return [];
+  if(!Number.isFinite(thickness)||thickness<=0||!Number.isFinite(tolerance)||tolerance<0)throw Error('Espesor o tolerancia incorrectos.');
+  const inset=Math.min(tolerance,thickness/4),r=thickness/2-inset,hits=[];
+  for(let i=1;i<line.length;i++){
+   const a=line[i-1],b=line[i],dx=b.x-a.x,dy=b.y-a.y,len=Math.hypot(dx,dy);if(len<1e-9)continue;
+   const ux=dx/len,uy=dy/len,cap=Math.min(inset,len/4),nx=-uy*r,ny=ux*r;
+   const p={x:a.x+ux*cap,y:a.y+uy*cap},q={x:b.x-ux*cap,y:b.y-uy*cap};
+   const strip=[{x:p.x+nx,y:p.y+ny},{x:q.x+nx,y:q.y+ny},{x:q.x-nx,y:q.y-ny},{x:p.x-nx,y:p.y-ny}];
+   if(polygonsOverlap(strip,polygon))hits.push(i-1);
+  }
+  return hits;
+ }
+ return {pointSegment,segmentPolygon,polylinePolygon,inPolygon,sheetPolygonOverlaps};
 });
+

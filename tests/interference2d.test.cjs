@@ -16,16 +16,17 @@ test('tope configurado queda fijo durante el paso aislado',()=>{
  assert.equal(first.stop.x,50);assert.equal(last.stop.x,50);
  assert.equal(first.stop.top,last.stop.top);assert.equal(first.stop.bottom,last.stop.bottom);
 });
-test('separación horizontal correcta cuando el extremo queda lejos del tope',()=>{
+test('el tope X130 comprueba TODOS los tramos Omega, no solo el ala local de 85',()=>{
  const m=scene(withStop(130),0,0);
- assert.equal(m.interferences.backgaugeState,'separado');
- assert.equal(m.interferences.backgaugeGap,45);
- assert.ok(!m.interferences.problems.some(x=>x.code==='BACKGAUGE_OVERLAP'));
+ assert.equal(m.interferences.backgaugeState,'interferencia');
+ assert.ok(m.interferences.backgaugeOverlapSegments.length>0);
+ assert.ok(m.interferences.problems.some(x=>x.code==='BACKGAUGE_OVERLAP'));
 });
-test('el extremo justo en tope se marca contacto nominal, no solapamiento',()=>{
+test('el tope X85 no ignora alas largas pendientes que invaden su volumen',()=>{
  const m=scene(withStop(85),0,0);
- assert.equal(m.interferences.backgaugeState,'contacto nominal');
- assert.ok(!m.interferences.problems.some(x=>x.code==='BACKGAUGE_OVERLAP'));
+ assert.equal(m.interferences.backgaugeState,'interferencia');
+ assert.ok(m.interferences.backgaugeOverlapSegments.length>0);
+ assert.ok(m.interferences.problems.some(x=>x.code==='BACKGAUGE_OVERLAP'));
 });
 test('tope invadido en posición inicial: alerta conservadora por solapamiento 2D',()=>{
  const m=scene(withStop(30),0,0);
@@ -36,7 +37,7 @@ test('tope invadido en posición inicial: alerta conservadora por solapamiento 2
 test('un flanco levantado por encima del tope deja de solaparlo en la vista aislada',()=>{
  const m=scene(withStop(30),0,1);
  assert.ok(!m.interferences.problems.some(x=>x.code==='BACKGAUGE_OVERLAP'));
- assert.ok(m.interferences.backgaugeGap<0); // La separación horizontal negativa por sí sola no certifica colisión
+ assert.ok(m.interferences.backgaugeGap===null||m.interferences.backgaugeGap>=0); // Distancia solo definida si hay borde a altura del dedo
 });
 test('geometría V patológica se clasifica solo como potencial penetración',()=>{
  const m=scene({...p,angles:[120,90,90,-90],sequence:[1,2,3,4]},0,1);

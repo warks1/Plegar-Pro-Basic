@@ -86,6 +86,7 @@
   }
   if(turn<0)warnings.push('Pliegue negativo B'+bend+' '+turn+'°: requiere VOLTEO previo de chapa. Se muestra la orientación nominal ya preparada sobre la matriz V; el giro, agarre, retirada y recolocación reales no están calculados. NO CNC.');
   if(angle>150)warnings.push('Pliegue superior a 150°: aproximación fuera de su aplicación habitual.');
+  const gauge=C.backgaugeTarget(piece,bend,setup);
   const output={
    bend,orderIndex,step:orderIndex+1,steps:piece.sequence.length,progress,turn,
    targetAngle:Math.abs(turn),currentAngle:angle,signedAngle:round(turn*progress),
@@ -97,8 +98,8 @@
    machineSetup:{machineId:setup.machineId,backgaugeMode:setup.backgaugeMode,dieHeight:setup.dieHeight??die.height??null,tableLeft:setup.tableLeft,tableRight:setup.tableRight,ramWidth:setup.ramWidth,ramBottomOffset:setup.ramBottomOffset},
    // 'depth' is nominal centreline descent from its START position, not CNC Y.
    depth:round(cy+t/2),punchTipY:round(cy-t/2),shoulderY,
-   stop:{x:setup.backgaugeByBend?.[bend-1]??setup.backgaugeX,bend,
-    source:setup.backgaugeByBend?.[bend-1]!=null?'por-pliegue':'general',
+   stop:{x:gauge.x,bend,
+    source:gauge.source,
     y:round(-t/2),width:Math.max(2,t),top:round(-t/2-12),bottom:round(-t/2+4)},warnings,
    note:'El signo (+/−) corresponde al PLANO final. Sobre la V se representa el golpe de prensa con punzón superior y alas elevándose; para -90° se supone un VOLTEO ANTERIOR que NO se ha simulado. No se conocen agarres, cambios de apoyo o trayectoria real. NO CNC ni colisiones verificadas.'
   };

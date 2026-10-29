@@ -20,6 +20,8 @@ La vista lateral representa la pieza completa, pliegues previos y pendientes, ma
 
 En las vistas de plegado 2D y 3D, el dedo del tope se dibuja detrás de la chapa para que ésta permanezca en primer plano, incluso al girar la cámara 3D.
 
+El tope X se posiciona automáticamente, por defecto, a la longitud nominal del ala derecha contigua al pliegue activo. Antes del siguiente golpe, la animación interpola el X desde la posición del pliegue anterior hasta la nueva posición y conserva la chapa delante del dedo. El valor alimenta la vista 2D, el modelo 3D, la hoja de proceso y el cribado de interferencias. Se puede escoger X manual o introducir una excepción por B. Es una regla geométrica nominal; no sustituye el cálculo de la máquina CNC, compensaciones, referencias de dedos ni calibración real.
+
 El vídeo de referencia muestra un ciclo lateral de seis golpes y reposicionamientos; se ha revisado en nueve instantes. No identifica por sí solo las dimensiones de la pieza B ni las geometrías de su utillaje. No se ha inventado un programa dimensional para esa pieza.
 
 ## Límites pendientes

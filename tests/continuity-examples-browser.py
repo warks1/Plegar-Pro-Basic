@@ -501,7 +501,7 @@ with sync_playwright() as pw:
   page.locator('[data-ed-bend-gauge="1"]').fill('95')
   page.locator('[data-ed-bend-gauge="1"]').dispatch_event('change')
   assert page.evaluate('PlegarFormingGeometry.scene(PlegarEditor2D.getData(),1,.5).stop.x')==95
-  assert page.evaluate('PlegarFormingGeometry.scene(PlegarEditor2D.getData(),3,.5).stop.x')==120
+  assert page.evaluate('PlegarFormingGeometry.scene(PlegarEditor2D.getData(),3,.5).stop.x')==60
   page.locator('#ed-quick-height').fill('60')
   page.locator('#ed-quick-height').dispatch_event('change')
   assert page.evaluate('PlegarEditor2D.getData().setup.dieHeight')==60

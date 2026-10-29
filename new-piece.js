@@ -50,7 +50,8 @@
     label('Radio interior Ri (mm)','setup.radius','number','min="0.1" max="500" step="0.1" inputmode="decimal" required')+
     label('Factor K','setup.kFactor','number','min="0.2" max="0.6" step="0.01" inputmode="decimal" required')+
     select('Referencia de las cotas','setup.dimensionBasis',[['outer','Exteriores'],['inner','Interiores'],['tangent','Tramos hasta tangencia']],setup.dimensionBasis)+
-    label('Tope X nominal (mm)','setup.backgaugeX','number','min="1" max="10000" step="0.1" inputmode="decimal" required')+
+    select('Posición del tope X','setup.backgaugePositionMode',[['wing','Automática según longitud del ala'],['manual','Manual: X fijo']],setup.backgaugePositionMode)+
+    label('Tope X manual/fallback (mm)','setup.backgaugeX','number','min="1" max="10000" step="0.1" inputmode="decimal"')+
     label('Altura matriz H (mm) · opcional','setup.dieHeight','number','min="5" max="400" step="0.1" placeholder="Desconocida" inputmode="decimal"')+
     '</div>';
  }
@@ -62,7 +63,7 @@
     '<label>Longitud del ala (mm)<input data-np-length="'+i+'" type="number" min=".1" max="100000" step=".1" inputmode="decimal" required value="'+esc(length)+'"></label>'+
     (hasBend?'<label>Grados del pliegue<input data-np-angle="'+i+'" type="number" min=".1" max="179" step=".1" inputmode="decimal" required value="'+esc(Math.abs(angle))+'"></label>'+
      '<label>Sentido del pliegue<select data-np-direction="'+i+'"><option value="up"'+(angle>0?' selected':'')+'>↑ Arriba (+)</option><option value="down"'+(angle<0?' selected':'')+'>↓ Abajo (−)</option></select></label>'+
-     '<label>Orden de plegado<select data-np-position="'+bend+'">'+draft.sequence.map((id,j)=>'<option value="'+(j+1)+'"'+(id===bend?' selected':'')+'>Paso '+(j+1)+'</option>').join('')+'</select></label>'+'<label>Tope X B'+bend+' (mm) opcional<input data-np-gauge="'+i+'" type="number" min="1" max="10000" step="0.1" inputmode="decimal" placeholder="X general" value="'+esc(draft.setup.backgaugeByBend?.[i]??'')+'"></label>':'')+
+     '<label>Orden de plegado<select data-np-position="'+bend+'">'+draft.sequence.map((id,j)=>'<option value="'+(j+1)+'"'+(id===bend?' selected':'')+'>Paso '+(j+1)+'</option>').join('')+'</select></label>'+'<label>Tope X B'+bend+' (mm) opcional<input data-np-gauge="'+i+'" type="number" min="1" max="10000" step="0.1" inputmode="decimal" placeholder="Según ala contigua" value="'+esc(draft.setup.backgaugeByBend?.[i]??'')+'"></label>':'')+
    '</div>';
   }).join('');
  }

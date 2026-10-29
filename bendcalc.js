@@ -11,7 +11,7 @@
  const LIB=typeof module==='object'&&module.exports?require('./tool-library.js'):window.PlegarToolLibrary;
  if(!LIB)throw new Error('Biblioteca de herramientas no cargada.');
  const {PUNCHES,DIES}=LIB;
- const DEFAULT_SETUP=Object.freeze({radius:2,kFactor:0.33,punch:'p88-r1',die:'v16-88',backgaugeX:120,dimensionBasis:'outer',dieHeight:null,tableLeft:null,tableRight:null,ramWidth:null,ramBottomOffset:null});
+ const DEFAULT_SETUP=Object.freeze({radius:2,kFactor:0.33,punch:'p88-r1',die:'v16-88',backgaugeX:120,backgaugePositionMode:'manual',dimensionBasis:'outer',dieHeight:null,tableLeft:null,tableRight:null,ramWidth:null,ramBottomOffset:null});
  function lookup(list,id){return list.find(item=>item.id===id);}
  function validateSetup(source){
   const s={...DEFAULT_SETUP,...source};
@@ -34,6 +34,8 @@
   const ramWidth=optional('ramWidth',20,2000),ramBottomOffset=optional('ramBottomOffset',10,500);
   const backgaugeX=Number(s.backgaugeX);
   if(!Number.isFinite(backgaugeX)||backgaugeX<1||backgaugeX>10000)throw new Error('Posición nominal del tope X entre 1 y 10000 mm.');
+  const backgaugePositionMode=s.backgaugePositionMode||'manual';
+  if(!['wing','manual'].includes(backgaugePositionMode))throw Error('Modo de posicionamiento X del tope desconocido.');
   // X por identificador B; null hereda el X general. Nunca por orden de ejecución.
   let backgaugeByBend;
   if(s.backgaugeByBend!=null){
@@ -50,8 +52,16 @@
   if(!['generic','trumpf-v85'].includes(machineId))throw Error('Máquina desconocida.');
   const backgaugeMode=s.backgaugeMode||'stop';
   if(!['stop','support'].includes(backgaugeMode))throw Error('Modo de tope desconocido.');
-  return {machineId,backgaugeMode,radius,kFactor,punch:s.punch,die:s.die,backgaugeX,dimensionBasis,dieHeight,tableLeft,tableRight,ramWidth,ramBottomOffset,
+  return {machineId,backgaugeMode,backgaugePositionMode,radius,kFactor,punch:s.punch,die:s.die,backgaugeX,dimensionBasis,dieHeight,tableLeft,tableRight,ramWidth,ramBottomOffset,
    ...(backgaugeByBend?{backgaugeByBend}:{})};
+ }
+ function backgaugeTarget(profile,bendId,setupInput=profile?.setup){
+  const setup=validateSetup(setupInput);
+  if(!Number.isInteger(bendId)||bendId<1||bendId>=profile.segments.length)throw Error('Pliegue fuera de rango para posicionar el tope.');
+  const override=setup.backgaugeByBend?.[bendId-1];
+  if(override!=null)return {x:override,source:'por-pliegue'};
+  if(setup.backgaugePositionMode==='wing')return {x:profile.segments[bendId],source:'ala contigua'};
+  return {x:setup.backgaugeX,source:'manual'};
  }
  function estimate(profile,setupInput){
   const setup=validateSetup(setupInput);
@@ -159,5 +169,5 @@
   return {kMin,kMax,flatMin:low.flat,flatMax:high.flat,spread:low.flat===null||high.flat===null?null:high.flat-low.flat,
    note:profile.bendOverrides?.some(x=>x?.kFactor!=null)?'Sólo cambia K general; los K individuales permanecen fijos.':'K general para todos los pliegues sin valor local.'};
  }
- return {PUNCHES,DIES,DEFAULT_SETUP,validateSetup,estimate,calibrateK,sensitivity};
+ return {PUNCHES,DIES,DEFAULT_SETUP,validateSetup,backgaugeTarget,estimate,calibrateK,sensitivity};
 });

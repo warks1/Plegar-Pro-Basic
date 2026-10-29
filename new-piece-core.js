@@ -9,7 +9,7 @@
  'use strict';
  const materials=['Acero S235JR','Acero S355JR','Inox 304','Aluminio 5754'];
  function create(current,width=100){
-  const setup=C.validateSetup({...current?.setup,machineId:current?.setup?.machineId||'trumpf-v85'});
+  const setup=C.validateSetup({...current?.setup,backgaugePositionMode:current?.setup?.backgaugePositionMode||'wing',machineId:current?.setup?.machineId||'trumpf-v85'});
   return {name:'Nueva pieza',material:materials.includes(current?.material)?current.material:'Acero S235JR',
    thickness:current?.thickness??2,width:Number.isFinite(width)?width:100,
    segments:[100,100],angles:[90],sequence:[1],setup:(()=>{const s={...setup};delete s.backgaugeByBend;return s;})()};

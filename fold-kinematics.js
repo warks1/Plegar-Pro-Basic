@@ -22,7 +22,7 @@
   // El cambio X se asocia al B precedente, no a su posición en el programa.
   // La configuración ha sido validada previamente por G.scene.
   const xPrevious=prevBend===null?xTarget:
-   (profile.setup?.backgaugeByBend?.[prevBend-1]??profile.setup?.backgaugeX??xTarget);
+   (G.scene(profile,step-1,0).stop.x);
   const hasTravel=step>0&&Math.abs(xTarget-xPrevious)>1e-9;
   const moving=hasTravel&&t<PREP_END;
   const ratio=hasTravel?smooth(t/PREP_END):1;

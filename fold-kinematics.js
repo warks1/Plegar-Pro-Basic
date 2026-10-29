@@ -51,7 +51,7 @@
   // No desplazar la chapa para hacer coincidir artificialmente ambos bordes.
   scene.stop={...scene.stop,x,previousX:xPrevious,targetX:xTarget,
    travelRatio:hasTravel?ratio:1,travelling:moving,axisValidated:false};
-  if(moving)scene.interferences=I.inspect(scene);
+  scene.interferences=I.inspect(scene);
   const punchTipY=scene.punchTipY-lift;
   scene.punchTipY=punchTipY;
   scene.toolProfiles={...scene.toolProfiles,punch:{...scene.toolProfiles.punch,
@@ -70,3 +70,4 @@
  }
  return {frame,phases:{backgaugeEnd:PREP_END,approachEnd:APPROACH,formingEnd:FORM_END}};
 });
+

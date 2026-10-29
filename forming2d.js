@@ -108,8 +108,15 @@
   output.previous=P.calculate(piece,output);
   output.assembly=A.calculate(piece,output);
   if(output.previous.completed.some(id=>piece.angles[id-1]<0))output.warnings.push('Hay pliegues anteriores negativos: la orientación y la recolocación necesarias NO se han resuelto.');
+  if(gauge.source==='ala contigua'){
+   // El tope se posiciona antes del golpe; no persigue el ala mientras sube.
+   const datum=progress===0?I.rearExtent(output):scene(profile,orderIndex,0).stop.x;
+   if(datum!==null&&datum>0){output.stop.x=round(datum);output.stop.source='borde de pieza';}
+   else output.warnings.push('No se encuentra un borde trasero a la altura del tope. Revisar orientación y apoyo.');
+  }
   output.interferences=I.inspect(output);
   return output;
  }
  return {scene};
 });
+

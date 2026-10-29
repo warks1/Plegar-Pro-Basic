@@ -10,19 +10,43 @@
  const EPS=0.05;
  const Clearance=typeof require==='function'?require('./clearance2d.js'):window.PlegarClearance2D;
  const clamp=(a,b,c)=>Math.max(b,Math.min(c,a));
+ // Extremo trasero del espesor de chapa dentro de la altura del dedo.
+ // Se consideran todas las alas, incluidas las que no tocan el pliegue activo.
+ function rearExtent(model){
+  const line=model.assembly?.contour||model.centerline,stop=model.stop,r=model.thickness/2;
+  let extent=null;
+  for(let i=1;i<line.length;i++){
+   const a=line[i-1],b=line[i],dx=b.x-a.x,dy=b.y-a.y,len=Math.hypot(dx,dy);
+   if(len<1e-9)continue;
+   const nx=-dy/len*r,ny=dx/len*r;
+   const poly=[{x:a.x+nx,y:a.y+ny},{x:b.x+nx,y:b.y+ny},{x:b.x-nx,y:b.y-ny},{x:a.x-nx,y:a.y-ny}];
+   const candidates=[];
+   for(let j=0;j<4;j++){
+    const u=poly[j],v=poly[(j+1)%4];
+    if(u.y>=stop.top&&u.y<=stop.bottom)candidates.push(u.x);
+    if(Math.abs(v.y-u.y)>1e-9)for(const y of [stop.top,stop.bottom]){
+     const t=(y-u.y)/(v.y-u.y);if(t>=0&&t<=1)candidates.push(u.x+t*(v.x-u.x));
+    }
+   }
+   if(candidates.length)extent=Math.max(extent??-Infinity,...candidates);
+  }
+  return extent;
+ }
  function inspect(model){
   const problems=[];
   const half=model.dieOpening/2,depth=model.dieDepth,t=model.thickness;
   const stop=model.stop;
-  const tipGap=stop.x-model.wingRight.x;
+  const rear=rearExtent(model);
+  const tipGap=rear===null?null:stop.x-rear;
   let backgaugeState='separado';
   // Backgauge is an idealized upright 2D rectangle behind the RIGHT flank.
   // Check sheet centreline at multiple locations, projected to the gauge face.
   // Detect only substantive overlap, not a simple butt contact at the edge.
-  if(tipGap < -EPS && model.centerline.length>1){
+  const contactLine=model.assembly?.contour||model.centerline;
+  if(tipGap!==null && tipGap < -EPS && contactLine.length>1){
    const xProbe=stop.x+Math.min(0.3,stop.width/2);
-   for(let k=0;k<model.centerline.length-1;k++){
-    const a=model.centerline[k],b=model.centerline[k+1];
+   for(let k=0;k<contactLine.length-1;k++){
+    const a=contactLine[k],b=contactLine[k+1];
     if(Math.min(a.x,b.x)-EPS<=xProbe && xProbe<=Math.max(a.x,b.x)+EPS && Math.abs(a.x-b.x)>1e-9){
      const u=(xProbe-a.x)/(b.x-a.x);
      const y=a.y+(b.y-a.y)*u;
@@ -34,7 +58,7 @@
     }
    }
   }
-  if(backgaugeState!=='interferencia'&&Math.abs(tipGap)<=EPS)backgaugeState='contacto nominal';
+  if(tipGap!==null&&backgaugeState!=='interferencia'&&Math.abs(tipGap)<=EPS)backgaugeState='contacto nominal';
   // Die V boundary: within |x| <= V/2, tool material lies BELOW the
   // idealized descending V face. Outside the shoulders, material starts y=0.
   // Nominal centreline + half thickness is a deliberately conservative check.
@@ -64,10 +88,11 @@
   }
   const result={status:problems.length?'revisar':'sin alertas geométricas',problems,flangeClearances,priorBendsEvaluated:model.previous?.paths?.flatMap(p=>p.bends)||[],
 
-   backgaugeState,backgaugeGap:Math.round(tipGap*1000)/1000,
+   backgaugeState,backgaugeGap:tipGap===null?null:Math.round(tipGap*1000)/1000,backgaugeRearX:rear,
    maxDiePenetration:Math.round(maxDiePenetration*1000)/1000,
    disclosure:'Cribado NO certificado. Alas previas solo como bisagras planas idealizadas: no se modelan reposicionamiento, colisiones barridas, radios reales anteriores, deformación, sólidos CAD, ejes CNC ni el entorno 3D. La ausencia de alertas NO demuestra seguridad.'};
   return result;
  }
- return {inspect};
+ return {inspect,rearExtent};
 });
+

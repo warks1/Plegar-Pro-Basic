@@ -90,7 +90,7 @@ function svg(m,zoom,bounds){
  <text x="885" y="28" text-anchor="end" font-size="11" fill="#eac187">PERFIL CON RADIO · APROXIMACIÓN</text>
  <text x="885" y="434" text-anchor="end" font-size="11" fill="${overlap?'#ff927b':warn}">Cribado 2D: ${html(m.interferences.status)}</text>
  <text x="885" y="450" text-anchor="end" font-size="11" fill="${warn}">Descenso estimado del eje: ${as2(m.depth)} mm</text>
- <text x="15" y="433" font-size="11" fill="${m.interferences.backgaugeGap>0.05?'#ffd29e':m.interferences.backgaugeGap<-.05?'#ff9d9d':'#acffdd'}">TOPE X · ${m.interferences.backgaugeGap>0.05?'SIN CONTACTO nominal':m.interferences.backgaugeGap<-.05?'POSIBLE SOLAPE':'CONTACTO nominal'} · ${as2(m.interferences.backgaugeGap)} mm en proyección</text>
+ <text x="15" y="433" font-size="11" fill="${m.interferences.backgaugeGap===null?'#ffd29e':m.interferences.backgaugeGap>0.05?'#ffd29e':m.interferences.backgaugeGap<-.05?'#ff9d9d':'#acffdd'}">TOPE X · ${m.interferences.backgaugeGap===null?'SIN BORDE a altura del dedo':m.interferences.backgaugeGap>0.05?'SIN CONTACTO nominal':m.interferences.backgaugeGap<-.05?'POSIBLE SOLAPE':'CONTACTO nominal'} · ${(m.interferences.backgaugeGap==null?'—':as2(m.interferences.backgaugeGap))} mm en proyección</text>
  <text x="15" y="455" font-size="11" fill="#c8d5df">Trancha gris · Punzón acero · Chapa azul · Matriz granate · Mesa violeta · Topes verdes.</text>
  <text x="15" y="471" font-size="10" fill="#ffd49e">Mesa / trancha ${bodies.v85?'V85 · sección reconstruida · montaje '+(bodies.v85.mountingAssumed?'supuesto':'introducido'):bodies.tableMeasured&&bodies.ramMeasured?'con cotas introducidas':'PARCIALMENTE SIN COTAS · esquemas'} · NO CNC</text>
  </svg>`;
@@ -221,7 +221,7 @@ function render(){
  ctl.host.querySelector('[data-f2-action="previous"]').disabled=ctl.currentStep===0;
  ctl.host.querySelector('[data-f2-action="next"]').disabled=ctl.currentStep>=order.length-1;
  const loopBox=ctl.host.querySelector('.f2-loop');if(loopBox)loopBox.checked=ctl.loop;
- ctl.host.querySelector('.f2-nominal').textContent=`Tope X ${as2(m.stop.x)} mm · borde nominal ${as2(m.wingRight.x)} mm · ${m.interferences.backgaugeGap>0.05?'SIN CONTACTO nominal':m.interferences.backgaugeGap<-.05?'POSIBLE SOLAPE con el tope':'CONTACTO nominal'} · distancia X ${as2(m.interferences.backgaugeGap)} mm. El contacto real no se ha calculado.`;
+ ctl.host.querySelector('.f2-nominal').textContent=`Tope X ${as2(m.stop.x)} mm · borde nominal ${(m.interferences.backgaugeRearX==null?'sin borde a esta altura':as2(m.interferences.backgaugeRearX))} mm · ${m.interferences.backgaugeGap===null?'SIN BORDE a altura del dedo':m.interferences.backgaugeGap>0.05?'SIN CONTACTO nominal':m.interferences.backgaugeGap<-.05?'POSIBLE SOLAPE con el tope':'CONTACTO nominal'} · distancia X ${(m.interferences.backgaugeGap==null?'—':as2(m.interferences.backgaugeGap))} mm. El contacto real no se ha calculado.`;
  ctl.host.querySelector('.f2-nominal').dataset.status=m.interferences.problems.length?'warning':'info';
  ctl.host.querySelector('.f2-prior-summary').textContent=`Perfil completo: ${m.assembly.contour.length} puntos · ${m.assembly.completed.length} pliegues previos · ${m.assembly.pending} pliegues pendientes. ${m.previous.paths.length?'Holguras 2D orientativas de alas contiguas: '+m.interferences.flangeClearances.map(v=>`${v.component} ${as2(v.gap)} mm`).join(' · '):'No hay alas previas contiguas comprobables en este paso.'}`;
  ctl.host.querySelector('.f2-notes').innerHTML=m.interferences.problems.map(p=>`<li><strong>${html(p.component)}:</strong> ${html(p.message)}</li>`).join('')+m.warnings.map(w=>`<li>${html(w)}</li>`).join('')+`<li>${html(m.interferences.disclosure)}</li><li>${html(m.note)}</li>`;
@@ -233,7 +233,7 @@ function render(){
    ['Material',data.material||'Sin especificar'],['Fuerza actual','NO CALCULADA'],
    ['Ángulo',as2(m.signedAngle)+'°'],
    ['Orientación',m.requiresTurnover?'VOLTEO previo sin simular':'Montaje nominal'],
-   ['Tope B'+m.bend,as2(m.stop.x)+' mm'+(m.stop.travelling?' → '+as2(m.stop.targetX)+' mm':'')+' · '+(m.stop.source==='por-pliegue'?'X particular':'X general')+' · NO CNC'],
+   ['Tope B'+m.bend,as2(m.stop.x)+' mm'+(m.stop.travelling?' → '+as2(m.stop.targetX)+' mm':'')+' · '+(m.stop.source==='por-pliegue'?'X particular':m.stop.source==='borde de pieza'?'Borde de pieza':'X general')+' · NO CNC'],
    ['Distancia punta–pie trancha',setup.ramBottomOffset==null?'Desconocida':as2(setup.ramBottomOffset)+' mm introducidos'],
    ['Y geométrica',as2(motion?.punchY??m.punchTipY)+' mm · NO CNC'],
    ['Avisos nominales',String(m.interferences.problems.length)]
@@ -365,4 +365,5 @@ function mount(host,getData,getSelection=()=>1,onSelect=()=>{}){
 function refresh(){const ctl=active;if(!ctl||ctl.selfSelecting)return;halt();ctl.showFinal=false;let next=ctl.getData().sequence.indexOf(ctl.getSelection());if(next>=0)ctl.currentStep=next;render();}
 window.PlegarForming2D={mount,destroy,refresh};
 })();
+
 

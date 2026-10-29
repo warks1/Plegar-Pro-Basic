@@ -79,7 +79,7 @@ test('Omega 1→2→4→3 interpola X entre golpes sin mover la chapa',()=>{
   eps(start.angle,0);eps(mid.angle,0);
   assert.deepEqual(build(start.scene).vertices,build(mid.scene).vertices);
   assert.equal(mid.backgaugeMotion.axisValidated,false);
-  assert.equal(mid.scene.interferences.backgaugeGap,Math.round((mid.scene.stop.x-mid.scene.wingRight.x)*1000)/1000);
+  assert.equal(mid.scene.interferences.backgaugeGap,Math.round((mid.scene.stop.x-mid.scene.interferences.backgaugeRearX)*1000)/1000);
   assert.notDeepEqual(groupVertices(start,'gauge'),groupVertices(end,'gauge'));
   assert.deepEqual(groupVertices(start,'die'),groupVertices(end,'die'));
  }
@@ -106,3 +106,4 @@ test('Secuencia negativa reproduce golpe sobre V con advertencia de volteo previ
  assert.ok(f.scene.wingLeft.y<f.scene.center.y&&f.scene.wingRight.y<f.scene.center.y);
  assert.match(f.notice,/volteo/);
 });
+

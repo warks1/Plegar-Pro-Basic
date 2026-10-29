@@ -27,7 +27,7 @@ const descriptions = {
  'Utillaje':'Biblioteca de utillaje del catálogo MECOS. Los punzones del programa proceden de las referencias MECOS documentadas.',
  'Materiales':'Materiales de muestra. Propiedades mecánicas y espesores pendientes de validación.',
  'Máquinas':'Catálogo de plegadoras, ejes y configuraciones. Aún sin gemelos digitales calibrados.',
- 'Producción':'Flujo de órdenes y estados de fabricación. Pendiente de conectar a datos reales.',
+ 'Producción':'Seguimiento de los trabajos reales de Agenda, con cambios de estado guardados localmente. Sin CNC.',
  'Agenda':'Trabajos de taller, fechas, operarios y estados. Guardado local con copia de seguridad.',
  'Calculadora de plegado':'Formulario de cálculo listo visualmente. No genera desarrollos hasta validar el motor.',
  'Curva perfecta':'Curvado progresivo: desarrollo, marcas de golpe y animación geométrica del perfil.',
@@ -89,6 +89,7 @@ function toggleMenu(){const opened=$('#sidebar').classList.toggle('open');$('#si
 function switchScreen(name){
  if(['Simulación 2D','Simulación 3D','Programación 3D'].includes(name)&&window.PlegarEditor2D?.getPlanReference()&&!window.PlegarEditor2D.isPlanConfigured()){name='Programación 2D';toast('Define primero las medidas del perfil del plano seleccionado para habilitar su simulación.');}
  window.PlegarWorkshop?.destroy();
+ window.PlegarProduction?.destroy();
  window.PlegarPlans?.destroy();
  window.PlegarForming2D?.destroy();
  window.PlegarPiece3DView?.destroy();
@@ -105,6 +106,7 @@ function renderModule(name){
  let content='';
  $('#module-sample').classList.remove('module-piece3d','module-workshop');
  if(name==='Agenda'){window.PlegarWorkshop.agenda($('#module-sample'),projects);return;}
+ if(name==='Producción'){window.PlegarProduction.mount($('#module-sample'));return;}
  if(name==='Curva perfecta'){window.PlegarWorkshop.curve($('#module-sample'));return;}
  if(name==='Planos'){
    $('#module-sample').classList.remove('module-editor','module-forming','module-piece3d');
@@ -158,7 +160,7 @@ function renderModule(name){
   $('#module-sample').classList.remove('module-editor','module-forming','module-piece3d');
   window.PlegarSettings.mount($('#module-sample'));return;
  }else if(name==='Acerca de'){
-  content='<div class="module-tile"><h2>Plegar Pro Basic</h2><p>Geometría, cálculo orientativo y simulación de plegado. Sin control CNC ni certificación de colisiones.</p>'+
+  content='<div class="module-tile"><h2>Plegar Pro Plus</h2><p><strong>Propietario del software: Antonio Molina Sánchez (AMS).</strong></p><p>Programación geométrica, desarrollo orientativo y simulación de plegado en evolución. Sin control CNC ni certificación de colisiones.</p>'+
    '<p>Preferencias guardadas en este navegador. Máquina principal: TRUMPF V85 con cotas de tus pantallas Cybelec.</p>'+
    '<button data-screen="Ajustes">Abrir preferencias</button> <button data-screen="Máquinas">Ver máquinas</button></div>';
  }else if(name==='Calculadora de plegado'||name==='Comparador de V'){

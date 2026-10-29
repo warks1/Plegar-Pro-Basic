@@ -64,7 +64,7 @@ function harness() {
 test('installs an offline page and cache version v116', async () => {
   const h = harness();
   await h.trigger('install');
-  assert.ok(h.stores.has('plegar-pro-forming2d-v116-video-revision'));
+  assert.ok(h.stores.has('plegar-pro-forming2d-v117-real-svg-gooseneck'));
   assert.ok(await h.caches.match(home));
   assert.ok(await h.caches.match(scope+'machine-references.js'),'Ficha de máquina disponible sin conexión');
   assert.ok(await h.caches.match(scope+'production-view.js'),'Producción local disponible sin conexión');

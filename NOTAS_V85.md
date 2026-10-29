@@ -18,6 +18,8 @@ La portada abre con la fotografía frontal de la TRUMPF TrumaBend V85 aportada p
 
 La vista lateral representa la pieza completa, pliegues previos y pendientes, matriz fija y punzón/trancha solidarios en aproximación, plegado y retirada. Se indica la separación nominal punta/chapa. La sección reconstruida de mesa, trancha y dedo sustituye las envolventes rectangulares de la V85 en el cribado 2D, y alimenta los prismas 3D. La visualización recorta las zonas lejanas de trancha/mesa para mostrar el golpe; los cálculos conservan los contornos completos. Se marca en rojo una posible interferencia, distinguiendo el contacto local previsto con el punzón y los apoyos de matriz de un ala remota que toca esas herramientas.
 
+En las vistas de plegado 2D y 3D, el dedo del tope se dibuja detrás de la chapa para que ésta permanezca en primer plano, incluso al girar la cámara 3D.
+
 El vídeo de referencia muestra un ciclo lateral de seis golpes y reposicionamientos; se ha revisado en nueve instantes. No identifica por sí solo las dimensiones de la pieza B ni las geometrías de su utillaje. No se ha inventado un programa dimensional para esa pieza.
 
 ## Límites pendientes

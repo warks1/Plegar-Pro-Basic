@@ -60,6 +60,8 @@ function svg(m,zoom,bounds){
  <path data-component="punzon" d="${punchOutline}" fill="${hit.has('punzon')?'#f04452':'url(#f2d-metal)'}" stroke="#eaf5ff" stroke-width="1.2"/>
  <path data-component="tope-carro" d="${path(bodies.carriage)}" fill="#526479" stroke="#bbd2d9" stroke-width="1"/>
  <path data-component="tope-brazo" d="${path(bodies.arm)}" fill="#617f85" stroke="#a6e9c9" stroke-width="1"/>
+ <!-- El tope está en el lado posterior: dibujarlo antes de la chapa mantiene ésta en primer plano. -->
+ <path data-component="topes" d="${path(bodies.finger)}" fill="#50e4a7" stroke="#d0ffe7" stroke-width="1"/>
  ${wholePaths}
  ${hingeLabels}
  <path d="${line}" stroke="#081526" stroke-width="${m.thickness+1.6}" fill="none" stroke-linejoin="round" stroke-linecap="round"/>
@@ -68,7 +70,6 @@ function svg(m,zoom,bounds){
  <circle data-component="contacto-punta" cx="0" cy="${m.punchTipY}" r="1.3" fill="${m.punchContact?.state==='contacto geométrico nominal'?'#5cffb1':'#ffb754'}"/>
  ${m.stop.travelling?'<line data-component="recorrido-tope" x1="'+m.stop.previousX+'" y1="'+(m.stop.top-4)+'" x2="'+m.stop.targetX+'" y2="'+(m.stop.top-4)+'" stroke="#ffe38e" stroke-width=".9" stroke-dasharray="3 2"/>':''}
  <line data-component="separacion-tope" x1="${m.wingRight.x}" y1="${m.wingRight.y}" x2="${m.stop.x}" y2="${m.wingRight.y}" stroke="#ebd48e" stroke-width=".7" stroke-dasharray="2 2" aria-label="Proyección horizontal del extremo de chapa al tope"/>
- <path data-component="topes" d="${path(bodies.finger)}" fill="#50e4a7" stroke="#d0ffe7" stroke-width="1"/>
  <text x="${m.stop.x+5}" y="${m.stop.top-9}" font-size="5" fill="#cbffe6">TOPE X</text>
  <text x="${-Math.max(20,m.dieOpening*1.2)}" y="${m.toolProfiles.punch.outline[0].y-12}" font-size="5" fill="#d6efff">AMARRE · ILUSTRATIVO</text>
  <path d="M ${-half} ${dimension} V ${dimension-3} M ${half} ${dimension} V ${dimension-3} M ${-half} ${dimension-1.5} H ${half}" stroke="#67bce9" stroke-width=".6" fill="none" stroke-dasharray="1.5 1"/>

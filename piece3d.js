@@ -57,8 +57,11 @@
   const midX=(minX+maxX)/2,midY=(minY+maxY)/2;
   const vertices=raw.map(p=>({x:450+(p.x-midX)*fit,y:238+(p.y-midY)*fit,depth:p.depth}));
   const faces=mesh.faces.map((f,i)=>({kind:f.kind,status:f.status||null,group:f.group||'sheet',points:f.ids.map(id=>vertices[id]),depth:f.ids.reduce((s,id)=>s+vertices[id].depth,0)/f.ids.length,index:i}));
-  faces.sort((a,b)=>b.depth-a.depth);
-  return {vertices,faces,fit};
+  const rearGauge=faces.filter(f=>f.group==='gauge').sort((a,b)=>b.depth-a.depth);
+  const visibleBodies=faces.filter(f=>f.group!=='gauge').sort((a,b)=>b.depth-a.depth);
+  // The backgauge stays behind the sheet in every camera; depth sorting alone
+  // could paint it over the workpiece when the view is rotated.
+  return {vertices,faces:[...rearGauge,...visibleBodies],fit};
  }
  return {build,project,bounds};
 });

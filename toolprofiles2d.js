@@ -18,20 +18,32 @@
   // no en una cara plana cuyo ancho dependía de la altura del punzón.
   const flankHeight=Math.max(0,Math.min(42,h*.22,(shoulder-tx)/Math.tan(alpha)));
   const taperY=ty-flankHeight,taperHalf=tx+flankHeight*Math.tan(alpha);
-  const outline=[pt(-shank/2,top),pt(shank/2,top),pt(shank/2,neckTop),pt(shoulder,neckTop),pt(shoulder,taperY),pt(taperHalf,taperY),pt(tx,ty)];
+  // Un cuello de cisne / pata de cabra necesita una garganta C cóncava.
+  // Las cotas del catálogo transcritas fijan H, R, ángulo y alcance; las
+  // transiciones no acotadas son reconstrucción visual, NUNCA CAD certificado.
+  const goose=p.profileFamily==='gooseneck';
+  const outerReach=Math.max(reach,shoulder+8);
+  const innerX=-Math.max(4,Math.min(outerReach-5,outerReach*.38));
+  const innerTopY=top+h*.36,innerBottomY=model.punchTipY-h*.30;
+  const outerTopY=top+h*.28,outerBottomY=model.punchTipY-h*.34;
+  const outline=goose
+   ?[pt(-shank/2,top),pt(shank/2,top),pt(shank/2,neckTop),pt(shoulder,neckTop),
+     pt(innerX,innerTopY),pt(innerX,innerBottomY),pt(taperHalf,taperY),pt(tx,ty)]
+   :[pt(-shank/2,top),pt(shank/2,top),pt(shank/2,neckTop),pt(shoulder,neckTop),
+     pt(shoulder,taperY),pt(taperHalf,taperY),pt(tx,ty)];
   const noseSegments=32;
   for(let i=1;i<=noseSegments;i++){
    const a=alpha+(Math.PI-2*alpha)*i/noseSegments;
    outline.push(pt(r*Math.cos(a),centerY+r*Math.sin(a)));
   }
   outline.push(pt(-taperHalf,taperY));
-  if(p.profileFamily==='gooseneck')outline.push(pt(-reach,taperY-Math.min(18,h*.08)),pt(-reach,neckTop),pt(-shoulder,neckTop));
+  if(goose)outline.push(pt(-outerReach,outerBottomY),pt(-outerReach,outerTopY),pt(-shoulder,neckTop));
   else outline.push(pt(-shoulder,taperY),pt(-shoulder,neckTop));
   outline.push(pt(-shank/2,neckTop));
   // El cuerpo y la transición al cuello siguen siendo aproximados cuando
   // el catálogo no proporciona todas sus cotas. No certificar colisiones.
   return {outline,tipY:model.punchTipY,nose:r,angle:p.angle,
-   geometry:'punta circular tangente a flancos; cuerpo reconstruido del catálogo',model:'perfil extruido · sin CAD',verified:false,
+   geometry:goose?'pata de cabra / cuello de cisne con garganta C nominal':'punta circular tangente a flancos; cuerpo reconstruido del catálogo',model:'perfil extruido · sin CAD',verified:false,
    source:p.source,dimensions:{height:p.height,length:p.length,sectionedLength:p.sectionedLength,bodyWidth:p.bodyWidth,
     mountingWidth:p.mountingWidth,angle:p.angle,nose:r,capacityTonPerM:p.capacityTonPerM}};
  }

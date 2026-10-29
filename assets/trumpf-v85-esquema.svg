@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 100" role="img" aria-labelledby="title desc">
+  <title id="title">Esquema de plegadora TRUMPF V85</title>
+  <desc id="desc">Ilustración frontal esquemática de una plegadora con trancha, mesa, matriz y dos montantes.</desc>
+  <rect width="160" height="100" rx="8" fill="#10283a"/>
+  <path d="M20 19h120v13H20zM30 32h100v11H30z" fill="#91a8b9" stroke="#d2e3ef" stroke-width="2"/>
+  <path d="M43 43h74v8H43z" fill="#e8b65d" stroke="#ffe0a3" stroke-width="1.5"/>
+  <path d="M20 19v63h15V32h-5V19zm120 0v63h-15V32h5V19z" fill="#277bb0" stroke="#83cef4" stroke-width="2"/>
+  <path d="M31 70h98v10H31zM24 82h112v7H24z" fill="#91a8b9" stroke="#d2e3ef" stroke-width="2"/>
+  <path d="M65 70h30l-6 8H71z" fill="#e8b65d" stroke="#ffe0a3" stroke-width="1.5"/>
+  <path d="M49 54h62" stroke="#54c8f1" stroke-width="2" stroke-dasharray="4 3"/>
+  <text x="80" y="97" text-anchor="middle" fill="#dbeaf4" font-family="Arial,sans-serif" font-size="7">TRUMPF V85 · ESQUEMA</text>
+</svg>

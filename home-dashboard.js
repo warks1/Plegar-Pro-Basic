@@ -2,7 +2,7 @@
 (function(){
 'use strict';
 const H=()=>window.PlegarHome3D,E=()=>window.PlegarExamples3D,Editor=()=>window.PlegarEditor2D,TL=()=>window.PlegarSequenceTimeline;
-const $=s=>document.querySelector(s),state={step:1,cycle:0,width:100,zoom:1,yaw:38,elevation:24,previewZoom:1,previewYaw:38,raf:null,last:null,paint:null,cameraKey:'',camera:null,profileKey:'',maximized:false,mode:'photo',loop:true,holdUntil:null};
+const $=s=>document.querySelector(s),state={step:1,cycle:0,width:100,zoom:1,yaw:38,elevation:24,previewZoom:1,previewYaw:38,raf:null,last:null,paint:null,cameraKey:'',camera:null,profileKey:'',maximized:false,mode:'cad',loop:true,holdUntil:null};
 let machineGestures=null,previewGestures=null;
 const Sample=()=>window.PlegarSampleLibrary;
 function program(){return Editor()?.getData();}
@@ -45,7 +45,9 @@ function applySettings(){
  if(cameras[prefs.camera]){
   [state.yaw,state.elevation]=cameras[prefs.camera];state.cameraKey='';
  }
- setMode(prefs.homeView==='cad'?'cad':'photo');
+ // La portada siempre abre con la máquina principal configurada: TRUMPF V85.
+ // La foto archivada sólo queda accesible como referencia manual.
+ setMode('cad');
  draw();
 }
 function stop(){

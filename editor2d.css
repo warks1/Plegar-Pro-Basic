@@ -251,3 +251,12 @@
 .ed-angle-pair select{flex:1 1 130px;min-width:125px}
 #ed-angles .ed-cell select{color:#eaffff}
 @media(max-width:700px){.ed-angle-pair{min-width:185px}.ed-angle-pair select{min-width:108px}}
+
+/* Vistas del mismo contorno de útil que consume la simulación 2D/3D. */
+.ed-tool-drawings{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:12px 0}
+.ed-tool-preview{min-width:0;padding:10px;border:1px solid #3c7492;border-radius:8px;background:#061b2b}
+.ed-tool-preview>strong{display:block;color:#bceaff;margin-bottom:8px;overflow-wrap:anywhere}
+.ed-tool-preview .mfg-dual{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:5px}
+.ed-tool-preview svg.catalog-section{display:block;width:100%;height:auto;min-width:0}
+.ed-tool-preview .catalog-original{display:inline-block;margin-top:8px;color:#6ed3ff;text-decoration:underline}
+@media(max-width:700px){.ed-tool-drawings{grid-template-columns:minmax(0,1fr)}}

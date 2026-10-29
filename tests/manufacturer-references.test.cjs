@@ -2,6 +2,7 @@ const {test}=require('node:test');
 const assert=require('node:assert/strict');
 const R=require('../manufacturer-references.js');
 const L=require('../tool-library.js');
+const M=require('../manufacturer-tooling-data.js');
 const C=require('../bendcalc.js');
 
 test('fichas documentadas tienen fuente oficial, fecha y referencia única',()=>{
@@ -27,7 +28,7 @@ test('matriz New AFH V16 especifica el radio de hombro y no el radio interior de
  assert.match(d.note,/CAD|geometría/);
 });
 test('catálogo de fabricante no modifica la lista simulable ni las selecciones antiguas',()=>{
- assert.equal(L.PUNCHES.length,8);assert.equal(L.DIES.length,21);
+ assert.equal(L.PUNCHES.length,M.PUNCHES.length);assert.equal(L.DIES.length,21+M.DIES.length);
  assert.equal(C.validateSetup().punch,'amada-p-11.101');assert.equal(C.validateSetup().die,'v16-88');
  assert.equal(L.get('die','amada-mt508-v8-30-415'),null);
  assert.equal(R.get('v16-88'),null);

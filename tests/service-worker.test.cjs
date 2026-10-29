@@ -61,10 +61,10 @@ function harness() {
   return { trigger, state, caches, stores, seen };
 }
 
-test('installs an offline page and cache version v101', async () => {
+test('installs an offline page and cache version v102', async () => {
   const h = harness();
   await h.trigger('install');
-  assert.ok(h.stores.has('plegar-pro-forming2d-v101'));
+  assert.ok(h.stores.has('plegar-pro-forming2d-v102'));
   assert.ok(await h.caches.match(home));
   assert.ok(await h.caches.match(scope+'machine-references.js'),'Ficha de máquina disponible sin conexión');
   assert.ok(await h.caches.match(scope+'settings.js'),'Preferencias disponibles offline');

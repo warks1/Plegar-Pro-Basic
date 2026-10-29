@@ -139,11 +139,11 @@ function renderModule(name){
    el.classList.remove('module-editor','module-forming','module-piece3d');
    el.innerHTML='<div id="tool-dxf-panel" aria-label="Importar perfiles reales DXF de utillaje"></div>'+
     '<div id="manufacturer-catalog" aria-label="Biblioteca por fabricante"></div>'+
-    '<details class="mfg-internal"><summary>Utillaje WILA–TRUMPF y perfiles paramétricos · seleccionar punzón o matriz</summary>'+
-    '<p>Incluye las cotas visibles de las páginas 45–54 del catálogo fotografiado. Selecciona un útil y abre Simulación 2D/3D para ver el perfil extruido. Las cotas publicadas se conservan; las siluetas exteriores sin acotar por completo son reconstrucciones, no CAD del fabricante ni validación de colisiones.</p>'+
-    '<div class="module-tiles">'+[...lib.PUNCHES,...lib.DIES].map(tool=>
+    '<details class="mfg-internal"><summary>Utillaje WILA–TRUMPF, AMADA–PROMECAM y adaptadores · catálogo</summary>'+
+    '<p>Incluye las cotas legibles de las páginas WILA–TRUMPF 45–55, AMADA–PROMECAM 13–20 y adaptadores 4/82 fotografiadas. Selecciona un punzón o matriz para cargarlo en el programa y verlo en Simulación 2D/3D. Los útiles con geometría insuficientemente acotada quedan como ficha documental. Las siluetas reconstruidas no son CAD del fabricante ni validación de colisiones.</p>'+
+    '<div class="module-tiles">'+[...lib.PUNCHES,...lib.DIES,...(lib.ACCESSORIES||[])].map(tool=>
      '<div class="module-tile"><strong>'+escapeHtml(tool.name)+'</strong><p>'+escapeHtml(lib.details(tool))+
-     '</p><button type="button" data-tool-set="'+tool.kind+':'+tool.id+'">Seleccionar '+(tool.kind==='die'?'matriz':'punzón')+' nominal</button></div>').join('')+'</div></details>';
+     '</p>'+(tool.kind==='punch'||tool.kind==='die'?'<button type="button" data-tool-set="'+tool.kind+':'+tool.id+'">Cargar '+(tool.kind==='die'?'matriz':'punzón')+' en el programa</button>':'<small>Referencia de catálogo · cotas/contorno insuficientes para simular</small>')+'</div>').join('')+'</div></details>';
    window.PlegarToolDXF?.mount($('#tool-dxf-panel'));
    catalog.mount($('#manufacturer-catalog'));
    return;

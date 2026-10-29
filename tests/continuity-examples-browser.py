@@ -599,7 +599,9 @@ with sync_playwright() as pw:
    assert page.locator('.f2d-svg [data-component="'+component+'"]').count()==1,component
   assert 'TRUMPF V85' in page.locator('.f2-machine-zones').inner_text()
   assert 'Tope B' in page.locator('.f2-data-panel').inner_text()
-  assert page.locator('.f2-zone-grid .f2-zone').count()==5
+  # V85 contiene cuatro secciones de máquina más los dos útiles; no usar un número antiguo fijo.
+  expected_zones=page.evaluate("""() => PlegarMachineSection2D.inspect(PlegarFormingGeometry.scene(PlegarEditor2D.getData(),0,0)).checked.length""")
+  assert page.locator('.f2-zone-grid .f2-zone').count()==expected_zones
   assert page.locator('.f2d-svg [data-component="indicador-tope"]').count()==1
   assert '21 posiciones' in page.locator('.f2-machine-zones').inner_text()
   assert page.locator('.f2d-svg [data-component="separacion-tope"]').count()==1

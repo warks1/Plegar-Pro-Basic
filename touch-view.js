@@ -37,7 +37,8 @@
    else gesture=null;
   }
   function down(e){
-   if(!allowPan)return;
+   // Pan puede quedar bloqueado, pero el registro de dedos es necesario para pellizcar.
+
    if(e.pointerType==='mouse'&&e.button!==0)return;
    const p={x:e.clientX,y:e.clientY};pointers.set(e.pointerId,p);
    if(pointers.size===1){origin=p;hadMotion=false;hadMultiple=false;}else hadMultiple=true;

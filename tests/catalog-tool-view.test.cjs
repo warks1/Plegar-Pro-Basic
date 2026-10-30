@@ -24,3 +24,16 @@ test('Páginas originales disponibles y códigos 22.312/22.825 enlazados',()=>{
   const tool=Data.DIES.find(t=>t.code===code);assert.match(View.cardArt(tool),/Ver dibujo original/);
  }
 });
+
+test('Vista individual MECOS con imagen fotografiada y silueta pata de cabra',()=>{
+ require('../catalog-pages');
+ const tool=Data.PUNCHES.find(t=>t.code==='15.670');
+ assert.ok(tool,'Referencia de cuello de cisne 15.670 cargada');
+ const art=View.cardArt(tool);
+ assert.match(art,/catalog-reference/);
+ assert.match(art,/IMG_8969\\.jpg/);
+ assert.match(art,/<img[^>]*loading="lazy"/);
+ assert.match(art,/PATA DE CABRA/);
+ assert.match(art,/Ver dibujo original/);
+ assert.match(art,/15\\.670/);
+});

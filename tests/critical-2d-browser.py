@@ -101,6 +101,9 @@ with sync_playwright() as pw:
   page.locator('[data-tool3d-picker]').select_option('wila-p-15.700')
   page.locator('[data-tool3d-quick]').click()
   assert page.locator('.tool3d-dialog').count()==1
+  debug=page.evaluate("""() => ({stage:document.querySelector('.tool3d-stage')?.innerHTML?.slice(0,450),dialog:document.querySelector('.tool3d-dialog')?.textContent?.slice(0,200)})""")
+  print('DIAGNOSTICO VISOR 3D',debug,'ERRORES',errors[-8:],flush=True)
+  assert page.locator('.tool3d-graphic polygon').count()>10,'La ventana 3D no ha dibujado las caras del sólido'
   first=page.locator('.tool3d-graphic polygon').first.get_attribute('points')
   page.locator('[data-tool3d="flip"]').click()
   flipped=page.locator('.tool3d-graphic polygon').first.get_attribute('points')

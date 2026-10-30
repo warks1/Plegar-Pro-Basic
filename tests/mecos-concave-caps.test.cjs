@@ -49,6 +49,22 @@ test('pata de cabra 15.700: área de tapas, renderizado de cámara y garganta c�
  assert.equal(view.faces.length,mesh.faces.length);
  assert.ok(view.faces.every(f=>f.points.every(p=>Number.isFinite(p.x)&&Number.isFinite(p.y))));
 });
+test('matriz AMADA 20.380: boca V80 dentro del cuerpo H145, alma y base 60 sin autocruce',()=>{
+ const tool=DIES.find(x=>x.code==='20.380');
+ assert.ok(tool);
+ const points=C.section(tool),xs=points.map(x=>x.x);
+ const width=Math.max(...xs)-Math.min(...xs);
+ assert.ok(Math.abs(width-145)<1e-7);
+ assert.ok(points.some(p=>p.x===40&&p.y===0));
+ assert.ok(points.some(p=>p.x===-40&&p.y===0));
+ assert.ok(points.some(p=>p.x===30&&p.y===tool.height));
+ assert.ok(points.some(p=>p.x===-30&&p.y===tool.height));
+ const model=T.die({dieCatalogTool:tool,dieOpening:tool.opening,dieDepth:T.dieDepth(tool)});
+ assert.deepEqual(model.outline,points);
+ const solid=extrude(points,0,835,'die');
+ assert.ok(solid.faces.some(x=>x.kind==='cap'&&x.ids.length===3));
+ assert.equal(model.verified,false);
+});
 test('una silueta cruzada no genera una falsa tapa 3D sólida',()=>{
  assert.throws(()=>extrude([{x:0,y:0},{x:100,y:100},{x:0,y:100},{x:100,y:0}],0,100,'punch'),/Contorno/);
 });

@@ -37,3 +37,28 @@ test('Vista individual MECOS con imagen fotografiada y silueta pata de cabra',()
  assert.match(art,/Ver dibujo original/);
  assert.match(art,/15\\.670/);
 });
+
+test('La sección de pata de cabra tiene garganta cóncava y respeta H/R/ángulo',()=>{
+ const punch=Data.PUNCHES.find(x=>x.code==='15.670');
+ const model={punchCatalogTool:punch,punchTipY:0};
+ const g=T.punch(model),points=g.outline;
+ assert.equal(g.angle,86);
+ assert.equal(g.nose,.8);
+ assert.equal(Math.min(...points.map(p=>p.y)),-punch.height);
+ assert.equal(Math.max(...points.map(p=>p.y)),0);
+ assert.ok(points.length>35);
+ assert.match(g.geometry,/pata de cabra/);
+ // Desde el radio de la punta hasta el hombro se reproduce una garganta
+ // interna distinta del lomo exterior; ninguna arista se cruza.
+ const orient=(a,b,c)=>(b.x-a.x)*(c.y-a.y)-(b.y-a.y)*(c.x-a.x);
+ const intersects=(a,b,c,d)=>orient(a,b,c)*orient(a,b,d)<-1e-8 && orient(c,d,a)*orient(c,d,b)<-1e-8;
+ for(let i=0;i<points.length;i++)for(let j=i+2;j<points.length;j++){
+  if(i===0&&j===points.length-1)continue;
+  assert.equal(intersects(points[i],points[(i+1)%points.length],points[j],points[(j+1)%points.length]),false,
+   'Contorno auto-intersectado '+punch.code+' en segmentos '+i+'/'+j);
+ }
+ const xs=points.map(p=>p.x),left=Math.min(...xs);
+ assert.ok(left< -punch.bodyWidth/2,'La pata de cabra debe tener lomo exterior');
+ assert.ok(points.some(p=>p.x>left+10&&p.x<0&&p.y< -punch.height*.3&&p.y> -punch.height*.7),
+   'El perfil debe tener relieve cóncavo en su garganta');
+});

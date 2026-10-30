@@ -62,3 +62,28 @@ test('La sección de pata de cabra tiene garganta cóncava y respeta H/R/ángulo
  assert.ok(points.some(p=>p.x>left+10&&p.x<0&&p.y< -punch.height*.3&&p.y> -punch.height*.7),
    'El perfil debe tener relieve cóncavo en su garganta');
 });
+
+test('Biblioteca de 237 referencias: render inicial paginado, ampliar y buscar sin perder fichas',()=>{
+ const cards=[...Data.PUNCHES,...Data.DIES].map(tool=>({textContent:tool.name+' '+tool.code+' '+tool.height,hidden:false}));
+ const input={value:'',listeners:{},addEventListener(event,fn){this.listeners[event]=fn;}};
+ const counter={textContent:''};
+ let more=null;
+ const grid={insertAdjacentElement(_position,btn){more=btn;}};
+ const host={
+  querySelector(selector){return selector.includes('data-catalog-search')?input:selector.includes('data-catalog-count')?counter:grid;},
+  querySelectorAll(){return cards;}
+ };
+ const prior=global.document;
+ try{
+  global.document={createElement:()=>({hidden:false,listeners:{},addEventListener(event,fn){this.listeners[event]=fn;}})};
+  View.mount(host);
+  assert.equal(cards.filter(card=>!card.hidden).length,36);
+  assert.ok(more&&!more.hidden);
+  more.listeners.click();
+  assert.equal(cards.filter(card=>!card.hidden).length,72);
+  input.value='15.670';input.listeners.input();
+  assert.equal(cards.filter(card=>!card.hidden).length,1);
+  assert.match(counter.textContent,/237 referencias/);
+  assert.equal(more.hidden,true);
+ }finally{global.document=prior;}
+});

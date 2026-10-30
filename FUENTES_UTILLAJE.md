@@ -21,7 +21,7 @@
 - [AMADA STANDARD catálogo](https://www.amada.de/CentralData/Bending/Tools/STANDARD/Brochures/EN/STANDARD_Catalog.pdf), © 2018.
 - [TRUMPF — bending tools](https://www.trumpf.com/en_INT/products/services/services-machines-systems-and-lasers/tools/bending-tools/), contiene catálogos descargables; no se han importado todavía referencias dimensionales de un útil concreto.
 
-MECOS y otros fabricantes **no** tienen fichas importadas en esta versión: no se atribuirán medidas sin una referencia verificable.
+**Actualización del 30/10/2026 — catálogo MECOS fotografiado:** este documento describe exclusivamente las fichas de `manufacturer-references.js`, no la biblioteca completa. En la rama principal hay también `manufacturer-tooling-data.js`, `tool-library.js` y `catalog-pages.js` con **87 punzones y 150 matrices** transcritos de las láminas de utillaje MECOS aportadas por el propietario. **205 de esas 237 referencias** están enlazadas por código a una de las **36 fotografías** guardadas; **32** no tienen aún imagen individual correctamente asociada. Las cotas impresas del catálogo han sido confirmadas como oficiales por el propietario. Los tramos de contorno no acotados siguen siendo reconstrucciones y no equivalen a CAD exacto ni autorizan una comprobación física de colisiones.
 
 ## Política de uso
 

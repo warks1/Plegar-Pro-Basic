@@ -87,3 +87,13 @@
 /* Ver exactamente el B y su giro en cada posición, también en móvil. */
 .p3-order-slot [data-p3-step]{width:100%;border:1px solid #487f9f;border-radius:6px;background:#0a324b;color:#e8f7ff;font-weight:700;padding:9px;min-height:38px;cursor:pointer}
 .p3-order-slot [data-p3-step][aria-current="step"]{background:#166e8e;border-color:#a8f2ff;box-shadow:inset 0 0 0 1px #a8f2ff}
+
+/* Selector de las mismas referencias 2D en la vista de sólidos 3D. */
+.p3-mecos-tools{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;padding:12px 14px;border-bottom:1px solid #365f7d;background:#0a2940;min-width:0}
+.p3-mecos-tools>strong,.p3-mecos-info,.p3-mecos-tools>a{grid-column:1/-1}
+.p3-mecos-tools>strong{font-size:12px;color:#9cdeff}
+.p3-mecos-tools label{display:flex;flex-direction:column;min-width:0;gap:5px;font-size:12px;color:#c9e6f7}
+.p3-mecos-tools select{width:100%;min-width:0;min-height:42px;padding:8px;border:1px solid #5b95b7;border-radius:7px;color:#f3fbff;background:#071c2e;font-size:12px}
+.p3-mecos-info{margin:0;font-size:11px;line-height:1.5;color:#f0d1a4;overflow-wrap:anywhere}
+.p3-mecos-tools [data-p3-tool-source]:not([hidden]){font-size:12px;color:#75d4ff;text-decoration:underline;padding:4px 0}
+@media(max-width:700px){.p3-mecos-tools{grid-template-columns:minmax(0,1fr);padding:10px}}

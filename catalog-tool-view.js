@@ -45,7 +45,7 @@
   const input=host.querySelector('[data-catalog-search]'),count=host.querySelector('[data-catalog-count]'),
    grid=host.querySelector('.mfg-internal .module-tiles'),cards=[...host.querySelectorAll('[data-catalog-tool]')];
   if(!input||!count)return;
-  const normalize=s=>s.toLocaleLowerCase('es').normalize('NFD').replace(/[\\u0300-\\u036f]/g,'');
+  const normalize=s=>s.toLocaleLowerCase('es').normalize('NFD').replace(/[\u0300-\u036f]/g,'');
   const index=cards.map(card=>({card,text:normalize(card.textContent)}));
   // No montar más de 36 fichas visibles con imágenes a la vez en móviles.
   // El buscador sigue operando sobre TODAS las referencias cargadas.
@@ -54,7 +54,7 @@
   more.type='button';more.className='catalog-more';more.textContent='Mostrar 36 referencias más';
   if(grid)grid.insertAdjacentElement('afterend',more);
   const paint=()=>{
-   const tokens=normalize(input.value).trim().split(/\\s+/).filter(Boolean);
+   const tokens=normalize(input.value).trim().split(/\s+/).filter(Boolean);
    let matches=0,visible=0;
    for(const {card,text} of index){
     const found=tokens.every(t=>text.includes(t));

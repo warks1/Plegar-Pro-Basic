@@ -17,7 +17,9 @@ const inside=(p,outline)=>{
 test('las tapas 3D MECOS están trianguladas y mantienen el área de la sección 2D',()=>{
  for(const tool of [...PUNCHES,...DIES]){
   const outline=C.section(tool);
-  const mesh=extrude(outline,0,tool.kind==='punch'?500:835,tool.kind);
+  let mesh;
+  try{mesh=extrude(outline,0,tool.kind==='punch'?500:835,tool.kind);}
+  catch(error){throw Error('Referencia '+tool.code+' / '+tool.kind+': '+error.message,{cause:error});}
   const caps=mesh.faces.filter(f=>f.kind==='cap');
   assert.ok(caps.length>=2,tool.code);
   assert.ok(caps.every(f=>f.ids.length===3),'Las tapas deben ser triángulos: '+tool.code);

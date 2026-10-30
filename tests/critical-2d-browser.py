@@ -32,6 +32,22 @@ with sync_playwright() as pw:
   print('AUDITORÍA VISOR 2D',w,json.dumps({'editor':editor,'sim':simulation,'errors':errors[-10:]},ensure_ascii=False),flush=True)
   assert editor['visible'] and editor['polyline']>=2 and editor['markup']>100, 'Editor sin dibujo'
   assert simulation['svg'] and simulation['width']>50 and simulation['height']>50 and simulation['datum'], 'Simulación 2D en blanco'
+  # El punzón elegido cambia tanto el perfil físico dibujado como el programa guardado.
+  assert page.locator('[data-f2-punch] option').count()>=50
+  initial_punch=page.locator('.f2d-svg [data-component="punzon"]').get_attribute('d')
+  page.locator('[data-f2-punch]').select_option('wila-p-15.700')
+  assert page.evaluate('PlegarEditor2D.getData().setup.punch')=='wila-p-15.700'
+  assert 'PATA DE CABRA' in page.locator('.f2-tool-preview').inner_text()
+  assert page.locator('.f2-tool-preview svg.catalog-section').count()==1
+  assert page.locator('[data-f2-source]').get_attribute('href').endswith('.jpg')
+  goose=page.locator('.f2d-svg [data-component="punzon"]').get_attribute('d')
+  assert goose!=initial_punch,'Cambiar el modelo de punzón debe cambiar también la silueta'
+  page.locator('[data-f2-punch]').select_option('wila-p-15.620')
+  assert 'PUNZÓN RECTO' in page.locator('.f2-tool-preview').inner_text()
+  assert page.locator('.f2d-svg [data-component="punzon"]').get_attribute('d')!=goose
+  page.locator('[data-f2-die]').select_option('wila-d-25.407')
+  assert page.evaluate('PlegarEditor2D.getData().setup.die')=='wila-d-25.407'
+  assert not errors,errors[-5:]
   before=page.locator('.f2d-svg [data-component="punzon"]').get_attribute('d')
   page.locator('.f2-range').evaluate("(el)=>{el.value='60';el.dispatchEvent(new Event('input',{bubbles:true}));}")
   after=page.locator('.f2d-svg [data-component="punzon"]').get_attribute('d')

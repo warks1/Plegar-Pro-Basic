@@ -105,8 +105,14 @@
   }
   if(d.baseWidth&&d.stemWidth){
    const h=d.height||80,baseH=d.baseHeight||18,stem=d.stemWidth,opening=v,half=opening/2,root=Math.min(d.vRootRadius||.5,half*.2),cut=Math.min(h-baseH-2,half/Math.tan(rad(d.angle/2)));
-   const outline=[pt(-stem/2,0),pt(-half,0),pt(-root,cut-root),pt(0,cut),pt(root,cut-root),pt(half,0),pt(stem/2,0),
-    pt(stem/2,h-baseH-4),pt(d.baseWidth/2,h-baseH),pt(d.baseWidth/2,h),pt(-d.baseWidth/2,h),pt(-d.baseWidth/2,h-baseH),pt(-stem/2,h-baseH-4)];
+   // 20.380: V80 más ancha que el alma de 60; la boca debe usar
+   // el ancho de cuerpo publicado (145). Transición inferior sin CAD.
+   const broad=opening>stem,topWidth=broad?Math.max(d.bodyWidth||0,opening+2,stem):stem;
+   const outline=[pt(-topWidth/2,0),pt(-half,0),pt(-root,cut-root),pt(0,cut),pt(root,cut-root),pt(half,0),pt(topWidth/2,0),
+    ...(broad?[pt(topWidth/2,h-baseH-12),pt(stem/2,h-baseH-4)]:[pt(stem/2,h-baseH-4)]),
+    pt(d.baseWidth/2,h-baseH),pt(d.baseWidth/2,h),pt(-d.baseWidth/2,h),
+    pt(-d.baseWidth/2,h-baseH),pt(-stem/2,h-baseH-4),
+    ...(broad?[pt(-topWidth/2,h-baseH-12)]:[])];
    return {outline,opening:v,depth,shoulderRadius:d.shoulderRadius||null,geometry:'matriz AMADA con base en T reconstruida desde cotas',
     model:'sección extruida · sin CAD',verified:false,source:d.source,
     dimensions:{angle:d.angle,height:d.height,length:d.length,availableLengths:d.availableLengths,bodyWidth:d.bodyWidth,

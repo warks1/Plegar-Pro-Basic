@@ -35,7 +35,7 @@
   const map=p=>[450+(p.x-cx)*scale,244+(p.y-cy)*scale];
   const path=ps=>ps.map((p,i)=>{const [x,y]=map(p);return(i?'L':'M')+fmt(x)+' '+fmt(y)}).join(' ');
   const [px,py]=map({x:0,y:0}),sign=m.target<0?'−':'+';
-  return '<svg class="f2d-svg f2d-signed" data-f2-signed="true" viewBox="0 0 900 480" role="img" aria-label="Pliegue B'+m.bend+' '+sign+Math.abs(m.target)+' grados, giro firmado del plano '+m.pathDirection+'">'+
+  return '<svg class="f2d-svg f2d-signed" data-f2-signed="true" viewBox="0 0 900 480" role="img" aria-label="Pliegue B'+m.bend+' '+sign+Math.abs(m.target)+' grados, giro firmado del plano '+m.pathDirection.toUpperCase()+'">'+
    '<rect width="900" height="480" fill="#061726"/>'+
    '<path d="'+path(m.before)+'" fill="none" stroke="#4d6980" stroke-width="3" stroke-dasharray="7 6"/>'+
    '<path data-component="chapa-firmada" d="'+path(m.points)+'" fill="none" stroke="#62d5f6" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>'+

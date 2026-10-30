@@ -40,14 +40,33 @@
  }
  function rootPages(){return typeof globalThis!=='undefined'?globalThis.PlegarCatalogPages||[]:[];}
  function cardArt(tool){return section(tool)?'<div class="mfg-dual">'+svg(tool)+svg(tool,'3d')+'</div>'+images(tool):images(tool);}
- function gallery(){return '<details class="catalog-originals" open><summary>Fotografías originales de tus catálogos ('+rootPages().length+' páginas) · abrir / cerrar</summary><div class="catalog-pages">'+rootPages().map(p=>'<a href="'+esc(p.src)+'" target="_blank" rel="noopener"><img src="'+esc(p.src)+'" loading="lazy" alt="'+esc(p.label)+'"><span>'+esc(p.label)+'</span></a>').join('')+'</div></details>';}
+ function gallery(){return '<details class="catalog-originals"><summary>Fotografías originales de tus catálogos ('+rootPages().length+' páginas) · abrir / cerrar</summary><div class="catalog-pages">'+rootPages().map(p=>'<a href="'+esc(p.src)+'" target="_blank" rel="noopener"><img src="'+esc(p.src)+'" loading="lazy" alt="'+esc(p.label)+'"><span>'+esc(p.label)+'</span></a>').join('')+'</div></details>';}
  function mount(host){
-  const input=host.querySelector('[data-catalog-search]'),count=host.querySelector('[data-catalog-count]'),cards=[...host.querySelectorAll('[data-catalog-tool]')];
-  if(!input)return;
-  const normalize=s=>s.toLocaleLowerCase('es').normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+  const input=host.querySelector('[data-catalog-search]'),count=host.querySelector('[data-catalog-count]'),
+   grid=host.querySelector('.mfg-internal .module-tiles'),cards=[...host.querySelectorAll('[data-catalog-tool]')];
+  if(!input||!count)return;
+  const normalize=s=>s.toLocaleLowerCase('es').normalize('NFD').replace(/[\\u0300-\\u036f]/g,'');
   const index=cards.map(card=>({card,text:normalize(card.textContent)}));
-  const paint=()=>{const tokens=normalize(input.value).trim().split(/\s+/).filter(Boolean);let visible=0;for(const {card,text} of index){card.hidden=!tokens.every(t=>text.includes(t));if(!card.hidden)visible++;}count.textContent=visible+' referencias de '+cards.length;};
-  input.addEventListener('input',paint);paint();
+  // No montar más de 36 fichas visibles con imágenes a la vez en móviles.
+  // El buscador sigue operando sobre TODAS las referencias cargadas.
+  let limit=36;
+  const more=document.createElement('button');
+  more.type='button';more.className='catalog-more';more.textContent='Mostrar 36 referencias más';
+  if(grid)grid.insertAdjacentElement('afterend',more);
+  const paint=()=>{
+   const tokens=normalize(input.value).trim().split(/\\s+/).filter(Boolean);
+   let matches=0,visible=0;
+   for(const {card,text} of index){
+    const found=tokens.every(t=>text.includes(t));
+    card.hidden=!found||matches>=limit;
+    if(found){matches++;if(!card.hidden)visible++;}
+   }
+   count.textContent=visible+' visibles de '+matches+' resultados · '+cards.length+' referencias en biblioteca';
+   more.hidden=!grid||visible>=matches;
+  };
+  input.addEventListener('input',()=>{limit=36;paint();});
+  more.addEventListener('click',()=>{limit+=36;paint();});
+  paint();
  }
  return {section,svg,cardArt,gallery,mount};
 });

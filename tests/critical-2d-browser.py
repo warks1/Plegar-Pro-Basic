@@ -77,5 +77,35 @@ with sync_playwright() as pw:
   assert page.evaluate('PlegarEditor2D.getData().setup.die')=='wila-d-25.407'
   assert page.locator('.p3-svg polygon[data-group="die"]').count()>0
   assert not errors,errors[-5:]
+  # Error del vídeo: B2 -90 NO puede aparecer como un giro positivo hacia arriba.
+  current=page.evaluate("PlegarEditor2D.getData()")
+  page.evaluate("""() => {const p=PlegarEditor2D.getData();PlegarEditor2D.loadProfile({...p,name:'Prueba B2 negativo',segments:[40,50,60],angles:[0,-90],sequence:[1,2]});}""")
+  page.evaluate("PlegarApp.switchScreen('Simulación 2D')")
+  page.locator('[data-f2-action="next"]').click()
+  assert page.locator('.f2-camera-content svg[data-f2-signed="true"]').count()==1,'B2 -90 se dibujó como +90 en la V'
+  assert 'ABAJO' in page.locator('.f2-camera-content svg').get_attribute('aria-label')
+  assert 'B2' in page.locator('.f2-camera-content svg').get_attribute('aria-label')
+  page.locator('.f2-range').evaluate("(el)=>{el.value='60';el.dispatchEvent(new Event('input',{bubbles:true}));}")
+  assert '−' in page.locator('.f2d-signed').inner_text(),'El ángulo firmado no cambia durante la reproducción'
+  page.locator('[data-f2-action="signed-view"]').click()
+  assert page.locator('.f2-camera-content svg[data-f2-signed="true"]').count()==0,'Debe permitir contrastar vista de golpe sobre V'
+  page.locator('[data-f2-action="signed-view"]').click()
+  assert page.locator('.f2-camera-content svg[data-f2-signed="true"]').count()==1
+  # La foto del catálogo debe dar acceso a un visor 3D orbital REAL, no un boceto estático.
+  page.evaluate("PlegarApp.switchScreen('Utillaje')")
+  assert page.locator('[data-tool3d-picker] option').count()>100
+  page.locator('[data-tool3d-picker]').select_option('wila-p-15.700')
+  page.locator('[data-tool3d-quick]').click()
+  assert page.locator('.tool3d-dialog').count()==1
+  first=page.locator('.tool3d-graphic polygon').first.get_attribute('points')
+  page.locator('[data-tool3d="flip"]').click()
+  flipped=page.locator('.tool3d-graphic polygon').first.get_attribute('points')
+  assert flipped!=first,'Voltear 180° no mueve el sólido 3D'
+  page.locator('[data-tool3d="right"]').click()
+  rotated=page.locator('.tool3d-graphic polygon').first.get_attribute('points')
+  assert rotated!=flipped,'Rotar no cambia el sólido 3D'
+  page.locator('[data-tool3d="close"]').click()
+  assert page.locator('.tool3d-dialog').count()==0
+  assert not errors,errors[-6:]
   context.close()
  browser.close()

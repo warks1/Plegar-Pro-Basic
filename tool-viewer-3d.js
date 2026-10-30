@@ -73,7 +73,8 @@
   shell.querySelector('.tool3d-metadata').textContent='Código '+tool.code+' · '+(tool.kind==='punch'?'Punzón':'Matriz')+
    ' · H '+(tool.height??'desconocida')+' mm · '+(tool.kind==='die'?'V '+tool.opening:'R '+tool.nose)+
    ' · '+(tool.angle??'—')+'° · geometría CAD no verificada';
-  const page=(root.PlegarCatalogPages||[]).find(p=>p.codes.includes(tool.code));
+  const pages=typeof globalThis!=='undefined'?(globalThis.PlegarCatalogPages||[]):[];
+  const page=pages.find(p=>p.codes.includes(tool.code));
   if(page)shell.querySelector('.tool3d-original').innerHTML='<a href="'+safe(page.src)+'" target="_blank" rel="noopener noreferrer">Ver fotografía original · '+safe(page.label)+'</a>';
   shell.addEventListener('click',e=>{
    if(e.target===shell||e.target.closest('[data-tool3d="close"]')){close();return;}

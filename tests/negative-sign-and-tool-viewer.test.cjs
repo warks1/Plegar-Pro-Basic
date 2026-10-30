@@ -2,6 +2,7 @@
 const {test}=require('node:test'),assert=require('node:assert/strict');
 const Sign=require('../signed-fold-view.js');
 const Viewer=require('../tool-viewer-3d.js');
+const Signed3D=require('../signed-fold-3d.js');
 const L=require('../tool-library.js');
 const part={name:'Segundo pliegue negativo',material:'S235',thickness:2,
  segments:[40,50,60],angles:[0,-90],sequence:[1,2],
@@ -25,6 +26,23 @@ test('B2 y B1 con signos opuestos comparten el mismo plano final independienteme
  const vectors=ps=>ps.slice(1).map((p,i)=>({x:+(p.x-ps[i].x).toFixed(5),y:+(p.y-ps[i].y).toFixed(5)}));
  assert.deepEqual(vectors(x.points),vectors(y.points),'La geometría final debe ser la misma, solo cambia el punto de montaje');
  assert.equal(x.target,-90);assert.equal(y.target,90);
+});
+test('B2 −90° pliega abajo tanto en 2D como en malla de pieza 3D, +90° arriba',()=>{
+ const p2={...part,sequence:[1,2]};
+ const down=Signed3D.build(p2,1,1,120);
+ const pos=Signed3D.build({...p2,angles:[0,90]},1,1,120);
+ assert.equal(down.turn,-90);assert.equal(pos.turn,90);
+ assert.equal(down.signedAngle,-90);
+ assert.equal(down.axisMode,'plano-firmado');
+ assert.equal(down.sheetTurnoverSimulated,false);
+ const endDown=down.vertices.slice(-4),endUp=pos.vertices.slice(-4);
+ assert.ok(Math.min(...endDown.map(v=>v.y))>25,'−90 debe terminar debajo del eje de B2');
+ assert.ok(Math.max(...endUp.map(v=>v.y))< -25,'+90 debe terminar encima del eje de B2');
+ const halfway=Signed3D.build(p2,1,.5,120);
+ assert.equal(halfway.signedAngle,-45);
+ assert.ok(halfway.faces.every(f=>f.ids.every(i=>i>=0&&i<halfway.vertices.length)));
+ assert.ok(halfway.vertices.every(v=>Number.isFinite(v.x)&&Number.isFinite(v.y)&&Number.isFinite(v.z)));
+ assert.deepEqual(p2.angles,[0,-90],'No se deben modificar los ángulos originales');
 });
 test('visor 3D orbital usa la misma sección de catálogo y rota/voltea ambos tipos de útil',()=>{
  const tools=[L.PUNCHES.find(x=>x.code==='15.700'),L.PUNCHES.find(x=>x.code==='15.620'),L.DIES.find(x=>x.code==='25.407')];

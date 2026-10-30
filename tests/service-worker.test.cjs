@@ -61,10 +61,10 @@ function harness() {
   return { trigger, state, caches, stores, seen };
 }
 
-test('installs an offline page and cache version v119', async () => {
+test('installs an offline page and cache version v120', async () => {
   const h = harness();
   await h.trigger('install');
-  assert.ok(h.stores.has('plegar-pro-forming2d-v119-mecos-dimensioned-profiles'));
+  assert.ok(h.stores.has('plegar-pro-forming2d-v120-tooling-simulation-sync'));
   assert.ok(await h.caches.match(home));
   assert.ok(await h.caches.match(scope+'machine-references.js'),'Ficha de máquina disponible sin conexión');
   assert.ok(await h.caches.match(scope+'production-view.js'),'Producción local disponible sin conexión');

@@ -26,7 +26,11 @@
    pathDirection:target<0?'abajo':'arriba',pivot:{x:0,y:0},endpoints:{left,right},verified:false};
  }
  function svg(profile,step,progress){
-  const m=model(profile,step,progress),all=[...m.points,...m.before];
+  const m=model(profile,step,progress);
+  // Mantener zoom/encuadre constante durante el golpe: el pliegue debe
+  // moverse, no la cámara compensando en cada fotograma.
+  const start=model(profile,step,0),end=model(profile,step,1);
+  const all=[...start.points,...end.points,...m.before];
   const minX=Math.min(...all.map(p=>p.x)),maxX=Math.max(...all.map(p=>p.x));
   const minY=Math.min(...all.map(p=>p.y)),maxY=Math.max(...all.map(p=>p.y));
   const width=Math.max(75,maxX-minX),height=Math.max(70,maxY-minY);

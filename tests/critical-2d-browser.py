@@ -66,6 +66,10 @@ with sync_playwright() as pw:
   assert page.locator('.p3-mecos-tools [data-p3-tool="punch"] option').count()>=50
   def solid_punch():
    return page.locator('.p3-svg polygon[data-group="punch"]').evaluate_all("(els)=>els.map(el=>el.getAttribute('points'))")
+  # La vista firmada de un B negativo muestra SOLO la chapa: para
+  # validar el utillaje hay que entrar en la vista de golpe nominal sobre V.
+  if page.locator('.p3-svg[data-p3-signed="true"]').count():
+   page.locator('[data-p3="signed-view"]').click()
   initial=solid_punch()
   assert len(initial)>5,'No hay sólido de punzón 3D'
   page.locator('[data-p3-tool="punch"]').select_option('wila-p-15.700')

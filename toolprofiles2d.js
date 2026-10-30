@@ -49,9 +49,13 @@
     pt(-outerReach,outerBackY),pt(-outerReach,backShoulderY),pt(-shoulder,neckTop));
   }else outline.push(pt(-shoulder,taperY),pt(-shoulder,neckTop));
   outline.push(pt(-shank/2,neckTop));
+  // Unos modelos WILA tienen ancho de espiga = ancho del hombro.
+  // Eliminar vértices contiguos coincidentes evita aristas nulas y falsos cruces
+  // del polígono al extruir en 3D; nunca alterar la posición de la punta.
+  const compact=outline.filter((p,i)=>i===0||Math.hypot(p.x-outline[i-1].x,p.y-outline[i-1].y)>1e-8);
   // El cuerpo y la transición al cuello siguen siendo aproximados cuando
   // el catálogo no proporciona todas sus cotas. No certificar colisiones.
-  return {outline,tipY:model.punchTipY,nose:r,angle:p.angle,
+  return {outline:compact,tipY:model.punchTipY,nose:r,angle:p.angle,
    geometry:goose?'pata de cabra / cuello de cisne con garganta C nominal':'punta circular tangente a flancos; cuerpo reconstruido del catálogo',model:'perfil extruido · sin CAD',verified:false,
    source:p.source,dimensions:{height:p.height,length:p.length,sectionedLength:p.sectionedLength,bodyWidth:p.bodyWidth,
     mountingWidth:p.mountingWidth,angle:p.angle,nose:r,capacityTonPerM:p.capacityTonPerM}};

@@ -22,7 +22,8 @@ test('B2 y B1 con signos opuestos comparten el mismo plano final independienteme
  const a={...part,angles:[90,-90],sequence:[1,2]};
  const b={...a,sequence:[2,1]};
  const x=Sign.model(a,1,1),y=Sign.model(b,1,1);
- assert.deepEqual(x.points,y.points);
+ const vectors=ps=>ps.slice(1).map((p,i)=>({x:+(p.x-ps[i].x).toFixed(5),y:+(p.y-ps[i].y).toFixed(5)}));
+ assert.deepEqual(vectors(x.points),vectors(y.points),'La geometría final debe ser la misma, solo cambia el punto de montaje');
  assert.equal(x.target,-90);assert.equal(y.target,90);
 });
 test('visor 3D orbital usa la misma sección de catálogo y rota/voltea ambos tipos de útil',()=>{

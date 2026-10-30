@@ -61,10 +61,10 @@ function harness() {
   return { trigger, state, caches, stores, seen };
 }
 
-test('installs an offline page and cache version v116', async () => {
+test('installs an offline page and cache version v118', async () => {
   const h = harness();
   await h.trigger('install');
-  assert.ok(h.stores.has('plegar-pro-forming2d-v117-real-svg-gooseneck'));
+  assert.ok(h.stores.has('plegar-pro-forming2d-v118-network-first-code'));
   assert.ok(await h.caches.match(home));
   assert.ok(await h.caches.match(scope+'machine-references.js'),'Ficha de máquina disponible sin conexión');
   assert.ok(await h.caches.match(scope+'production-view.js'),'Producción local disponible sin conexión');
@@ -98,12 +98,29 @@ test('offline navigation falls back to the installed page', async () => {
   assert.equal(result.content, 'precache:./index.html');
 });
 
-test('known static resources are cached but private PDFs are not', async () => {
+test('JS y CSS obtienen versión online y mantienen respaldo offline', async () => {
   const h = harness();
   await h.trigger('install');
-  const staticAsset = scope + 'splash.css';
-  const cached = await h.trigger('fetch', { url: staticAsset, method: 'GET', mode: 'same-origin' });
-  assert.equal(cached.content, 'precache:./splash.css');
+  for (const file of ['forming2d-view.js', 'editor2d.js', 'splash.css']) {
+    const url = scope + file;
+    const result = await h.trigger('fetch', { url, method: 'GET', mode: 'same-origin' });
+    assert.equal(result.content, 'network:' + url, file + ' debe cargar siempre desde red si es posible');
+    assert.equal((await h.caches.match(url)).content, 'network:' + url,
+      file + ' debe sustituir su copia offline anticuada');
+  }
+  h.state.offline = true;
+  for (const file of ['forming2d-view.js', 'editor2d.js', 'splash.css']) {
+    const url = scope + file;
+    const result = await h.trigger('fetch', { url, method: 'GET', mode: 'same-origin' });
+    assert.equal(result.content, 'network:' + url, 'Debe permitir uso offline');
+  }
+});
+test('Las imágenes siguen precargadas y los PDF de clientes no se almacenan', async () => {
+  const h = harness();
+  await h.trigger('install');
+  const imageUrl = scope + 'assets/splash-composicion-movil.webp';
+  const image = await h.trigger('fetch', { url: imageUrl, method: 'GET', mode: 'same-origin' });
+  assert.equal(image.content, 'precache:./assets/splash-composicion-movil.webp');
   assert.equal(h.seen.length, 0);
   const doc = scope + 'planos/trenirtrade/IV6-HZ051_Soporte_lateral.pdf';
   const live = await h.trigger('fetch', { url: doc, method: 'GET', mode: 'same-origin' });
@@ -111,9 +128,3 @@ test('known static resources are cached but private PDFs are not', async () => {
   assert.equal(await h.caches.match(doc), undefined);
   assert.equal(h.seen.length, 1);
 });
-
-
-
-
-
-

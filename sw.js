@@ -1,5 +1,5 @@
 // Prototipo offline: cachea solo los recursos locales de esta versión.
-const CACHE='plegar-pro-forming2d-v117-real-svg-gooseneck';
+const CACHE='plegar-pro-forming2d-v118-network-first-code';
 const FILES=['./agenda-core.js','./curve-core.js','./workshop-modules.js','./production-view.js','./workshop-modules.css','./catalog-pages.js','./catalog-tool-view.js','./','./splash.css','./splash.js','./assets/splash-plegar-pro.webp','./assets/splash-hero-desktop.webp','./assets/splash-hero-mobile.webp','./assets/splash-composicion-movil.webp','./assets/splash-fondo-movil.webp','./assets/splash-composicion-pc.webp','./index.html','./styles.css','./settings.css','./responsive-v32.css','./settings.js','./app.js','./geometry2d.js','./manufacturer-tooling-data.js','./tool-library.js','./manufacturer-drawings.js','./manufacturer-catalog.js','./tool-dxf-import.js','./tool-dxf-3d.js','./tool-fit-audit.js','./tool-dxf-import.css','./tool-fit-audit.css','./manufacturer-catalog.css','./manufacturer-references.js','./cad-profile.js','./cad-orientation.js','./cad-profile-view.js','./cad-mounting-audit.js','./cad-mounting-view.js','./cad-mounting.css','./cad-trace.js','./cad-trace-view.js','./cad-trace.css','./cad-topology.js','./cad-topology-view.js','./cad-topology.css','./cad-chain.js','./cad-chain-view.js','./cad-chain.css','./cad-crossings.js','./cad-crossings-view.js','./cad-crossings.css','./cad-tangency.js','./cad-tangency-view.js','./bendcalc.js','./flat-pattern-view.js','./plan-trace.js','./editor2d.js','./editor2d.css','./new-piece-core.js','./piece-library.js','./piece-shelf.js','./piece-shelf.css','./new-piece.js','./new-piece.css','./clearance2d.js','./toolprofiles2d.js','./previousbends2d.js','./interference2d.js','./assembly2d.js','./forming2d.js','./machine-section2d.js','./machine-v85.js','./sequence-pose.js','./sheet-offset.js','./piece3d.js','./metal-render.js','./plan-drawing.js','./examples3d.js','./sequence-timeline.js','./home3d.js','./home-dashboard.js','./touch-view.js','./assets/maquina.webp','./assets/trumpf-v85-frontal.jpg','./assets/trumpf-v85-activa.jpg','./assets/bystronic-frontal-referencia.svg','./sample-library.js','./engineering-checks.js','./bend-workplan.js','./development-tools.js','./fold-kinematics.js','./tooling3d.js','./scene3d-audit.js','./proximity3d.js','./sweep3d.js','./machine-references.js','./machine-clearance.js','./sequence-planner.js','./piece3d-view.js','./piece3d.css','./forming2d-view.js','./forming2d.css','./plans.css','./plans-core.js','./repo-plans.js','./plans-view.js','./manifest.webmanifest','./assets/favicon.svg'];
 // v0.36: actualizar siempre la página principal desde la red.
 // La versión anterior servía HTML cacheado, ocultando las actualizaciones de GitHub Pages.
@@ -39,7 +39,21 @@ self.addEventListener('fetch', event => {
     }));
     return;
   }
-  // Recursos de la app precargados y con nombre/versionado de caché.
+  // JS y CSS: consultar la red para evitar módulos obsoletos tras GitHub Pages.
+  // Conservar la última copia para uso offline. No almacenar PDF de clientes.
+  if (/\.(?:js|css)$/i.test(url.pathname)) {
+    event.respondWith(fetch(request).then(async response => {
+      if (response.ok && PRELOAD.has(url.pathname)) {
+        try {
+          const cache = await caches.open(CACHE);
+          await cache.put(request, response.clone());
+        } catch (_) { /* La falta de espacio no debe impedir usar la respuesta online. */ }
+      }
+      return response;
+    }).catch(async () => (await caches.match(request)) || Response.error()));
+    return;
+  }
+  // Imágenes y otros recursos públicos: caché por versión.
   // No guardar automáticamente PDFs de clientes ni archivos descargados.
   event.respondWith(caches.match(request).then(cached => cached || fetch(request).then(response => {
     if (response.ok && PRELOAD.has(url.pathname)) {

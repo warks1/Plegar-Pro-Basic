@@ -31,11 +31,11 @@ test('Vista individual MECOS con imagen fotografiada y silueta pata de cabra',()
  assert.ok(tool,'Referencia de cuello de cisne 15.670 cargada');
  const art=View.cardArt(tool);
  assert.match(art,/catalog-reference/);
- assert.match(art,/IMG_8969\\.jpg/);
+ assert.match(art,/IMG_8969\.jpg/);
  assert.match(art,/<img[^>]*loading="lazy"/);
  assert.match(art,/PATA DE CABRA/);
  assert.match(art,/Ver dibujo original/);
- assert.match(art,/15\\.670/);
+ assert.match(art,/15\.670/);
 });
 
 test('La sección de pata de cabra tiene garganta cóncava y respeta H/R/ángulo',()=>{

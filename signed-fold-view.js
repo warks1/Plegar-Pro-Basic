@@ -44,7 +44,7 @@
    '<text x="25" y="38" fill="#d2efff" font-size="21" font-weight="bold">B'+m.bend+' · '+sign+Math.abs(m.target)+'° · '+(m.down?'ABAJO':'ARRIBA')+'</text>'+
    '<text x="25" y="67" fill="#ffda99" font-size="16">Ángulo actual: '+(m.angle<0?'−':'+')+Math.abs(fmt(m.angle))+'° · SECUENCIA DE PLANO</text>'+
    '<text x="25" y="96" fill="#b6ccdb" font-size="13">Línea gris: posición anterior · línea azul: pieza nominal · naranja/verde: pliegue activo</text>'+
-   '<text x="25" y="435" fill="#ffd29a" font-size="13">Vista FIRMADA, no montaje físico en la matriz V. El volteo de la chapa NO está calculado.</text>'+
+   '<text data-component="aviso-volteo" x="25" y="435" fill="#ffd29a" font-size="13">Vista FIRMADA, no montaje físico en la matriz V. El volteo de la chapa NO está calculado.</text>'+
    '<text x="25" y="456" fill="#ffd29a" font-size="13">NO CNC · Colisiones y contacto no certificados</text></svg>';
  }
  return {model,svg};

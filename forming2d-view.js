@@ -169,7 +169,12 @@ function render(){
  if(ctl.cameraKey!==key){ctl.bounds=ctl.focus?detailExtents(data,ctl.currentStep):fixedExtents(data,ctl.currentStep,ctl.mode);ctl.cameraKey=key;}
  const motion=ctl.mode==='cycle'?K().frame(data,ctl.currentStep,ctl.progress):null;
  const m=motion?motion.scene:Model.scene(data,ctl.currentStep,ctl.progress);
- ctl.host.querySelector('.f2-camera-content').innerHTML=ctl.showFinal?finalSvg(data,ctl.zoom):svg(m,ctl.zoom,ctl.bounds);
+ // Negativo: el giro FIRMADO del plano se dibuja hacia ABAJO; el golpe
+ // nominal en la V se conserva opcional, con volteo físico no calculado.
+ const signedVisible=!ctl.showFinal&&m.turn<0&&!ctl.negativeMachineView;
+ const signedProgress=motion?motion.formingProgress:ctl.progress;
+ ctl.host.querySelector('.f2-camera-content').innerHTML=ctl.showFinal?finalSvg(data,ctl.zoom):
+  signedVisible?window.PlegarSignedFoldView.svg(data,ctl.currentStep,signedProgress):svg(m,ctl.zoom,ctl.bounds);
  const proximity=Section.inspect(m),zones=ctl.host.querySelector('.f2-machine-zones');
  const sweepKey=JSON.stringify([data,ctl.currentStep]);
  if(ctl.sectionSweepKey!==sweepKey){
@@ -213,11 +218,18 @@ function render(){
  const modeButton=ctl.host.querySelector('[data-f2-action="mode"]');
  modeButton.textContent=ctl.mode==='cycle'?'☑ Ciclo completo':'☐ Ciclo completo';
  modeButton.setAttribute('aria-pressed',String(ctl.mode==='cycle'));
+ const signedButton=ctl.host.querySelector('[data-f2-action="signed-view"]');
+ if(signedButton){
+  signedButton.hidden=m.turn>=0||ctl.showFinal;
+  signedButton.textContent=ctl.negativeMachineView?'↙ Ver −90° del plano (ABAJO)':'⚙ Ver golpe nominal sobre V';
+  signedButton.setAttribute('aria-pressed',String(signedVisible));
+ }
  const fb=ctl.host.querySelector('[data-f2-action="focus"]');if(fb){fb.setAttribute('aria-pressed',String(ctl.focus));fb.textContent=ctl.focus?'◱ Vista completa':'⌕ Detalle del pliegue';}
  ctl.host.querySelector('.f2-cycle-state').textContent=ctl.showFinal?'FIN DEL PROGRAMA · Pieza objetivo desde el plano. No representa la última posición de la prensa ni verifica colisiones.':motion
   ? `FASE: ${motion.phase.toUpperCase()} · ${motion.backgaugeMotion.active?'TOPE X '+as2(motion.backgaugeMotion.fromX)+' → '+as2(motion.backgaugeMotion.toX)+' mm · posición '+as2(m.stop.x)+' mm · ':''}Punzón Y nominal ${as2(motion.punchY)} mm · retirada ${as2(motion.punchLift)} mm. ${motion.notice}. Movimiento de ejes y recolocación reales NO calculados. NO CNC.`
   : 'MODO CONFORMADO · avance angular sin aproximación ni retirada. Activa Ciclo completo para ver las tres fases.';
- if(m.requiresTurnover)ctl.host.querySelector('.f2-cycle-state').textContent+=' · B'+m.bend+' '+m.turn+'° exige VOLTEO PREVIO: retirada, giro y recolocación no simulados.';
+ if(m.requiresTurnover)ctl.host.querySelector('.f2-cycle-state').textContent+=' · B'+m.bend+' '+m.turn+'° exige VOLTEO PREVIO: retirada, giro y recolocación no simulados.'+
+   (signedVisible?' SENTIDO FIRMADO ABAJO, NO CONTACTO EN LA V.':' GOLPE NOMINAL CON CHAPA PREVIAMENTE VOLTEADA.');
  ctl.host.querySelector('[data-f2-action="previous"]').disabled=ctl.currentStep===0;
  ctl.host.querySelector('[data-f2-action="next"]').disabled=ctl.currentStep>=order.length-1;
  const loopBox=ctl.host.querySelector('.f2-loop');if(loopBox)loopBox.checked=ctl.loop;
@@ -307,11 +319,11 @@ function mount(host,getData,getSelection=()=>1,onSelect=()=>{}){
  destroy();
  if(!host)return;
  let step=Math.max(0,getData().sequence.indexOf(getSelection()));
- active={host,getData,getSelection,onSelect,currentStep:step,progress:0,zoom:1,focus:false,showFinal:false,mode:'cycle',timer:null,lastFrame:null,lastPaint:null,speed:Number(window.PlegarSettings?.get?.().speed)||1,
+ active={host,getData,getSelection,onSelect,currentStep:step,progress:0,zoom:1,focus:false,showFinal:false,mode:'cycle',negativeMachineView:false,timer:null,lastFrame:null,lastPaint:null,speed:Number(window.PlegarSettings?.get?.().speed)||1,
  loop:window.PlegarSettings?.get?.().repeat!==false,holdUntil:null,selfSelecting:false,cameraKey:null,bounds:null,tilesKey:null};
  host.innerHTML=`<section class="f2-view" aria-label="Seguimiento cinemático 2D de plegado">
  <div class="f2-title"><div><strong>SEGUIMIENTO DE PLEGADO · PERFIL</strong><small>Punzón superior · matriz V inferior · tope posterior · chapa</small></div><span>PERFIL GEOMÉTRICO v0.39</span></div>
- <div class="f2-layout"><div class="f2-stage" aria-label="Mueve la simulación 2D con un dedo y usa dos dedos para cambiar el zoom"><div class="f2-camera-content"></div></div><aside class="f2-data-panel" aria-label="Datos de operación nominal"><h3>DATOS</h3><dl class="f2-data-values"></dl><div class="f2-tooling" aria-label="Utillaje MECOS para la simulación 2D"><strong>UTILLAJE EN LA SIMULACIÓN</strong><label>Punzón MECOS<select data-f2-punch aria-label="Cambiar punzón MECOS en simulación 2D"></select></label><label>Matriz<select data-f2-die aria-label="Cambiar matriz en simulación 2D"></select></label><div class="f2-tool-preview" aria-live="polite"></div><a data-f2-source target="_blank" rel="noopener noreferrer" hidden>Ver lámina original MECOS</a></div><small>Geometría ilustrativa. Sin fuerzas calculadas ni trayectorias certificadas.</small></aside></div><div class="f2-toolbar"><strong class="f2-step-label"></strong><div class="f2-controls"><button type="button" data-f2-action="previous">← Anterior</button><button type="button" data-f2-action="play">▶ Reproducir sin pausas</button><button type="button" data-f2-action="mode" aria-pressed="false">☐ Ciclo completo</button><button type="button" data-f2-action="next">Siguiente →</button><button type="button" data-f2-action="reset">Reiniciar</button><button type="button" data-f2-action="omega" class="f2-omega-btn" hidden aria-label="Cargar orden Omega B1, B2, B4, B3 para estudio; no certificado CNC">Omega · 1 → 2 → 4 → 3</button><button type="button" data-f2-action="focus" aria-pressed="false">⌕ Detalle del pliegue</button><label class="f2-loop-control"><input class="f2-loop" type="checkbox" checked> Repetir secuencia</label><button type="button" data-f2-action="zoom-out" aria-label="Reducir zoom">−</button><button type="button" data-f2-action="zoom-in" aria-label="Ampliar zoom">+</button></div></div>
+ <div class="f2-layout"><div class="f2-stage" aria-label="Mueve la simulación 2D con un dedo y usa dos dedos para cambiar el zoom"><div class="f2-camera-content"></div></div><aside class="f2-data-panel" aria-label="Datos de operación nominal"><h3>DATOS</h3><dl class="f2-data-values"></dl><div class="f2-tooling" aria-label="Utillaje MECOS para la simulación 2D"><strong>UTILLAJE EN LA SIMULACIÓN</strong><label>Punzón MECOS<select data-f2-punch aria-label="Cambiar punzón MECOS en simulación 2D"></select></label><label>Matriz<select data-f2-die aria-label="Cambiar matriz en simulación 2D"></select></label><div class="f2-tool-preview" aria-live="polite"></div><a data-f2-source target="_blank" rel="noopener noreferrer" hidden>Ver lámina original MECOS</a></div><small>Geometría ilustrativa. Sin fuerzas calculadas ni trayectorias certificadas.</small></aside></div><div class="f2-toolbar"><strong class="f2-step-label"></strong><div class="f2-controls"><button type="button" data-f2-action="previous">← Anterior</button><button type="button" data-f2-action="play">▶ Reproducir sin pausas</button><button type="button" data-f2-action="mode" aria-pressed="false">☐ Ciclo completo</button><button type="button" data-f2-action="next">Siguiente →</button><button type="button" data-f2-action="reset">Reiniciar</button><button type="button" data-f2-action="omega" class="f2-omega-btn" hidden aria-label="Cargar orden Omega B1, B2, B4, B3 para estudio; no certificado CNC">Omega · 1 → 2 → 4 → 3</button><button type="button" data-f2-action="focus" aria-pressed="false">⌕ Detalle del pliegue</button><button type="button" data-f2-action="signed-view" aria-pressed="true" hidden>⚙ Ver golpe nominal sobre V</button><label class="f2-loop-control"><input class="f2-loop" type="checkbox" checked> Repetir secuencia</label><button type="button" data-f2-action="zoom-out" aria-label="Reducir zoom">−</button><button type="button" data-f2-action="zoom-in" aria-label="Ampliar zoom">+</button></div></div>
  <div class="f2-order-live" role="status" aria-label="Orden real de ejecución en 2D"></div><div class="f2-program-controls" role="group" aria-label="Editar giro y orden del pliegue directamente en simulación 2D"><strong class="f2-edit-label"></strong><label>Grados (sin signo)<input data-f2-angle type="number" inputmode="decimal" min="0" max="179" step="0.1" aria-label="Grados sin signo del pliegue activo"></label><label>Sentido<select data-f2-direction aria-label="Sentido del pliegue activo"><option value="up">↑ Arriba (+)</option><option value="down">↓ Abajo (−)</option></select></label><label>Orden del pliegue<select data-f2-position aria-label="Posición del pliegue activo en la secuencia"></select></label><small>Estos valores se guardan en el programa 2D/3D. Los pliegues negativos requieren una recolocación de chapa aún NO representada.</small></div><div class="f2-cycle-state" role="status" aria-label="Fase cinemática 2D"></div><div class="f2-slider"><label for="f2-range">Avance del ciclo o conformado</label><input id="f2-range" class="f2-range" type="range" min="0" max="100" step="1" value="0"><output class="f2-progress" for="f2-range">0 %</output></div>
  <div class="f2-steps" aria-label="Orden de plegado"></div><div class="f2-machine-zones" role="status" aria-label="Componentes de máquina y proximidades"></div><div class="f2-prior-summary" role="status"></div><div class="f2-nominal" role="status"></div><ul class="f2-notes"></ul></section>`;
  active.touchCamera=window.PlegarTouchView.attach(host.querySelector('.f2-stage'),host.querySelector('.f2-camera-content'));
@@ -337,6 +349,7 @@ function mount(host,getData,getSelection=()=>1,onSelect=()=>{}){
    }
    return;
   }
+  if(action==='signed-view'){halt();ctl.negativeMachineView=!ctl.negativeMachineView;render();return;}
   if(action==='mode'){halt();ctl.showFinal=false;ctl.mode=ctl.mode==='bend'?'cycle':'bend';ctl.progress=0;ctl.holdUntil=null;render();return;}
   if(action==='play'){
    if(ctl.timer!==null){halt();render();return;}

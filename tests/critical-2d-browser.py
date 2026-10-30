@@ -108,6 +108,9 @@ with sync_playwright() as pw:
     catch(e){return {error:String(e),stack:String(e.stack),toast:[...document.querySelectorAll('[role="status"]')].map(x=>x.textContent).slice(-6)};}
    }""")
   print('DIAGNOSTICO VISOR 3D',debug,'DIRECTO',direct,'ERRORES',errors[-8:],flush=True)
+  if page.locator('.tool3d-graphic polygon').count()<=10:
+   apiError=page.evaluate("""() => { const tool=PlegarToolLibrary.PUNCHES.find(t=>t.code==='15.700');try {PlegarToolViewer3D.open(tool);return 'SIN ERROR';}catch(e){return String(e.stack||e);} }""")
+   print('ERROR AL ABRIR MODAL 3D',apiError,flush=True)
   assert page.locator('.tool3d-graphic polygon').count()>10,'La ventana 3D no ha dibujado las caras del sólido'
   first=page.locator('.tool3d-graphic polygon').first.get_attribute('points')
   page.locator('[data-tool3d="flip"]').click()

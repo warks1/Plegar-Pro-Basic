@@ -57,5 +57,25 @@ with sync_playwright() as pw:
   assert 'Pausar' in page.locator('[data-f2-action="play"]').inner_text(),'El reproductor 2D no se inicia'
   page.locator('[data-f2-action="play"]').click()
   assert not errors,errors[-5:]
+  # Mismo catálogo y misma malla 3D: no es suficiente cambiar una etiqueta.
+  page.evaluate("PlegarApp.switchScreen('Simulación 3D')")
+  assert page.locator('.p3-mecos-tools [data-p3-tool="punch"] option').count()>=50
+  def solid_punch():
+   return page.locator('.p3-svg polygon[data-group="punch"]').evaluate_all("(els)=>els.map(el=>el.getAttribute('points'))")
+  initial=solid_punch()
+  assert len(initial)>5,'No hay sólido de punzón 3D'
+  page.locator('[data-p3-tool="punch"]').select_option('wila-p-15.700')
+  assert page.evaluate('PlegarEditor2D.getData().setup.punch')=='wila-p-15.700'
+  assert 'PATA DE CABRA' in page.locator('.p3-mecos-info').inner_text()
+  assert page.locator('[data-p3-tool-source]').get_attribute('href').endswith('.jpg')
+  goose=solid_punch()
+  assert goose!=initial,'Al elegir pata de cabra debe cambiar el sólido 3D real'
+  page.locator('[data-p3-tool="punch"]').select_option('wila-p-15.620')
+  assert 'PUNZÓN RECTO' in page.locator('.p3-mecos-info').inner_text()
+  assert solid_punch()!=goose
+  page.locator('[data-p3-tool="die"]').select_option('wila-d-25.407')
+  assert page.evaluate('PlegarEditor2D.getData().setup.die')=='wila-d-25.407'
+  assert page.locator('.p3-svg polygon[data-group="die"]').count()>0
+  assert not errors,errors[-5:]
   context.close()
  browser.close()

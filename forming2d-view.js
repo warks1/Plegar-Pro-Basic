@@ -240,6 +240,34 @@ function render(){
   ];
   pane.innerHTML=values.map(([key,value])=>'<div><dt>'+html(key)+'</dt><dd>'+html(value)+'</dd></div>').join('');
  }
+ // El selector muestra la sección que usa el motor 2D y la extrusión 3D.
+ // Crear opciones solo una vez; el visor se repinta a 30 fotogramas por segundo.
+ const toolHost=ctl.host.querySelector('.f2-tooling'),lib=window.PlegarToolLibrary;
+ if(toolHost&&lib){
+  if(!ctl.toolSelectReady){
+   for(const [kind,values] of [['punch',lib.PUNCHES],['die',lib.DIES]]){
+    const select=toolHost.querySelector('[data-f2-'+kind+']');
+    select.innerHTML=values.map(tool=>'<option value="'+html(tool.id)+'">'+html(tool.name)+'</option>').join('');
+   }
+   ctl.toolSelectReady=true;
+  }
+  const punchSelect=toolHost.querySelector('[data-f2-punch]'),dieSelect=toolHost.querySelector('[data-f2-die]');
+  if(punchSelect&&punchSelect.value!==setup.punch)punchSelect.value=setup.punch;
+  if(dieSelect&&dieSelect.value!==setup.die)dieSelect.value=setup.die;
+  if(ctl.toolPreviewKey!==setup.punch){
+   ctl.toolPreviewKey=setup.punch;
+   const selected=lib.PUNCHES.find(tool=>tool.id===setup.punch);
+   const view=window.PlegarCatalogToolView,preview=toolHost.querySelector('.f2-tool-preview');
+   if(preview)preview.innerHTML=selected&&view?
+    '<strong>'+html(selected.profileFamily==='gooseneck'?'PATA DE CABRA · CUELLO DE CISNE':'PUNZÓN RECTO')+'</strong>'+
+    view.svg(selected,'2d')+
+    '<small>'+html(selected.code)+' · H'+html(selected.height)+' mm · '+html(selected.angle)+'° · R'+html(selected.nose)+' mm · sección aproximada, NO CAD</small>':
+    '<small>Perfil no disponible; no simular una herramienta no identificada.</small>';
+   const source=toolHost.querySelector('[data-f2-source]');
+   const page=selected&&(window.PlegarCatalogPages||[]).find(p=>p.codes.includes(selected.code));
+   if(source){source.hidden=!page;if(page)source.href=page.src;else source.removeAttribute('href');}
+  }
+ }
  const tiles=ctl.host.querySelector('.f2-steps'),key2=JSON.stringify(data);
  if(ctl.tilesKey!==key2){ctl.tilesKey=key2;tiles.innerHTML=gallery(data,order);}
  tiles.querySelectorAll('[data-f2-step]').forEach(button=>{
@@ -283,7 +311,7 @@ function mount(host,getData,getSelection=()=>1,onSelect=()=>{}){
  loop:window.PlegarSettings?.get?.().repeat!==false,holdUntil:null,selfSelecting:false,cameraKey:null,bounds:null,tilesKey:null};
  host.innerHTML=`<section class="f2-view" aria-label="Seguimiento cinemático 2D de plegado">
  <div class="f2-title"><div><strong>SEGUIMIENTO DE PLEGADO · PERFIL</strong><small>Punzón superior · matriz V inferior · tope posterior · chapa</small></div><span>PERFIL GEOMÉTRICO v0.39</span></div>
- <div class="f2-layout"><div class="f2-stage" aria-label="Mueve la simulación 2D con un dedo y usa dos dedos para cambiar el zoom"><div class="f2-camera-content"></div></div><aside class="f2-data-panel" aria-label="Datos de operación nominal"><h3>DATOS</h3><dl class="f2-data-values"></dl><small>Geometría ilustrativa. Sin fuerzas calculadas ni trayectorias certificadas.</small></aside></div><div class="f2-toolbar"><strong class="f2-step-label"></strong><div class="f2-controls"><button type="button" data-f2-action="previous">← Anterior</button><button type="button" data-f2-action="play">▶ Reproducir sin pausas</button><button type="button" data-f2-action="mode" aria-pressed="false">☐ Ciclo completo</button><button type="button" data-f2-action="next">Siguiente →</button><button type="button" data-f2-action="reset">Reiniciar</button><button type="button" data-f2-action="omega" class="f2-omega-btn" hidden aria-label="Cargar orden Omega B1, B2, B4, B3 para estudio; no certificado CNC">Omega · 1 → 2 → 4 → 3</button><button type="button" data-f2-action="focus" aria-pressed="false">⌕ Detalle del pliegue</button><label class="f2-loop-control"><input class="f2-loop" type="checkbox" checked> Repetir secuencia</label><button type="button" data-f2-action="zoom-out" aria-label="Reducir zoom">−</button><button type="button" data-f2-action="zoom-in" aria-label="Ampliar zoom">+</button></div></div>
+ <div class="f2-layout"><div class="f2-stage" aria-label="Mueve la simulación 2D con un dedo y usa dos dedos para cambiar el zoom"><div class="f2-camera-content"></div></div><aside class="f2-data-panel" aria-label="Datos de operación nominal"><h3>DATOS</h3><dl class="f2-data-values"></dl><div class="f2-tooling" aria-label="Utillaje MECOS para la simulación 2D"><strong>UTILLAJE EN LA SIMULACIÓN</strong><label>Punzón MECOS<select data-f2-punch aria-label="Cambiar punzón MECOS en simulación 2D"></select></label><label>Matriz<select data-f2-die aria-label="Cambiar matriz en simulación 2D"></select></label><div class="f2-tool-preview" aria-live="polite"></div><a data-f2-source target="_blank" rel="noopener noreferrer" hidden>Ver lámina original MECOS</a></div><small>Geometría ilustrativa. Sin fuerzas calculadas ni trayectorias certificadas.</small></aside></div><div class="f2-toolbar"><strong class="f2-step-label"></strong><div class="f2-controls"><button type="button" data-f2-action="previous">← Anterior</button><button type="button" data-f2-action="play">▶ Reproducir sin pausas</button><button type="button" data-f2-action="mode" aria-pressed="false">☐ Ciclo completo</button><button type="button" data-f2-action="next">Siguiente →</button><button type="button" data-f2-action="reset">Reiniciar</button><button type="button" data-f2-action="omega" class="f2-omega-btn" hidden aria-label="Cargar orden Omega B1, B2, B4, B3 para estudio; no certificado CNC">Omega · 1 → 2 → 4 → 3</button><button type="button" data-f2-action="focus" aria-pressed="false">⌕ Detalle del pliegue</button><label class="f2-loop-control"><input class="f2-loop" type="checkbox" checked> Repetir secuencia</label><button type="button" data-f2-action="zoom-out" aria-label="Reducir zoom">−</button><button type="button" data-f2-action="zoom-in" aria-label="Ampliar zoom">+</button></div></div>
  <div class="f2-order-live" role="status" aria-label="Orden real de ejecución en 2D"></div><div class="f2-program-controls" role="group" aria-label="Editar giro y orden del pliegue directamente en simulación 2D"><strong class="f2-edit-label"></strong><label>Grados (sin signo)<input data-f2-angle type="number" inputmode="decimal" min="0" max="179" step="0.1" aria-label="Grados sin signo del pliegue activo"></label><label>Sentido<select data-f2-direction aria-label="Sentido del pliegue activo"><option value="up">↑ Arriba (+)</option><option value="down">↓ Abajo (−)</option></select></label><label>Orden del pliegue<select data-f2-position aria-label="Posición del pliegue activo en la secuencia"></select></label><small>Estos valores se guardan en el programa 2D/3D. Los pliegues negativos requieren una recolocación de chapa aún NO representada.</small></div><div class="f2-cycle-state" role="status" aria-label="Fase cinemática 2D"></div><div class="f2-slider"><label for="f2-range">Avance del ciclo o conformado</label><input id="f2-range" class="f2-range" type="range" min="0" max="100" step="1" value="0"><output class="f2-progress" for="f2-range">0 %</output></div>
  <div class="f2-steps" aria-label="Orden de plegado"></div><div class="f2-machine-zones" role="status" aria-label="Componentes de máquina y proximidades"></div><div class="f2-prior-summary" role="status"></div><div class="f2-nominal" role="status"></div><ul class="f2-notes"></ul></section>`;
  active.touchCamera=window.PlegarTouchView.attach(host.querySelector('.f2-stage'),host.querySelector('.f2-camera-content'));
@@ -330,6 +358,23 @@ function mount(host,getData,getSelection=()=>1,onSelect=()=>{}){
  };
  host.onchange=e=>{
   const ctl=active;if(!ctl||ctl.host!==host)return;
+  const toolSelection=e.target.closest('[data-f2-punch],[data-f2-die]');
+  if(toolSelection){
+   const kind=toolSelection.matches('[data-f2-punch]')?'punch':'die';
+   const lib=window.PlegarToolLibrary;
+   const list=kind==='punch'?lib?.PUNCHES:lib?.DIES;
+   if(!list?.some(tool=>tool.id===toolSelection.value))return;
+   halt();ctl.holdUntil=null;ctl.progress=0;ctl.showFinal=false;ctl.cameraKey=null;
+   try{
+    if(kind==='punch')window.PlegarEditor2D.setPunch(toolSelection.value);
+    else window.PlegarEditor2D.setDie(toolSelection.value);
+    render();
+   }catch(error){
+    const state=ctl.host.querySelector('.f2-cycle-state');
+    if(state)state.textContent='No se pudo aplicar el útil: '+error.message;
+   }
+   return;
+  }
   const control=e.target.closest('[data-f2-angle],[data-f2-direction],[data-f2-position]');
   if(!control)return;
   const data=ctl.getData(),id=data.sequence[ctl.currentStep];

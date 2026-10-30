@@ -90,7 +90,7 @@ with sync_playwright() as pw:
   assert 'ABAJO' in page.locator('.f2-camera-content svg').get_attribute('aria-label')
   assert 'B2' in page.locator('.f2-camera-content svg').get_attribute('aria-label')
   page.locator('.f2-range').evaluate("(el)=>{el.value='60';el.dispatchEvent(new Event('input',{bubbles:true}));}")
-  assert '−' in page.locator('.f2d-signed').inner_text(),'El ángulo firmado no cambia durante la reproducción'
+  assert '−' in page.locator('.f2d-signed').text_content(),'El ángulo firmado no cambia durante la reproducción'
   page.locator('[data-f2-action="signed-view"]').click()
   assert page.locator('.f2-camera-content svg[data-f2-signed="true"]').count()==0,'Debe permitir contrastar vista de golpe sobre V'
   page.locator('[data-f2-action="signed-view"]').click()

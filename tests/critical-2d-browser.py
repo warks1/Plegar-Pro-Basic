@@ -34,6 +34,10 @@ with sync_playwright() as pw:
   assert simulation['svg'] and simulation['width']>50 and simulation['height']>50 and simulation['datum'], 'Simulación 2D en blanco'
   # El punzón elegido cambia tanto el perfil físico dibujado como el programa guardado.
   assert page.locator('[data-f2-punch] option').count()>=50
+  # La orientación negativa se abre ahora como giro firmado ABAJO.
+  # Para comprobar el contorno del punzón, cambiar explícitamente a golpe nominal en V.
+  if page.locator('.f2-camera-content svg[data-f2-signed="true"]').count():
+   page.locator('[data-f2-action="signed-view"]').click()
   initial_punch=page.locator('.f2d-svg [data-component="punzon"]').get_attribute('d')
   page.locator('[data-f2-punch]').select_option('wila-p-15.700')
   assert page.evaluate('PlegarEditor2D.getData().setup.punch')=='wila-p-15.700'

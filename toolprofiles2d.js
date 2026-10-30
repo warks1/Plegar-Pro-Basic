@@ -23,12 +23,19 @@
   // transiciones no acotadas son reconstrucción visual, NUNCA CAD certificado.
   const goose=p.profileFamily==='gooseneck';
   const outerReach=Math.max(reach,shoulder+8);
-  const innerX=-Math.max(4,Math.min(outerReach-5,outerReach*.38));
-  const innerTopY=top+h*.36,innerBottomY=model.punchTipY-h*.30;
-  const outerTopY=top+h*.28,outerBottomY=model.punchTipY-h*.34;
+  // La sección de cuello de cisne debe tener una garganta C REALMENTE
+  // CÓNCAVA: la versión anterior cruzaba la zona del cuerpo con el lateral
+  // del punzón, haciendo desaparecer la silueta de pata de cabra.
+  // Posiciones de garganta y hombros no acotadas = reconstrucción visual.
+  // Altura, radio y ángulo se conservan sin modificación.
+  const throatX=-Math.max(4,Math.min(outerReach*.42,outerReach-4));
+  const throatLowerY=model.punchTipY-h*.30;
+  const throatUpperY=model.punchTipY-h*.48;
+  const outerBackY=model.punchTipY-h*.70;
+  const backShoulderY=top+h*.25;
   const outline=goose
    ?[pt(-shank/2,top),pt(shank/2,top),pt(shank/2,neckTop),pt(shoulder,neckTop),
-     pt(innerX,innerTopY),pt(innerX,innerBottomY),pt(taperHalf,taperY),pt(tx,ty)]
+     pt(shoulder,top+h*.43),pt(taperHalf,taperY),pt(tx,ty)]
    :[pt(-shank/2,top),pt(shank/2,top),pt(shank/2,neckTop),pt(shoulder,neckTop),
      pt(shoulder,taperY),pt(taperHalf,taperY),pt(tx,ty)];
   const noseSegments=32;
@@ -37,8 +44,10 @@
    outline.push(pt(r*Math.cos(a),centerY+r*Math.sin(a)));
   }
   outline.push(pt(-taperHalf,taperY));
-  if(goose)outline.push(pt(-outerReach,outerBottomY),pt(-outerReach,outerTopY),pt(-shoulder,neckTop));
-  else outline.push(pt(-shoulder,taperY),pt(-shoulder,neckTop));
+  if(goose){
+   outline.push(pt(throatX,throatLowerY),pt(throatX,throatUpperY),
+    pt(-outerReach,outerBackY),pt(-outerReach,backShoulderY),pt(-shoulder,neckTop));
+  }else outline.push(pt(-shoulder,taperY),pt(-shoulder,neckTop));
   outline.push(pt(-shank/2,neckTop));
   // El cuerpo y la transición al cuello siguen siendo aproximados cuando
   // el catálogo no proporciona todas sus cotas. No certificar colisiones.

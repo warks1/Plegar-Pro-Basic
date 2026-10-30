@@ -91,7 +91,7 @@
   const gauge=C.backgaugeTarget(piece,bend,setup);
   const output={
    bend,orderIndex,step:orderIndex+1,steps:piece.sequence.length,progress,turn,
-   targetAngle:Math.abs(turn),currentAngle:angle,signedAngle:round(turn*progress),
+   targetAngle:Math.abs(turn),currentAngle:angle,signedAngle:(round(turn*progress)===0?0:round(turn*progress)),
    mountSign,machineAngle,sheetSign,requiresTurnover:turn<0,orientationVerified:false,
    left,right,center,wingLeft,wingRight,
    tangentLeft,tangentRight,centerline,shoulderContacts:support?{left:support.left,right:support.right}:null,dieOpening:die.opening,dieDepth,

@@ -38,3 +38,7 @@ html[data-pp-theme="light"] .mfg-catalog>p{color:#32536c}
 .catalog-reference .catalog-original span{display:block;padding:7px 5px 0;text-align:center;font-size:.85rem;font-weight:700;text-decoration:underline;text-underline-offset:3px}
 .catalog-reference figcaption{padding:5px 9px 10px;color:#344959;font-size:.75rem;overflow-wrap:anywhere}
 @media (max-width:480px){.catalog-reference .catalog-original img{height:195px}.mfg-internal .module-tiles{grid-template-columns:minmax(0,1fr)}}
+
+.catalog-more{display:block;width:min(100%,430px);margin:18px auto 22px;padding:13px 20px;border:1px solid #70b8e2;border-radius:12px;background:#eaf6ff;color:#15567d;font:inherit;font-weight:800;cursor:pointer;min-height:44px}
+.catalog-more:hover,.catalog-more:focus-visible{background:#cdeaff;outline-color:#1974b4}
+.catalog-more[hidden]{display:none!important}

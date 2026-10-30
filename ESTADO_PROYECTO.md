@@ -307,3 +307,14 @@ Ajuste de presentación a pantalla completa sin franjas de imagen no ocupadas. S
 - Ahora cada paso de Simulación 3D muestra PASO, ID del pliegue (B) y signo ± de su giro; se destaca el paso ejecutado.
 - Los cambios de B desde el selector 3D mueven ese pliegue a la posición elegida (misma semántica que 2D), sin mezclar los ángulos de B1/B2/B3/B4. Nuevas regresiones reales de navegador verifican Omega 1-2-4-3 y la reordenación 3-1-2-4.
 - Las cotas y signos se conservan en la programación y en el motor. La reorientación física de la chapa, contacto real y colisiones NO están resueltos. NO CNC.
+
+
+## v119 — catálogo MECOS: ficha fotografiada, pata de cabra y caché móvil (30 octubre 2026)
+- Biblioteca activa: **237** referencias (87 punzones y 150 matrices), con cotas transcritas de las láminas MECOS aportadas por el propietario. El propietario confirma las cotas impresas como oficiales; esto **no** certifica los tramos de contorno que el catálogo no acota.
+- **36** fotografías originales guardadas en `assets/catalogo-mecos/`; **205** referencias tienen una fotografía enlazada por código y **32** todavía no tienen una lámina vinculada.
+- Cada ficha con correspondencia muestra la foto del dibujo acotado y permite ampliarla; mantiene la sección 2D/3D generada. Los perfiles de cuello de cisne se identifican expresamente como **PATA DE CABRA**.
+- Corregido el generador de sección cóncava del cuello de cisne en `toolprofiles2d.js`, compartido con el visor y la simulación. Se inspeccionaron programáticamente **80** perfiles clasificados como cuello de cisne: sin intersecciones internas detectadas y con altura y punta conservadas.
+- Biblioteca más manejable en smartphone: mostrar inicialmente 36 fichas, cargar de 36 en 36 y buscar sobre las 237 referencias.
+- Caché offline del service worker incrementada a **v119** para actualizar los recursos de utillaje.
+- **7** pruebas específicas del catálogo superadas en ejecución JavaScript aislada; **no consta** todavía una verificación satisfactoria de toda la CI, ni inspección visual final en iPhone/GitHub Pages.
+- **Pendiente prioritario:** vincular las 32 fichas sin fotografía; reproducir los contornos completos de catálogo con fidelidad métrica donde existan datos; verificar cinemática y colisiones 2D/3D, orden firmado y funcionamiento real en navegador. No atribuir precisión de CAD completo ni seguridad de plegado industrial a secciones aún reconstruidas.

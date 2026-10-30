@@ -3,6 +3,13 @@ const assert=require('node:assert/strict');
 const {scene}=require('../forming2d.js');
 const p={name:'Omega prueba',material:'S235',thickness:2,segments:[60,85,120,85,60],angles:[-90,90,90,-90],sequence:[3,1,4,2],setup:{radius:2,kFactor:0.33,punch:'p88-r1',die:'v16-88'}};
 const near=(a,b,eps=1e-5)=>assert.ok(Math.abs(a-b)<eps,`${a} ≠ ${b}`);
+test('pliegue negativo al inicio indica 0°, nunca -0°, pero mantiene objetivo negativo',()=>{
+ const m=scene(p,1,0);
+ assert.equal(m.turn,-90);
+ assert.equal(m.signedAngle,0);
+ assert.equal(Object.is(m.signedAngle,-0),false);
+ assert.equal(scene(p,1,.5).signedAngle,-45);
+});
 test('ordered sequence selects the correct vertex and setup',()=>{
  const m=scene(p,0,0);assert.equal(m.bend,3);assert.equal(m.left,120);assert.equal(m.right,85);assert.equal(m.steps,4);
  near(m.currentAngle,0);near(m.center.y,-1);near(m.depth,0);

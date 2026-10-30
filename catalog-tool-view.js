@@ -24,13 +24,19 @@
   if(view==='2d'){
    const left=90-(maxX-minX)*scale/2,right=90+(maxX-minX)*scale/2,bottom=25+(maxY-minY)*scale;
    shape+='<g stroke="#6ed5ff" stroke-width=".7" fill="none"><path d="M'+(left-8)+' 25 H'+(left-17)+' V'+bottom+' H'+(left-8)+' M'+left+' '+(bottom+5)+' V'+(bottom+12)+' H'+right+' V'+(bottom+5)+'"/></g>';
-   shape+='<text x="90" y="'+(bottom+22)+'" text-anchor="middle" fill="#bfeaff" font-size="9">Ancho total '+esc((maxX-minX).toFixed(2))+'</text>';
+   shape+='<text x="90" y="'+(bottom+22)+'" text-anchor="middle" fill="#bfeaff" font-size="9">Envolvente aproximada '+esc((maxX-minX).toFixed(2))+'</text>';
   }
   return '<svg class="catalog-section" viewBox="0 0 240 195" role="img" aria-label="'+esc(tool.code||tool.id)+' '+view.toUpperCase()+' · sección de simulación"><rect width="240" height="195" rx="8" fill="#061a29"/><text x="10" y="14" fill="#92d7ff" font-size="10">'+view.toUpperCase()+' · '+esc(tool.code||tool.id)+'</text>'+shape+'<text x="172" y="72" fill="#d5efff" font-size="10">H '+esc(tool.height??'—')+'</text><text x="172" y="89" fill="#d5efff" font-size="10">'+(tool.kind==='die'?'V '+tool.opening:'R '+tool.nose)+'</text><text x="172" y="106" fill="#d5efff" font-size="10">'+tool.angle+'°</text><text x="172" y="123" fill="#d5efff" font-size="9">'+(tool.kind==='die'?'R hombro '+esc(tool.shoulderRadius??'—'):'B '+esc(tool.bodyWidth??'—'))+'</text><text x="172" y="140" fill="#d5efff" font-size="9">'+(tool.footWidth?'Pie '+esc(tool.footWidth):'')+'</text><text x="10" y="178"  fill="#b3cbdc" font-size="9">Cotas en mm · '+esc(tool.profileFamily||'paramétrico')+'</text><text x="10" y="190" fill="#edc991" font-size="8">'+(tool.kind==='die'?(T.shoulders(tool)?'Hombros redondeados · V teórica':'Radios de hombro pendientes de modelar'):'Cuerpo provisional · punta nominal')+'</text></svg>';
  }
  function images(tool){
+  // Mostrar la fotografía de catálogo correspondiente al código concreto.
+  // Las láminas agrupan referencias: el enlace abre la página completa.
   const pages=rootPages().filter(p=>p.codes.includes(tool.code));
-  return pages.map(p=>'<a class="catalog-original" href="'+esc(p.src)+'" target="_blank" rel="noopener">Ver dibujo original · '+esc(p.label)+'</a>').join('');
+  return pages.map(p=>'<figure class="catalog-reference">'+
+   '<a class="catalog-original" href="'+esc(p.src)+'" target="_blank" rel="noopener noreferrer" aria-label="Ver dibujo original del código '+esc(tool.code)+' en '+esc(p.label)+'">'+
+   '<img src="'+esc(p.src)+'" loading="lazy" decoding="async" alt="Página original del catálogo MECOS correspondiente a '+esc(tool.code)+'">'+
+   '<span>Ver dibujo original · ampliar lámina</span></a>'+
+   '<figcaption>Fuente MECOS · '+esc(p.label)+' · referencia '+esc(tool.code)+'</figcaption></figure>').join('');
  }
  function rootPages(){return typeof globalThis!=='undefined'?globalThis.PlegarCatalogPages||[]:[];}
  function cardArt(tool){return section(tool)?'<div class="mfg-dual">'+svg(tool)+svg(tool,'3d')+'</div>'+images(tool):images(tool);}

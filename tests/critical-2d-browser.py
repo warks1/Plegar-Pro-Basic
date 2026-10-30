@@ -95,6 +95,21 @@ with sync_playwright() as pw:
   assert page.locator('.f2-camera-content svg[data-f2-signed="true"]').count()==0,'Debe permitir contrastar vista de golpe sobre V'
   page.locator('[data-f2-action="signed-view"]').click()
   assert page.locator('.f2-camera-content svg[data-f2-signed="true"]').count()==1
+  # B2 -90 en 3D: el sólido de la PIEZA debe bajar, no reutilizar el golpe +90.
+  page.evaluate("PlegarApp.switchScreen('Simulación 3D')")
+  page.locator('[data-p3-step="1"]').click()
+  assert page.locator('.p3-svg[data-p3-signed="true"]').count()==1,'Simulación 3D no muestra giro firmado para B2 -90'
+  assert 'ABAJO' in page.locator('.p3-svg').get_attribute('aria-label')
+  initial=page.locator('.p3-svg polygon[data-group="sheet"]').first.get_attribute('points')
+  page.locator('.p3-progress').evaluate("(el)=>{el.value='75';el.dispatchEvent(new Event('input',{bubbles:true}));}")
+  after=page.locator('.p3-svg polygon[data-group="sheet"]').first.get_attribute('points')
+  assert initial!=after,'El sólido 3D de la chapa no cambia durante B2 -90'
+  page.locator('[data-p3="signed-view"]').click()
+  assert page.locator('.p3-svg[data-p3-signed="true"]').count()==0,'No se puede alternar con la máquina V'
+  assert page.locator('.p3-svg polygon[data-group="punch"]').count()>0
+  page.locator('[data-p3="signed-view"]').click()
+  assert page.locator('.p3-svg[data-p3-signed="true"]').count()==1
+  assert not errors,errors[-6:]
   # La foto del catálogo debe dar acceso a un visor 3D orbital REAL, no un boceto estático.
   page.evaluate("PlegarApp.switchScreen('Utillaje')")
   assert page.locator('[data-tool3d-picker] option').count()>100

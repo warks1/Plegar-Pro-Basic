@@ -129,3 +129,14 @@ test('Las imágenes siguen precargadas y los PDF de clientes no se almacenan', a
   assert.equal(await h.caches.match(doc), undefined);
   assert.equal(h.seen.length, 1);
 });
+
+test('Iframe TITANIUM no puede sobrescribir la copia offline de index.html', async () => {
+  const h = harness();
+  await h.trigger('install');
+  const url = scope+'titanium-loading.html';
+  const frame = await h.trigger('fetch',{url,method:'GET',mode:'navigate'});
+  assert.equal(frame.content,'precache:./titanium-loading.html');
+  h.state.offline = true;
+  const result = await h.trigger('fetch',{url:home,method:'GET',mode:'navigate'});
+  assert.equal(result.content,'precache:./index.html');
+});

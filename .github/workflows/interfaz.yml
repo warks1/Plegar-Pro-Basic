@@ -26,3 +26,5 @@ jobs:
         run: |
           python tests/critical-2d-browser.py
           python tests/continuity-examples-browser.py
+          python tests/splash-responsive-check.py
+          python tests/splash-browser-check.py

@@ -4,7 +4,7 @@
 const doc=root.document,splash=doc.getElementById('startup-splash');
 if(!splash)return;
 splash.setAttribute('aria-label','PlegadoX TITANIUM, cargando la aplicación');
-splash.innerHTML=String.raw\`
+splash.innerHTML=String.raw`
 <div class="ti-grain" aria-hidden="true"></div>
 <div class="ti-shell">
   <header class="ti-top"><div class="ti-company"><span class="ti-mark">A</span>A.M.S TECNOLIGICS</div><span class="ti-edition">02 / TITANIUM · INDUSTRIAL EDITION</span></header>
@@ -46,7 +46,7 @@ splash.innerHTML=String.raw\`
     <div class="ti-ticks"><span>00 / INICIO</span><span>SCRIPTS · INTERFAZ · MÓDULOS</span><span>100 / LISTO</span></div>
   </section>
   <footer class="ti-footer"><span>© 2026 A.M.S TECNOLIGICS · TODOS LOS DERECHOS RESERVADOS.</span><span id="ti-footer-info">PRECISION ENGINEERING INTERFACE</span><button id="ti-retry" type="button" hidden>REINTENTAR INICIO</button></footer>
-</div>\`;
+</div>`;
 const el=id=>doc.getElementById(id);
 const sheet=el('ti-sheet'),face=el('ti-sheet-face'),glint=el('ti-sheet-glint'),edge=el('ti-sheet-edge'),punch=el('ti-punch'),angle=el('ti-angle'),operation=el('ti-operation');
 const fill=el('startup-fill'),meter=el('startup-meter'),value=el('startup-value'),status=el('startup-status');

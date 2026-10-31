@@ -1,0 +1,39 @@
+/* PlegadoX 02 TITANIUM — splash responsive en acero y azul plata */
+.pp-splash{position:fixed;inset:0;z-index:3000;background:#050b16;color:#e7f6ff;font-family:Inter,"Segoe UI",Arial,sans-serif;overflow:hidden;box-sizing:border-box;isolation:isolate;transition:opacity .35s ease,visibility .35s ease}
+.pp-splash *{box-sizing:border-box}.pp-splash.ti-done{opacity:0;visibility:hidden;pointer-events:none}
+.pp-splash:before{content:"";position:absolute;inset:0;background:radial-gradient(ellipse 55% 60% at 50% 45%,#1b57934c,transparent 80%),linear-gradient(112deg,#050914,#112036 50%,#050914);pointer-events:none}
+.ti-grain{position:absolute;inset:0;opacity:.34;background:repeating-linear-gradient(116deg,transparent 0 3px,#b9eeff08 4px 5px);pointer-events:none}
+.ti-shell{position:relative;display:flex;flex-direction:column;width:min(100%,1660px);height:100%;height:100dvh;margin:auto;padding:clamp(10px,2vh,25px) clamp(13px,4vw,65px) clamp(11px,2vh,22px);gap:clamp(6px,1.3vh,16px)}
+.ti-top,.ti-footer,.ti-progress-head,.ti-ticks,.ti-hud,.ti-stage-foot{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.ti-company{display:flex;align-items:center;gap:12px;color:#d1e3ef;font-size:clamp(10px,1vw,13px);font-weight:800;letter-spacing:.2em}
+.ti-mark{display:grid;place-items:center;border:1px solid #8ad9ff99;background:linear-gradient(135deg,#0a1c31,#365a73);color:#b9ebff;width:30px;height:30px;box-shadow:0 0 18px #25aeff44}
+.ti-edition{color:#90bdd5;font:700 clamp(9px,.86vw,12px) "Segoe UI",sans-serif;letter-spacing:.15em}
+.ti-title{text-align:center;flex:none;padding:4px 0 2px}.ti-kicker{font-size:clamp(8px,.85vw,12px);letter-spacing:.32em;color:#87dafa;font-weight:800}
+.ti-name{font-size:clamp(53px,8.2vw,126px);line-height:.99;letter-spacing:-.075em;font-weight:900;margin:6px 0;filter:drop-shadow(0 12px 30px #0009)}
+.ti-name span{background:linear-gradient(175deg,#faffff 0%,#afc4d8 22%,#fbffff 37%,#7593ab 56%,#dcecff 71%,#ffffff);background-clip:text;-webkit-background-clip:text;color:transparent}
+.ti-name b{color:#a5edff;text-shadow:0 0 25px #27b8ff85;padding-right:.05em}
+.ti-subtitle{font-size:clamp(9px,1vw,12px);letter-spacing:.42em;color:#9db4ca}
+.ti-stage{position:relative;flex:1 1 0;min-height:180px;overflow:hidden;border:1px solid #5e92b16b;background:linear-gradient(180deg,#0a1a29c9,#091323aa 65%,#091827dd);box-shadow:inset 0 0 60px #2f95ca12,0 25px 65px #0008}
+.ti-stage:before{content:"";position:absolute;inset:0;opacity:.26;background-image:linear-gradient(#80bade30 1px,transparent 1px),linear-gradient(90deg,#80bade30 1px,transparent 1px);background-size:43px 43px}
+.ti-stage:after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(100deg,transparent 25%,#8be1ff10 48%,transparent 68%);animation:ti-sweep 6s ease-in-out infinite}
+.ti-corner{position:absolute;width:20px;height:20px;border-color:#b6edff;z-index:3}.ti-tl{top:0;left:0;border-top:2px solid;border-left:2px solid}.ti-br{right:0;bottom:0;border-bottom:2px solid;border-right:2px solid}
+.ti-machine{display:block;position:absolute;inset:0;width:100%;height:100%;filter:drop-shadow(0 14px 24px #000a)}
+.ti-hud,.ti-stage-foot{position:absolute;left:clamp(12px,3vw,30px);right:clamp(12px,3vw,30px);z-index:4;color:#91cde9;font-size:clamp(8px,.8vw,11px);font-weight:800;letter-spacing:.13em}
+.ti-hud{top:clamp(10px,2vh,20px)}.ti-stage-foot{bottom:clamp(10px,2vh,20px);color:#9fb9cf}
+.ti-live{color:#a4e9ff}.ti-live:first-letter{color:#50f3ff}
+.ti-bottom{flex:none;padding:2px 2px 0}.ti-progress-head{align-items:flex-end}.ti-progress-head small{color:#75bbe0;font-size:10px;font-weight:800;letter-spacing:.21em}
+.ti-progress-head p{margin:6px 0 0;font-size:clamp(12px,1.5vw,19px);font-weight:650}.ti-progress-head strong{font:700 clamp(28px,3.4vw,45px) Consolas,monospace;color:#ddf9ff;min-width:4ch;text-align:right}
+.ti-track{height:12px;padding:2px;background:#0b1d30;border:1px solid #619ec1;margin-top:11px;box-shadow:inset 0 0 11px #001c32}
+#startup-fill{height:100%;width:0;background:linear-gradient(90deg,#1c79b6,#3dbafd,#e5fcff);box-shadow:0 0 14px #60cfff;transition:width .12s ease}
+.ti-ticks{color:#7590aa;font:10px Consolas,monospace;margin-top:7px}.ti-footer{flex:none;border-top:1px solid #547b8e5c;padding-top:10px;color:#8299ae;font-size:clamp(9px,.85vw,11px);letter-spacing:.05em}
+#ti-retry{background:#174e75;border:1px solid #7dcde8;padding:8px 12px;color:#e4f6ff;cursor:pointer;font-weight:800}
+@keyframes ti-sweep{from{transform:translateX(-80%)}to{transform:translateX(80%)}}
+@media(max-width:650px){.ti-shell{padding:14px 12px;gap:10px}.ti-edition{font-size:8px;max-width:36%;text-align:right}.ti-company{letter-spacing:.08em;font-size:9px}.ti-title{padding-top:24px}.ti-kicker{letter-spacing:.12em}.ti-name{font-size:clamp(49px,13vw,85px)}.ti-subtitle{letter-spacing:.16em}.ti-stage{flex:1 1 38vh;min-height:225px}.ti-machine{width:145%;left:-22.5%}.ti-hud,.ti-stage-foot{font-size:8px}.ti-stage-foot span:last-child,.ti-hud span:last-child,.ti-ticks span:nth-child(2),#ti-footer-info{display:none}.ti-footer{line-height:1.5}}
+@media(orientation:landscape) and (max-height:580px){.ti-title{padding-top:0}.ti-name{font-size:clamp(38px,6.5vh,80px)}.ti-subtitle,.ti-kicker{font-size:8px}.ti-shell{gap:4px}.ti-progress-head p{margin-top:2px}.ti-stage{min-height:110px}.ti-track{margin-top:6px}}
+@media(prefers-reduced-motion:reduce){.ti-stage:after{animation:none}#startup-fill,.pp-splash{transition:none}}
+
+.ti-embedded{position:absolute;inset:0;z-index:8;width:100%;height:100%;border:0;opacity:0;pointer-events:none;background:#050b16;transition:opacity .2s ease}
+.ti-embedded.ti-frame-ready{opacity:1}
+@media(prefers-reduced-motion:reduce){.ti-embedded{transition:none}}
+
+.ti-iframe-active .ti-stage:after{animation:none}

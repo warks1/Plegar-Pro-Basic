@@ -31,4 +31,21 @@ with sync_playwright() as pw:
     assert not errors,(width,height,errors)
     print(f'OK TITANIUM {width}x{height}')
     page.close()
+
+  # Valida también la composición real incrustada, no solo el fallback.
+  embedded=(root/'titanium-loading.html').read_text(encoding='utf-8')
+  for width,height in [(320,568),(390,844),(844,390),(1440,900)]:
+    page=browser.new_page(viewport={'width':width,'height':height})
+    errors=[]
+    page.on('pageerror',lambda e:errors.append(str(e)))
+    page.set_content(embedded,wait_until='load')
+    assert page.locator('svg.machine').count()==1
+    assert page.locator('.brand').is_visible()
+    assert page.locator('#progressArea').is_visible()
+    assert page.locator('.copyright').is_visible()
+    overflow=page.evaluate('({width:document.body.scrollWidth,height:document.body.scrollHeight})')
+    assert overflow['width']<=width+1 and overflow['height']<=height+1,(width,height,overflow)
+    assert not errors,(width,height,errors)
+    print(f'OK TITANIUM incrustado {width}x{height}')
+    page.close()
   browser.close()

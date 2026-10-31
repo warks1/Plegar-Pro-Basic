@@ -64,11 +64,12 @@ function harness() {
 test('installs an offline page and cache version v125', async () => {
   const h = harness();
   await h.trigger('install');
-  assert.ok(h.stores.has('plegar-pro-forming2d-v125-titanium-splash'));
+  assert.ok(h.stores.has('plegar-pro-forming2d-v126-titanium-original'));
   assert.ok(await h.caches.match(home));
   assert.ok(await h.caches.match(scope+'machine-references.js'),'Ficha de máquina disponible sin conexión');
   assert.ok(await h.caches.match(scope+'production-view.js'),'Producción local disponible sin conexión');
   assert.ok(await h.caches.match(scope+'settings.js'),'Preferencias disponibles offline');
+  assert.ok(await h.caches.match(scope+'titanium-loading.html'),'Presentación TITANIUM con cinemática offline');
   assert.ok(await h.caches.match(scope+'settings.css'),'Estilos accesibles offline');
   assert.ok(await h.caches.match(scope+'manufacturer-catalog.js'),'Catálogo documental sin conexión');
   assert.ok(await h.caches.match(scope+'tool-dxf-import.js'),'Importador DXF disponible sin conexión');

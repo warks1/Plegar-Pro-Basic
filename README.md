@@ -375,8 +375,8 @@ Pruebas: `tests/service-worker.test.cjs` (cuatro casos nuevos); `node --test tes
 
 La nueva pantalla de inicio usa acero plateado y azul frío, título PLEGADOX, copyright A.M.S Tecnoligics y animación SVG continua de punzón + chapa + matriz en V. Es una **recreación visual**, no una simulación CNC, y no reemplaza los módulos de cálculo ni programación.
 
-La barra ya **no usa un temporizador de avance ficticio**: refleja la carga de los archivos JavaScript diferidos del arranque; se completa al confirmar \`DOMContentLoaded\`, \`PlegarApp\`, \`PlegarHomeDashboard\`, menú y proyectos inicializados. Si falta un archivo o no se inicializa la interfaz, se mantiene el error en pantalla y se ofrece «Reintentar inicio»; nunca se finge el 100 %. Sin espera mínima artificial ni botón para saltar la carga.
+La barra ya **no usa un temporizador de avance ficticio**: refleja la carga de los archivos JavaScript diferidos del arranque; se completa al confirmar `DOMContentLoaded`, `PlegarApp`, `PlegarHomeDashboard`, menú y proyectos inicializados. Si falta un archivo o no se inicializa la interfaz, se mantiene el error en pantalla y se ofrece «Reintentar inicio»; nunca se finge el 100 %. Sin espera mínima artificial ni botón para saltar la carga.
 
-Archivos: \`titanium-splash.js\`, \`titanium-splash.css\`. Los anteriores \`splash.js\` y \`splash.css\` se conservan como archivos históricos no cargados. \`sw.js\` precarga los nuevos archivos para funcionamiento offline.
+Archivos: `titanium-splash.js`, `titanium-splash.css` y `titanium-loading.html` (reutiliza la recreación visual TITANIUM preparada previamente). Los anteriores `splash.js` y `splash.css` se conservan como archivos históricos no cargados. `sw.js` precarga los nuevos archivos para funcionamiento offline.
 
-Comprobaciones: \`node --test tests/*.test.cjs\`, \`python tests/splash-responsive-check.py\`, \`python tests/splash-browser-check.py\`. El inicio y los demás módulos no se modifican.
+Comprobaciones: `node --test tests/*.test.cjs`, `python tests/splash-responsive-check.py`, `python tests/splash-browser-check.py`. El inicio y los demás módulos no se modifican.

@@ -125,6 +125,7 @@ function sheetPath(p){
 // call window.PlegadoXLoading.setProgress(0..100) and finish() when ready.
 let start=performance.now(),hold=false,manual=0;
 const duration=11200;
+let externalStatus='';
 function render(ms){
  let t=(ms%duration)/duration;
  // Approach, bend into V, hold, retract, reset. Punch moves with formed sheet.
@@ -147,12 +148,12 @@ function render(ms){
  nodes.pct.textContent=String(progress).padStart(2,'0')+'%';
  nodes.progress.style.width=progress+'%';nodes.area.setAttribute('aria-valuenow',String(progress));
  const status=progress<22?'Preparando geometría de chapa y herramientas…':progress<48?'Calculando trayectorias y secuencia de plegado…':progress<72?'Sincronizando simulación CNC en tiempo real…':progress<96?'Verificando colisiones y parámetros de máquina…':'PlegadoX listo para comenzar.';
- nodes.status.textContent=status;
+ nodes.status.textContent=externalStatus||status;
 }
 function tick(now){if(!hold)render(now-start);requestAnimationFrame(tick)}
 requestAnimationFrame(tick);
 $('replay').addEventListener('click',()=>{manual=null;hold=false;start=performance.now();render(0)});
-window.PlegadoXLoading={setProgress(value){manual=Math.max(0,Math.min(100,Number(value)||0));},automatic(){manual=null;},finish(){manual=100;hold=true;render(10000);nodes.status.textContent='PlegadoX listo para comenzar.';},restart(){manual=null;hold=false;start=performance.now();render(0);},pause(){hold=true;},resume(){hold=false;start=performance.now();}};
+window.PlegadoXLoading={setProgress(value,label){manual=Math.max(0,Math.min(100,Number(value)||0));externalStatus=typeof label==='string'?label:'';},automatic(){manual=null;},finish(){manual=100;hold=true;render(10000);nodes.status.textContent='PlegadoX listo para comenzar.';},restart(){manual=null;hold=false;start=performance.now();render(0);},pause(){hold=true;},resume(){hold=false;start=performance.now();}};
 // Used only for deterministic offline video export; no external dependencies.
 window.__setPreview=(normalized)=>{hold=true;manual=null;render(Math.min(0.99999,Math.max(0,normalized))*duration);};
 })();

@@ -22,7 +22,8 @@ self.addEventListener('fetch', event => {
   if (request.method !== 'GET') return;
   const url = new URL(request.url);
   if (url.origin !== self.location.origin || !url.pathname.startsWith(SCOPE_PATH)) return;
-  const isHome = request.mode === 'navigate' ||
+  const isTitaniumFrame = url.pathname === SCOPE_PATH + 'titanium-loading.html';
+  const isHome = (request.mode === 'navigate' && !isTitaniumFrame) ||
     url.pathname === SCOPE_PATH || url.pathname === SCOPE_PATH + 'index.html';
   if (isHome) {
     // Red primero: una actualización de GitHub Pages es visible al volver a abrir.

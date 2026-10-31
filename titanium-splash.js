@@ -55,7 +55,7 @@ preview.title='Presentación PlegadoX TITANIUM';
 preview.setAttribute('aria-hidden','true');preview.tabIndex=-1;
 splash.appendChild(preview);
 preview.addEventListener('load',()=>{
- try{preview.contentWindow.PlegadoXLoading.setProgress(displayed,doc.getElementById('startup-status')?.textContent||'Cargando PlegadoX…');preview.classList.add('ti-frame-ready');}
+ try{preview.contentWindow.PlegadoXLoading.setProgress(displayed,doc.getElementById('startup-status')?.textContent||'Cargando PlegadoX…');preview.classList.add('ti-frame-ready');root.cancelAnimationFrame(raf);splash.classList.add('ti-iframe-active');}
  catch(e){preview.remove();}
 });
 const el=id=>doc.getElementById(id);

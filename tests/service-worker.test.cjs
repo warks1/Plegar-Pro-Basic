@@ -61,10 +61,10 @@ function harness() {
   return { trigger, state, caches, stores, seen };
 }
 
-test('installs an offline page and cache version v123', async () => {
+test('installs an offline page and cache version v125', async () => {
   const h = harness();
   await h.trigger('install');
-  assert.ok(h.stores.has('plegar-pro-forming2d-v124-signed-3d-negatives'));
+  assert.ok(h.stores.has('plegar-pro-forming2d-v125-titanium-splash'));
   assert.ok(await h.caches.match(home));
   assert.ok(await h.caches.match(scope+'machine-references.js'),'Ficha de máquina disponible sin conexión');
   assert.ok(await h.caches.match(scope+'production-view.js'),'Producción local disponible sin conexión');
@@ -101,7 +101,7 @@ test('offline navigation falls back to the installed page', async () => {
 test('JS y CSS obtienen versión online y mantienen respaldo offline', async () => {
   const h = harness();
   await h.trigger('install');
-  for (const file of ['forming2d-view.js', 'editor2d.js', 'splash.css']) {
+  for (const file of ['forming2d-view.js', 'editor2d.js', 'titanium-splash.css']) {
     const url = scope + file;
     const result = await h.trigger('fetch', { url, method: 'GET', mode: 'same-origin' });
     assert.equal(result.content, 'network:' + url, file + ' debe cargar siempre desde red si es posible');
@@ -109,7 +109,7 @@ test('JS y CSS obtienen versión online y mantienen respaldo offline', async () 
       file + ' debe sustituir su copia offline anticuada');
   }
   h.state.offline = true;
-  for (const file of ['forming2d-view.js', 'editor2d.js', 'splash.css']) {
+  for (const file of ['forming2d-view.js', 'editor2d.js', 'titanium-splash.css']) {
     const url = scope + file;
     const result = await h.trigger('fetch', { url, method: 'GET', mode: 'same-origin' });
     assert.equal(result.content, 'network:' + url, 'Debe permitir uso offline');

@@ -47,6 +47,17 @@ splash.innerHTML=String.raw`
   </section>
   <footer class="ti-footer"><span>© 2026 A.M.S TECNOLIGICS · TODOS LOS DERECHOS RESERVADOS.</span><span id="ti-footer-info">PRECISION ENGINEERING INTERFACE</span><button id="ti-retry" type="button" hidden>REINTENTAR INICIO</button></footer>
 </div>`;
+let displayed=0;
+const preview=doc.createElement('iframe');
+preview.className='ti-embedded';
+preview.src='titanium-loading.html';
+preview.title='Presentación PlegadoX TITANIUM';
+preview.setAttribute('aria-hidden','true');preview.tabIndex=-1;
+splash.appendChild(preview);
+preview.addEventListener('load',()=>{
+ try{preview.contentWindow.PlegadoXLoading.setProgress(displayed,doc.getElementById('startup-status')?.textContent||'Cargando PlegadoX…');preview.classList.add('ti-frame-ready');}
+ catch(e){preview.remove();}
+});
 const el=id=>doc.getElementById(id);
 const sheet=el('ti-sheet'),face=el('ti-sheet-face'),glint=el('ti-sheet-glint'),edge=el('ti-sheet-edge'),punch=el('ti-punch'),angle=el('ti-angle'),operation=el('ti-operation');
 const fill=el('startup-fill'),meter=el('startup-meter'),value=el('startup-value'),status=el('startup-status');
@@ -75,12 +86,12 @@ let loaded=1,failed=[],finished=false;
 const settled=new Set([doc.currentScript||scripts[0]]);
 function paint(p){
  const n=Math.max(0,Math.min(100,Math.floor(p)));
- fill.style.width=n+'%';meter.setAttribute('aria-valuenow',String(n));value.textContent=n+'%';
+ displayed=n;fill.style.width=n+'%';meter.setAttribute('aria-valuenow',String(n));value.textContent=n+'%';try{preview.contentWindow?.PlegadoXLoading?.setProgress(n,status.textContent)}catch(e){}
 }
 function update(){
  if(finished)return;
- paint(Math.min(96,Math.floor(96*loaded/Math.max(1,scripts.length))));
  status.textContent='Cargando archivos de la aplicación ('+loaded+' de '+scripts.length+')…';
+ paint(Math.min(96,Math.floor(96*loaded/Math.max(1,scripts.length))));
 }
 for(const script of scripts){
  if(settled.has(script))continue;
@@ -99,7 +110,7 @@ function complete(){
   el('ti-retry').hidden=false;el('ti-footer-info').textContent='ARRANQUE NO COMPLETADO';
   return;
  }
- finished=true;paint(100);status.textContent='PlegadoX listo.';
+ finished=true;status.textContent='PlegadoX listo.';paint(100);
  root.cancelAnimationFrame(raf);
  splash.classList.add('ti-done');
  root.setTimeout(()=>splash.remove(),420);

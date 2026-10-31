@@ -21,7 +21,7 @@ with sync_playwright() as pw:
     assert page.locator('.ti-machine').count()==1,(width,'sin máquina SVG')
     assert page.locator('#ti-punch').count()==1,(width,'sin punzón')
     assert page.locator('#ti-sheet').count()==1,(width,'sin chapa')
-    assert page.locator('.ti-name').inner_text().replace(' ','')=='PLEGADOX'
+    assert ''.join(page.locator('.ti-name').inner_text().split())=='PLEGADOX'
     assert page.locator('#startup-meter').get_attribute('aria-valuenow') is not None
     for selector in ['.ti-top','.ti-title','.ti-stage','.ti-bottom','.ti-footer']:
       box=page.locator(selector).bounding_box()

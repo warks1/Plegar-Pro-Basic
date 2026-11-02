@@ -10,21 +10,44 @@
 })(typeof globalThis!=='undefined'?globalThis:this,function(){
  'use strict';
  const MECOS_CATALOG_URL='https://www.mecos.es/files/productos/utillaje-plegadora/MECOS-Catalogo-General-de-Utillaje-2022.pdf';
+ const MECOS_CATALOG_2026_URL='https://mecos.es/wp-content/uploads/2026/04/catalogo-general-tecnostamp-utillaje-plegadora-mecos-iberica-deformacion-metal-2026.pdf';
  const source=Object.freeze({type:'catalog-photo',supplier:'MECOS',title:'MECOS · catálogo de utillaje para plegadora · páginas WILA–TRUMPF 45–55',url:MECOS_CATALOG_URL,website:'https://www.mecos.es/plegado/',version:'catálogo general ED22 + fotos aportadas',verified:false,note:'Cotas transcritas de las páginas del catálogo MECOS aportadas por el propietario. La marca original de cada referencia se conserva. Los contornos no acotados por completo son reconstrucciones, no CAD del fabricante.'});
  const amadaSource=Object.freeze({type:'catalog-photo',supplier:'MECOS',title:'MECOS · catálogo de utillaje para plegadora · páginas AMADA–PROMECAM 13–41',url:MECOS_CATALOG_URL,website:'https://www.mecos.es/plegado/',version:'catálogo general ED22 + fotos aportadas',verified:false,note:'Cotas transcritas de las páginas del catálogo MECOS aportadas por el propietario. Las siluetas no acotadas por completo son reconstrucciones de la sección impresa, no CAD del fabricante.'});
+ const mecos2026PunchSource=Object.freeze({type:'official-catalog',supplier:'MECOS',title:'TECNOSTAMP · Catálogo general de utillaje 2026 · AMADA–PROMECAM, página 14',url:MECOS_CATALOG_2026_URL+'#page=14',website:'https://www.mecos.es/productos/utillaje-para-plegadora/',version:'catálogo general 2026',verified:true,note:'Referencia y cotas transcritas únicamente de la tabla y el dibujo impresos. El contorno no constituye un CAD oficial completo.'});
+ const mecos2026Amada16Source=Object.freeze({type:'official-catalog',supplier:'MECOS',title:'TECNOSTAMP · Catálogo general de utillaje 2026 · AMADA–PROMECAM, página 16',url:MECOS_CATALOG_2026_URL+'#page=16',website:'https://www.mecos.es/productos/utillaje-para-plegadora/',version:'catálogo general 2026',verified:true,note:'Cotas transcritas de la tabla y del dibujo impresos; no existe CAD oficial completo en la ficha.'});
+ const mecos2026Trumpf47Source=Object.freeze({type:'official-catalog',supplier:'MECOS',title:'TECNOSTAMP · Catálogo general de utillaje 2026 · TRUMPF STYLE, página 47',url:MECOS_CATALOG_2026_URL+'#page=47',website:'https://www.mecos.es/productos/utillaje-para-plegadora/',version:'catálogo general 2026',verified:true,note:'Cotas transcritas de la tabla y del dibujo impresos; no existe CAD oficial completo en la ficha.'});
+ const mecos2026Trumpf49Source=Object.freeze({type:'official-catalog',supplier:'MECOS',title:'TECNOSTAMP · Catálogo general de utillaje 2026 · TRUMPF STYLE, página 49',url:MECOS_CATALOG_2026_URL+'#page=49',website:'https://www.mecos.es/productos/utillaje-para-plegadora/',version:'catálogo general 2026',verified:true,note:'Cotas transcritas de la tabla y del dibujo impresos; no existe CAD oficial completo en la ficha.'});
+ const mecos2026BladeSource=Object.freeze({type:'official-catalog',supplier:'MECOS',title:'TECNOSTAMP · Catálogo general de utillaje 2026 · LAME / BLADES, página 111',url:MECOS_CATALOG_2026_URL+'#page=111',website:'https://www.mecos.es/productos/utillaje-para-plegadora/',version:'catálogo general 2026',verified:true,note:'Referencia y cotas transcritas únicamente de la tabla y el dibujo impresos. El contorno no constituye un CAD oficial completo.'});
  const accessorySource=Object.freeze({type:'catalog-photo',supplier:'MECOS',title:'MECOS · catálogo de utillaje · páginas 4 y 82 aportadas',url:MECOS_CATALOG_URL,website:'https://www.mecos.es/plegado/',version:'catálogo general ED22 + fotos aportadas',verified:false,note:'Ficha documental. Las páginas no aportan sección y cotas suficientes para generar una geometría 3D fiable.'});
  const punch=(code,angle,nose,height,capacity,bodyWidth,reach=0,b= null)=>Object.freeze({
   id:'wila-p-'+code+(b?'-b'+b:''),kind:'punch',brand:'WILA / TRUMPF',manufacturer:'WILA / TRUMPF',
   name:'WILA / TRUMPF · punzón '+code+(reach?' · pata de cabra / cuello de cisne':'')+(b?' · b '+b+' mm':''),code,angle,nose,height,length:500,sectionedLength:550,
-  capacityTonPerM:capacity,mountingWidth:20,bodyWidth,reach,b,profileFamily:reach?'gooseneck':'straight',source,
-  geometryCertified:false,dimensionsNote:'Longitud publicada: 500 mm; versión fraccionada: 550 mm.'});
+  capacityTonPerM:capacity,mountingWidth:20,bodyWidth,reach,b,profileFamily:reach?'gooseneck':'straight',source:code==='15.730'?mecos2026Trumpf49Source:source,
+  ...(code==='15.730'?{workingHeight:220,availableLengths:Object.freeze([100,200,300,500,550]),catalogPage:49,visualReference:MECOS_CATALOG_2026_URL+'#page=49'}:{}),
+  geometryCertified:false,dimensionsNote:code==='15.730'?'Cotas impresas en 2026: altura total 256 mm, H220 mm, ángulo 60°, radio 4 mm, hombro 60 mm y 250 T/m. Longitudes 100/200/300/500 mm y 550 mm fraccionado.':'Longitud publicada: 500 mm; versión fraccionada: 550 mm.'});
  const punches=[
   punch('15.670',86,.8,195,40,20,57),punch('15.635',86,.2,195,30,30),punch('15.630',86,.8,195,100,30),
   punch('15.680',60,.8,195,40,20,57),punch('15.620',28,1,195,80,24),punch('15.610',28,3,195,100,20),
   punch('15.700',86,1,256,80,33,85),punch('15.710',86,1,256,80,28,60),punch('15.720',28,1,256,60,28,30),
-  punch('15.730',60,4,256,100,25,60),punch('15.750',28,1,276,40,24,60),
+  punch('15.730',60,4,256,250,25,60),punch('15.750',28,1,276,40,24,60),
   punch('15.902',24,.6,195,80,25,0,8),punch('15.904',24,.6,195,80,25,0,10),punch('15.905',24,.6,195,80,25,0,12)
  ];
+
+ punches.push(
+  Object.freeze({id:'amada-p-11.840',kind:'punch',brand:'AMADA / PROMECAM',manufacturer:'AMADA / PROMECAM',name:'AMADA / PROMECAM · punzón 11.840 · cuello de cisne',code:'11.840',angle:85,nose:1,height:185,length:505,availableLengths:Object.freeze([505,500]),sectionedLength:500,capacityTonPerM:90,mountingWidth:13,reach:85,profileFamily:'gooseneck',source:mecos2026Amada16Source,catalogPage:16,visualReference:MECOS_CATALOG_2026_URL+'#page=16',geometryCertified:false,dimensionsNote:'Cotas impresas: H185 mm, alcance 85 mm, ángulo 85°, radio 1 mm y 90 T/m. Longitud 505 mm y 500 mm fraccionado.'}),
+  Object.freeze({id:'trumpf-p-15.310',kind:'punch',brand:'TRUMPF STYLE',manufacturer:'TRUMPF STYLE',name:'TRUMPF STYLE · punzón recto 15.310',code:'15.310',angle:60,nose:4,height:157,workingHeight:120,length:500,availableLengths:Object.freeze([100,200,300,500,550]),sectionedLength:550,capacityTonPerM:180,mountingWidth:20,bodyWidth:20,profileFamily:'straight',source:mecos2026Trumpf47Source,catalogPage:47,visualReference:MECOS_CATALOG_2026_URL+'#page=47',geometryCertified:false,dimensionsNote:'Cotas impresas: altura total 157 mm, H120 mm, ancho 20 mm, ángulo 60°, radio 4 mm y 180 T/m. Longitudes 100/200/300/500 mm y 550 mm fraccionado.'}),
+  Object.freeze({id:'trumpf-p-15.335',kind:'punch',brand:'TRUMPF STYLE',manufacturer:'TRUMPF STYLE',name:'TRUMPF STYLE · punzón 15.335 · cuello de cisne',code:'15.335',angle:86,nose:1,height:157,workingHeight:120,length:500,availableLengths:Object.freeze([100,200,300,500,550]),sectionedLength:550,capacityTonPerM:40,mountingWidth:20,reach:30,profileFamily:'gooseneck',source:mecos2026Trumpf47Source,catalogPage:47,visualReference:MECOS_CATALOG_2026_URL+'#page=47',geometryCertified:false,dimensionsNote:'Cotas impresas: altura total 157 mm, H120 mm, alcance 30 mm, ángulo 86°, radio 1 mm y 40 T/m. Longitudes 100/200/300/500 mm y 550 mm fraccionado.'})
+ );
+ punches.push(
+  ...[
+   ['15.762',28,1.5],['15.764',28,2.5]
+  ].map(([code,angle,nose])=>Object.freeze({
+   id:'universal-blade-'+code,kind:'punch',brand:'AMADA / TRUMPF / WILA / BYSTRONIC / LVD / EHT / WEINBRENNER',manufacturer:'AMADA / TRUMPF / WILA / BYSTRONIC / LVD / EHT / WEINBRENNER',
+   name:'Cuchilla universal de plegado · '+code,code,angle,nose,height:100,length:500,availableLengths:Object.freeze([100,200,300,500,550]),sectionedLength:550,
+   capacityTonPerM:100,mountingWidth:12,bodyWidth:12,reach:0,profileFamily:'blade',source:mecos2026BladeSource,catalogPage:111,visualReference:MECOS_CATALOG_2026_URL+'#page=111',
+   geometryCertified:false,dimensionsNote:'Cotas impresas: espesor 12 mm, H100 mm, ángulo 28°, radio '+nose+' mm y 100 T/m. Longitudes publicadas: 100/200/300/500 mm y 550 mm fraccionado.'
+  }))
+ );
  function die(code,opening,angle,height,bodyWidth,shoulderRadius,capacity=100,sectioned=false,style='v'){
   return Object.freeze({id:'wila-d-'+code,kind:'die',brand:'WILA / TRUMPF',manufacturer:'WILA / TRUMPF',
    name:'WILA / TRUMPF · matriz '+code+' · '+(style==='hemming'?'aplastado b':'V')+opening+(style==='hemming'?' mm':' · '+angle+'°'),
@@ -66,11 +89,12 @@
  // leídos de las tablas fotografiadas. La cota transversal es sólo una guía
  // de reconstrucción cuando el dibujo no define todos los vértices.
  const amadaPunches=[];
- function amadaPunch(code,angle,nose,height,capacity,profileReach=26,profileFamily='gooseneck'){
+ function amadaPunch(code,angle,nose,height,capacity,profileReach=26,profileFamily='gooseneck',sourceOverride=null,catalogPage=null){
   const lengths=[835,415,805];
   amadaPunches.push(Object.freeze({id:'amada-p-'+code,kind:'punch',brand:'AMADA / PROMECAM',manufacturer:'AMADA / PROMECAM',
    name:'AMADA / PROMECAM · punzón '+code+(profileFamily==='gooseneck'?' · pata de cabra / cuello de cisne':''),code,angle,nose,height,length:835,availableLengths:lengths,sectionedLength:805,
-   capacityTonPerM:capacity,mountingWidth:13,bodyWidth:profileReach,reach:profileReach,profileFamily,source:amadaSource,
+   capacityTonPerM:capacity,mountingWidth:13,bodyWidth:profileReach,reach:profileReach,profileFamily,source:sourceOverride||amadaSource,
+   ...(catalogPage?{catalogPage,visualReference:MECOS_CATALOG_2026_URL+'#page='+catalogPage}:{}),
    geometryCertified:false,dimensionsNote:'Longitudes de catálogo: 835 mm, 415 mm y fraccionado estándar 805 mm.'}));
  }
  const amadaRows=[
@@ -99,6 +123,9 @@
   ['11.158',30,.6,80,100,26],['11.258',30,.6,104,100,26],['11.810',30,1,200,50,26],['11.514',30,.6,104,50,26],['11.780',30,.5,135,80,26],['11.540',26,.8,117,100,26]
  ];
  for(const row of amadaRows)amadaPunch(...row);
+ // Altas del catálogo oficial MECOS/TECNOSTAMP 2026, página 14.
+ amadaPunch('11.861',85,.6,100,50,26,'straight',mecos2026PunchSource,14);
+ amadaPunch('10.626',85,.25,100,50,26,'straight',mecos2026PunchSource,14);
 
  const amadaDies=[];
  function amadaDie(code,width,height,angle,openings,radii,offsets,capacity=100){
@@ -205,6 +232,6 @@
   ].map(([code,name,dimensionsNote])=>Object.freeze({id:'amada-support-'+code,kind:'accessory',manufacturer:'AMADA / PROMECAM',code,name,dimensionsNote,source:amadaSource}))
   ,Object.freeze({id:'amada-holder-22.010',kind:'accessory',manufacturer:'AMADA / PROMECAM',code:'22.010',name:'Soporte AMADA para matriz de 30° · 22.010',dimensionsNote:'ancho base 60 mm · ancho de sujeción 14 mm · altura total 115.5 mm · cotas verticales marcadas 50 y 51.5 mm',source:amadaSource})
  ]);
- return {source,MECOS_CATALOG_URL,PUNCHES:Object.freeze([...punches,...amadaPunches]),DIES:Object.freeze([...dies,...amadaDies,...amadaStandardDies]),ACCESSORIES:accessories};
+ return {source,MECOS_CATALOG_URL,MECOS_CATALOG_2026_URL,PUNCHES:Object.freeze([...punches,...amadaPunches]),DIES:Object.freeze([...dies,...amadaDies,...amadaStandardDies]),ACCESSORIES:accessories};
 });
 

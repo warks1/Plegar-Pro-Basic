@@ -106,6 +106,14 @@
   c.host.querySelector('.p3-machine-envelope').textContent=(s.machineSetup.machineId==='trumpf-v85'?'TRUMPF V85 · ':'MÁQUINA · ')+(s.punchContact?s.punchContact.state+' · separación '+s.punchContact.gapMm.toFixed(2)+' mm · ':'')+'Matriz H '+(machine.dieHeight===null?'no introducida':machine.dieHeight+' mm')+' · '+(machine.possibleTableContact?'POSIBLE CONTACTO MESA. ':'')+(machine.possibleRamContact?'POSIBLE CONTACTO TRANCHA. ':'')+(machine.unknown.length?'Faltan cotas: '+machine.unknown.join(', ')+'. ':'')+(machine.machineId==='trumpf-v85'?'TRUMPF V85 · Contornos de sección según pantallas Cybelec; montaje y amarres pendientes.':'Perfil rectangular orientativo: sin CAD real ni seguridad CNC.');
   c.host.querySelector('.p3-sweep').textContent=`MUESTREO DEL CICLO · ${sweep.frames} posiciones, ${sweep.checkedPairs} pares. ${sweep.verdict}. ${first} ${sweep.minimum?`Mínimo observado ${sweep.minimum.mm.toFixed(2)} mm en ${pct(sweep.minimum)}.`:'Sin alas anteriores evaluables.'} Instante próximo al cursor ${pct(observed)}: ${observed.status}. NO constituye barrido continuo ni certificación de colisiones. NO CNC / SIN VERIFICAR.`;
   c.host.querySelector('.p3-sweep-marker').innerHTML=sweep.rows.filter(row=>row.minimum?.mm<=sweep.nearMm).map(row=>`<i title="Muestra ${row.percent.toFixed(1)} %: distancia nominal ${row.minimum.mm.toFixed(2)} mm" style="left:${row.percent}%"></i>`).join('');
+  // Un movimiento X no es una operación de plegado: la chapa no está
+  // presentada. No mostrar avisos de colisión como si estuviera montada.
+  if(s.sheetPresented===false&&!signedVisible){
+   const absent='PREPARACIÓN X: CHAPA FUERA DEL ÁREA. No se evalúan contacto ni colisiones durante este traslado ilustrativo. Retirada y recolocación físicas NO simuladas. NO CNC.';
+   for(const selector of ['.p3-clearance','.p3-proximity3d','.p3-machine-envelope','.p3-sweep'])
+    c.host.querySelector(selector).textContent=absent;
+   c.host.querySelector('.p3-sweep-marker').innerHTML='';
+  }
   c.host.querySelector('[data-p3="scan-export"]').disabled=false;
   c.host.querySelector('.p3-state').textContent=s.sheetPresented===false&&!signedVisible?
    'PREPARACIÓN X · CHAPA RETIRADA DEL ÁREA DE PLEGADO · TOPE X '+s.stop.x.toFixed(2)+' mm → '+s.stop.targetX.toFixed(2)+' mm. Contacto y colisiones con la chapa NO EVALUABLES en esta fase. Retirada y recolocación sin animar. NO CNC.':

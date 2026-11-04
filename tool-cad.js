@@ -7,8 +7,9 @@
   {T:root.PlegarToolProfiles2D,L:root.PlegarToolLibrary};
  const api=factory(deps);
  if(typeof module==='object'&&module.exports)module.exports=api;else root.PlegarToolCAD=api;
-})(typeof globalThis!=='undefined'?globalThis:this,function({T,L}){
+})(typeof globalThis!=='undefined'?globalThis:this,function(deps){
  'use strict';
+ const {T,L}=deps;
  const EPS=1e-7,OK='GEOMETRÍA OK · PENDIENTE DE VERIFICACIÓN',REVIEW='REVISAR GEOMETRÍA · PENDIENTE DE VERIFICACIÓN';
  const esc=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
  const ascii=x=>String(x).normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^\x20-\x7e]/g,'-');

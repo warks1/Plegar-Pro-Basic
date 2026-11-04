@@ -36,9 +36,9 @@
   for(const tool of records){
    if(seen.has(tool.id))throw Error('Herramienta duplicada.');seen.add(tool.id);
    if(!tool.source||tool.source.verified!==false)throw Error('Origen de utillaje inconsistente.');
-   if(tool.kind==='punch'&&(tool.source.supplier!=='MECOS'||!/^https:\/\/www\.mecos\.es\//.test(tool.source.url||'')))throw Error('El punzón debe proceder del catálogo MECOS.');
-   if(tool.manufacturer&&!/^https:\/\/www\.mecos\.es\//.test(tool.source.url||''))throw Error('Referencia sin enlace al catálogo MECOS.');
-   if(![null,'WILA / TRUMPF','AMADA / PROMECAM'].includes(tool.manufacturer))throw Error('Fabricante de herramienta desconocido.');
+   if(tool.kind==='punch'&&(tool.source.supplier!=='MECOS'||!/^https:\/\/(?:www\.)?mecos\.es\//.test(tool.source.url||'')))throw Error('El punzón debe proceder del catálogo MECOS.');
+   if(tool.manufacturer&&!/^https:\/\/(?:www\.)?mecos\.es\//.test(tool.source.url||''))throw Error('Referencia sin enlace al catálogo MECOS.');
+   if(![null,'WILA / TRUMPF','AMADA / PROMECAM','TRUMPF STYLE','AMADA / TRUMPF / WILA / BYSTRONIC / LVD / EHT / WEINBRENNER'].includes(tool.manufacturer))throw Error('Fabricante de herramienta desconocido.');
    if(!(tool.angle>0&&tool.angle<180))throw Error('Ángulo inválido.');
    if((tool.kind==='punch'&&!(tool.nose>0))||(tool.kind==='die'&&!(tool.opening>0)))throw Error('Dimensión inválida.');
    if(tool.height!==null&&!(tool.height>0))throw Error('Altura inválida.');

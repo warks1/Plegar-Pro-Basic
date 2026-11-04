@@ -60,6 +60,23 @@
   return {machineId,backgaugeMode,backgaugePositionMode,radius,kFactor,punch:s.punch,die:s.die,backgaugeX,dimensionBasis,dieHeight,tableLeft,tableRight,ramWidth,ramBottomOffset,
    ...(backgaugeByBend?{backgaugeByBend}:{})};
  }
+
+ // Valores orientativos de K para plegado a 90° en acero: tabla tipo DIN 6935
+ // simplificada, según radio interior/espesor. Nunca sustituye calibración física.
+ function suggestK(radius,thickness){
+  const t=Number(thickness),r=Number(radius);
+  if(!Number.isFinite(t)||!Number.isFinite(r)||!(t>0)||!(r>=0))
+   throw new Error('Radio y espesor positivos y finitos requeridos.');
+  const ratio=r/t;
+  const k=ratio<=.65?.33:ratio<=1?.35:ratio<=1.5?.38:ratio<=2.4?.42:ratio<=3.8?.445:.5;
+  return {ratio,kFactor:k,basis:'tabla orientativa tipo DIN 6935 · acero · 90°'};
+ }
+ // El plegado al aire de acero dulce suele aproximarse mediante Ri ≈ 0,16·V.
+ function airBendRadius(vOpening){
+  const v=Number(vOpening);
+  if(!Number.isFinite(v)||!(v>0))throw new Error('Apertura V positiva y finita requerida.');
+  return {radius:.16*v,ratioToV:.16,basis:'estimación ≈ 0,16·V para plegado al aire en acero dulce'};
+ }
  function backgaugeTarget(profile,bendId,setupInput=profile?.setup){
   const setup=validateSetup(setupInput);
   if(!Number.isInteger(bendId)||bendId<1||bendId>=profile.segments.length)throw Error('Pliegue fuera de rango para posicionar el tope.');
@@ -137,6 +154,14 @@
   if(rows.some(r=>r.angle>0&&r.inside<die.angle))warnings.push('Uno o más ángulos interiores son inferiores al ángulo nominal de la matriz seleccionada.');
   if(rows.some(r=>r.angle>150))warnings.push('Pliegue muy cerrado: la hipótesis geométrica simplificada puede perder validez.');
   if(rows.some(r=>r.angle>=170))warnings.push('Giro extremo (≥170°): la intersección virtual de caras es inestable y se requiere CAD de radios reales.');
+  {
+   const air=airBendRadius(die.opening).radius;
+   if(setup.radius<air*.6||setup.radius>air*1.6)
+    warnings.push('Radio interior supuesto '+setup.radius.toFixed(2)+' mm distinto del radio de plegado al aire estimado (≈'+air.toFixed(2)+' mm = 0,16·V'+die.opening+'); ajustar Ri o comprobar con una pieza de ensayo.');
+   const sk=suggestK(setup.radius,e);
+   if(Math.abs(setup.kFactor-sk.kFactor)>.06)
+    warnings.push('K='+setup.kFactor.toFixed(2)+' se aleja del valor orientativo '+sk.kFactor.toFixed(2)+' para Ri/e='+sk.ratio.toFixed(2)+'; calibrar con un ensayo (calibrateK).');
+  }
   warnings.push(basis==='outer'
    ? 'Cotas EXTERIORES: cada tramo llega a la intersección teórica de las caras exteriores; BD=2·OSSB−BA.'
    :basis==='inner'
@@ -174,5 +199,5 @@
   return {kMin,kMax,flatMin:low.flat,flatMax:high.flat,spread:low.flat===null||high.flat===null?null:high.flat-low.flat,
    note:profile.bendOverrides?.some(x=>x?.kFactor!=null)?'Sólo cambia K general; los K individuales permanecen fijos.':'K general para todos los pliegues sin valor local.'};
  }
- return {PUNCHES,DIES,DEFAULT_SETUP,validateSetup,backgaugeTarget,estimate,calibrateK,sensitivity};
+ return {PUNCHES,DIES,DEFAULT_SETUP,validateSetup,backgaugeTarget,estimate,calibrateK,sensitivity,suggestK,airBendRadius};
 });

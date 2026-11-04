@@ -8,7 +8,7 @@ const P={name:'Prueba de utillaje',material:'Acero S235JR',thickness:2,segments:
 test('fichas únicas de origen paramétrico no verificado',()=>{
  const x=L.validate();assert.equal(x.punches,M.PUNCHES.length);assert.equal(x.dies,21+M.DIES.length);assert.equal(x.verified,0);
  assert.equal(new Set([...L.PUNCHES,...L.DIES].map(v=>v.id)).size,L.PUNCHES.length+L.DIES.length);
- assert.ok(L.PUNCHES.every(v=>v.source.supplier==='MECOS'&&v.source.url.startsWith('https://www.mecos.es/')));
+ assert.ok(L.PUNCHES.every(v=>v.source.supplier==='MECOS'&&/^https:\/\/(?:www\.)?mecos\.es\//.test(v.source.url)));
 });
 test('series V y alturas disponibles, sin inventar marca oficial',()=>{
  for(const v of [6,10,12,16,22,24,32,35,40,50]){

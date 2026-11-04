@@ -85,7 +85,7 @@ function svg(m,zoom,bounds){
  <rect width="200" height="67" rx="6" fill="#0d2b3e" stroke="#478b89"/>
  <path d="M18 38 H181 M129 39 V21 H161" stroke="#51ddb2" stroke-width="3" fill="none"/>
  <circle cx="129" cy="39" r="4" fill="#a6f8d7"/>
- <text x="12" y="15" fill="#c4ffe6" font-size="11">TOPE X · ${as2(m.stop.x)} mm</text>
+ <text x="12" y="15" fill="#c4ffe6" font-size="11">${m.stop.mode==='support'?'TOPE 2 SUPPORT':'TOPE 1 STOP'} · X ${as2(m.stop.x)} mm</text>
  <text x="12" y="56" fill="#c1dbea" font-size="9">${m.stop.travelling?'CHAPA FUERA · X → '+as2(m.stop.targetX)+' mm':'X FIJO DURANTE EL GOLPE'} · no a escala</text>
  </g>
  <text x="885" y="28" text-anchor="end" font-size="11" fill="#eac187">PERFIL CON RADIO · APROXIMACIÓN</text>
@@ -253,6 +253,7 @@ function render(){
    ['Ángulo',as2(m.signedAngle)+'°'],
    ['Orientación',m.requiresTurnover?'VOLTEO previo sin simular':'Montaje nominal'],
    ['Tope B'+m.bend,as2(m.stop.x)+' mm'+(m.stop.travelling?' → '+as2(m.stop.targetX)+' mm':'')+' · '+(m.stop.source==='por-pliegue'?'X particular':m.stop.source==='borde de pieza'?'Borde de pieza':'X general')+' · NO CNC'],
+   ['Tipo de dedo B'+m.bend,(m.stop.mode==='support'?'Tope 2 · Support':'Tope 1 · Stop')+' · '+(m.stop.modeSource==='por-pliegue'?'selección por B':'tipo general')+' · contorno nominal'],
    ['Distancia punta–pie trancha',setup.ramBottomOffset==null?'Desconocida':as2(setup.ramBottomOffset)+' mm introducidos'],
    ['Y geométrica',as2(motion?.punchY??m.punchTipY)+' mm · NO CNC'],
    ['Avisos nominales',String(m.interferences.problems.length)]

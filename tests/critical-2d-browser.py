@@ -188,5 +188,24 @@ with sync_playwright() as pw:
   assert page.locator('.p3-svg[data-p3-sheet-presented="true"]').count()==1
   assert page.locator('.p3-svg polygon[data-group="sheet"]').count()>0
   assert not errors,errors[-6:]
+  # Elegir Tope 1 o 2 por B, sin asociarlo incorrectamente a la posición del paso.
+  page.evaluate("PlegarApp.switchScreen('Programación 2D')")
+  page.locator('[data-ed-bend-stop="1"]').select_option('support')
+  page.locator('[data-ed-bend-stop="3"]').select_option('stop')
+  assert page.evaluate("PlegarEditor2D.getData().setup.backgaugeModeByBend[1]")=='support'
+  assert page.evaluate("PlegarEditor2D.getData().setup.backgaugeModeByBend[3]")=='stop'
+  typed=page.evaluate("""() => {
+   const p=PlegarEditor2D.getData(),original=PlegarFormingGeometry.scene(p,p.sequence.indexOf(2),0);
+   const general={...p,setup:{...p.setup,backgaugeModeByBend:[]}};
+   const fallback=PlegarFormingGeometry.scene(general,general.sequence.indexOf(2),0);
+   return {chosen:original.stop.mode,fallback:fallback.stop.mode,
+    real:JSON.stringify(PlegarMachineV85.geometry(original).finger),
+    generic:JSON.stringify(PlegarMachineV85.geometry(fallback).finger)};
+  }""")
+  assert typed['chosen']=='support' and typed['fallback']=='stop'
+  assert typed['real']!=typed['generic'],'El tipo por B debe modificar geometría del dedo real en el visor'
+  page.evaluate("PlegarEditor2D.setSequence([4,1,3,2])")
+  assert page.evaluate("PlegarFormingGeometry.scene(PlegarEditor2D.getData(),3,0).stop.mode")=='support'
+  assert not errors,errors[-6:]
   context.close()
  browser.close()

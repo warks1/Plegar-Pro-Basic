@@ -4,7 +4,8 @@ const CAD=require('../tool-cad.js'),UI=require('../tool-cad-ui.js'),L=require('.
 test('v127f: catálogo activo completo puede generar fichas CAD sin certificar herramientas',()=>{
  const all=CAD.all();
  assert.equal(all.length,L.PUNCHES.length+L.DIES.length);
- assert.ok(all.length>=237);
+ assert.equal(all.length,265,'El catálogo activo incorpora 94 punzones y 171 matrices, incluidas genéricas');
+ assert.ok(all.every(r=>r.geometryChecksPassed),'Ningún contorno debe presentar aristas nulas o autocruces');
  assert.equal(new Set(all.map(x=>x.id)).size,all.length);
  for(const item of all){
   assert.equal(item.verified,false);

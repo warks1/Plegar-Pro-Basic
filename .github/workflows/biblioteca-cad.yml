@@ -1,0 +1,41 @@
+name: Plegar Pro Plus - biblioteca CAD reconstruida
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'tool-cad.js'
+      - 'toolprofiles2d.js'
+      - 'tool-library.js'
+      - 'manufacturer-tooling-data.js'
+      - 'tools/generate-tool-cad.cjs'
+      - 'tests/tool-cad-dynamic.test.cjs'
+      - '.github/workflows/biblioteca-cad.yml'
+permissions:
+  contents: read
+jobs:
+  cad:
+    name: CAD orientativo (NO CNC)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Comprobar perfiles y procedencia de cotas
+        run: node --test tests/tool-cad-dynamic.test.cjs
+      - name: Generar todas las fichas DXF SVG JSON
+        run: |
+          node tools/generate-tool-cad.cjs
+          test "$(find herramientas-cad -name '*.dxf' | wc -l)" -eq 265
+          test "$(find herramientas-cad -name '*.svg' | wc -l)" -eq 265
+          test "$(find herramientas-cad -name '*.json' | wc -l)" -eq 265
+      - name: Empaquetar los 265 perfiles sin alterar la web
+        run: tar -czf Plegar-Pro-CAD-Reconstruido-NO-CNC.tar.gz herramientas-cad
+      - name: Publicar paquete descargable entre los artefactos de GitHub
+        uses: actions/upload-artifact@v4
+        with:
+          name: Plegar-Pro-CAD-NO-CNC
+          path: Plegar-Pro-CAD-Reconstruido-NO-CNC.tar.gz
+          retention-days: 30
+          if-no-files-found: error

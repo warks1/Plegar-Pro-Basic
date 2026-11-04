@@ -124,7 +124,7 @@
    const notch=flat>0?[pt(-half,0),pt(-flat/2,cut),pt(flat/2,cut),pt(half,0)]:[pt(-half,0),pt(0,cut),pt(half,0)];
    const channel=shoulder?[...shoulder.leftArc,...notch.slice(1,-1),...shoulder.rightArc]:notch;
    const outline=[pt(-body/2,0),...channel,pt(body/2,0)];
-   if(d.footWidth){const foot=d.footWidth/2,y=Math.max(0,d.height-10);outline.push(pt(body/2,y),pt(foot,y),pt(foot,d.height),pt(-foot,d.height),pt(-foot,y),pt(-body/2,y));}
+   if(d.footWidth&&d.footWidth<body-1e-8){const foot=d.footWidth/2,y=Math.max(0,d.height-10);outline.push(pt(body/2,y),pt(foot,y),pt(foot,d.height),pt(-foot,d.height),pt(-foot,y),pt(-body/2,y));}
    else outline.push(pt(body/2,d.height),pt(-body/2,d.height));
    return {outline,opening:v,depth:cut,shoulders:shoulder,shoulderRadius:d.shoulderRadius||null,geometry:'bloque AMADA con canal V reconstruido desde cotas',
     model:'sección extruida · sin CAD',verified:false,source:d.source,

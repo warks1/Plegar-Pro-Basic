@@ -42,7 +42,7 @@ function svg(m,zoom,bounds){
  const wholePaths=(sheetPresented?[...m.assembly.left.items,...m.assembly.right.items]:[]).map(v=>`<line x1="${v.from.x}" y1="${v.from.y}" x2="${v.to.x}" y2="${v.to.y}" stroke="${v.status==='realizado'?'#fea478':'#71b5ed'}" stroke-width="${m.thickness}" stroke-dasharray="${v.status==='realizado'?'2 1.4':'none'}" stroke-linecap="round"/>`).join('');
  const hingeLabels=(sheetPresented?m.assembly.hinges:[]).map(v=>`<circle cx="${v.point.x}" cy="${v.point.y}" r="1.1" fill="${v.status==='realizado'?'#ffc37f':'#a1cceb'}"/>`).join('');
  const bodies=machineOutlines(m);
- const scan=Section.inspect(m,bodies),hit=new Set(scan.hits.filter(x=>!x.expectedContact).map(x=>x.id));
+ const scan=Section.inspect(m,bodies),hit=new Set(sheetPresented?scan.hits.filter(x=>!x.expectedContact).map(x=>x.id):[]);
  const overlap=m.interferences.problems.length>0;
  const warn=m.warnings.length?'#efb06e':'#59ceff';
  return `<svg class="f2d-svg" viewBox="0 0 900 480" role="img" aria-label="Vista lateral esquemática de punzón, matriz y chapa con zona curva tangente. No es una simulación física ni una verificación de colisiones.">

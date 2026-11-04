@@ -31,6 +31,7 @@
   if(!Number.isInteger(orderIndex)||orderIndex<0||orderIndex>=piece.sequence.length)throw new Error('Paso de secuencia fuera de rango.');
   if(!Number.isFinite(progress)||progress<0||progress>1)throw new Error('Progreso de reproducción entre 0 y 1.');
   const bend=piece.sequence[orderIndex];
+  const backgaugeMode=setup.backgaugeModeByBend?.[bend-1]??setup.backgaugeMode;
   const die=C.DIES.find(d=>d.id===setup.die),punch=C.PUNCHES.find(p=>p.id===setup.punch);
   const turn=piece.angles[bend-1],angle=Math.abs(turn)*progress,beta=rad(angle/2);
   const half=die.opening/2,left=piece.segments[bend-1],right=piece.segments[bend];
@@ -97,11 +98,11 @@
    tangentLeft,tangentRight,centerline,shoulderContacts:support?{left:support.left,right:support.right}:null,dieOpening:die.opening,dieDepth,
    punchAngle:punch.angle,punchNose:punch.nose,punchHeight:punch.height,dieAngle:die.angle,dieHeight:setup.dieHeight??die.height,thickness:t,
    insideRadius:setup.radius,centreRadius:R,tangentSetback,tangentX,
-   machineSetup:{machineId:setup.machineId,backgaugeMode:setup.backgaugeMode,dieHeight:setup.dieHeight??die.height??null,tableLeft:setup.tableLeft,tableRight:setup.tableRight,ramWidth:setup.ramWidth,ramBottomOffset:setup.ramBottomOffset},
+   machineSetup:{machineId:setup.machineId,backgaugeMode,dieHeight:setup.dieHeight??die.height??null,tableLeft:setup.tableLeft,tableRight:setup.tableRight,ramWidth:setup.ramWidth,ramBottomOffset:setup.ramBottomOffset},
    punchCatalogTool:punch,dieCatalogTool:die,
    // 'depth' is nominal centreline descent from its START position, not CNC Y.
    depth:round(cy+t/2),punchTipY:round(cy-t/2),shoulderY,
-   stop:{x:gauge.x,bend,
+   stop:{x:gauge.x,bend,mode:backgaugeMode,modeSource:setup.backgaugeModeByBend?.[bend-1]!=null?'por-pliegue':'general',
     source:gauge.source,
     y:round(-t/2),width:Math.max(2,t),top:round(-t/2-12),bottom:round(-t/2+4)},warnings,
    note:'El signo (+/−) corresponde al PLANO final. Sobre la V se representa el golpe de prensa con punzón superior y alas elevándose; para -90° se supone un VOLTEO ANTERIOR que NO se ha simulado. No se conocen agarres, cambios de apoyo o trayectoria real. NO CNC ni colisiones verificadas.'

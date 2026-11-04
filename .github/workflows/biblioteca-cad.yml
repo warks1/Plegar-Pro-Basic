@@ -30,12 +30,10 @@ jobs:
           test "$(find herramientas-cad -name '*.dxf' | wc -l)" -eq 265
           test "$(find herramientas-cad -name '*.svg' | wc -l)" -eq 265
           test "$(find herramientas-cad -name '*.json' | wc -l)" -eq 265
-      - name: Empaquetar los 265 perfiles sin alterar la web
-        run: tar -czf Plegar-Pro-CAD-Reconstruido-NO-CNC.tar.gz herramientas-cad
-      - name: Publicar paquete descargable entre los artefactos de GitHub
+      - name: Publicar un único ZIP accesible con todas las fichas CAD
         uses: actions/upload-artifact@v4
         with:
           name: Plegar-Pro-CAD-NO-CNC
-          path: Plegar-Pro-CAD-Reconstruido-NO-CNC.tar.gz
+          path: herramientas-cad/
           retention-days: 30
           if-no-files-found: error

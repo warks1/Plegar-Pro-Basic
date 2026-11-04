@@ -57,8 +57,20 @@
   if(!['generic','trumpf-v85'].includes(machineId))throw Error('Máquina desconocida.');
   const backgaugeMode=s.backgaugeMode||'stop';
   if(!['stop','support'].includes(backgaugeMode))throw Error('Modo de tope desconocido.');
+  // Tipo de dedo por identidad de pliegue B, NO por paso de la secuencia.
+  // null significa heredar el tipo general (Stop o Support).
+  let backgaugeModeByBend;
+  if(s.backgaugeModeByBend!=null){
+   if(!Array.isArray(s.backgaugeModeByBend)||s.backgaugeModeByBend.length>23)
+    throw Error('Tabla del tipo de tope por pliegue inválida (máximo 23).');
+   backgaugeModeByBend=s.backgaugeModeByBend.map((mode,i)=>{
+    if(mode===null||mode==='')return null;
+    if(mode!=='stop'&&mode!=='support')throw Error('Tipo de tope B'+(i+1)+' desconocido.');
+    return mode;
+   });
+  }
   return {machineId,backgaugeMode,backgaugePositionMode,radius,kFactor,punch:s.punch,die:s.die,backgaugeX,dimensionBasis,dieHeight,tableLeft,tableRight,ramWidth,ramBottomOffset,
-   ...(backgaugeByBend?{backgaugeByBend}:{})};
+   ...(backgaugeByBend?{backgaugeByBend}:{}),...(backgaugeModeByBend?{backgaugeModeByBend}:{})};
  }
 
  // Valores orientativos de K para plegado a 90° en acero: tabla tipo DIN 6935

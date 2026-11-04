@@ -49,6 +49,13 @@
   scene.interferences=I.inspect(scene);
   // El tope móvil se comparte con herramientas 2D, malla 3D y cribado.
   // No desplazar la chapa para hacer coincidir artificialmente ambos bordes.
+  // Durante el traslado de X no se puede dejar la chapa del B siguiente
+  // visualmente atravesada por el tope. Representar la preparación CON LA
+  // PIEZA FUERA DEL ÁREA DE PLEGADO, sin inventar trayectoria de retirada.
+  // La inspección geométrica sigue referida a la hipótesis de chapa colocada.
+  scene.sheetPresented=!moving;
+  scene.sheetPresentation=moving?'retirada-nominal':'montada-nominal';
+  scene.sheetPositionValidated=false;
   scene.stop={...scene.stop,x,previousX:xPrevious,targetX:xTarget,
    travelRatio:hasTravel?ratio:1,travelling:moving,axisValidated:false};
   scene.interferences=I.inspect(scene);
@@ -61,12 +68,15 @@
   const physicalAxis=scene.turn<0?'Requiere volteo o recolocación de chapa no calculada':'Orientación de chapa nominal ilustrativa';
   const backgaugeMotion={fromX:xPrevious,toX:xTarget,x,progress:hasTravel?ratio:1,
    active:moving,required:hasTravel,axisValidated:false,completed:!moving,
-   note:'Desplazamiento X ilustrativo, sin aceleración/velocidad real ni contacto calibrado.'};
+   sheetPresented:!moving,physicalSheetTransferSimulated:false,
+   note:moving?
+    'Preparación: se representa la chapa retirada antes de mover X. NO se reproduce la extracción, agarre, volteo ni colocación posterior; el cribado con la chapa colocada no es aplicable al movimiento de X.':
+    'Desplazamiento X ilustrativo finalizado, sin aceleración/velocidad real ni contacto calibrado.'};
   return {cycle:t,phase,formingProgress,angle:scene.currentAngle,
    punchY:punchTipY,dieY:0,punchLift:lift,approachGap:gap,
    partMoved:formingProgress>0,partFormed:formingProgress>=1,
    scene,backgaugeMotion,notice:physicalAxis,
-   warning:'CINEMÁTICA ILUSTRATIVA: conserva los pliegues ya ejecutados en una pose nominal para el B activo. El movimiento real de retirada, volteo y recolocación entre golpes aún no está modelado. Sin servo real, fuerzas, recorrido verificado, seguridad CNC ni colisiones certificadas.'};
+   warning:'CINEMÁTICA ILUSTRATIVA: la chapa se oculta de la zona de máquina durante el traslado X, sin simular agarre ni recorrido físico de retirada. El movimiento real de retirada, volteo y recolocación entre golpes aún no está modelado. Sin servo real, fuerzas, recorrido verificado, seguridad CNC ni colisiones certificadas.'};
  }
  return {frame,phases:{backgaugeEnd:PREP_END,approachEnd:APPROACH,formingEnd:FORM_END}};
 });

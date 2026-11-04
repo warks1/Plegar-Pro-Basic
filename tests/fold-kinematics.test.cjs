@@ -62,7 +62,7 @@ test('all positions have finite mesh and punch coordinates',()=>{
  }
 });
 
-test('Omega 1→2→4→3 interpola X entre golpes sin mover la chapa',()=>{
+test('Omega 1→2→4→3 desplaza X con chapa retirada de la vista de máquina',()=>{
  const omega={...part,sequence:[1,2,4,3],setup:{...part.setup,
   backgaugeX:120,backgaugeByBend:[70,95,null,145]}};
  const X=[70,95,145,120];
@@ -74,7 +74,13 @@ test('Omega 1→2→4→3 interpola X entre golpes sin mover la chapa',()=>{
   eps(mid.scene.stop.x,(X[step-1]+X[step])/2);
   eps(end.scene.stop.x,X[step]);eps(bend.scene.stop.x,X[step]);
   assert.equal(mid.phase,'reposicionamiento X');assert.equal(mid.backgaugeMotion.active,true);
+  assert.equal(start.scene.sheetPresented,false);assert.equal(mid.scene.sheetPresented,false);
+  assert.equal(start.scene.sheetPresentation,'retirada-nominal');
+  assert.equal(mid.backgaugeMotion.sheetPresented,false);
+  assert.equal(mid.backgaugeMotion.physicalSheetTransferSimulated,false);
   assert.equal(end.phase,'aproximación');assert.equal(bend.phase,'plegado');
+  assert.equal(end.scene.sheetPresented,true);assert.equal(bend.scene.sheetPresented,true);
+  assert.equal(end.scene.sheetPresentation,'montada-nominal');
   eps(start.punchLift,start.approachGap);eps(mid.punchLift,mid.approachGap);
   eps(start.angle,0);eps(mid.angle,0);
   assert.deepEqual(build(start.scene).vertices,build(mid.scene).vertices);
@@ -88,6 +94,7 @@ test('No se inventa desplazamiento X si dos pliegues comparten el mismo tope',()
  const same={...part,sequence:[1,2,4,3],setup:{...part.setup,backgaugeX:120,backgaugeByBend:[80,80,80,80]}};
  const q=K.frame(same,1,.06);
  assert.equal(q.phase,'aproximación');assert.equal(q.scene.stop.travelling,false);
+ assert.equal(q.scene.sheetPresented,true);
  eps(q.scene.stop.x,80);assert.equal(q.backgaugeMotion.required,false);
 });
 test('Interpolar no desplaza ni altera las posiciones de tope guardadas por B',()=>{

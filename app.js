@@ -143,7 +143,7 @@ function renderModule(name){
    const el=$('#module-sample');
    el.classList.remove('module-editor','module-forming','module-piece3d');
    el.innerHTML='<section class="mecos-source-card" aria-label="Fuente y revisión semanal del catálogo MECOS"><div><span class="mecos-source-kicker">FUENTE PRINCIPAL · PUNZONES Y MATRICES</span><h2>Catálogo de utillaje MECOS</h2><p>Los punzones seleccionables del programa proceden de las páginas del catálogo MECOS aportadas. Se conserva el fabricante impreso en cada referencia. Consulta los dibujos originales y las cotas de tus fotografías junto a la sección que usa el simulador.</p><small>La lectura de dibujos escaneados puede ser ambigua: las cotas nuevas se revisan antes de entrar en la simulación.</small></div><a href="https://www.mecos.es/files/productos/utillaje-plegadora/MECOS-Catalogo-General-de-Utillaje-2022.pdf" target="_blank" rel="noopener noreferrer">Abrir catálogo MECOS ↗</a></section>'+
-    '<div class="catalog-quick-3d"><strong>VISOR 3D INTERACTIVO DE PUNZONES Y MATRICES</strong><p>Selecciona una referencia de las fotografías y gira o voltea su modelo con los dedos. Las siluetas incompletas son reconstrucciones, NO CAD oficial.</p><label>Referencia de utillaje<select data-tool3d-picker>'+[...lib.PUNCHES,...lib.DIES].filter(t=>t.kind==='punch'||t.kind==='die').map(t=>'<option value="'+escapeHtml(t.id)+'">'+escapeHtml(t.name)+'</option>').join('')+'</select></label><button class="catalog-view3d-action" type="button" data-tool3d-quick>Girar y voltear herramienta en 3D</button></div>'+
+    '<div class="catalog-quick-3d"><strong>VISOR 3D INTERACTIVO DE PUNZONES Y MATRICES</strong><p>Selecciona una referencia de las fotografías y gira o voltea su modelo con los dedos. Las siluetas incompletas son reconstrucciones, NO CAD oficial.</p><label>Referencia de utillaje<select data-tool3d-picker>'+[...lib.PUNCHES,...lib.DIES].filter(t=>t.kind==='punch'||t.kind==='die').map(t=>'<option value="'+escapeHtml(t.id)+'">'+escapeHtml(t.name)+'</option>').join('')+'</select></label><button class="catalog-view3d-action" type="button" data-tool3d-quick>Girar y voltear herramienta en 3D</button><button type="button" class="catalog-export-cad" data-tool-cad-quick>Plano CAD reconstruido · DXF/SVG/JSON</button></div>'+
     window.PlegarCatalogToolView.gallery()+
     '<div id="tool-dxf-panel" aria-label="Importar perfiles reales DXF de utillaje"></div>'+
     
@@ -151,7 +151,7 @@ function renderModule(name){
     '<p>Incluye las cotas legibles de las páginas MECOS WILA–TRUMPF 45–55, AMADA–PROMECAM 13–41 y adaptadores 4/82 fotografiadas. Selecciona un punzón o matriz para cargarlo en el programa y verlo en Simulación 2D/3D. Los útiles con geometría insuficientemente acotada quedan como ficha documental. Las siluetas reconstruidas no son CAD del fabricante ni validación de colisiones.</p>'+
     '<label class="catalog-search">Buscar referencia, V, altura o fabricante<input type="search" data-catalog-search placeholder="Ejemplo: 22.312, V16, H74…"></label><p data-catalog-count role="status"></p><div class="module-tiles">'+[...lib.PUNCHES,...lib.DIES,...(lib.ACCESSORIES||[])].map(tool=>
      '<div class="module-tile" data-catalog-tool="'+escapeHtml(tool.id)+'">'+window.PlegarCatalogToolView.cardArt(tool)+'<strong>'+escapeHtml(tool.name)+'</strong><p>'+escapeHtml(lib.details(tool))+
-     '</p>'+(tool.kind==='punch'||tool.kind==='die'?'<button type="button" class="catalog-view3d-action" data-tool3d-open="'+escapeHtml(tool.id)+'">Girar / voltear 3D · '+escapeHtml(tool.code||tool.id)+'</button><button type="button" data-tool-set="'+tool.kind+':'+tool.id+'">Cargar '+(tool.kind==='die'?'matriz':'punzón')+' en el programa</button>':'<small>Referencia de catálogo · cotas/contorno insuficientes para simular</small>')+'</div>').join('')+'</div></details><details><summary>Otras familias documentales · esquemas genéricos</summary><div id="manufacturer-catalog" aria-label="Familias documentales"></div></details>';
+     '</p>'+(tool.kind==='punch'||tool.kind==='die'?'<button type="button" class="catalog-view3d-action" data-tool3d-open="'+escapeHtml(tool.id)+'">Girar / voltear 3D · '+escapeHtml(tool.code||tool.id)+'</button><button type="button" class="catalog-export-cad" data-tool-cad-open="'+escapeHtml(tool.id)+'">Plano acotado · DXF / SVG / JSON</button><button type="button" data-tool-set="'+tool.kind+':'+tool.id+'">Cargar '+(tool.kind==='die'?'matriz':'punzón')+' en el programa</button>':'<small>Referencia de catálogo · cotas/contorno insuficientes para simular</small>')+'</div>').join('')+'</div></details><details><summary>Otras familias documentales · esquemas genéricos</summary><div id="manufacturer-catalog" aria-label="Familias documentales"></div></details>';
    window.PlegarToolDXF?.mount($('#tool-dxf-panel'));
    catalog.mount($('#manufacturer-catalog'));
    window.PlegarCatalogToolView.mount(el);
@@ -254,6 +254,16 @@ document.addEventListener('click',event=>{
   const tool=[...(lib?.PUNCHES||[]),...(lib?.DIES||[])].find(t=>t.id===id);
   if(!tool){toast('Referencia 3D no encontrada.');return;}
   try{window.PlegarToolViewer3D.open(tool);}catch(e){toast('No se pudo abrir el 3D: '+e.message);}
+  return;
+ }
+ const cadButton=event.target.closest('[data-tool-cad-open],[data-tool-cad-quick]');
+ if(cadButton){
+  const id=cadButton.dataset.toolCadOpen||document.querySelector('[data-tool3d-picker]')?.value;
+  const lib=window.PlegarToolLibrary;
+  const tool=[...(lib?.PUNCHES||[]),...(lib?.DIES||[])].find(t=>t.id===id);
+  if(!tool){toast('No se encuentra la referencia CAD.');return;}
+  try{window.PlegarToolCADUI.open(tool);}
+  catch(error){toast('No se pudo generar el plano reconstruido: '+error.message);}
   return;
  }
  const chosenTool=event.target.closest('[data-tool-set]');

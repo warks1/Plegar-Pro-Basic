@@ -46,6 +46,27 @@ test('cambio de ancho, matriz, paso y posición respeta dimensiones y fases',()=
  assert.equal(a.rows[2].angle,K.frame(part,2,.5).angle);
  assert.ok(Number.isFinite(c.rows[2].minimum.mm));
 });
+test('durante traslado X el barrido NO calcula falsas colisiones con chapa retirada',()=>{
+ const moving={...part,sequence:[1,2,4,3],setup:{...part.setup,backgaugeX:120,
+  backgaugePositionMode:'manual',backgaugeByBend:[70,95,120,145]}};
+ const scan=S.sample(moving,1,120,{intervals:24});
+ assert.ok(scan.preparationSamples>=2);
+ for(const row of scan.rows){
+  if(row.t<.12){
+   assert.equal(row.sheetPresented,false);
+   assert.equal(row.minimum,null);
+   assert.equal(row.checkedPairs,0);
+   assert.equal(row.evaluatedSegments,0);
+   assert.match(row.status,/no evaluable/);
+  }else{
+   assert.equal(row.sheetPresented,true);
+  }
+ }
+ assert.ok(scan.evaluatedSegments>0,'El barrido debe volver a calcular después de recolocar nominalmente');
+ assert.equal(scan.checkedPairs,scan.rows.reduce((sum,row)=>sum+row.checkedPairs,0));
+ assert.ok(scan.minimum&&scan.minimum.percent>=12);
+ assert.equal(scan.cncApproved,false);
+});
 test('parámetros fuera de rango provocan errores',()=>{
  for(const intervals of [0,3,65,8.5,NaN])assert.throws(()=>S.sample(part,1,100,{intervals}),/intervalos/);
  for(const nearMm of [-1,Infinity,1001])assert.throws(()=>S.sample(part,1,100,{nearMm}),/Umbral/);

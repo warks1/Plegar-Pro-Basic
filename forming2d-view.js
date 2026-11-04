@@ -38,8 +38,9 @@ function svg(m,zoom,bounds){
  const dimension=-Math.min(18,m.dieOpening*1.15)-m.thickness;
  const line=m.centerline.map((p,i)=>`${i?'L':'M'}${p.x.toFixed(3)} ${p.y.toFixed(3)}`).join(' ');
  const punchOutline=m.toolProfiles.punch.outline.map((p,i)=>`${i?'L':'M'}${p.x.toFixed(3)} ${p.y.toFixed(3)}`).join(' ')+' Z';
- const wholePaths=[...m.assembly.left.items,...m.assembly.right.items].map(v=>`<line x1="${v.from.x}" y1="${v.from.y}" x2="${v.to.x}" y2="${v.to.y}" stroke="${v.status==='realizado'?'#fea478':'#71b5ed'}" stroke-width="${m.thickness}" stroke-dasharray="${v.status==='realizado'?'2 1.4':'none'}" stroke-linecap="round"/>`).join('');
- const hingeLabels=m.assembly.hinges.map(v=>`<circle cx="${v.point.x}" cy="${v.point.y}" r="1.1" fill="${v.status==='realizado'?'#ffc37f':'#a1cceb'}"/>`).join('');
+ const sheetPresented=m.sheetPresented!==false;
+ const wholePaths=(sheetPresented?[...m.assembly.left.items,...m.assembly.right.items]:[]).map(v=>`<line x1="${v.from.x}" y1="${v.from.y}" x2="${v.to.x}" y2="${v.to.y}" stroke="${v.status==='realizado'?'#fea478':'#71b5ed'}" stroke-width="${m.thickness}" stroke-dasharray="${v.status==='realizado'?'2 1.4':'none'}" stroke-linecap="round"/>`).join('');
+ const hingeLabels=(sheetPresented?m.assembly.hinges:[]).map(v=>`<circle cx="${v.point.x}" cy="${v.point.y}" r="1.1" fill="${v.status==='realizado'?'#ffc37f':'#a1cceb'}"/>`).join('');
  const bodies=machineOutlines(m);
  const scan=Section.inspect(m,bodies),hit=new Set(scan.hits.filter(x=>!x.expectedContact).map(x=>x.id));
  const overlap=m.interferences.problems.length>0;
@@ -64,12 +65,12 @@ function svg(m,zoom,bounds){
  <path data-component="topes" d="${path(bodies.finger)}" fill="#50e4a7" stroke="#d0ffe7" stroke-width="1"/>
  ${wholePaths}
  ${hingeLabels}
- <path d="${line}" stroke="#081526" stroke-width="${m.thickness+1.6}" fill="none" stroke-linejoin="round" stroke-linecap="round"/>
- <path data-component="chapa" d="${line}" stroke="url(#f2d-sheet)" stroke-width="${m.thickness}" fill="none" stroke-linejoin="round" stroke-linecap="round"/>
+ ${sheetPresented?'<path d="'+line+'" stroke="#081526" stroke-width="'+(m.thickness+1.6)+'" fill="none" stroke-linejoin="round" stroke-linecap="round"/>':''}
+ ${sheetPresented?'<path data-component="chapa" d="'+line+'" stroke="url(#f2d-sheet)" stroke-width="'+m.thickness+'" fill="none" stroke-linejoin="round" stroke-linecap="round"/>':''}
  <g stroke="#f8bf56" stroke-width=".6" fill="#f8bf56"><circle cx="${-half}" cy="0" r=".9"/><circle cx="${half}" cy="0" r=".9"/></g>
  <circle data-component="contacto-punta" cx="0" cy="${m.punchTipY}" r="1.3" fill="${m.punchContact?.state==='contacto geométrico nominal'?'#5cffb1':'#ffb754'}"/>
  ${m.stop.travelling?'<line data-component="recorrido-tope" x1="'+m.stop.previousX+'" y1="'+(m.stop.top-4)+'" x2="'+m.stop.targetX+'" y2="'+(m.stop.top-4)+'" stroke="#ffe38e" stroke-width=".9" stroke-dasharray="3 2"/>':''}
- <line data-component="separacion-tope" x1="${m.wingRight.x}" y1="${m.wingRight.y}" x2="${m.stop.x}" y2="${m.wingRight.y}" stroke="#ebd48e" stroke-width=".7" stroke-dasharray="2 2" aria-label="Proyección horizontal del extremo de chapa al tope"/>
+ ${sheetPresented?'<line data-component="separacion-tope" x1="'+m.wingRight.x+'" y1="'+m.wingRight.y+'" x2="'+m.stop.x+'" y2="'+m.wingRight.y+'" stroke="#ebd48e" stroke-width=".7" stroke-dasharray="2 2" aria-label="Proyección horizontal del extremo de chapa al tope"/>':''}
  <text x="${m.stop.x+5}" y="${m.stop.top-9}" font-size="5" fill="#cbffe6">TOPE X</text>
  <text x="${-Math.max(20,m.dieOpening*1.2)}" y="${m.toolProfiles.punch.outline[0].y-12}" font-size="5" fill="#d6efff">AMARRE · ILUSTRATIVO</text>
  <path d="M ${-half} ${dimension} V ${dimension-3} M ${half} ${dimension} V ${dimension-3} M ${-half} ${dimension-1.5} H ${half}" stroke="#67bce9" stroke-width=".6" fill="none" stroke-dasharray="1.5 1"/>
@@ -85,13 +86,13 @@ function svg(m,zoom,bounds){
  <path d="M18 38 H181 M129 39 V21 H161" stroke="#51ddb2" stroke-width="3" fill="none"/>
  <circle cx="129" cy="39" r="4" fill="#a6f8d7"/>
  <text x="12" y="15" fill="#c4ffe6" font-size="11">TOPE X · ${as2(m.stop.x)} mm</text>
- <text x="12" y="56" fill="#c1dbea" font-size="9">${m.stop.travelling?'MOVIENDO HACIA X '+as2(m.stop.targetX)+' mm':'X FIJO DURANTE EL GOLPE'} · no a escala</text>
+ <text x="12" y="56" fill="#c1dbea" font-size="9">${m.stop.travelling?'CHAPA FUERA · X → '+as2(m.stop.targetX)+' mm':'X FIJO DURANTE EL GOLPE'} · no a escala</text>
  </g>
  <text x="885" y="28" text-anchor="end" font-size="11" fill="#eac187">PERFIL CON RADIO · APROXIMACIÓN</text>
- <text x="885" y="434" text-anchor="end" font-size="11" fill="${overlap?'#ff927b':warn}">Cribado 2D: ${html(m.interferences.status)}</text>
+ <text x="885" y="434" text-anchor="end" font-size="11" fill="${sheetPresented?(overlap?'#ff927b':warn):'#ffdc9c'}">${sheetPresented?'Cribado 2D: '+html(m.interferences.status):'PREPARACIÓN X · CHAPA FUERA DEL ÁREA · NO EVALUABLE'}</text>
  <text x="885" y="450" text-anchor="end" font-size="11" fill="${warn}">Descenso estimado del eje: ${as2(m.depth)} mm</text>
- <text x="15" y="433" font-size="11" fill="${m.interferences.backgaugeGap===null?'#ffd29e':m.interferences.backgaugeGap>0.05?'#ffd29e':m.interferences.backgaugeGap<-.05?'#ff9d9d':'#acffdd'}">TOPE X · ${html(m.interferences.backgaugeState.toUpperCase())} · ${(m.interferences.backgaugeGap==null?'—':as2(m.interferences.backgaugeGap))} mm en proyección</text>
- <text x="15" y="455" font-size="11" fill="#c8d5df">Trancha gris · Punzón acero · Chapa azul · Matriz granate · Mesa violeta · Topes verdes.</text>
+ <text x="15" y="433" font-size="11" fill="${!sheetPresented?'#ffe29a':m.interferences.backgaugeGap===null?'#ffd29e':m.interferences.backgaugeGap>0.05?'#ffd29e':m.interferences.backgaugeGap<-.05?'#ff9d9d':'#acffdd'}">${sheetPresented?'TOPE X · '+html(m.interferences.backgaugeState.toUpperCase())+' · '+(m.interferences.backgaugeGap==null?'—':as2(m.interferences.backgaugeGap))+' mm en proyección':'CHAPA RETIRADA NOMINALMENTE · SIN CONTACTO CON TOPE EN PREPARACIÓN X'}</text>
+ <text x="15" y="455" font-size="11" fill="#c8d5df">${sheetPresented?'Trancha gris · Punzón acero · Chapa azul · Matriz granate · Mesa violeta · Topes verdes.':'Movimiento X ilustrativo con chapa fuera de la V; retirada y recolocación reales NO simuladas.'}</text>
  <text x="15" y="471" font-size="10" fill="#ffd49e">Mesa / trancha ${bodies.v85?'V85 · sección reconstruida · montaje '+(bodies.v85.mountingAssumed?'supuesto':'introducido'):bodies.tableMeasured&&bodies.ramMeasured?'con cotas introducidas':'PARCIALMENTE SIN COTAS · esquemas'} · NO CNC</text>
  </svg>`;
 }

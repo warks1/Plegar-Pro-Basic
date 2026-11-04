@@ -20,8 +20,17 @@
   // K.frame and M.build also validate part/step/tool selection and width.
   const rows=[];let min=null,earliest=null,totalPairs=0;
   for(let i=0;i<=intervals;i++){
-   const time=i/intervals,f=K.frame(profile,step,time),sheet=M.build(f.scene,width),r=P.inspect(sheet,f.scene,{nearMm});
-   const item={t:time,percent:Math.round(time*1000)/10,phase:f.phase,angle:f.angle,
+   const time=i/intervals,f=K.frame(profile,step,time);
+   // La chapa no se encuentra en la V cuando se desplaza el tope X entre B.
+   // No evaluar como colisión una pieza virtual que se ha retirado de la escena.
+   if(f.scene.sheetPresented===false){
+    rows.push({t:time,percent:Math.round(time*1000)/10,phase:f.phase,angle:f.angle,
+     minimum:null,evaluatedSegments:0,checkedPairs:0,sheetPresented:false,
+     status:'preparación X: chapa fuera de máquina, no evaluable'});
+    continue;
+   }
+   const sheet=M.build(f.scene,width),r=P.inspect(sheet,f.scene,{nearMm});
+   const item={t:time,percent:Math.round(time*1000)/10,phase:f.phase,angle:f.angle,sheetPresented:true,
     minimum:r.minimum?{mm:r.minimum.mm,segment:r.minimum.segment,tool:r.minimum.tool}:null,
     evaluatedSegments:r.evaluatedSegments,checkedPairs:r.checkedPairs,
     status:!r.minimum?'no evaluable':r.minimum.mm<=1e-9?'solapamiento nominal':r.minimum.mm<nearMm?'proximidad nominal':'separado en muestras'};
@@ -29,13 +38,14 @@
    if(item.minimum && (!min||item.minimum.mm<min.mm-1e-9))min={...item.minimum,t:time,percent:item.percent,phase:item.phase};
    if(!earliest && item.minimum && item.minimum.mm<nearMm)earliest={...item.minimum,t:time,percent:item.percent,phase:item.phase};
   }
-  const count=rows[0].evaluatedSegments;
+  const count=Math.max(0,...rows.map(r=>r.evaluatedSegments));
+  const preparationSamples=rows.filter(r=>r.sheetPresented===false).length;
   return {model:'muestreo_prismas_nominales_v0.26',step:step+1,bend:profile.sequence[step],width,
-   intervals,frames:rows.length,nearMm,checkedPairs:totalPairs,evaluatedSegments:count,
+   intervals,frames:rows.length,nearMm,checkedPairs:totalPairs,evaluatedSegments:count,preparationSamples,
    minimum:min,firstNear:earliest,rows,
    verdict:count===0?'No hay alas previas representables en este paso':min?.mm<=1e-9?'Posible solapamiento en alguna muestra':min&&min.mm<nearMm?'Proximidad en alguna muestra':'Sin proximidad en muestras evaluables (NO garantiza seguridad)',
    safetyApproved:false,cncApproved:false,manufacturerGeometryVerified:false,continuousSweep:false,
-   note:NOTE};
+   note:NOTE+' Los instantes de traslado X con chapa retirada se excluyen del cribado; la retirada y recolocación físicas NO se simulan.'};
  }
  function at(report,cycle){
   if(!Array.isArray(report?.rows)||!report.rows.length||!Number.isFinite(cycle)||cycle<0||cycle>1)throw new Error('Informe o posición de ciclo inválidos.');

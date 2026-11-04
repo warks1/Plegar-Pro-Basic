@@ -140,6 +140,27 @@ with sync_playwright() as pw:
   assert rotated!=flipped,'Rotar no cambia el sólido 3D'
   page.locator('[data-tool3d="close"]').click()
   assert page.locator('.tool3d-dialog').count()==0
+  # Exportación CAD v127f: cada referencia tiene SVG/DXF/JSON con supuestos visibles.
+  assert page.locator('[data-tool-cad-quick]').is_visible()
+  page.locator('[data-tool-cad-quick]').click()
+  assert page.locator('.toolcad-dialog').count()==1
+  assert page.locator('.toolcad-preview svg').count()==1
+  assert 'PENDIENTE DE VERIFICACIÓN' in page.locator('.toolcad-warning').inner_text()
+  assert 'NO CNC' in page.locator('.toolcad-preview').inner_text()
+  assert page.locator('[data-cad-format]').count()==3
+  generated=page.evaluate("""() => {
+   const item=PlegarToolLibrary.get('punch','wila-p-15.700');
+   const rec=PlegarToolCAD.build(item);
+   return {id:rec.id,verified:rec.verified,approved:rec.approvedForCNC,
+    assumed:rec.assumedCount,dxflen:PlegarToolCAD.dxf(rec).length,
+    svglen:PlegarToolCAD.svg(rec).length,json:JSON.parse(PlegarToolCADUI.contents(rec,'json').body).id};
+  }""")
+  assert generated['id']=='wila-p-15.700'
+  assert generated['json']==generated['id']
+  assert generated['verified']==False and generated['approved']==False
+  assert generated['assumed']>0 and generated['dxflen']>500 and generated['svglen']>300
+  page.locator('[data-cad-close]').click()
+  assert page.locator('.toolcad-dialog').count()==0
   assert not errors,errors[-6:]
   context.close()
  browser.close()

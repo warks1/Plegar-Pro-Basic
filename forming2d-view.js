@@ -183,7 +183,11 @@ function render(){
   ctl.sectionSweepKey=sweepKey;
  }
  if(zones&&ctl.showFinal)zones.innerHTML='<strong>PIEZA FINAL DEL PLANO</strong><p>Referencia de la geometría objetivo con todos los pliegues. La orientación de la chapa en la máquina y sus volteos siguen sin calcularse. NO CNC.</p>';
- if(zones&&!ctl.showFinal){
+ if(zones&&!ctl.showFinal&&m.sheetPresented===false){
+  zones.innerHTML='<strong>PREPARACIÓN X · CHAPA FUERA DEL ÁREA DE TRABAJO</strong>'+
+   '<p>Se representa únicamente el desplazamiento ilustrativo del tope. La chapa no está montada; los cruces de chapa con útiles y tope NO son evaluables en esta fase. No se ha modelado la retirada ni el posterior amarre. NO CNC.</p>';
+ }
+ if(zones&&!ctl.showFinal&&m.sheetPresented!==false){
   const checked=proximity.checked.map(part=>'<span class="f2-zone'+(part.possibleOverlap?' f2-zone-near':'')+
    '" title="Modelo 2D nominal; no es plano CAD verificado">'+part.name+' · '+
    (part.distanceMm===null?'sin tramo analizable':part.possibleOverlap?(part.expectedContact?'contacto previsto o posible solape':'posible cruce 2D'):part.distanceMm.toFixed(1)+' mm aprox.')+'</span>').join('');
@@ -227,17 +231,19 @@ function render(){
  }
  const fb=ctl.host.querySelector('[data-f2-action="focus"]');if(fb){fb.setAttribute('aria-pressed',String(ctl.focus));fb.textContent=ctl.focus?'◱ Vista completa':'⌕ Detalle del pliegue';}
  ctl.host.querySelector('.f2-cycle-state').textContent=ctl.showFinal?'FIN DEL PROGRAMA · Pieza objetivo desde el plano. No representa la última posición de la prensa ni verifica colisiones.':motion
-  ? `FASE: ${motion.phase.toUpperCase()} · ${motion.backgaugeMotion.active?'TOPE X '+as2(motion.backgaugeMotion.fromX)+' → '+as2(motion.backgaugeMotion.toX)+' mm · posición '+as2(m.stop.x)+' mm · ':''}Punzón Y nominal ${as2(motion.punchY)} mm · retirada ${as2(motion.punchLift)} mm. ${motion.notice}. Movimiento de ejes y recolocación reales NO calculados. NO CNC.`
+  ? `FASE: ${motion.phase.toUpperCase()} · ${motion.backgaugeMotion.active?'TOPE X '+as2(motion.backgaugeMotion.fromX)+' → '+as2(motion.backgaugeMotion.toX)+' mm · posición '+as2(m.stop.x)+' mm · ':''}Punzón Y nominal ${as2(motion.punchY)} mm · retirada ${as2(motion.punchLift)} mm. ${motion.notice}. ${motion.backgaugeMotion.active?'CHAPA FUERA DE LA V (retirada física no animada).':''} Movimiento de ejes y recolocación reales NO calculados. NO CNC.`
   : 'MODO CONFORMADO · avance angular sin aproximación ni retirada. Activa Ciclo completo para ver las tres fases.';
  if(m.requiresTurnover)ctl.host.querySelector('.f2-cycle-state').textContent+=' · B'+m.bend+' '+m.turn+'° exige VOLTEO PREVIO: retirada, giro y recolocación no simulados.'+
    (signedVisible?' SENTIDO FIRMADO ABAJO, NO CONTACTO EN LA V.':' GOLPE NOMINAL CON CHAPA PREVIAMENTE VOLTEADA.');
  ctl.host.querySelector('[data-f2-action="previous"]').disabled=ctl.currentStep===0;
  ctl.host.querySelector('[data-f2-action="next"]').disabled=ctl.currentStep>=order.length-1;
  const loopBox=ctl.host.querySelector('.f2-loop');if(loopBox)loopBox.checked=ctl.loop;
- ctl.host.querySelector('.f2-nominal').textContent=`Tope X ${as2(m.stop.x)} mm · borde nominal ${(m.interferences.backgaugeRearX==null?'sin borde a esta altura':as2(m.interferences.backgaugeRearX))} mm · ${m.interferences.backgaugeState.toUpperCase()} · distancia X ${(m.interferences.backgaugeGap==null?'—':as2(m.interferences.backgaugeGap))} mm. Comprobación de contornos representados; no valida el contacto físico.`;
- ctl.host.querySelector('.f2-nominal').dataset.status=m.interferences.problems.length?'warning':'info';
+ ctl.host.querySelector('.f2-nominal').textContent=m.sheetPresented===false?
+  'TOPE X MOVIÉNDOSE · X '+as2(m.stop.x)+' mm → '+as2(m.stop.targetX)+' mm. Chapa retirada de la zona de máquina; contacto y distancia de chapa NO EVALUABLES durante la preparación. Sin retirada física simulada.':
+  `Tope X ${as2(m.stop.x)} mm · borde nominal ${(m.interferences.backgaugeRearX==null?'sin borde a esta altura':as2(m.interferences.backgaugeRearX))} mm · ${m.interferences.backgaugeState.toUpperCase()} · distancia X ${(m.interferences.backgaugeGap==null?'—':as2(m.interferences.backgaugeGap))} mm. Comprobación de contornos representados; no valida el contacto físico.`;
+ ctl.host.querySelector('.f2-nominal').dataset.status=m.sheetPresented===false?'info':m.interferences.problems.length?'warning':'info';
  ctl.host.querySelector('.f2-prior-summary').textContent=`Perfil completo: ${m.assembly.contour.length} puntos · ${m.assembly.completed.length} pliegues previos · ${m.assembly.pending} pliegues pendientes. ${m.previous.paths.length?'Holguras 2D orientativas de alas contiguas: '+m.interferences.flangeClearances.map(v=>`${v.component} ${as2(v.gap)} mm`).join(' · '):'No hay alas previas contiguas comprobables en este paso.'}`;
- ctl.host.querySelector('.f2-notes').innerHTML=m.interferences.problems.map(p=>`<li><strong>${html(p.component)}:</strong> ${html(p.message)}</li>`).join('')+m.warnings.map(w=>`<li>${html(w)}</li>`).join('')+`<li>${html(m.interferences.disclosure)}</li><li>${html(m.note)}</li>`;
+ ctl.host.querySelector('.f2-notes').innerHTML=(m.sheetPresented===false?['<li>CHAPA FUERA DE MÁQUINA DURANTE TRASLADO X. Los informes de contacto son hipótesis de montaje, no alertas durante la retirada.</li>']:[]).join('')+m.interferences.problems.map(p=>`<li><strong>${html(p.component)}:</strong> ${html(p.message)}</li>`).join('')+m.warnings.map(w=>`<li>${html(w)}</li>`).join('')+`<li>${html(m.interferences.disclosure)}</li><li>${html(m.note)}</li>`;
  const pane=ctl.host.querySelector('.f2-data-values'),setup=data.setup||{};
  if(pane){
   const values=[

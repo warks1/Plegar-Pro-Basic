@@ -1,0 +1,17 @@
+/* v127f: accesibilidad y móvil, conserva el diseño de Inicio. */
+.skip-link{position:absolute;left:8px;top:-60px;z-index:10000;padding:10px 14px;background:#0b2235;color:#e7f1ff;border:2px solid #6ed5ff;border-radius:8px;font:600 14px/1.2 system-ui,sans-serif;text-decoration:none}
+.skip-link:focus{top:8px}
+:where(a,button,input,select,textarea,summary,[tabindex]:not([tabindex="-1"])):focus-visible{outline:2px solid #6ed5ff;outline-offset:2px}
+.module-view :is(small,label,option,time,kbd,.tab,.small-button,.inline-link,.status,.demo-overlay,.f2-step){font-size:max(11px,.7rem)}
+@media (pointer:coarse){
+ .module-view :is(button,select,summary,.small-button,.inline-link,.tab),
+ .module-view input:not([type=checkbox]):not([type=radio]):not([type=range]),
+ .mobile-bottom button{min-height:44px}
+ .module-view :is(button,.small-button){min-width:44px}
+ .icon-btn,.top-search input{min-height:44px}
+ .icon-btn{min-width:44px}
+}
+@media (prefers-reduced-motion:reduce){
+ *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
+}
+@media (max-width:1000px){.statusbar{gap:8px;padding:0 8px}.statusbar>div{min-width:0;overflow:hidden;text-overflow:ellipsis}}

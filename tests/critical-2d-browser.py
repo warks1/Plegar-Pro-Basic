@@ -162,5 +162,31 @@ with sync_playwright() as pw:
   page.locator('[data-cad-close]').click()
   assert page.locator('.toolcad-dialog').count()==0
   assert not errors,errors[-6:]
+  # El tope NUNCA debe verse atravesando la chapa durante la preparación X:
+  # la pieza se dibuja fuera de máquina, sin inventar una retirada física.
+  page.evaluate("""() => {
+   const p=PlegarEditor2D.getData();
+   PlegarEditor2D.loadProfile({...p,name:'Omega tope móvil',
+    segments:[60,85,120,85,60],angles:[90,90,90,90],sequence:[1,2,4,3],
+    setup:{...p.setup,backgaugePositionMode:'manual',backgaugeX:120,
+     backgaugeByBend:[70,95,120,145]}});
+  }""")
+  page.evaluate("PlegarApp.switchScreen('Simulación 2D')")
+  page.locator('[data-f2-action="next"]').click()
+  assert page.locator('.f2d-svg [data-component="topes"]').count()==1
+  assert page.locator('.f2d-svg [data-component="chapa"]').count()==0,'El tope X atraviesa la chapa dibujada durante su recorrido'
+  assert 'CHAPA RETIRADA' in page.locator('.f2d-svg').text_content()
+  assert 'NO EVALUABLE' in page.locator('.f2-nominal').inner_text()
+  page.locator('.f2-range').evaluate("(el)=>{el.value='12';el.dispatchEvent(new Event('input',{bubbles:true}));}")
+  assert page.locator('.f2d-svg [data-component="chapa"]').count()==1,'La chapa debe reaparecer al terminar la preparación'
+  page.evaluate("PlegarApp.switchScreen('Simulación 3D')")
+  page.locator('[data-p3-step="1"]').click()
+  assert page.locator('.p3-svg[data-p3-sheet-presented="false"]').count()==1
+  assert page.locator('.p3-svg polygon[data-group="sheet"]').count()==0,'El modelo 3D no debe dejar la chapa delante del tope móvil'
+  assert page.locator('.p3-svg polygon[data-group="gauge"]').count()>0
+  page.locator('.p3-progress').evaluate("(el)=>{el.value='12';el.dispatchEvent(new Event('input',{bubbles:true}));}")
+  assert page.locator('.p3-svg[data-p3-sheet-presented="true"]').count()==1
+  assert page.locator('.p3-svg polygon[data-group="sheet"]').count()>0
+  assert not errors,errors[-6:]
   context.close()
  browser.close()

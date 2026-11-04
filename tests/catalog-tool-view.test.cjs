@@ -63,7 +63,7 @@ test('La sección de pata de cabra tiene garganta cóncava y respeta H/R/ángulo
    'El perfil debe tener relieve cóncavo en su garganta');
 });
 
-test('Biblioteca de 237 referencias: render inicial paginado, ampliar y buscar sin perder fichas',()=>{
+test('Biblioteca MECOS: render inicial paginado, ampliar y buscar sin perder fichas al crecer catálogo',()=>{
  const cards=[...Data.PUNCHES,...Data.DIES].map(tool=>({textContent:tool.name+' '+tool.code+' '+tool.height,hidden:false}));
  const input={value:'',listeners:{},addEventListener(event,fn){this.listeners[event]=fn;}};
  const counter={textContent:''};
@@ -83,7 +83,7 @@ test('Biblioteca de 237 referencias: render inicial paginado, ampliar y buscar s
   assert.equal(cards.filter(card=>!card.hidden).length,72);
   input.value='15.670';input.listeners.input();
   assert.equal(cards.filter(card=>!card.hidden).length,1);
-  assert.match(counter.textContent,/237 referencias/);
+  assert.match(counter.textContent,new RegExp((Data.PUNCHES.length+Data.DIES.length)+' referencias'));
   assert.equal(more.hidden,true);
  }finally{global.document=prior;}
 });

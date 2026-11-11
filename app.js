@@ -7,7 +7,7 @@ const icon = name => `<svg aria-hidden="true"><use href="#i-${name}"/></svg>`;
 const escapeHtml = value => String(value).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const navGroups = [
   {title:'PRINCIPAL', items:[['Inicio','home','#168ef7'],['Proyectos','folder','#235dc2'],['Planos','folder','#1d9cbd'],['Programación 2D','ruler','#ec7b19'],['Programación 3D','box','#6530f5'],['Simulación 2D','box','#0eb2c9'],['Simulación 3D','box','#663be3'],['Utillaje','wrench','#536a94'],['Materiales','box','#32ab49'],['Máquinas','box','#1b6fc2'],['Producción','wrench','#ec741b'],['Agenda','calendar','#e83d65']]},
-  {title:'HERRAMIENTAS',items:[['Calculadora de plegado','calc','#536786'],['Curva perfecta','wrench','#1275a2'],['Comparador de V','box','#7d2bd8']]},
+  {title:'HERRAMIENTAS',items:[['Calculadora de plegado','calc','#536786'],['Fuerza de plegado','calc','#2a8d9c'],['Curva perfecta','wrench','#1275a2'],['Comparador de V','box','#7d2bd8']]},
   {title:'CONFIGURACIÓN',items:[['Ajustes','gear','#496b91'],['Acerca de','help','#476482']]}
 ];
 const initialProjects=window.PlegarSampleLibrary.list().map((s,i)=>({
@@ -29,7 +29,8 @@ const descriptions = {
  'Máquinas':'Catálogo de plegadoras, ejes y configuraciones. Aún sin gemelos digitales calibrados.',
  'Producción':'Seguimiento de los trabajos reales de Agenda, con cambios de estado guardados localmente. Sin CNC.',
  'Agenda':'Trabajos de taller, fechas, operarios y estados. Guardado local con copia de seguridad.',
- 'Calculadora de plegado':'Formulario de cálculo listo visualmente. No genera desarrollos hasta validar el motor.',
+ 'Calculadora de plegado':'Desarrollo geométrico estimado a partir del programa 2D, con Ri y K asumidos. No validado para fabricación.',
+ 'Fuerza de plegado':'Estimador de fuerza de plegado al aire: longitud, espesor, V y resistencia a tracción editables. NO CNC.',
  'Curva perfecta':'Curvado progresivo: desarrollo, marcas de golpe y animación geométrica del perfil.',
  'Comparador de V':'Comparación de matrices según espesor y geometría. Motor pendiente.',
  'Ajustes':'Preferencias funcionales, accesibilidad, simulación, navegación y copias locales.',
@@ -93,6 +94,7 @@ function switchScreen(name){
  window.PlegarPlans?.destroy();
  window.PlegarForming2D?.destroy();
  window.PlegarPiece3DView?.destroy();
+ window.PlegarForceView?.destroy();
  stopPlayer();if(name!==activeScreen)previousScreen=activeScreen;activeScreen=name;buildNav();closeMenu();
  $$('.mobile-bottom [data-screen]').forEach(b=>b.classList.toggle('active',b.dataset.screen===name));
  $('#summary-cards').hidden=name!=='Inicio';$('#module-view').hidden=name==='Inicio';
@@ -108,6 +110,11 @@ function renderModule(name){
  if(name==='Agenda'){window.PlegarWorkshop.agenda($('#module-sample'),projects);return;}
  if(name==='Producción'){window.PlegarProduction.mount($('#module-sample'));return;}
  if(name==='Curva perfecta'){window.PlegarWorkshop.curve($('#module-sample'));return;}
+ if(name==='Fuerza de plegado'){
+  $('#module-sample').classList.remove('module-editor','module-forming','module-piece3d');
+  window.PlegarForceView.mount($('#module-sample'),window.PlegarEditor2D.getData,window.PlegarEditor2D.getWidth);
+  return;
+ }
  if(name==='Planos'){
    $('#module-sample').classList.remove('module-editor','module-forming','module-piece3d');
    $('#module-sample').innerHTML='';
@@ -310,7 +317,7 @@ document.addEventListener('click',event=>{
  }
  const calc=event.target.closest('[data-calc]');if(calc){
   $$('#calc-tabs [data-calc]').forEach(b=>b.classList.toggle('selected',b===calc));
-  switchScreen(calc.dataset.calc==='Curva perfecta'?'Curva perfecta':'Calculadora de plegado');
+  switchScreen(calc.dataset.calc==='Curva perfecta'?'Curva perfecta':calc.dataset.calc==='Fuerza'?'Fuerza de plegado':'Calculadora de plegado');
   return;
  }
  if(event.target.closest('#new-project')){

@@ -68,21 +68,28 @@
    return null;
   }
  }
+ let active=null;
+ function destroy(){
+  if(!active)return;
+  active.host.removeEventListener('input',active.onInput);
+  active.host.removeEventListener('click',active.onClick);
+  active=null;
+ }
  function mount(host,getProfile,getWidth){
   if(!host||typeof getProfile!=='function'||typeof getWidth!=='function')throw Error('No se puede montar el cálculo de fuerza.');
-  let snapshot;
+  destroy();
   const refresh=()=>{
-   snapshot=defaults(getProfile(),getWidth());
-   host.innerHTML=html(getProfile(),getWidth());
+   const profile=getProfile(),width=getWidth();
+   host.innerHTML=html(profile,width);
    paint(host);
   };
+  const onInput=e=>{if(e.target.closest('[data-force-input]'))paint(host);};
+  const onClick=e=>{if(e.target.closest('[data-force-reset]'))refresh();};
+  host.addEventListener('input',onInput);
+  host.addEventListener('click',onClick);
+  active={host,onInput,onClick};
   refresh();
-  host.addEventListener('input',e=>{if(e.target.closest('[data-force-input]'))paint(host);});
-  host.addEventListener('click',e=>{
-   if(!e.target.closest('[data-force-reset]'))return;
-   refresh();
-  });
-  return {values:()=>values(host),result:()=>paint(host),reset:refresh};
+  return {values:()=>values(host),result:()=>paint(host),reset:refresh,destroy};
  }
- return {defaults,html,values,paint,mount};
+ return {defaults,html,values,paint,mount,destroy};
 });

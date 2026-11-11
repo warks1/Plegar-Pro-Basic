@@ -30,6 +30,29 @@
   }
   return hits;
  }
+ // Estimador BASE de plegado al aire (no certifica herramienta o máquina).
+ // Se usa también en la calculadora interactiva: un solo motor y una fórmula.
+ // 1 MPa=1 N/mm²; longitud y aperturas en mm -> fuerza en kN.
+ function estimateAirForce({thickness,length,opening,rm}){
+  const inputs={thickness,length,opening,rm};
+  for(const [key,value] of Object.entries(inputs)){
+   if(typeof value!=='number'||!Number.isFinite(value))throw Error('Fuerza: '+key+' debe ser numérico y finito.');
+  }
+  if(thickness<.1||thickness>35)throw Error('Espesor fuera del rango orientativo 0,1–35 mm.');
+  if(length<1||length>5000)throw Error('Longitud de plegado entre 1 y 5000 mm.');
+  if(opening<2||opening>400)throw Error('Apertura V entre 2 y 400 mm.');
+  if(rm<50||rm>2000)throw Error('Resistencia a tracción Rm entre 50 y 2000 MPa.');
+  const coefficient=1.33;
+  const forceKN=coefficient*rm*length*thickness*thickness/opening/1000;
+  const ratio=opening/thickness;
+  const warnings=[];
+  if(ratio<6||ratio>12)warnings.push('V/espesor='+ratio.toFixed(2)+' fuera del intervalo orientativo 6–12 para plegado al aire.');
+  if(thickness>10)warnings.push('Espesor elevado: contrastar fórmulas y tabla del fabricante para la combinación de útil y material.');
+  return {forceKN,tonnes:forceKN/9.80665,perMeterKN:forceKN*1000/length,
+   coefficient,vRatio:ratio,nominalV:8*thickness,length,thickness,opening,rm,
+   warnings,method:'F(kN)≈1,33×Rm(MPa)×L(mm)×e(mm)²÷[1000×V(mm)]',
+   estimated:true,approvedForCNC:false,machineValidated:false,toolCapacityValidated:false};
+ }
  function analyse(profile,{width=100}={}){
   if(!profile||!Number.isFinite(width)||width<1||width>5000)throw Error('Introduce un ancho de plegado confirmado entre 1 y 5000 mm.');
   const setup=C.validateSetup(profile.setup);
@@ -41,10 +64,10 @@
   if(!mat)alerts.push('Material sin resistencia de referencia: fuerza no calculable.');
   if(profile.segments.some(v=>v<.7*opening))alerts.push('Una o más alas están por debajo de la regla ilustrativa 0,7 × V; verificar apoyo real.');
   if(setup.radius<e/5)alerts.push('Radio interior elegido muy pequeño respecto al espesor: confirmar herramienta/material.');
-  const forceKN=mat?1.33*mat.rm*width*e*e/opening/1000:null;
+  const forceKN=mat?estimateAirForce({thickness:e,length:width,opening,rm:mat.rm}).forceKN:null;
   return {material:mat,forceKN,tonnes:forceKN===null?null:forceKN/9.80665,
     vNominal:8*e,vRatio:ratio,opening,width,flat:calc.flat,intersections:crossings,errors:calc.problems,warnings:[...new Set(alerts)],
     isIllustrative:true,method:'Plegado al aire aproximado · F≈1,33×Rm×L×e²/V; Rm supuesto; no contempla límite de máquina ni geometría real.'};
  }
- return {MATERIALS,analyse,profileIntersections};
+ return {MATERIALS,analyse,profileIntersections,estimateAirForce};
 });

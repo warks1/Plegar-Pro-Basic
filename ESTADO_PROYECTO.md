@@ -1,6 +1,7 @@
-# Plegar Pro Plus — Punto de continuidad v0.30
+# Plegar Pro Plus — Estado y continuidad v130 (BETA)
 
-**Fecha:** 2026-10-19  
+**Última actualización:** 2026-11-11  
+**Historial de desarrollo:** los apartados v0.30–v119 son retrospectivos; no describen por sí solos el estado actual.  
 **Repositorio:** https://github.com/warks1/Plegar-Pro-Basic  
 **Rama:** `main` (verificar el SHA antes de nuevos cambios).  
 **Interfaz oficial:** el boceto aprobado en `assets/referencia-aprobada.webp`; **no rediseñar** Inicio sin aprobación expresa.
@@ -318,3 +319,14 @@ Ajuste de presentación a pantalla completa sin franjas de imagen no ocupadas. S
 - Caché offline del service worker incrementada a **v119** para actualizar los recursos de utillaje.
 - **7** pruebas específicas del catálogo superadas en ejecución JavaScript aislada; **no consta** todavía una verificación satisfactoria de toda la CI, ni inspección visual final en iPhone/GitHub Pages.
 - **Pendiente prioritario:** vincular las 32 fichas sin fotografía; reproducir los contornos completos de catálogo con fidelidad métrica donde existan datos; verificar cinemática y colisiones 2D/3D, orden firmado y funcionamiento real en navegador. No atribuir precisión de CAD completo ni seguridad de plegado industrial a secciones aún reconstruidas.
+
+
+## v130 BETA — revisión de navegación, persistencia y caché (11 noviembre 2026)
+
+- **Corrección crítica de Inicio → Calculadora:** las pestañas Desarrollo, Fuerza y Curva perfecta usaban `$('#calc-tabs [data-calc]').forEach`, pero `$` devuelve un único Element. Se utiliza `$$` para la selección múltiple; se conserva la navegación a Calculadora de plegado o Curva perfecta. Esto **no** implica que Fuerza tenga un motor industrial de tonelaje verificado.
+- **Proyectos de demostración:** el alta ya prepara la copia del registro con sello temporal `new Date().toISOString()`, intenta guardar dentro de `try/catch` y **no modifica la lista en memoria** si falla por modo privado, cuota o acceso a almacenamiento. El diálogo permanece abierto y se comunica el error.
+- **Inicio 3D:** eliminados los controladores obsoletos de `app.js` para botones sustituidos por `home-dashboard.js` (playback, vistas, gestos y ampliación). Se conservan controles funcionales independientes de la calculadora, la biblioteca y la navegación. Eliminada rama inaccesible de Simulación 2D/3D.
+- **Correcciones visuales:** «Ralímite: 360 MPa» se sustituye por «Resistencia a tracción: 360 MPa» como dato de referencia del acero S235JR (no valor validado para una colada concreta). En TITANIUM el nombre de empresa se muestra como «A.M.S TECHNOLOGICS» en cabecera y copyright.
+- **Versión única visible:** `v130 BETA` en `index.html`, encabezado de este documento y caché `plegar-pro-forming2d-v130-navigation-storage`. Se añade `cad-tangency.css` al precache para funcionamiento offline del inspector de tangencias.
+- **Estado técnico previo v129:** el editor permite escoger Tope 1 Stop / Tope 2 Support por identificador B, y los movimientos X se representan con chapa no presentada en el área de plegado. Los sólidos de herramienta 3D siguen siendo reconstrucciones cuando falta CAD oficial completo.
+- **Limitaciones sin resolver:** tonelaje/fuerza industrial calibrada, geometría CAD verificada para cada referencia, cinemática física de retirada, volteo y recolocación, y validación CNC/seguridad. Ningún ensayo automático sustituye una prueba de máquina real.

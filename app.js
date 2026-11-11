@@ -41,7 +41,7 @@ catch { projects=initialProjects.slice(); }
 // Agregar piezas de muestra nuevas sin reemplazar ni eliminar los proyectos locales del usuario.
 if(!Array.isArray(projects))projects=initialProjects.slice();
 for(const example of initialProjects){if(!projects.some(p=>p.sampleId===example.sampleId||p.name===example.name))projects.push(example);}
-let previousScreen='Inicio', activeScreen='Inicio', currentStep=3, playerTimer=null, machineZoom=1, previewZoom=1, previewRotation=0, toastTimeout;
+let previousScreen='Inicio', activeScreen='Inicio', currentStep=3, playerTimer=null, toastTimeout;
 
 const steps=['Posicionar chapa','Plegado 1','Plegado 2','Plegado 3','Plegado 4','Pieza terminada'];
 function buildNav(){
@@ -132,8 +132,6 @@ function renderModule(name){
  content=projects.map((p,i)=>`<div class="module-tile"><div class="home-project-big-thumb">${window.PlegarHomeDashboard?.projectThumb(p,i)||'Sin plano vinculado'}</div><strong>${escapeHtml(p.name)}</strong><p>${p.profile?'Plano del programa vinculado':p.sampleId||window.PlegarSampleLibrary.byName(p.name)?'Plano 2D + vista 3D de ejemplo, no original de cliente':'Borrador 2D/3D con cotas sin confirmar; sustituir por programa real'}</p><div class="project-work-buttons"><button type="button" data-project-action="plan" data-project-index="${i}">Ver plano y pieza 3D</button><button type="button" data-project-action="program2d" data-project-index="${i}">Programar 2D</button><button type="button" data-project-action="sim3d" data-project-index="${i}">Simular 3D</button><button type="button" data-project-action="save" data-project-index="${i}">Guardar planos</button><button type="button" data-attach-project="${i}">Vincular programa actual</button></div></div>`).join('')+`<div class="module-tile"><strong>Nuevo proyecto</strong><p>Crea un proyecto de muestra almacenado en este navegador.</p><button type="button" id="new-project">Crear proyecto</button></div>`;
  }else if(name==='Materiales'){
  content=materials.map(([title,thick],i)=>`<div class="module-tile"><img src="assets/chapa-mini.webp" alt="Muestra de chapa"/><strong>${title}</strong><p>Espesor de demostración: ${thick}</p><button type="button" data-material="${i}">Seleccionar material</button></div>`).join('');
- }else if(name==='Simulación 3D'||name==='Simulación 2D'){
- content=`<div class="module-tile"><img src="assets/${name==='Simulación 3D'?'maquina':'seccion-2d'}.webp" alt="Referencia aprobada"/><strong>Imagen del boceto original</strong><p>Reproduce la identidad visual aprobada. No realiza simulación geométrica.</p><button type="button" data-screen="Inicio">Abrir panel principal</button></div><div class="module-tile"><strong>Controles de secuencia</strong><p>En Inicio puedes avanzar, retroceder o reproducir automáticamente los seis pasos ilustrativos.</p></div>`;
  }else if(name==='Máquinas'){
  content=window.PlegarMachineReferences?.html(window.PlegarEditor2D?.getData()?.setup)||'<div class="module-tile">Ficha técnica de máquinas no disponible.</div>';
  }else if(name==='Utillaje'){
@@ -320,7 +318,10 @@ document.addEventListener('click',event=>{
  }
  if(event.target.closest('#confirm-project')){
   const value=$('#new-project-name')?.value.trim();if(!value){toast('Introduce un nombre de proyecto.');return;}
-  projects.unshift({name:value,detail:'BORRADOR geométrico · cotas por introducir',time:new Date().toLocaleString('es-ES'),profile:null});localStorage.setItem('plegarpro-demo-projects',JSON.stringify(projects));$('#dialog').close();renderProjects();renderModule('Proyectos');toast('Proyecto de muestra guardado en este navegador.');return;
+  const next=[{name:value,detail:'BORRADOR geométrico · cotas por introducir',time:new Date().toISOString(),profile:null},...projects];
+  try{localStorage.setItem('plegarpro-demo-projects',JSON.stringify(next));}
+  catch{toast('No se ha guardado: almacenamiento del navegador no disponible o lleno. Conserva el nombre e inténtalo después.');return;}
+  projects=next;$('#dialog').close();renderProjects();renderModule('Proyectos');toast('Proyecto de muestra guardado en este navegador.');return;
  }
 });
 $('#brand-home').addEventListener('click',()=>switchScreen('Inicio'));
@@ -328,15 +329,7 @@ $('#brand-home').addEventListener('click',()=>switchScreen('Inicio'));
 $('#open-menu').addEventListener('click',toggleMenu);
 $('#bottom-more').addEventListener('click',toggleMenu);
 $('#sidebar-curtain').addEventListener('click',closeMenu);
-$('#step-back').addEventListener('click',()=>{stopPlayer();setStep(currentStep-1);});
-$('#step-next').addEventListener('click',()=>{stopPlayer();setStep(currentStep+1);});
-$('#play').addEventListener('click',playPause);
-$('#timeline').addEventListener('input',event=>{stopPlayer();setStep(Number(event.target.value));});
-$('#speed').addEventListener('change',()=>{if(playerTimer!==null){stopPlayer();playPause();}});
-$('#machine-info').addEventListener('click',()=>showNotice('Simulación 3D','La imagen central procede del boceto aprobado. Los controles de pasos son interactivos pero todavía no deforman geométricamente la chapa.'));
-$('#view-option').addEventListener('click',()=>toast('Vista frontal del boceto aprobado. Otras cámaras pendientes.'));
-$('#realistic-option').addEventListener('click',()=>toast('Modo visual realista: imagen de referencia aprobada.'));
-$('#views').addEventListener('click',()=>toast('Otras vistas 3D pendientes del futuro motor geométrico.'));
+// Controles de la máquina, vista 3D y gestos: únicos manejadores en home-dashboard.js.
 $('#section-switch').addEventListener('click',()=>switchScreen('Simulación 2D'));
 $('#calc-action').addEventListener('click',()=>switchScreen('Calculadora de plegado'));
 $('#calc-close').addEventListener('click',()=>{
@@ -355,30 +348,13 @@ $('#tool-select').addEventListener('change',event=>{
   }catch(e){toast(e.message);}
  });
 $('#open-menu').setAttribute('aria-expanded','false');
-$('#zoom-in').addEventListener('click',()=>setMachineZoom(machineZoom+.10));
-$('#zoom-out').addEventListener('click',()=>setMachineZoom(machineZoom-.10));
-$('#reset-view').addEventListener('click',()=>setMachineZoom(1));
-$('#center-view').addEventListener('click',()=>setMachineZoom(1));
-function setMachineZoom(z){machineZoom=Math.max(.8,Math.min(1.7,z));$('.machine-stage img').style.transform=`scale(${machineZoom})`;}
-let maximized=false;
-$('#maximize').addEventListener('click',()=>{
- maximized=!maximized;$('#machine-panel').classList.toggle('maximized-panel',maximized);
- $('#maximize use').setAttribute('href',maximized?'#i-min':'#i-max');
- document.body.style.overflow=maximized?'hidden':'';
-});
-$('#preview-open').addEventListener('click',()=>showDialog('Pieza del boceto aprobado','<img src="assets/pieza-3d.webp" alt="Pieza de chapa" style="width:100%;height:auto"/><p>Vista ilustrativa, no modelo CAD exportable.</p>'));
-function setPreview(){ $('.preview-image img').style.transform=`scale(${previewZoom}) rotate(${previewRotation}deg)`; }
-$('#rotate-prev').addEventListener('click',()=>{previewRotation-=10;setPreview();});
-$('#rotate-next').addEventListener('click',()=>{previewRotation+=10;setPreview();});
-$('#preview-zoom').addEventListener('click',()=>{previewZoom=previewZoom>=1.5?1:previewZoom+.1;setPreview();});
-$('#preview-reset').addEventListener('click',()=>{previewZoom=1;previewRotation=0;setPreview();});
 $('#notifications').addEventListener('click',()=>showNotice('Notificaciones de ejemplo','Los contadores rojos replican el diseño aprobado. No existen notificaciones de servidor en este prototipo.'));
 $('#messages').addEventListener('click',()=>showNotice('Mensajes de ejemplo','Este prototipo todavía no tiene mensajería real.'));
 $('#search').addEventListener('input',e=>{const v=e.target.value.toLowerCase().trim();$$('.nav-item').forEach(b=>{b.style.display=!v||b.textContent.toLowerCase().includes(v)?'':'none';});if(v&&!$('#sidebar').classList.contains('open')&&window.innerWidth<1121)toggleMenu();});
 $('#search').addEventListener('keydown',e=>{if(e.key==='Enter'){const first=$$('.nav-item').find(el=>el.style.display!=='none');if(first) switchScreen(first.dataset.screen);e.target.blur();}});
 document.addEventListener('keydown',e=>{
  if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='k'){e.preventDefault();$('#search').focus();}
- if(e.key==='Escape'){closeMenu();if(maximized){$('#maximize').click();}}
+ if(e.key==='Escape'){closeMenu();if($('#machine-panel')?.classList.contains('maximized-panel'))$('#maximize')?.click();}
 });
 $('#dialog-close').addEventListener('click',()=>$('#dialog').close());
 $('#dialog').addEventListener('click',event=>{if(event.target===$('#dialog'))$('#dialog').close();});

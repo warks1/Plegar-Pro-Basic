@@ -24,6 +24,7 @@ jobs:
           fi
       - name: Probar secuencia 2D/3D y cuatro gadgets
         run: |
+          python tests/calculator-navigation-browser.py
           python tests/critical-2d-browser.py
           python tests/continuity-examples-browser.py
           python tests/splash-responsive-check.py

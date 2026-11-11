@@ -61,10 +61,10 @@ function harness() {
   return { trigger, state, caches, stores, seen };
 }
 
-test('installs an offline page and cache version v130', async () => {
+test('installs an offline page and cache version v131', async () => {
   const h = harness();
   await h.trigger('install');
-  assert.ok(h.stores.has('plegar-pro-forming2d-v130-navigation-storage'));
+  assert.ok(h.stores.has('plegar-pro-forming2d-v131-force-calculator'));
   assert.ok(await h.caches.match(home));
   assert.ok(await h.caches.match(scope+'machine-references.js'),'Ficha de máquina disponible sin conexión');
   assert.ok(await h.caches.match(scope+'production-view.js'),'Producción local disponible sin conexión');
@@ -72,6 +72,8 @@ test('installs an offline page and cache version v130', async () => {
   assert.ok(await h.caches.match(scope+'titanium-loading.html'),'Presentación TITANIUM con cinemática offline');
   assert.ok(await h.caches.match(scope+'settings.css'),'Estilos accesibles offline');
   assert.ok(await h.caches.match(scope+'cad-tangency.css'),'Tangencias CAD con estilos disponibles offline');
+  assert.ok(await h.caches.match(scope+'force-view.js'),'Calculadora de fuerza utilizable offline');
+  assert.ok(await h.caches.match(scope+'force-view.css'),'Estilos de fuerza disponibles offline');
   assert.ok(await h.caches.match(scope+'manufacturer-catalog.js'),'Catálogo documental sin conexión');
   assert.ok(await h.caches.match(scope+'tool-dxf-import.js'),'Importador DXF disponible sin conexión');
   assert.ok(await h.caches.match(scope+'tool-dxf-3d.js'),'Visor geométrico tridimensional disponible sin conexión');

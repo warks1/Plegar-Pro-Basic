@@ -309,7 +309,7 @@ document.addEventListener('click',event=>{
   return;
  }
  const calc=event.target.closest('[data-calc]');if(calc){
-  $('#calc-tabs [data-calc]').forEach(b=>b.classList.toggle('selected',b===calc));
+  $$('#calc-tabs [data-calc]').forEach(b=>b.classList.toggle('selected',b===calc));
   switchScreen(calc.dataset.calc==='Curva perfecta'?'Curva perfecta':'Calculadora de plegado');
   return;
  }

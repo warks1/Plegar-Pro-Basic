@@ -7,7 +7,7 @@ splash.setAttribute('aria-label','PlegadoX TITANIUM, cargando la aplicación');
 splash.innerHTML=String.raw`
 <div class="ti-grain" aria-hidden="true"></div>
 <div class="ti-shell">
-  <header class="ti-top"><div class="ti-company"><span class="ti-mark">A</span>A.M.S TECNOLIGICS</div><span class="ti-edition">02 / TITANIUM · INDUSTRIAL EDITION</span></header>
+  <header class="ti-top"><div class="ti-company"><span class="ti-mark">A</span>A.M.S TECHNOLOGICS</div><span class="ti-edition">02 / TITANIUM · INDUSTRIAL EDITION</span></header>
   <div class="ti-title"><div class="ti-kicker">INGENIERÍA DE PLEGADO DE NUEVA GENERACIÓN</div><div class="ti-name"><span>PLEGADO</span><b>X</b></div><div class="ti-subtitle">LA PRECISIÓN TOMA FORMA</div></div>
   <div class="ti-stage" role="img" aria-label="Animación decorativa: un punzón dobla una chapa plateada sobre una matriz en V">
     <span class="ti-corner ti-tl"></span><span class="ti-corner ti-br"></span>
@@ -45,7 +45,7 @@ splash.innerHTML=String.raw`
     <div class="ti-track" id="startup-meter" role="progressbar" aria-label="Carga de los archivos de la aplicación" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><div id="startup-fill"></div></div>
     <div class="ti-ticks"><span>00 / INICIO</span><span>SCRIPTS · INTERFAZ · MÓDULOS</span><span>100 / LISTO</span></div>
   </section>
-  <footer class="ti-footer"><span>© 2026 A.M.S TECNOLIGICS · TODOS LOS DERECHOS RESERVADOS.</span><span id="ti-footer-info">PRECISION ENGINEERING INTERFACE</span><button id="ti-retry" type="button" hidden>REINTENTAR INICIO</button></footer>
+  <footer class="ti-footer"><span>© 2026 A.M.S TECHNOLOGICS · TODOS LOS DERECHOS RESERVADOS.</span><span id="ti-footer-info">PRECISION ENGINEERING INTERFACE</span><button id="ti-retry" type="button" hidden>REINTENTAR INICIO</button></footer>
 </div>`;
 let displayed=0;
 const preview=doc.createElement('iframe');

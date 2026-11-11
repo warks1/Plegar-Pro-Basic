@@ -1,4 +1,4 @@
-# Plegar Pro Plus — Estado y continuidad v130 (BETA)
+# Plegar Pro Plus — Estado y continuidad v131 (BETA)
 
 **Última actualización:** 2026-11-11  
 **Historial de desarrollo:** los apartados v0.30–v119 son retrospectivos; no describen por sí solos el estado actual.  
@@ -330,3 +330,14 @@ Ajuste de presentación a pantalla completa sin franjas de imagen no ocupadas. S
 - **Versión única visible:** `v130 BETA` en `index.html`, encabezado de este documento y caché `plegar-pro-forming2d-v130-navigation-storage`. Se añade `cad-tangency.css` al precache para funcionamiento offline del inspector de tangencias.
 - **Estado técnico previo v129:** el editor permite escoger Tope 1 Stop / Tope 2 Support por identificador B, y los movimientos X se representan con chapa no presentada en el área de plegado. Los sólidos de herramienta 3D siguen siendo reconstrucciones cuando falta CAD oficial completo.
 - **Limitaciones sin resolver:** tonelaje/fuerza industrial calibrada, geometría CAD verificada para cada referencia, cinemática física de retirada, volteo y recolocación, y validación CNC/seguridad. Ningún ensayo automático sustituye una prueba de máquina real.
+
+
+## v131 BETA — Fuerza de plegado al aire: calculadora funcional (11 noviembre 2026)
+
+- La pestaña **Fuerza** ya no abre la misma pantalla que Desarrollo. Dispone de un módulo independiente (también en el menú Herramientas), con entradas **e (espesor), L (longitud del pliegue), V (apertura de matriz) y Rm (resistencia a tracción)**. Los valores de partida proceden del programa 2D y de la matriz/material seleccionados, pero pueden ajustarse en la calculadora sin modificar el programa.
+- Motor único en `engineering-checks.estimateAirForce`, compartido con el diagnóstico existente: **F(kN)≈1,33×Rm(MPa)×L(mm)×e²(mm²)/(1000×V(mm))**. Salidas en kN, toneladas métricas (9,80665 kN/t), kN/m, V/e. Coeficiente ilustrativo, sin validación del fabricante.
+- Entradas vacías o fuera de rango no generan tonelajes ficticios. Se advierte si V/e sale de 6–12 y se aclara que la capacidad de la plegadora y de los útiles **NO** se compara ni certifica automáticamente.
+- `force-view.js` y `force-view.css`: visor responsive y accesible, resultado inmediato al introducir valores, restablecer datos del programa y acceso directo a Programación 2D. Los eventos se desconectan al cambiar de módulo.
+- Pruebas en `tests/force-calculator.test.cjs`: conversión y magnitudes, ley e², variaciones de L/Rm/V, datos inválidos y coherencia del cálculo existente. Regresión de navegación y cálculo en `tests/calculator-navigation-browser.py`, en PC y smartphone.
+- Cache offline `plegar-pro-forming2d-v131-force-calculator` precarga la nueva pantalla y estilos. Interfaz `v131 BETA`.
+- **Alcance industrial:** la fórmula asume plegado al aire cerca de 90°; la fuerza real varía con propiedades certificadas del material, ángulo, radio, fricción y utillaje. El plegado a fondo y acuñado requieren métodos y fuerzas diferentes. No usar este número para autorizar un programa CNC, capacidad de máquina o elección definitiva de herramienta.

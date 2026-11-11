@@ -348,6 +348,13 @@ $('#tool-select').addEventListener('change',event=>{
   }catch(e){toast(e.message);}
  });
 $('#open-menu').setAttribute('aria-expanded','false');
+// Maximizar es un control propio de app.js: home-dashboard.js NO lo sustituye.
+// Se mantiene independiente de los botones 3D clonados.
+$('#maximize').addEventListener('click',()=>{
+ const maximized=$('#machine-panel').classList.toggle('maximized-panel');
+ $('#maximize use').setAttribute('href',maximized?'#i-min':'#i-max');
+ document.body.style.overflow=maximized?'hidden':'';
+});
 $('#notifications').addEventListener('click',()=>showNotice('Notificaciones de ejemplo','Los contadores rojos replican el diseño aprobado. No existen notificaciones de servidor en este prototipo.'));
 $('#messages').addEventListener('click',()=>showNotice('Mensajes de ejemplo','Este prototipo todavía no tiene mensajería real.'));
 $('#search').addEventListener('input',e=>{const v=e.target.value.toLowerCase().trim();$$('.nav-item').forEach(b=>{b.style.display=!v||b.textContent.toLowerCase().includes(v)?'':'none';});if(v&&!$('#sidebar').classList.contains('open')&&window.innerWidth<1121)toggleMenu();});
